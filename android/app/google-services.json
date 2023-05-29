@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "722807694701",
+    "project_id": "autopilot-a884e",
+    "storage_bucket": "autopilot-a884e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:722807694701:android:8ffb8f8512657e62836664",
+        "android_client_info": {
+          "package_name": "com.autopilot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1aLCBIUcxqZWPy5A_Iu0OmXOySkTsdy4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

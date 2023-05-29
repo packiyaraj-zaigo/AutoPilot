@@ -8,6 +8,5 @@ class AppConstants {
   static const String USER_PROFILE_PIC = "user_profile_pic";
   static const String OTP = "OTP";
   static const String USER_ID = "USER_ID";
-  static const String kGoogleApiKey  = "AIzaSyBSQft-_3nkzJK-2kFyuUKidm8kldWP1d8";
-
+  static const String kGoogleApiKey = "AIzaSyBSQft-_3nkzJK-2kFyuUKidm8kldWP1d8";
 }
