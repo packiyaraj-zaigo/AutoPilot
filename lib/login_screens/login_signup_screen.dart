@@ -3,6 +3,7 @@ import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -66,8 +67,15 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           }else if(state is CreateAccountErrorState){
             if(BlocProvider.of<LoginBloc>(context).errorRes.isNotEmpty){
               if(BlocProvider.of<LoginBloc>(context).errorRes.containsKey("email")){
-                emailErrorStatus=true;
+                print("thisss");
+
+               emailErrorStatus=true;
+                
+              
+                print(emailErrorStatus);
                 emailErrorMsg=BlocProvider.of<LoginBloc>(context).errorRes['email'][0];
+                print(emailErrorMsg);
+             // }
               }else{
                 emailErrorStatus=false;
 
@@ -77,7 +85,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 passwordErrorStatus=true;
                 passwordErrorMsg=BlocProvider.of<LoginBloc>(context).errorRes['password'][0];
               }else{
-                emailErrorStatus=false;
+                passwordErrorStatus=false;
 
               }
                if(BlocProvider.of<LoginBloc>(context).errorRes.containsKey("emp_phone")){
@@ -376,10 +384,12 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              maxLength: label=='Phone Number'?16:label=='Password'?12:50,
               
               obscureText: label=="Password" ?isObscure:false,
               decoration: InputDecoration(
                   hintText: placeHolder,
+                  counterText: "",
                   suffixIcon:label=="Password"? GestureDetector(
                     onTap: (){
                       print("tapped");
@@ -439,8 +449,16 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             width: MediaQuery.of(context).size.width / 2.4,
             child: TextField(
               controller: controller,
+              maxLength: 50,
+              inputFormatters: [
+             
+                  FilteringTextInputFormatter.deny(
+                      RegExp(r'\s')),
+              ],
+              
               decoration: InputDecoration(
                   hintText: placeHolder,
+                  counterText: "",
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color:errorStatus==true?Color(0xffD80027): Color(0xffC1C4CD))),
@@ -498,14 +516,16 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top:8.0),
-          child: emailErrorStatus? Text(emailErrorMsg,style: const TextStyle(
+          child: Visibility(
+            visible: emailErrorStatus,
+            child: Text(emailErrorMsg,style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   color: Color(0xffD80027,
                   
                   
                   ),
-                ),):const SizedBox()
+                ))),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
@@ -693,7 +713,14 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
   Widget continueToLogin() {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.close),
+        leading: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+            setState(() {
+              widget.widgetIndex=0;
+            });
+          },
+          child: Icon(Icons.close)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black,
@@ -706,10 +733,10 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text(
+                     Text(
                       "Confirm Your Email",
                       style: TextStyle(
                           fontSize: 28,
@@ -717,7 +744,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding:  EdgeInsets.only(top: 8.0),
                       child: Text(
                         "We just send you a confirmation email",
                         style: TextStyle(
@@ -727,7 +754,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 24.0),
+                      padding:  EdgeInsets.only(top: 24.0),
                       child: Text(
                         "Please open it and click the link to\ncomplete the registration.",
                         textAlign: TextAlign.center,
@@ -842,14 +869,33 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
     }
 
     if(email.isEmpty){
-      setState(() {
+
+
+   
+
+    
+         setState(() {
         emailErrorMsg='Email cant be empty';
         emailErrorStatus=true;
       });
-    }else{
+
+      }
+     
+    else{
+
+         final bool emailValid = 
+    RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+      .hasMatch(email);
+        if(!emailValid){
          setState(() {
-         emailErrorStatus=false;
+         emailErrorStatus=true;
+         emailErrorMsg='Please enter a valid email';
       });
+        }else{
+          setState(() {
+            emailErrorStatus=false;
+          });
+        }
 
     }
     if(phoneNumber.isEmpty){
@@ -858,9 +904,19 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         phoneNumberErrorStatus=true;
       });
     }else{
-      setState(() {
+      if(phoneNumber.length<6){
+        setState(() {
+          phoneNumberErrorStatus=true;
+          phoneErrorMsg='Please enter a valid phone number';
+        });
+        
+      }else{
+           setState(() {
         phoneNumberErrorStatus=false;
       });
+
+      }
+   
     }
     if(password.isEmpty){
       setState(() {
