@@ -1,6 +1,7 @@
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 
 class LoginAndSignupScreen extends StatefulWidget {
   LoginAndSignupScreen({super.key, required this.widgetIndex});
@@ -18,6 +20,9 @@ class LoginAndSignupScreen extends StatefulWidget {
 }
 
 class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
+
+  final countryPicker = const  FlCountryCodePicker();
+  CountryCode?selectedCountry;
   final TextEditingController loginEmailController = TextEditingController();
   final TextEditingController loginPasswordController = TextEditingController();
   final TextEditingController firstNameController = TextEditingController();
@@ -382,14 +387,19 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           child: SizedBox(
             height: 56,
             width: MediaQuery.of(context).size.width,
+
             child: TextField(
               controller: controller,
+              keyboardType: label=='Phone Number'?TextInputType.number:null,
               maxLength: label=='Phone Number'?16:label=='Password'?12:50,
+              
               
               obscureText: label=="Password" ?isObscure:false,
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
+                  prefixIcon: label=='Phone Number'?countryPickerWidget():null,
+                 
                   suffixIcon:label=="Password"? GestureDetector(
                     onTap: (){
                       print("tapped");
@@ -533,6 +543,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               "Enter phone number", phoneNumberController, "Phone Number",phoneNumberErrorStatus),
         ),
 
+    
+
         Padding(
           padding: const EdgeInsets.only(top:8.0),
           child: Visibility(
@@ -549,7 +561,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
           child: textBox(
-              "Min. 8 charecters", signUpPasswordController, "Password",passwordErrorStatus),
+              "Min. 8 characters", signUpPasswordController, "Password",passwordErrorStatus),
         ),
         Padding(
           padding: const EdgeInsets.only(top:8.0),
@@ -926,7 +938,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
     }else{
       if(password.length<8){
         setState(() {
-          passwordErrorMsg='Minimum 8 charecters required';
+          passwordErrorMsg='Minimum 8 characters required';
           passwordErrorStatus=true;
         });
       }else{
@@ -952,5 +964,76 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
       });
     }
 
+  }
+
+
+  Widget countryPickerWidget(){
+    return GestureDetector(
+    onTap: () async {
+        // Show the country code picker when tapped.
+        final code = await countryPicker.showPicker(context: context);
+        // Null check
+        if (code != null) {
+          setState(() {
+            selectedCountry=code;
+          });
+        };
+    },
+    child: Container(
+      width: 90,
+      height: 56,
+      
+        padding: const  EdgeInsets.symmetric(
+        horizontal: 8.0, vertical: 4.0),
+        margin: const  EdgeInsets.symmetric(horizontal: 8.0),
+        decoration: const  BoxDecoration(
+        color: Colors.transparent,
+       
+        borderRadius: BorderRadius.all(Radius.circular(5.0))),
+        child: Row(
+          children: [
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(10),
+            //   child: CircleAvatar(
+            //     radius: 9,
+            //     backgroundColor: Colors.transparent,
+            //     child: selectedCountry!=null?ClipOval(child: selectedCountry!.flagImage):const SizedBox() ,
+               
+            //   ),
+            // ),
+
+            Container(
+              height: 20,
+              width: 20,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey,
+               
+              ),
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(10),
+    child:selectedCountry!=null? selectedCountry!.flagImage:const SizedBox()),
+   
+   
+  ),
+
+            Padding(
+              padding: const EdgeInsets.only(left:6.0),
+              child: Text(selectedCountry!=null?selectedCountry!.dialCode:"+1"),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left:5.0),
+              child: Container(
+                width: 0.7,
+               
+                color: AppColors.greyText,
+            
+              ),
+            )
+          ],
+        ),
+        
+        ),
+    );
   }
 }
