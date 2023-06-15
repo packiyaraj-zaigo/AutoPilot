@@ -1,8 +1,10 @@
-import 'package:auto_pilot/Dashboard/bottom_bar.dart';
+
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
-import 'package:auto_pilot/login_screens/login_signup_screen.dart';
-import 'package:auto_pilot/login_screens/welcome_screen.dart';
+
+
+import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

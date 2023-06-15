@@ -1,22 +1,10 @@
-import 'package:auto_pilot/login_screens/first_screen.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: ResetPassword(),
-    );
-  }
-}
 
 class ResetPassword extends StatefulWidget {
   const ResetPassword({Key? key}) : super(key: key);
@@ -241,12 +229,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                     ),
                     Container(
                       child: PinCodeTextField(
-                        appContext: context,
+                       appContext: context,
                         pastedTextStyle: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
-                        length: 5,
+                       length: 5,
                         validator: (v) {
                           if (v!.length < 3) {
                             return "Enter OTP";

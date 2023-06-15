@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 
-import 'package:auto_pilot/Dashboard/bottom_bar.dart';
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';

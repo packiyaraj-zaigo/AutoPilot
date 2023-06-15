@@ -6,11 +6,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 
+// ignore: must_be_immutable
 class LoginAndSignupScreen extends StatefulWidget {
   LoginAndSignupScreen({super.key, required this.widgetIndex});
   int widgetIndex;

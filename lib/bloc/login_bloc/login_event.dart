@@ -15,6 +15,7 @@ class CreateAccountEvent extends LoginEvent{
 }
 
 
+// ignore: must_be_immutable
 class UserLoginEvent extends LoginEvent{
   final String email,password;
   BuildContext context;
