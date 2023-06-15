@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 
 import '../forgot_password/forgot_screen.dart';
 
-void main() {
-  runApp(MyApp());
-}
+// void main() {
+//   runApp(MyApp());
+// }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+// class MyApp extends StatelessWidget {
+//   const MyApp({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: HomeState(),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return const MaterialApp(
+//       home: HomeState(),
+//     );
+//   }
+// }
 
 class HomeState extends StatefulWidget {
   const HomeState({Key? key}) : super(key: key);
@@ -49,7 +49,7 @@ class _HomeStateState extends State<HomeState> {
             child: Column(
               children: [
                 // WelcomeScreen(),
-                CreateAccountScreen(),
+               // CreateAccountScreen(),
                 // LoginScreen(),
               ],
             ),
