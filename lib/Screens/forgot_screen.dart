@@ -1,13 +1,13 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
-
-
+import '../utils/app_colors.dart';
+import '../utils/app_colors.dart';
 
 class ResetPassword extends StatefulWidget {
-  const ResetPassword({Key? key}) : super(key: key);
+  ResetPassword({super.key, required this.widgetIndex});
+  int widgetIndex;
 
   @override
   State<ResetPassword> createState() => _ResetPasswordState();
@@ -15,10 +15,12 @@ class ResetPassword extends StatefulWidget {
 
 class _ResetPasswordState extends State<ResetPassword> {
   bool emailSent = true;
+
   final TextEditingController otpController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -29,12 +31,10 @@ class _ResetPasswordState extends State<ResetPassword> {
       ),
       body: Column(
         children: [
-          // emailSent
-          //     ?  resetpasswordscreen()
-          //     :  recoveryemailscreen(),
-          // recoveryemailscreen(),
-          // resetpasswordscreen()
-          newpassword(),
+          newpassword()
+          // widget.widgetIndex == 0
+          //     ? resetpasswordscreen()
+          //     : recoveryemailscreen()
         ],
       ),
     );
@@ -48,7 +48,10 @@ class _ResetPasswordState extends State<ResetPassword> {
         children: [
           Text(
             "Reset Password",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 28,
+                color: AppColors.primaryTitleColor),
           ),
           SizedBox(
             height: 15,
@@ -56,14 +59,19 @@ class _ResetPasswordState extends State<ResetPassword> {
           Text(
             "Provide your email to receive a reset link",
             style: TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 20, color: Colors.teal),
+                fontWeight: FontWeight.w400,
+                fontSize: 14,
+                color: AppColors.greyText),
           ),
           SizedBox(
-            height: 15,
+            height: 40,
           ),
           Text(
             "Email",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+                color: AppColors.greyText),
           ),
           SizedBox(
             height: 10,
@@ -79,20 +87,20 @@ class _ResetPasswordState extends State<ResetPassword> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           SizedBox(
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => recoveryemailscreen()));
+                // Navigator.push(
+                //     context,
+                //     CupertinoPageRoute(
+                //         builder: (context) => recoveryemailscreen()));
               },
               style: ElevatedButton.styleFrom(
-                primary: emailSent ? Colors.black : Colors.white,
+                primary: emailSent ? AppColors.primaryColors : Colors.white,
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(10.0),
                 ),
@@ -116,30 +124,40 @@ class _ResetPasswordState extends State<ResetPassword> {
         children: [
           Text(
             "Recovery Email Sent",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 28,
+                color: AppColors.primaryTitleColor),
           ),
           SizedBox(
-            height: 15,
+            height: 8,
           ),
           Text(
-            "Please check your email",
+            "Please check your email.",
             style: TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 20, color: Colors.teal),
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: AppColors.greyText),
           ),
           SizedBox(
-            height: 15,
+            height: 25,
           ),
           Text(
             "If this email is associated with an account you will receive a password reser link.",
             style: TextStyle(
-                fontWeight: FontWeight.w500, fontSize: 20, color: Colors.teal),
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                color: AppColors.greyText),
           ),
           SizedBox(
-            height: 15,
+            height: 30,
           ),
           Text(
             "Email",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+            style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: AppColors.greyText),
           ),
           SizedBox(
             height: 10,
@@ -155,7 +173,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             ),
           ),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           SizedBox(
             width: double.infinity,
@@ -165,7 +183,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 displayBottomSheet(context);
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.black,
+                primary: AppColors.primaryColors,
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(10.0),
                 ),
@@ -202,17 +220,22 @@ class _ResetPasswordState extends State<ResetPassword> {
                         width: 60,
                         height: 8,
                         decoration: BoxDecoration(
-                          color: Colors.teal,
+                          color: AppColors.dividerColors,
                           borderRadius: BorderRadius.all(
                             Radius.circular(10),
                           ),
                         ),
                       ),
                     ),
+                    SizedBox(
+                      height: 24,
+                    ),
                     Text(
                       "5-Digit Code",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w500, fontSize: 25),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 28,
+                          color: AppColors.primaryTitleColor),
                     ),
                     SizedBox(
                       height: 10,
@@ -222,19 +245,19 @@ class _ResetPasswordState extends State<ResetPassword> {
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 15,
-                          color: Colors.teal),
+                          color: AppColors.greyText),
                     ),
                     SizedBox(
                       height: 20,
                     ),
                     Container(
                       child: PinCodeTextField(
-                       appContext: context,
+                        appContext: context,
                         pastedTextStyle: const TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
                         ),
-                       length: 5,
+                        length: 5,
                         validator: (v) {
                           if (v!.length < 3) {
                             return "Enter OTP";
@@ -243,14 +266,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                           }
                         },
                         pinTheme: PinTheme(
-                          selectedColor: const Color(0xff808B9E),
-                          inactiveColor: const Color(0xff808B9E),
+                          selectedColor: Colors.black,
+                          inactiveColor: AppColors.greyText,
                           activeColor: const Color(0xff808B9E),
                           errorBorderColor: const Color(0xff808B9E),
                           shape: PinCodeFieldShape.box,
                           borderRadius: BorderRadius.circular(15),
-                          fieldHeight: 54,
-                          fieldWidth: 63,
+                          fieldHeight: 57,
+                          fieldWidth: 55,
                           //activeColor: Colors.black
                         ),
                         cursorColor: Colors.black,
@@ -275,9 +298,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          // Navigator.push(
+                          //     context,
+                          //     CupertinoPageRoute(
+                          //         builder: (context) => newpassword()));
+                        },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.black,
+                          primary: AppColors.primaryColors,
                           shape: new RoundedRectangleBorder(
                             borderRadius: new BorderRadius.circular(10.0),
                           ),
@@ -297,7 +325,8 @@ class _ResetPasswordState extends State<ResetPassword> {
                         TextButton(
                           child: const Text(
                             'Resend',
-                            style: TextStyle(fontSize: 20),
+                            style: TextStyle(
+                                fontSize: 20, color: AppColors.greyText),
                           ),
                           onPressed: () {},
                         )
@@ -318,25 +347,32 @@ class _ResetPasswordState extends State<ResetPassword> {
         children: [
           Text(
             "Create a new password",
-            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 25),
+            style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 28,
+                color: AppColors.primaryTitleColor),
           ),
           SizedBox(
-            height: 20,
+            height: 26,
           ),
           Text(
             "New password",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                fontFamily: "SF Pro",
+                color: AppColors.greyText),
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           SizedBox(
-            height: 50,
+            height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter password',
+              placeholder: 'Enter password...',
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(),
+                border: Border.all(color: AppColors.greyText),
               ),
             ),
           ),
@@ -345,23 +381,27 @@ class _ResetPasswordState extends State<ResetPassword> {
           ),
           Text(
             "Confirm New password",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+            style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                fontFamily: "SF Pro",
+                color: AppColors.greyText),
           ),
           SizedBox(
-            height: 20,
+            height: 10,
           ),
           SizedBox(
-            height: 50,
+            height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter password',
+              placeholder: 'Enter password...',
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(),
+                border: Border.all(color: AppColors.greyText),
               ),
             ),
           ),
           SizedBox(
-            height: 20,
+            height: 40,
           ),
           SizedBox(
             width: double.infinity,
@@ -371,7 +411,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                 displayBottomSheet(context);
               },
               style: ElevatedButton.styleFrom(
-                primary: Colors.black,
+                primary: AppColors.primaryColors,
                 shape: new RoundedRectangleBorder(
                   borderRadius: new BorderRadius.circular(10.0),
                 ),

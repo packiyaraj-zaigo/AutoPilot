@@ -86,6 +86,24 @@ class AppUtils {
     );
   }
 
+  static drawerStyle() {
+    return const TextStyle(
+      color: AppColors.primaryBlackColors,
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
+      fontFamily: '.SF Pro Text',
+    );
+  }
+
+  static summaryStyle() {
+    return const TextStyle(
+      color: AppColors.greyText,
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
+      fontFamily: '.SF Pro Text',
+    );
+  }
+
   static Future<void> setToken(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(AppConstants.USER_TOKEN, value);
@@ -159,8 +177,7 @@ class AppUtils {
     return outputDate;
   }
 
-  static  getFormattedForApi(String date)
-  {
+  static getFormattedForApi(String date) {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);
 

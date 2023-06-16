@@ -1,6 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+
+import '../utils/app_colors.dart';
+import '../utils/app_utils.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({Key? key}) : super(key: key);
@@ -78,6 +82,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       87,
     )
   ];
+
   @override
   Widget build(BuildContext context) {
     final scaffoldKey = GlobalKey<ScaffoldState>();
@@ -97,15 +102,28 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         elevation: 0,
         title: Text(
           'Autopilot',
-          style: TextStyle(color: Colors.black87),
+          style: TextStyle(
+              color: AppColors.primaryBlackColors,
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
         actions: [
-          Icon(Icons.mark_chat_unread_outlined, color: Colors.black87),
+          SvgPicture.asset(
+            "assets/images/message.svg",
+            color: AppColors.primaryColors,
+            height: 20,
+            width: 20,
+          ),
           SizedBox(
             width: 20,
           ),
-          Icon(Icons.notification_add, color: Colors.black87),
+          SvgPicture.asset(
+            "assets/images/notification.svg",
+            color: AppColors.primaryColors,
+            height: 20,
+            width: 20,
+          ),
           SizedBox(
             width: 20,
           ),
@@ -117,7 +135,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           padding: const EdgeInsets.all(0),
           children: [
             const DrawerHeader(
-              // padding: EdgeInsets.zero,
+              padding: EdgeInsets.only(left: 5),
               decoration: BoxDecoration(
                 color: Colors.white,
               ), //BoxDecoration
@@ -125,11 +143,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 decoration: BoxDecoration(color: Colors.white),
                 accountName: Text(
                   "Hello",
-                  style: TextStyle(fontSize: 18, color: Colors.grey),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: AppColors.greyText,
+                      fontWeight: FontWeight.w600),
                 ),
                 accountEmail: Text(
                   "Madhi",
-                  style: TextStyle(fontSize: 28, color: Colors.black),
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: AppColors.primaryBlackColors,
+                      fontWeight: FontWeight.w500),
                 ),
                 // currentAccountPictureSize: Size.square(50),
                 // currentAccountPicture: CircleAvatar(
@@ -142,57 +166,129 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               ), //UserAccountDrawerHeader
             ), //DrawerHeader
             ListTile(
-              leading: Icon(Icons.data_saver_off),
-              title: const Text('DashBoard'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/dashboard_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Dashboard',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.keyboard_alt_outlined),
-              title: const Text('Employees'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/employee_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Employees',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(CupertinoIcons.person_3_fill),
-              title: const Text('Customers'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/customers_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Customers',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(CupertinoIcons.car_detailed),
-              title: const Text('Vehicles'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/vehicles_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Vehicles',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(CupertinoIcons.archivebox),
-              title: const Text('Parts'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/parts_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Parts',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.car_crash_sharp),
-              title: const Text('Service'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/services_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Service',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.report),
-              title: const Text('Reports'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/reports_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Reports',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.access_time_outlined),
-              title: const Text('Time Cards'),
+              horizontalTitleGap: 1,
+              leading: SvgPicture.asset(
+                "assets/images/time_icon.svg",
+                color: AppColors.primaryColors,
+                height: 20,
+                width: 20,
+              ),
+              title: Text(
+                'Time Cards',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
@@ -201,25 +297,37 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               height: 30,
             ),
             ListTile(
-              title: const Text('Settings'),
+              title: Text(
+                'Settings',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Legal'),
+              title: Text(
+                'Legal',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('About'),
+              title: Text(
+                'About',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: const Text('Sign Out'),
+              title: Text(
+                'Sign Out',
+                style: AppUtils.drawerStyle(),
+              ),
               onTap: () {
                 Navigator.pop(context);
               },
@@ -243,7 +351,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   children: [
                     Text(
                       'Today\'s Summary',
-                      style: TextStyle(fontSize: 20),
+                      style: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.primaryTitleColor,
+                          fontWeight: FontWeight.w600),
                     ),
                     hideSummary
                         ? Icon(
@@ -257,18 +368,124 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               ),
               Visibility(
                 visible: hideSummary,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: 5,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Card(
+                child: Column(
+                  children: [
+                    Card(
                       child: ListTile(
-                        leading: Icon(Icons.stacked_bar_chart_rounded),
-                        title: Text('Sales'),
-                        trailing: Text('\$3,275'),
+                        leading: SvgPicture.asset(
+                          "assets/images/sales.svg",
+                          color: AppColors.greyText,
+                          height: 20,
+                          width: 20,
+                        ),
+                        title: Text(
+                          'Sales',
+                          style: AppUtils.summaryStyle(),
+                        ),
+                        trailing: Text(
+                          '\$3,275.00',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontFamily: '.SF Pro Text',
+                          ),
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                    Card(
+                      child: ListTile(
+                        leading: SvgPicture.asset(
+                          "assets/images/drop.svg",
+                          color: AppColors.greyText,
+                          height: 20,
+                          width: 20,
+                        ),
+                        title: Text(
+                          'Drop-offs',
+                          style: AppUtils.summaryStyle(),
+                        ),
+                        trailing: Text(
+                          '4',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontFamily: '.SF Pro Text',
+                          ),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        leading: SvgPicture.asset(
+                          "assets/images/pick.svg",
+                          color: AppColors.greyText,
+                          height: 20,
+                          width: 20,
+                        ),
+                        title: Text(
+                          'Pick-ups',
+                          style: AppUtils.summaryStyle(),
+                        ),
+                        trailing: Text(
+                          '3',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontFamily: '.SF Pro Text',
+                          ),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        leading: SvgPicture.asset(
+                          "assets/images/vehicles_icon.svg",
+                          color: AppColors.greyText,
+                          height: 20,
+                          width: 20,
+                        ),
+                        title: Text(
+                          'Current Vehicles',
+                          style: AppUtils.summaryStyle(),
+                        ),
+                        trailing: Text(
+                          '12',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontFamily: '.SF Pro Text',
+                          ),
+                        ),
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        leading: SvgPicture.asset(
+                          "assets/images/customers_icon.svg",
+                          color: AppColors.greyText,
+                          height: 20,
+                          width: 20,
+                        ),
+                        title: Text(
+                          'Staff',
+                          style: AppUtils.summaryStyle(),
+                        ),
+                        trailing: Text(
+                          '4',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontFamily: '.SF Pro Text',
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(
@@ -276,7 +493,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               ),
               Text(
                 'Weekly Revenue',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTitleColor),
               ),
               SfCartesianChart(
                   primaryXAxis: CategoryAxis(),
