@@ -26,6 +26,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         super(LoginInitial()) {
           on<CreateAccountEvent>(createAccountBloc);
           on<UserLoginEvent>(loginBloc);
+          on<ResetPasswordGetPasswordEvent>(resetPasswordGetOtpBloc);
+          on<ResetPasswordSendOtpEvent>(resetPasswordSendOtpBloc);
    
   }
 
@@ -96,6 +98,79 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
        
     } catch (e) {
       emit(CreateAccountErrorState());
+      
+      print(e.toString());
+     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      print("thisss");
+    }
+  }
+
+
+
+   Future<void> resetPasswordGetOtpBloc(
+    ResetPasswordGetPasswordEvent event,
+    Emitter<LoginState> emit,
+  ) async {
+
+    
+    try {
+      
+      emit(ResetPasswordGetOtpLoadingState());
+
+      Response resetPasswordRes = await _apiRepository.resetPasswordGetOtp(
+        event.emailId);
+      var resetPasswordData = _decoder.convert(resetPasswordRes.body);
+      log("res${resetPasswordRes.body}");
+
+      
+      if (resetPasswordRes.statusCode==200) {
+        emit(ResetPasswordGetOtpState());
+       
+      }else{
+        emit(ResetPasswordGetOtpErrorState(
+          errorMsg: resetPasswordData['message']
+        ));
+      }
+       
+       
+    } catch (e) {
+      emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
+      
+      print(e.toString());
+     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      print("thisss");
+    }
+  }
+
+
+   Future<void> resetPasswordSendOtpBloc(
+    ResetPasswordSendOtpEvent event,
+    Emitter<LoginState> emit,
+  ) async {
+
+    
+    try {
+      
+      emit(ResetPasswordSendOtpLoadingState());
+
+      Response resetPasswordRes = await _apiRepository.resetPasswordSendOtp(
+        event.email,event.otp);
+      var resetPasswordData = _decoder.convert(resetPasswordRes.body);
+      log("res${resetPasswordRes.body}");
+
+      
+      if (resetPasswordRes.statusCode==200) {
+        emit(ResetPasswordSendOtpState());
+       
+      }else{
+        emit(ResetPasswordSendOtpErrorState(
+          errorMsg: resetPasswordData['message']
+        ));
+      }
+       
+       
+    } catch (e) {
+      emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
       
       print(e.toString());
      // emit(LoginInvalidCredentialsState(message: e.toString()));

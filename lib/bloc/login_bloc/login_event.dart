@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 part of 'login_bloc.dart';
 
 abstract class LoginEvent extends Equatable {
@@ -15,10 +17,20 @@ class CreateAccountEvent extends LoginEvent{
 }
 
 
-// ignore: must_be_immutable
+
 class UserLoginEvent extends LoginEvent{
   final String email,password;
   BuildContext context;
   UserLoginEvent({required this.email,required this.password,required this.context});
 
+}
+
+class ResetPasswordGetPasswordEvent extends LoginEvent{
+  String emailId;
+  ResetPasswordGetPasswordEvent({required this.emailId});
+}
+
+class ResetPasswordSendOtpEvent extends LoginEvent{
+  final String email,otp;
+ const ResetPasswordSendOtpEvent({required this.email,required this.otp});
 }

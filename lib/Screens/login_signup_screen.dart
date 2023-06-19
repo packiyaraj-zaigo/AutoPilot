@@ -384,11 +384,11 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                           context,
                           CupertinoPageRoute(
                               builder: (BuildContext context) => ResetPassword(
-                                    widgetIndex: 0,
+                             
                                   )));
                     },
-                    child: Text("Forgot Password?",
-                        style: const TextStyle(
+                    child: const Text("Forgot Password?",
+                        style:  TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryColors)),

@@ -11,6 +11,24 @@ class ApiRepository {
     return apiProvider.login( email, password);
   }
 
+
+   Future getRevenueChartData(dynamic token) {
+    return apiProvider.getRevenueChartData(token);
+  }
+
+
+     Future resetPasswordGetOtp(String emailId) {
+    return apiProvider.resetPasswordGetOtp(emailId);
+  }
+
+     Future resetPasswordSendOtp(String emailId,String otp) {
+    return apiProvider.resetPasswordSendOtp(emailId,otp);
+  }
+
+       Future getUserProfile(String token) {
+    return apiProvider.getUserProfile(token);
+  }
+
 }
 
 class NetworkError extends Error {}

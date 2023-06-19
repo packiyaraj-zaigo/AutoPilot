@@ -36,7 +36,17 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primaryColors,
         elevation: 0,
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(context: context, builder: (context) {
+
+            return mainCreateWidget();
+          },
+          isScrollControlled: true,
+           shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
+        ),
+          );
+        },
         child: Icon(Icons.add),
       ),
       bottomNavigationBar: BottomAppBar(
@@ -243,5 +253,91 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
       currentIndex = index;
       pageController.jumpToPage(index);
     });
+  }
+
+
+
+  Widget mainCreateWidget(){
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height/1.6,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            bottomSheetTile("New Estimate","assets/images/estimate_icon.svg"),
+             bottomSheetTile("New Customer","assets/images/customer_icon.svg"),
+             bottomSheetTile("New Vehicle","assets/images/vehicle_icon.svg"),
+             bottomSheetTile("New Appointment","assets/images/appointment_icon.svg"),
+             bottomSheetTile("Scanner","assets/images/scanner_icon.svg"),
+             Padding(
+               padding: const EdgeInsets.only(top:16.0),
+               child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: (){
+                  Navigator.pop(context);
+                },
+                 child: Container(
+                       alignment: Alignment.center,
+                       height: 56,
+                       width: MediaQuery.of(context).size.width,
+                       decoration: BoxDecoration(
+                       
+                         borderRadius: BorderRadius.circular(12)
+                   
+                       ),
+                       child: const Text("Cancel",style:  TextStyle(
+                         fontSize: 16,
+                         fontWeight: FontWeight.w500,
+                         color: AppColors.primaryColors
+                         
+                       ),),
+                   
+                     ),
+               ),
+             ),
+
+      
+          ],
+        ),
+      ),
+   
+
+
+     
+    );
+  }
+
+
+  Widget bottomSheetTile(String title,String iconUrl){
+    return Padding(
+      padding: const EdgeInsets.only(top:16.0),
+      child: Container(
+        alignment: Alignment.center,
+        height: 56,
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+          color: AppColors.primaryColors,
+          borderRadius: BorderRadius.circular(12)
+    
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(iconUrl,color: Colors.white,),
+            Padding(
+              padding: const EdgeInsets.only(left:8.0),
+              child: Text(title,style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white
+                
+              ),),
+            ),
+          ],
+        ),
+    
+      ),
+    );
   }
 }

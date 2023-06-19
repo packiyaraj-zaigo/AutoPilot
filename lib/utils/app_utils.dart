@@ -241,6 +241,8 @@ class AppUtils {
     String? userID = prefs.getString(AppConstants.USER_ID);
     return userID ?? "";
   }
+
+
 }
 
 class Debouncer {

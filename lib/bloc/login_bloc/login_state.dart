@@ -20,3 +20,19 @@ class UserLoginErrorState extends LoginState{
   UserLoginErrorState({required this.errorMessage});
 
 }
+
+class ResetPasswordGetOtpState extends LoginState{}
+class ResetPasswordGetOtpLoadingState extends LoginState{}
+class ResetPasswordGetOtpErrorState extends LoginState{
+  final String errorMsg;
+  const ResetPasswordGetOtpErrorState({required this.errorMsg});
+
+}
+
+class ResetPasswordSendOtpState extends LoginState{}
+class ResetPasswordSendOtpLoadingState extends LoginState{}
+class ResetPasswordSendOtpErrorState extends LoginState{
+  final String errorMsg;
+  const ResetPasswordSendOtpErrorState({required this.errorMsg});
+
+}
