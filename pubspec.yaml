@@ -47,6 +47,7 @@ dependencies:
   flutter_svg: ^2.0.6
   fl_country_code_picker: ^0.0.4
   pin_code_fields: ^7.4.0
+  alphabet_scroll_view: ^0.3.2
   sticky_az_list: ^0.0.5
 
 dev_dependencies:
