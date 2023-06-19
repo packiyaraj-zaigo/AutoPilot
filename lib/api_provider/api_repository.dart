@@ -29,6 +29,9 @@ class ApiRepository {
     return apiProvider.getUserProfile(token);
   }
 
+  Future getEmployees(String token, int currentPage) {
+    return apiProvider.getEmployees(token, currentPage);
+  }
 }
 
 class NetworkError extends Error {}

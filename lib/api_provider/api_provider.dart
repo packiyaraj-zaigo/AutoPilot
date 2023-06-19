@@ -200,4 +200,15 @@ class ApiProvider {
 
 
 
+  Future<dynamic> getEmployees(String token, int page) async {
+    try {
+      final url = page == 1
+          ? '${BASE_URL}api/users'
+          : '${BASE_URL}api/users?page=$page';
+      var response = http.get(Uri.parse(url), headers: getHeader(token));
+      return response;
+    } catch (e) {
+      print(e.toString() + 'get employee error');
+    }
+  }
 }

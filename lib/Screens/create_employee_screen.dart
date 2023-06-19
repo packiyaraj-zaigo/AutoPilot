@@ -1,3 +1,6 @@
+import 'dart:developer';
+
+import 'package:auto_pilot/models/employee_creation_model.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,27 +16,46 @@ class CreateEmployeeScreen extends StatefulWidget {
 
 class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
   final TextEditingController firstNameController = TextEditingController();
+
   String firstNameError = '';
+
   final TextEditingController lastNameController = TextEditingController();
+
   String lastNameError = '';
+
   final TextEditingController positionController = TextEditingController();
+
   String positionError = '';
+
   final TextEditingController emailController = TextEditingController();
+
   String emailError = '';
+
   final TextEditingController phoneController = TextEditingController();
+
   String phoneError = '';
+
   final TextEditingController addressController = TextEditingController();
+
   String addressError = '';
+
   final TextEditingController cityController = TextEditingController();
+
   String cityError = '';
+
   final TextEditingController stateController = TextEditingController();
+
   final TextEditingController zipController = TextEditingController();
+
   String stateZipError = '';
+
   CountryCode? selectedCountry;
+
   final countryPicker = const FlCountryCodePicker();
 
   @override
   Widget build(BuildContext context) {
+    log('set state called');
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -59,221 +81,209 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Basic Details',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(
-                    0xFF061237,
-                  ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: ListView(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Basic Details',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                color: Color(
+                  0xFF061237,
                 ),
               ),
-              const SizedBox(height: 16),
-              textBox('Enter name...', TextEditingController(), 'First Name',
-                  firstNameError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: firstNameError.isNotEmpty,
-                    child: Text(
-                      firstNameError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              textBox('Enter name...', TextEditingController(), 'Last Name',
-                  lastNameError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: lastNameError.isNotEmpty,
-                    child: Text(
-                      lastNameError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              textBox('Enter position...', TextEditingController(), 'Position',
-                  positionError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: positionError.isNotEmpty,
-                    child: Text(
-                      positionError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              textBox('Enter email', TextEditingController(), 'Email',
-                  emailError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: emailError.isNotEmpty,
-                    child: Text(
-                      emailError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              textBox('ex. 555-555-5555', TextEditingController(), 'Phone',
-                  phoneError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: phoneError.isNotEmpty,
-                    child: Text(
-                      phoneError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              textBox('Enter address...', TextEditingController(), 'Address',
-                  addressError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: addressError.isNotEmpty,
-                    child: Text(
-                      addressError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              textBox('Enter city...', TextEditingController(), 'City',
-                  cityError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: cityError.isNotEmpty,
-                    child: Text(
-                      cityError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  halfTextBox('Select', stateController, 'State',
-                      stateZipError.contains('State')),
-                  halfTextBox('Zipcode', zipController, 'Zip',
-                      stateZipError.contains('Zipcode')),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: stateZipError.isNotEmpty,
-                    child: Text(
-                      stateZipError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(top: 32.0),
-                child: GestureDetector(
-                  onTap: () {
-                    // Navigator.push(context, MaterialPageRoute(
-                    //   builder: (context) {
-                    //     return LoginAndSignupScreen(
-                    //       widgetIndex: 1,
-                    //     );
-                    //   },
-                    // ));
-                  },
-                  child: GestureDetector(
-                    onTap: () {
-                      // validateData(loginEmailController.text,
-                      //     loginPasswordController.text, context);
-                    },
-                    child: Container(
-                      height: 56,
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: const Color(0xff333333),
-                      ),
-                      child: const Text(
-                        "Confirm",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+            textBox('Enter name...', firstNameController, 'First Name',
+                firstNameError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: firstNameError.isNotEmpty,
+                  child: Text(
+                    firstNameError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
                       ),
                     ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            textBox('Enter name...', lastNameController, 'Last Name',
+                lastNameError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: lastNameError.isNotEmpty,
+                  child: Text(
+                    lastNameError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            textBox('Enter position...', positionController, 'Position',
+                positionError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: positionError.isNotEmpty,
+                  child: Text(
+                    positionError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            textBox('Enter email', emailController, 'Email',
+                emailError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: emailError.isNotEmpty,
+                  child: Text(
+                    emailError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            textBox('ex. 555-555-5555', phoneController, 'Phone',
+                phoneError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: phoneError.isNotEmpty,
+                  child: Text(
+                    phoneError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            textBox('Enter address...', addressController, 'Address',
+                addressError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: addressError.isNotEmpty,
+                  child: Text(
+                    addressError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            textBox('Enter city...', cityController, 'City',
+                cityError.isNotEmpty, context),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: cityError.isNotEmpty,
+                  child: Text(
+                    cityError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                halfTextBox('Select', stateController, 'State',
+                    stateZipError.contains('State'), context),
+                halfTextBox('Zipcode', zipController, 'Zip',
+                    stateZipError.contains('Zipcode'), context),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Visibility(
+                  visible: stateZipError.isNotEmpty,
+                  child: Text(
+                    stateZipError,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )),
+            ),
+            const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(top: 32.0),
+              child: GestureDetector(
+                onTap: () {
+                  final validate = validation();
+                  if (validate) {
+                    // final employee = EmployeeCreationModel(cli);
+                  }
+                },
+                child: Container(
+                  height: 56,
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xff333333),
+                  ),
+                  child: const Text(
+                    "Confirm",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
                   ),
                 ),
               ),
-              const SizedBox(height: 34),
-            ],
-          ),
+            ),
+            const SizedBox(height: 34),
+          ],
         ),
       ),
     );
   }
 
   Widget textBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus) {
+      String label, bool errorStatus, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -294,11 +304,16 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             child: TextField(
               controller: controller,
               keyboardType: label == 'Phone' ? TextInputType.number : null,
-              maxLength: label == 'Phone' ? 16 : 50,
+              maxLength: label == 'Phone'
+                  ? 16
+                  : label.contains('Name')
+                      ? 100
+                      : 50,
               decoration: InputDecoration(
                 hintText: placeHolder,
                 counterText: "",
-                prefixIcon: label == 'Phone' ? countryPickerWidget() : null,
+                prefixIcon:
+                    label == 'Phone' ? countryPickerWidget(context) : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
@@ -332,7 +347,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
   }
 
   Widget halfTextBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus) {
+      String label, bool errorStatus, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -349,6 +364,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             height: 56,
             width: MediaQuery.of(context).size.width / 2.4,
             child: TextField(
+              onSubmitted: (value) {},
               controller: controller,
               maxLength: 50,
               inputFormatters: [
@@ -391,7 +407,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     );
   }
 
-  Widget countryPickerWidget() {
+  Widget countryPickerWidget(BuildContext context) {
     return GestureDetector(
       onTap: () async {
         final code = await countryPicker.showPicker(context: context);
@@ -452,5 +468,46 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
         ),
       ),
     );
+  }
+
+  validation() {
+    bool status = true;
+    final bool emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(emailController.text);
+    if (firstNameController.text.isEmpty) {
+      firstNameError = 'First name cannot be empty';
+      status = false;
+    } else if (firstNameController.text.length < 2) {
+      firstNameError = 'Enter a valid first name';
+      status = false;
+    }
+    if (lastNameController.text.isEmpty) {
+      lastNameError = 'Last name cannot be empty';
+      status = false;
+    } else if (lastNameController.text.length < 2) {
+      lastNameError = 'Enter a valid last name';
+      status = false;
+    }
+    if (positionController.text.isEmpty) {
+      positionError = 'Position cannot be empty';
+      status = false;
+    }
+    if (emailController.text.isEmpty) {
+      emailError = 'Email cannot be empty';
+      status = false;
+    } else if (!emailValid) {
+      emailError = 'Enter a valid email';
+      status = false;
+    }
+    if (phoneController.text.isEmpty) {
+      phoneError = 'Phone number cannot be empty';
+      status = false;
+    } else if (phoneController.text.length < 2) {
+      phoneError = 'Enter a valid phone number';
+      status = false;
+    }
+    setState(() {});
+    return status;
   }
 }

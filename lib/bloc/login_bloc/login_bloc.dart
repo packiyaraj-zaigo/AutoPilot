@@ -86,8 +86,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (userLoginRes.statusCode==200) {
         emit(UserLoginSuccessState());
         AppUtils.setToken(userLoginData['access_token']);
-      Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(builder: (context) {
-        return BottomBarScreen();
+        AppUtils.setUserID(userLoginData['client_id'].toString());
+        Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
+          builder: (context) {
+            return BottomBarScreen();
       },), (route) => false);
       }else{
         emit(UserLoginErrorState(
@@ -98,7 +100,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
        
     } catch (e) {
       emit(CreateAccountErrorState());
-      
+
       print(e.toString());
      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
@@ -112,9 +114,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
 
-    
+
     try {
-      
+
       emit(ResetPasswordGetOtpLoadingState());
 
       Response resetPasswordRes = await _apiRepository.resetPasswordGetOtp(
@@ -122,20 +124,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       var resetPasswordData = _decoder.convert(resetPasswordRes.body);
       log("res${resetPasswordRes.body}");
 
-      
+
       if (resetPasswordRes.statusCode==200) {
         emit(ResetPasswordGetOtpState());
-       
+
       }else{
         emit(ResetPasswordGetOtpErrorState(
           errorMsg: resetPasswordData['message']
         ));
       }
-       
-       
+
+
     } catch (e) {
       emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
-      
+
       print(e.toString());
      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
@@ -148,9 +150,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     Emitter<LoginState> emit,
   ) async {
 
-    
+
     try {
-      
+
       emit(ResetPasswordSendOtpLoadingState());
 
       Response resetPasswordRes = await _apiRepository.resetPasswordSendOtp(
@@ -158,20 +160,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       var resetPasswordData = _decoder.convert(resetPasswordRes.body);
       log("res${resetPasswordRes.body}");
 
-      
+
       if (resetPasswordRes.statusCode==200) {
         emit(ResetPasswordSendOtpState());
-       
+
       }else{
         emit(ResetPasswordSendOtpErrorState(
           errorMsg: resetPasswordData['message']
         ));
       }
-       
-       
+
+
     } catch (e) {
       emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
-      
+
       print(e.toString());
      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
