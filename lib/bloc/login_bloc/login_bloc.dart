@@ -16,22 +16,22 @@ part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
-   final ApiRepository _apiRepository;
+  final ApiRepository _apiRepository;
   final JsonDecoder _decoder = const JsonDecoder();
 
   Map errorRes={};
- LoginBloc({
+  LoginBloc({
     required ApiRepository apiRepository,
   })  : _apiRepository = apiRepository,
         super(LoginInitial()) {
-          on<CreateAccountEvent>(createAccountBloc);
-          on<UserLoginEvent>(loginBloc);
+    on<CreateAccountEvent>(createAccountBloc);
+    on<UserLoginEvent>(loginBloc);
    
   }
 
 
 
-   Future<void> createAccountBloc(
+  Future<void> createAccountBloc(
     CreateAccountEvent event,
     Emitter<LoginState> emit,
   ) async {
@@ -57,15 +57,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
        
     } catch (e) {
       emit(CreateAccountErrorState());
-      
+
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }
 
 
-   Future<void> loginBloc(
+  Future<void> loginBloc(
     UserLoginEvent event,
     Emitter<LoginState> emit,
   ) async {
@@ -84,8 +84,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       if (userLoginRes.statusCode==200) {
         emit(UserLoginSuccessState());
         AppUtils.setToken(userLoginData['access_token']);
-      Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(builder: (context) {
-        return BottomBarScreen();
+        AppUtils.setUserID(userLoginData['client_id'].toString());
+        Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
+          builder: (context) {
+            return BottomBarScreen();
       },), (route) => false);
       }else{
         emit(UserLoginErrorState(
@@ -96,9 +98,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
        
     } catch (e) {
       emit(CreateAccountErrorState());
-      
+
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }

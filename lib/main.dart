@@ -1,6 +1,7 @@
 
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 
 
@@ -15,7 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 String? initScreen;
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-   SharedPreferences prefs = await SharedPreferences.getInstance();
+  SharedPreferences prefs = await SharedPreferences.getInstance();
   initScreen = prefs.getString(AppConstants.USER_TOKEN);
   runApp(const MyApp());
 }
@@ -31,9 +32,11 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => LoginBloc(apiRepository: ApiRepository()),
         ),
-        
+        BlocProvider(
+          create: (context) => EmployeeBloc(),
+        ),
       ],
-       child: MaterialApp(
+      child: MaterialApp(
         title: 'Flutter Demo',
         initialRoute: initScreen!="" &&initScreen!=null?"/home":"/login",
         theme: ThemeData(
@@ -44,11 +47,11 @@ class MyApp extends StatelessWidget {
         home: WelcomeScreen(),
         debugShowCheckedModeBanner: false,
 
-         routes: <String, WidgetBuilder>{
-                '/login': (BuildContext context) => WelcomeScreen(),
-                '/home': (BuildContext context) => BottomBarScreen(),
+        routes: <String, WidgetBuilder>{
+          '/login': (BuildContext context) => WelcomeScreen(),
+          '/home': (BuildContext context) => BottomBarScreen(),
                
-              },
+        },
         
       ),
    

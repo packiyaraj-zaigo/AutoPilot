@@ -48,6 +48,7 @@ dependencies:
   fl_country_code_picker: ^0.0.4
   pin_code_fields: ^7.4.0
   sticky_az_list: ^0.0.5
+  mobile_scanner: ^3.2.0
 
 dev_dependencies:
   flutter_test:
