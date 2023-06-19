@@ -1,11 +1,17 @@
-import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Models/revenue_chart_model.dart';
+import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
+import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../utils/app_colors.dart';
-import '../utils/app_utils.dart';
+
+String userName='';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({Key? key}) : super(key: key);
@@ -16,6 +22,9 @@ class DashBoardScreen extends StatefulWidget {
 
 class _DashBoardScreenState extends State<DashBoardScreen> {
   bool hideSummary = true;
+   final scaffoldKey = GlobalKey<ScaffoldState>();
+   RevenueChartModel? revenueChartData;
+   
   // final List<ChartData> chartData = [
   //   ChartData(1, 35),
   //   ChartData(2, 23),
@@ -24,506 +33,257 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   //   ChartData(5, 40)
   // ];
   final List<ChartData> chartData = [
-    ChartData(
-      'Mon',
-      98,
-    ),
-    ChartData(
-      'Tue',
-      73,
-    ),
-    ChartData(
-      'Wed',
-      55,
-    ),
-    ChartData(
-      'Thur',
-      66,
-    ),
-    ChartData(
-      'Fri',
-      90,
-    ),
-    ChartData(
-      'Sat',
-      57,
-    ),
-    ChartData(
-      'Sun',
-      87,
-    )
+    
   ];
   final List<ChartData> chartData2 = [
-    ChartData(
-      'Mon',
-      111,
-    ),
-    ChartData(
-      'Tue',
-      99,
-    ),
-    ChartData(
-      'Wed',
-      44,
-    ),
-    ChartData(
-      'Thur',
-      33,
-    ),
-    ChartData(
-      'Fri',
-      80,
-    ),
-    ChartData(
-      'Sat',
-      77,
-    ),
-    ChartData(
-      'Sun',
-      87,
-    )
+  
   ];
 
+  final List<String> dashIconUrl = [
+    'assets/images/sales.svg',
+    'assets/images/drop.svg',
+    'assets/images/pick.svg',
+    'assets/images/current_vehicle_dash_icon.svg',
+    'assets/images/staff_dash_icon.svg'
+  ];
+  final List<String> dashTitle = [
+    'Sales',
+    'Drop-offs',
+    'Pick-ups',
+    'Current Vehicles',
+    'Staff'
+  ];
+
+  final List<String>dashboardCountList=[];
   @override
   Widget build(BuildContext context) {
-    final scaffoldKey = GlobalKey<ScaffoldState>();
-    return Scaffold(
-      key: scaffoldKey,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.menu,
-            color: Colors.black87,
-          ),
-          onPressed: () {
-            scaffoldKey.currentState!.openDrawer();
+   
+    return BlocProvider(
+      create: (context) => DashboardBloc(apiRepository: ApiRepository())
+      ..add(GetRevenueChartDataEvent())
+      ..add(GetUserProfileEvent()),
+      child: BlocListener<DashboardBloc, DashboardState>(
+        listener: (context, state) {
+          if(state is GetRevenueChartDataState){
+            revenueChartData=state.revenueData;
+            print(revenueChartData?.graphdata??"");
+            dashboardCountList.clear();
+            chartData.clear();
+            chartData2.clear();
+
+            dashboardCountList.add(revenueChartData?.sales??"");
+             dashboardCountList.add(revenueChartData?.dropoffs.toString()??"");
+               dashboardCountList.add(revenueChartData?.pickups.toString()??"");
+                dashboardCountList.add(revenueChartData?.currentVehicles.toString()??"");
+                 dashboardCountList.add(revenueChartData?.staff.toString()??"");
+            revenueChartData?.graphdata.week1.forEach((element) { 
+              chartData.add(ChartData(element.x, double.parse(element.y)));
+            });
+
+             revenueChartData?.graphdata.week2.forEach((element) { 
+              chartData2.add(ChartData(element.x, double.parse(element.y)));
+            });
+           
+          } else if(state is GetProfileDetailsState){
+            AppUtils.setUserName(state.userProfile.user[0].firstName);
+            getUserName();
+
+
+
+
+          }
+          // TODO: implement listener
+        },
+        child: BlocBuilder<DashboardBloc, DashboardState>(
+          builder: (context, state) {
+            return Scaffold(
+              backgroundColor: Colors.grey[100],
+              key: scaffoldKey,
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(
+                    Icons.menu,
+                    color: Colors.black87,
+                  ),
+                  onPressed: () {
+                    scaffoldKey.currentState!.openDrawer();
+                  },
+                ),
+                backgroundColor: Colors.white,
+                elevation: 0,
+                title: const Text(
+                  'Autopilot',
+                  style: TextStyle(color: Colors.black87),
+                ),
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                      onPressed: () {},
+                      icon: SvgPicture.asset("assets/images/message.svg")),
+                  IconButton(
+                      onPressed: () {},
+                      icon: SvgPicture.asset(
+                          "assets/images/notification.svg"))
+                ],
+              ),
+              drawer: showDrawer(context),
+              body:state is DashboardLoadingState?const Center(
+                child: CupertinoActivityIndicator(),
+              ): ScrollConfiguration(
+                
+                behavior: const ScrollBehavior(
+                 
+
+                ),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              hideSummary = !hideSummary;
+                            });
+                          },
+                          child: Row(
+                            children: [
+                              const Text(
+                                'Today\'s Summary',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.w500),
+                              ),
+                              hideSummary
+                                  ? const Icon(
+                                      Icons.keyboard_arrow_down_outlined,
+                                    )
+                                  : const Icon(
+                                      Icons.keyboard_arrow_up_outlined,
+                                    )
+                            ],
+                          ),
+                        ),
+                        Visibility(
+                          visible: hideSummary,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: 5,
+                            itemBuilder: (BuildContext context, int index) {
+                              return dashBoardTile(
+                                  dashIconUrl[index], dashTitle[index], dashboardCountList[index]);
+                            },
+                            physics: const NeverScrollableScrollPhysics(),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        const Text(
+                          'Weekly Revenue',
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.w500),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 220,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.white),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: SfCartesianChart(
+                                  primaryXAxis: CategoryAxis(),
+                                  // Palette colors
+                                  palette: <Color>[
+                                    Colors.black,
+                                    Colors.grey,
+                                  ],
+                                  series: <CartesianSeries>[
+                                    ColumnSeries<ChartData, String>(
+                                        dataSource: chartData,
+                                        xValueMapper: (ChartData data, _) =>
+                                            data.x,
+                                        yValueMapper: (ChartData data, _) =>
+                                            data.y),
+                                    ColumnSeries<ChartData, String>(
+                                        dataSource: chartData2,
+                                        xValueMapper: (ChartData data, _) =>
+                                            data.x,
+                                        yValueMapper: (ChartData data, _) =>
+                                            data.y),
+                                  ]),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
           },
         ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          'Autopilot',
-          style: TextStyle(
-              color: AppColors.primaryBlackColors,
-              fontSize: 16,
-              fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
-        actions: [
-          SvgPicture.asset(
-            "assets/images/message.svg",
-            color: AppColors.primaryColors,
-            height: 20,
-            width: 20,
-          ),
-          SizedBox(
-            width: 20,
-          ),
-          SvgPicture.asset(
-            "assets/images/notification.svg",
-            color: AppColors.primaryColors,
-            height: 20,
-            width: 20,
-          ),
-          SizedBox(
-            width: 20,
-          ),
-        ],
       ),
-      drawer: Drawer(
-        backgroundColor: Colors.white,
-        child: ListView(
-          padding: const EdgeInsets.all(0),
-          children: [
-            const DrawerHeader(
-              padding: EdgeInsets.only(left: 5),
-              decoration: BoxDecoration(
-                color: Colors.white,
-              ), //BoxDecoration
-              child: UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Colors.white),
-                accountName: Text(
-                  "Hello",
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: AppColors.greyText,
-                      fontWeight: FontWeight.w600),
-                ),
-                accountEmail: Text(
-                  "Madhi",
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: AppColors.primaryBlackColors,
-                      fontWeight: FontWeight.w500),
-                ),
-                // currentAccountPictureSize: Size.square(50),
-                // currentAccountPicture: CircleAvatar(
-                //   backgroundColor: Color.fromARGB(255, 165, 255, 137),
-                //   child: Text(
-                //     "A",
-                //     style: TextStyle(fontSize: 30.0, color: Colors.blue),
-                //   ), //Text
-                // ), //circleAvatar
-              ), //UserAccountDrawerHeader
-            ), //DrawerHeader
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/dashboard_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Dashboard',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/employee_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Employees',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const EmployeeListScreen(),
-                ));
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/customers_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Customers',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/vehicles_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Vehicles',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/parts_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Parts',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/services_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Service',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/reports_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Reports',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              horizontalTitleGap: 1,
-              leading: SvgPicture.asset(
-                "assets/images/time_icon.svg",
-                color: AppColors.primaryColors,
-                height: 20,
-                width: 20,
-              ),
-              title: Text(
-                'Time Cards',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            ListTile(
-              title: Text(
-                'Settings',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Legal',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                'About',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(
-                'Sign Out',
-                style: AppUtils.drawerStyle(),
-              ),
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-      body: SingleChildScrollView(
+    );
+  }
+
+  Widget dashBoardTile(String iconUrl, String title, String subTitle) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 50,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12), color: Colors.white),
         child: Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    hideSummary = !hideSummary;
-                  });
-                },
-                child: Row(
-                  children: [
-                    Text(
-                      'Today\'s Summary',
-                      style: TextStyle(
+              Row(
+                children: [
+                  SvgPicture.asset(iconUrl),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 13.0),
+                    child: Text(
+                      title,
+                      style: const TextStyle(
                           fontSize: 16,
-                          color: AppColors.primaryTitleColor,
-                          fontWeight: FontWeight.w600),
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff9A9A9A)),
                     ),
-                    hideSummary
-                        ? Icon(
-                            Icons.keyboard_arrow_down_outlined,
-                          )
-                        : Icon(
-                            Icons.keyboard_arrow_up_outlined,
-                          )
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: hideSummary,
-                child: Column(
-                  children: [
-                    Card(
-                      child: ListTile(
-                        leading: SvgPicture.asset(
-                          "assets/images/sales.svg",
-                          color: AppColors.greyText,
-                          height: 20,
-                          width: 20,
-                        ),
-                        title: Text(
-                          'Sales',
-                          style: AppUtils.summaryStyle(),
-                        ),
-                        trailing: Text(
-                          '\$3,275.00',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontFamily: '.SF Pro Text',
-                          ),
-                        ),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: SvgPicture.asset(
-                          "assets/images/drop.svg",
-                          color: AppColors.greyText,
-                          height: 20,
-                          width: 20,
-                        ),
-                        title: Text(
-                          'Drop-offs',
-                          style: AppUtils.summaryStyle(),
-                        ),
-                        trailing: Text(
-                          '4',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontFamily: '.SF Pro Text',
-                          ),
-                        ),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: SvgPicture.asset(
-                          "assets/images/pick.svg",
-                          color: AppColors.greyText,
-                          height: 20,
-                          width: 20,
-                        ),
-                        title: Text(
-                          'Pick-ups',
-                          style: AppUtils.summaryStyle(),
-                        ),
-                        trailing: Text(
-                          '3',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontFamily: '.SF Pro Text',
-                          ),
-                        ),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: SvgPicture.asset(
-                          "assets/images/vehicles_icon.svg",
-                          color: AppColors.greyText,
-                          height: 20,
-                          width: 20,
-                        ),
-                        title: Text(
-                          'Current Vehicles',
-                          style: AppUtils.summaryStyle(),
-                        ),
-                        trailing: Text(
-                          '12',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontFamily: '.SF Pro Text',
-                          ),
-                        ),
-                      ),
-                    ),
-                    Card(
-                      child: ListTile(
-                        leading: SvgPicture.asset(
-                          "assets/images/customers_icon.svg",
-                          color: AppColors.greyText,
-                          height: 20,
-                          width: 20,
-                        ),
-                        title: Text(
-                          'Staff',
-                          style: AppUtils.summaryStyle(),
-                        ),
-                        trailing: Text(
-                          '4',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontFamily: '.SF Pro Text',
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 20,
+                  )
+                ],
               ),
               Text(
-                'Weekly Revenue',
-                style: TextStyle(
-                    fontSize: 16,
+                subTitle,
+                style: const TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                     color: AppColors.primaryTitleColor),
-              ),
-              SfCartesianChart(
-                  primaryXAxis: CategoryAxis(),
-                  // Palette colors
-                  palette: <Color>[
-                    Colors.black,
-                    Colors.grey,
-                  ],
-                  series: <CartesianSeries>[
-                    ColumnSeries<ChartData, String>(
-                        dataSource: chartData,
-                        xValueMapper: (ChartData data, _) => data.x,
-                        yValueMapper: (ChartData data, _) => data.y),
-                    ColumnSeries<ChartData, String>(
-                        dataSource: chartData2,
-                        xValueMapper: (ChartData data, _) => data.x,
-                        yValueMapper: (ChartData data, _) => data.y),
-                  ])
+              )
             ],
           ),
         ),
       ),
     );
   }
+
+  getUserName()async{
+   
+     await AppUtils.getUserName().then((value) {
+      setState(() {
+        userName=value;
+      });
+     });
+      
+
+
+
+}
 }
 
 class ChartData {

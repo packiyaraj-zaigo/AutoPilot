@@ -84,5 +84,120 @@ class ApiProvider {
   }
 
 
+  Future<dynamic> getRevenueChartData(String token
+     ) async {
+    print("into provider");
+  
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse(
+       "${BASE_URL}api/dashboard"
+           
+      );
+      var request = http.MultipartRequest("Get", url);
+      
+
+     
+
+       request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
+  Future<dynamic> resetPasswordGetOtp(String email
+     ) async {
+    print("into provider");
+  
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse(
+       "${BASE_URL}api/password/create"
+           
+      );
+      var request = http.MultipartRequest("POST", url)
+      ..fields['email']=email;
+      
+
+     
+
+      // request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
+
+  Future<dynamic> resetPasswordSendOtp(String email,String otp
+     ) async {
+    print("into provider");
+  
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse(
+       "${BASE_URL}api/password/find",
+       
+           
+      );
+      var request = http.MultipartRequest("GET", url)
+      ..fields['email']=email
+      ..fields['code']=otp;
+      
+
+     
+
+      // request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
+  Future<dynamic> getUserProfile(String token
+     ) async {
+    print("into provider");
+  
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse(
+       "${BASE_URL}api/myprofile",
+       
+           
+      );
+      var request = http.MultipartRequest("GET", url);
+     
+      
+
+     
+
+       request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
 
 }
