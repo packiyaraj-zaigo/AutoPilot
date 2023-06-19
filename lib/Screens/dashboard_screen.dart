@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -152,7 +153,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               leading: const Icon(Icons.keyboard_alt_outlined),
               title: const Text('Employees'),
               onTap: () {
-                Navigator.pop(context);
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const EmployeeListScreen(),
+                ));
               },
             ),
             ListTile(
