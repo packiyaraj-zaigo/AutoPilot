@@ -15,4 +15,6 @@ class AppColors {
   static const textColors = Color(0xff3c3c4399);
   static const primaryGrayColors = Color(0xFF979797);
   static const buttonColors = Color(0xFFF6F6F6);
+  static const primaryTextFieldColors = Color(0xFF7F808C);
+  static const primarySegmentColors = Color(0xFFF7F9FC);
 }
