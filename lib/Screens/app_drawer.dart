@@ -1,5 +1,4 @@
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
-import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -125,14 +124,14 @@ showDrawer(BuildContext context) {
             AppUtils.setToken("");
             AppUtils.setUserName("");
 
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return const WelcomeScreen();
+               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+                 return const WelcomeScreen();
+               },), (route) => false);
               },
-            ), (route) => false);
-          },
+            ),
+          ],
         ),
-      ],
-    ),
-  );
+      );
 }
+
+
