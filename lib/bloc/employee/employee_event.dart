@@ -7,9 +7,14 @@ abstract class EmployeeEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetAllEmployees extends EmployeeEvent {}
+class GetAllEmployees extends EmployeeEvent {
+  final String query;
+  GetAllEmployees({this.query = ''});
+}
 
 class CreateEmployee extends EmployeeEvent {
   final EmployeeCreationModel model;
   CreateEmployee({required this.model});
 }
+
+class GetAllRoles extends EmployeeEvent {}

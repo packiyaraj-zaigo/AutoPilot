@@ -1,5 +1,3 @@
-import 'package:sticky_az_list/sticky_az_list.dart';
-
 class AllEmployeeResponse {
   int? currentPage;
   List<Employee>? employeeList;
@@ -49,7 +47,7 @@ class AllEmployeeResponse {
   }
 }
 
-class Employee extends TaggedItem {
+class Employee {
   int? id;
   int? clientId;
   String? email;
@@ -111,9 +109,6 @@ class Employee extends TaggedItem {
       });
     }
   }
-
-  @override
-  String sortName() => firstName ?? '';
 }
 
 class Roles {

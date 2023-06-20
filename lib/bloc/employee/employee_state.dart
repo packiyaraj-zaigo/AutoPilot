@@ -16,15 +16,34 @@ class EmployeeDetailsLoadingState extends EmployeeState {
 
 class EmployeeDetailsErrorState extends EmployeeState {
   final String message;
-  EmployeeDetailsErrorState({required this.message});
+  const EmployeeDetailsErrorState({required this.message});
 }
 
 class EmployeeDetailsSuccessState extends EmployeeState {
   final AllEmployeeResponse employees;
-  EmployeeDetailsSuccessState({required this.employees});
+  const EmployeeDetailsSuccessState({required this.employees});
 
   @override
   List<Object> get props => [employees];
 }
 
-class EmployeeDetailsPageNationLoading extends EmployeeState {}
+class EmployeeCreateLoadingState extends EmployeeState {}
+
+class EmployeeCreateErrorState extends EmployeeState {
+  final String message;
+  const EmployeeCreateErrorState({required this.message});
+}
+
+class EmployeeCreateSuccessState extends EmployeeState {}
+
+class EmployeeRolesLoadingState extends EmployeeState {}
+
+class EmployeeRolesErrorState extends EmployeeState {
+  final String message;
+  const EmployeeRolesErrorState({required this.message});
+}
+
+class EmployeeRolesSuccessState extends EmployeeState {
+  final List<RoleModel> roles;
+  const EmployeeRolesSuccessState({required this.roles});
+}

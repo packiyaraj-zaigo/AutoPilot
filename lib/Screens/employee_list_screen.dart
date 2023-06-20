@@ -1,14 +1,16 @@
+import 'dart:async';
 import 'dart:developer';
 
+import 'package:alphabet_scroll_view/alphabet_scroll_view.dart';
+import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/create_employee_screen.dart';
 import 'package:auto_pilot/Screens/employee_details_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
-import 'package:auto_pilot/models/employee_response_model.dart';
+import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sticky_az_list/sticky_az_list.dart';
 
 class EmployeeListScreen extends StatefulWidget {
   const EmployeeListScreen({super.key});
@@ -18,9 +20,11 @@ class EmployeeListScreen extends StatefulWidget {
 }
 
 class _EmployeeListScreenState extends State<EmployeeListScreen> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   late final EmployeeBloc bloc;
   final ScrollController controller = ScrollController();
   final List<Employee> employeeList = [];
+  final _debouncer = Debouncer();
 
   @override
   void initState() {
@@ -33,6 +37,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
+      drawer: showDrawer(context),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(
@@ -40,7 +46,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             color: Colors.black87,
           ),
           onPressed: () {
-            // scaffoldKey.currentState!.openDrawer();
+            scaffoldKey.currentState!.openDrawer();
           },
         ),
         backgroundColor: const Color(0xFFFAFAFA),
@@ -70,60 +76,64 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Employees',
-                      style:
-                          TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Employees',
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.07),
+                          offset: const Offset(0, 4),
+                          blurRadius: 10,
+                        )
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.07),
-                            offset: const Offset(0, 4),
-                            blurRadius: 10,
-                          )
+                    height: 50,
+                    child: CupertinoTextField(
+                      textAlignVertical: TextAlignVertical.bottom,
+                      padding:
+                          const EdgeInsets.only(top: 14, bottom: 14, left: 16),
+                      onChanged: (value) {
+                        print(value);
+                        _debouncer.run(() {
+                          employeeList.clear();
+                          bloc.currentPage = 1;
+                          bloc.add(GetAllEmployees(query: value));
+                        });
+                      },
+                      prefix: const Row(
+                        children: [
+                          SizedBox(width: 24),
+                          Icon(
+                            CupertinoIcons.search,
+                            color: Color(0xFF7F808C),
+                            size: 20,
+                          ),
                         ],
                       ),
-                      height: 50,
-                      child: CupertinoTextField(
-                        textAlignVertical: TextAlignVertical.bottom,
-                        padding: const EdgeInsets.only(
-                            top: 14, bottom: 14, left: 16),
-                        prefix: const Row(
-                          children: [
-                            SizedBox(width: 24),
-                            Icon(
-                              CupertinoIcons.search,
-                              color: Color(0xFF7F808C),
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                        placeholder: 'Search Employee...',
-                        maxLines: 1,
-                        placeholderStyle: const TextStyle(
-                          color: Color(0xFF7F808C),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                      placeholder: 'Search Employee...',
+                      maxLines: 1,
+                      placeholderStyle: const TextStyle(
+                        color: Color(0xFF7F808C),
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
               const SizedBox(height: 24),
               Expanded(
@@ -136,30 +146,119 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   child: BlocBuilder<EmployeeBloc, EmployeeState>(
                     builder: (context, state) {
                       if (state is EmployeeDetailsLoadingState &&
-                          !bloc.isEmployeesLoading) {
+                          !bloc.isPagenationLoading) {
                         return const Center(
                             child: CupertinoActivityIndicator());
-                      } else if (state is EmployeeDetailsSuccessState) {
-                        log('here');
-                        return customScrollView(employeeList);
                       } else {
-                        return const SizedBox();
+                        print('Success');
+                        print(employeeList.length.toString());
+                        return ScrollConfiguration(
+                          behavior: ScrollBehavior(),
+                          child: ListView.separated(
+                              shrinkWrap: true,
+                              controller: controller
+                                ..addListener(() {
+                                  if (controller.offset ==
+                                          controller.position.maxScrollExtent &&
+                                      !bloc.isPagenationLoading &&
+                                      bloc.currentPage <= bloc.totalPages) {
+                                    _debouncer.run(() {
+                                      bloc.isPagenationLoading = true;
+                                      bloc.add(GetAllEmployees());
+                                    });
+                                  }
+                                }),
+                              itemBuilder: (context, index) {
+                                print(employeeList.length);
+                                final item = employeeList[index];
+                                return Column(
+                                  children: [
+                                    GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                EmployeeDetailsScreen(
+                                              employee: item,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 77,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.07),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
+                                            ),
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                item.firstName ?? "",
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF061237),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 3),
+                                              Text(
+                                                item.roles?[0].name ?? '',
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF6A7187),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    bloc.currentPage <= bloc.totalPages &&
+                                            index == employeeList.length - 1
+                                        ? const Column(
+                                            children: [
+                                              SizedBox(height: 24),
+                                              const Center(
+                                                child:
+                                                    CupertinoActivityIndicator(),
+                                              ),
+                                              SizedBox(height: 24),
+                                            ],
+                                          )
+                                        : const SizedBox(),
+                                  ],
+                                );
+                              },
+                              separatorBuilder: (context, index) =>
+                                  SizedBox(height: 24),
+                              itemCount: employeeList.length),
+                        );
                       }
                     },
                   ),
                 ),
               ),
-              BlocBuilder<EmployeeBloc, EmployeeState>(
-                builder: (context, state) {
-                  if (bloc.isEmployeesLoading) {
-                    return const Center(
-                      child: CupertinoActivityIndicator(),
-                    );
-                  } else {
-                    return const SizedBox();
-                  }
-                },
-              )
+              SizedBox(height: 24),
             ],
           ),
         ),
@@ -167,83 +266,104 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     );
   }
 
-  ScrollConfiguration customScrollView(List<Employee> employeeList) {
-    return ScrollConfiguration(
-      behavior: const ScrollBehavior(),
-      child: StickyAzList(
-        controller: controller
-          ..addListener(() {
-            if (controller.offset == controller.position.maxScrollExtent &&
-                !bloc.isEmployeesLoading &&
-                bloc.currentPage <= bloc.totalPages) {
-              bloc.add(GetAllEmployees());
-            }
-          }),
-        options: const StickyAzOptions(
-          scrollBarOptions: ScrollBarOptions(scrollable: true),
-          listOptions: ListOptions(
-            showSectionHeader: false,
-          ),
-        ),
-        items: employeeList,
-        builder: (context, index, item) => Column(
-          children: [
-            GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const EmployeeDetailsScreen(),
-                  ),
-                );
-              },
-              child: Container(
-                height: 77,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
-                      offset: const Offset(0, 4),
-                      blurRadius: 10,
-                    ),
-                  ],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.firstName ?? "",
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF061237),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 3),
-                      Text(
-                        item.roles?[0].name ?? '',
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Color(0xFF6A7187),
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
+  // ScrollConfiguration customScrollView(BuildContext context) {
+  //   print('here');
+  //   return ScrollConfiguration(
+  //     behavior: const ScrollBehavior(),
+  //     child: StickyAzList(
+  //         controller: controller
+  //           ..addListener(() {
+  //             if (controller.offset == controller.position.maxScrollExtent &&
+  //                 !bloc.isPagenationLoading &&
+  //                 bloc.currentPage <= bloc.totalPages) {
+  //               _debouncer.run(() {
+  //                 bloc.isPagenationLoading = true;
+  //                 bloc.add(GetAllEmployees());
+  //               });
+  //             }
+  //           }),
+  //         options: const StickyAzOptions(
+  //           scrollBarOptions: ScrollBarOptions(scrollable: true),
+  //           listOptions: ListOptions(
+  //             showSectionHeader: false,
+  //           ),
+  //         ),
+  //         items: employeeList,
+  //         builder: (context, index, item) {
+  //           return Column(
+  //             children: [
+  //               GestureDetector(
+  //                 behavior: HitTestBehavior.opaque,
+  //                 onTap: () {
+  //                   Navigator.of(context).push(
+  //                     MaterialPageRoute(
+  //                       builder: (context) => const EmployeeDetailsScreen(),
+  //                     ),
+  //                   );
+  //                 },
+  //                 child: Container(
+  //                   height: 77,
+  //                   width: double.infinity,
+  //                   decoration: BoxDecoration(
+  //                     color: Colors.white,
+  //                     boxShadow: [
+  //                       BoxShadow(
+  //                         color: Colors.black.withOpacity(0.07),
+  //                         offset: const Offset(0, 4),
+  //                         blurRadius: 10,
+  //                       ),
+  //                     ],
+  //                     borderRadius: BorderRadius.circular(12),
+  //                   ),
+  //                   child: Padding(
+  //                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
+  //                     child: Column(
+  //                       mainAxisAlignment: MainAxisAlignment.center,
+  //                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                       children: [
+  //                         Text(
+  //                           item.firstName ?? "",
+  //                           overflow: TextOverflow.ellipsis,
+  //                           style: const TextStyle(
+  //                             color: Color(0xFF061237),
+  //                             fontSize: 16,
+  //                             fontWeight: FontWeight.w500,
+  //                           ),
+  //                         ),
+  //                         const SizedBox(height: 3),
+  //                         Text(
+  //                           item.roles?[0].name ?? '',
+  //                           overflow: TextOverflow.ellipsis,
+  //                           style: const TextStyle(
+  //                             color: Color(0xFF6A7187),
+  //                             fontWeight: FontWeight.w400,
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 24),
+  //             ],
+  //           );
+  //         }),
+  //   );
+  // }
+}
+
+class Debouncer {
+  int? milliseconds;
+  VoidCallback? action;
+  Timer? timer;
+
+  run(VoidCallback action) {
+    if (null != timer) {
+      timer!.cancel();
+    }
+    timer = Timer(
+      const Duration(milliseconds: Duration.millisecondsPerSecond),
+      action,
     );
   }
 }

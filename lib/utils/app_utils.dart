@@ -163,7 +163,7 @@ class AppUtils {
     var inputFormat = DateFormat('yyyy-MM-dd');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('yyyy-MM-dd');
+    var outputFormat = DateFormat('MM/dd/yy');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
@@ -241,8 +241,6 @@ class AppUtils {
     String? userID = prefs.getString(AppConstants.USER_ID);
     return userID ?? "";
   }
-
-
 }
 
 class Debouncer {
