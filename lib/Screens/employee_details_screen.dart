@@ -1,9 +1,14 @@
+import 'package:auto_pilot/Models/employee_response_model.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:mailto/mailto.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EmployeeDetailsScreen extends StatefulWidget {
-  const EmployeeDetailsScreen({super.key});
+  const EmployeeDetailsScreen({super.key, required this.employee});
+  final Employee employee;
 
   @override
   State<EmployeeDetailsScreen> createState() => _EmployeeDetailsScreenState();
@@ -18,6 +23,8 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
+    final date =
+        AppUtils.getDateFormatted(widget.employee.createdAt.toString());
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFFAFAFA),
@@ -57,8 +64,8 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            const Text(
-              'Bruce Wayne',
+            Text(
+              '${widget.employee.firstName ?? ''} ${widget.employee.lastName ?? ''}',
               style: TextStyle(
                   color: Color(0xFF061237),
                   fontSize: 18,
@@ -91,7 +98,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -103,7 +110,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                '(888) 922-9292',
+                                '(${widget.employee.phone!.substring(0, 3)})    ${widget.employee.phone!.substring(3, 6)} - ${widget.employee.phone!.substring(6)}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -114,7 +121,18 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                           Row(
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (widget.employee.phone != null) {
+                                    final Uri smsLaunchUri = Uri(
+                                      scheme: 'sms',
+                                      path: widget.employee.phone!,
+                                      queryParameters: <String, String>{
+                                        'body': Uri.encodeComponent(' '),
+                                      },
+                                    );
+                                    launchUrl(smsLaunchUri);
+                                  }
+                                },
                                 icon: SvgPicture.asset(
                                   'assets/images/sms_icons.svg',
                                   height: 27,
@@ -124,7 +142,14 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 width: 20,
                               ),
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  final Uri emailLaunchUri = Uri(
+                                    scheme: 'tel',
+                                    path: widget.employee.phone ?? '',
+                                  );
+
+                                  launchUrl(emailLaunchUri);
+                                },
                                 icon: SvgPicture.asset(
                                   'assets/images/phone_icon.svg',
                                   height: 27,
@@ -143,7 +168,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -155,7 +180,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                               ),
                               SizedBox(height: 5),
                               Text(
-                                'Brucewayne@gmail.com',
+                                '${widget.employee.email}',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -164,7 +189,27 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             ],
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              if (widget.employee.email != null) {
+                                String? encodeQueryParameters(
+                                    Map<String, String> params) {
+                                  return params.entries
+                                      .map((MapEntry<String, String> e) =>
+                                          '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                                      .join('&');
+                                }
+
+                                final Uri emailLaunchUri = Uri(
+                                  scheme: 'mailto',
+                                  path: widget.employee.email ?? '',
+                                  query: encodeQueryParameters(<String, String>{
+                                    'subject': ' ',
+                                  }),
+                                );
+
+                                launchUrl(emailLaunchUri);
+                              }
+                            },
                             icon: SvgPicture.asset(
                               'assets/images/mail_icons.svg',
                               height: 23,
@@ -177,28 +222,22 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         thickness: 1.5,
                         color: Color(0xFFE8EAED),
                       ),
-                      const SizedBox(height: 14),
-                      const Text(
-                        'Address',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 5),
-                      const Text(
-                        '123 Street Name City, State Zip',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      const Divider(
-                        thickness: 1.5,
-                        color: Color(0xFFE8EAED),
-                      ),
-                      const SizedBox(height: 14),
+                      // const SizedBox(height: 14),
+                      // const Text(
+                      //   'Address',
+                      //   style: TextStyle(
+                      //     fontWeight: FontWeight.w500,
+                      //     fontSize: 15,
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 5),
+                      // const Text(
+                      //   '123 Street Name City, State Zip',
+                      //   style: TextStyle(
+                      //     fontSize: 16,
+                      //     fontWeight: FontWeight.w400,
+                      //   ),
+                      // ),
                       const Text(
                         'Position',
                         style: TextStyle(
@@ -207,8 +246,8 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      const Text(
-                        'Technician',
+                      Text(
+                        '${widget.employee.roles?[0].name ?? ''}',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,
@@ -228,8 +267,8 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      const Text(
-                        '03/09/21',
+                      Text(
+                        '$date',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w400,

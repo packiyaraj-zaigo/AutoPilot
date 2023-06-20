@@ -1,6 +1,7 @@
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
+import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -37,14 +38,15 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         backgroundColor: AppColors.primaryColors,
         elevation: 0,
         onPressed: () {
-          showModalBottomSheet(context: context, builder: (context) {
-
-            return mainCreateWidget();
-          },
-          isScrollControlled: true,
-           shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
-        ),
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return mainCreateWidget();
+            },
+            isScrollControlled: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
+            ),
           );
         },
         child: Icon(Icons.add),
@@ -255,88 +257,89 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
     });
   }
 
-
-
-  Widget mainCreateWidget(){
+  Widget mainCreateWidget() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height/1.6,
+      height: MediaQuery.of(context).size.height / 1.6,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            bottomSheetTile("New Estimate","assets/images/estimate_icon.svg"),
-             bottomSheetTile("New Customer","assets/images/customer_icon.svg"),
-             bottomSheetTile("New Vehicle","assets/images/vehicle_icon.svg"),
-             bottomSheetTile("New Appointment","assets/images/appointment_icon.svg"),
-             bottomSheetTile("Scanner","assets/images/scanner_icon.svg"),
-             Padding(
-               padding: const EdgeInsets.only(top:16.0),
-               child: GestureDetector(
+            bottomSheetTile("New Estimate", "assets/images/estimate_icon.svg",
+                ScannerScreen()),
+            bottomSheetTile("New Customer", "assets/images/customer_icon.svg",
+                ScannerScreen()),
+            bottomSheetTile("New Vehicle", "assets/images/vehicle_icon.svg",
+                ScannerScreen()),
+            bottomSheetTile("New Appointment",
+                "assets/images/appointment_icon.svg", ScannerScreen()),
+            bottomSheetTile(
+                "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: GestureDetector(
                 behavior: HitTestBehavior.translucent,
-                onTap: (){
+                onTap: () {
                   Navigator.pop(context);
                 },
-                 child: Container(
-                       alignment: Alignment.center,
-                       height: 56,
-                       width: MediaQuery.of(context).size.width,
-                       decoration: BoxDecoration(
-                       
-                         borderRadius: BorderRadius.circular(12)
-                   
-                       ),
-                       child: const Text("Cancel",style:  TextStyle(
-                         fontSize: 16,
-                         fontWeight: FontWeight.w500,
-                         color: AppColors.primaryColors
-                         
-                       ),),
-                   
-                     ),
-               ),
-             ),
-
-      
-          ],
-        ),
-      ),
-   
-
-
-     
-    );
-  }
-
-
-  Widget bottomSheetTile(String title,String iconUrl){
-    return Padding(
-      padding: const EdgeInsets.only(top:16.0),
-      child: Container(
-        alignment: Alignment.center,
-        height: 56,
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-          color: AppColors.primaryColors,
-          borderRadius: BorderRadius.circular(12)
-    
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(iconUrl,color: Colors.white,),
-            Padding(
-              padding: const EdgeInsets.only(left:8.0),
-              child: Text(title,style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: Colors.white
-                
-              ),),
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 56,
+                  width: MediaQuery.of(context).size.width,
+                  decoration:
+                      BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColors),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
-    
+      ),
+    );
+  }
+
+  Widget bottomSheetTile(String title, String iconUrl, constructor) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => constructor,
+          ));
+        },
+        child: Container(
+          alignment: Alignment.center,
+          height: 56,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+              color: AppColors.primaryColors,
+              borderRadius: BorderRadius.circular(12)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                iconUrl,
+                color: Colors.white,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.white),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -1,11 +1,16 @@
 import 'dart:developer';
 
-import 'package:auto_pilot/models/employee_creation_model.dart';
+import 'package:auto_pilot/Models/employee_creation_model.dart';
+import 'package:auto_pilot/Models/role_model.dart';
+import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateEmployeeScreen extends StatefulWidget {
   const CreateEmployeeScreen({super.key});
@@ -16,46 +21,30 @@ class CreateEmployeeScreen extends StatefulWidget {
 
 class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
   final TextEditingController firstNameController = TextEditingController();
-
   String firstNameError = '';
-
   final TextEditingController lastNameController = TextEditingController();
-
   String lastNameError = '';
-
-  final TextEditingController positionController = TextEditingController();
-
-  String positionError = '';
-
   final TextEditingController emailController = TextEditingController();
-
   String emailError = '';
-
   final TextEditingController phoneController = TextEditingController();
-
   String phoneError = '';
-
-  final TextEditingController addressController = TextEditingController();
-
-  String addressError = '';
-
-  final TextEditingController cityController = TextEditingController();
-
-  String cityError = '';
-
-  final TextEditingController stateController = TextEditingController();
-
-  final TextEditingController zipController = TextEditingController();
-
-  String stateZipError = '';
+  String dropdownValue = '';
+  String positionError = '';
+  final List<RoleModel> roles = [];
 
   CountryCode? selectedCountry;
-
   final countryPicker = const FlCountryCodePicker();
+  late final EmployeeBloc bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    bloc = BlocProvider.of<EmployeeBloc>(context);
+    bloc.add(GetAllRoles());
+  }
 
   @override
   Widget build(BuildContext context) {
-    log('set state called');
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -83,200 +72,236 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: ListView(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Basic Details',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(
-                  0xFF061237,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            textBox('Enter name...', firstNameController, 'First Name',
-                firstNameError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: firstNameError.isNotEmpty,
-                  child: Text(
-                    firstNameError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
+        child: ScrollConfiguration(
+          behavior: const ScrollBehavior(),
+          child: BlocListener<EmployeeBloc, EmployeeState>(
+            listener: (context, state) {
+              if (state is EmployeeRolesErrorState) {
+                CommonWidgets().showDialog(
+                    context, 'Something went wrong please try again later');
+                Navigator.pop(context);
+              } else if (state is EmployeeCreateErrorState) {
+                CommonWidgets().showDialog(context, state.message);
+              } else if (state is EmployeeRolesSuccessState) {
+                roles.clear();
+                roles.addAll(state.roles);
+              } else if (state is EmployeeCreateSuccessState) {
+                Navigator.of(context).pop();
+              }
+            },
+            child: BlocBuilder<EmployeeBloc, EmployeeState>(
+              builder: (context, state) {
+                if (state is EmployeeRolesLoadingState) {
+                  return const Center(
+                    child: CupertinoActivityIndicator(),
+                  );
+                } else if (state is EmployeeCreateLoadingState) {
+                  return const Center(
+                    child: CupertinoActivityIndicator(),
+                  );
+                }
+                return ListView(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Basic Details',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: Color(
+                          0xFF061237,
+                        ),
                       ),
                     ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            textBox('Enter name...', lastNameController, 'Last Name',
-                lastNameError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: lastNameError.isNotEmpty,
-                  child: Text(
-                    lastNameError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
+                    const SizedBox(height: 16),
+                    textBox('Enter name...', firstNameController, 'First Name',
+                        firstNameError.isNotEmpty, context),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Visibility(
+                          visible: firstNameError.isNotEmpty,
+                          child: Text(
+                            firstNameError,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(
+                                0xffD80027,
+                              ),
+                            ),
+                          )),
                     ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            textBox('Enter position...', positionController, 'Position',
-                positionError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: positionError.isNotEmpty,
-                  child: Text(
-                    positionError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
+                    const SizedBox(height: 16),
+                    textBox('Enter name...', lastNameController, 'Last Name',
+                        lastNameError.isNotEmpty, context),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Visibility(
+                          visible: lastNameError.isNotEmpty,
+                          child: Text(
+                            lastNameError,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(
+                                0xffD80027,
+                              ),
+                            ),
+                          )),
                     ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            textBox('Enter email', emailController, 'Email',
-                emailError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: emailError.isNotEmpty,
-                  child: Text(
-                    emailError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
+                    const SizedBox(height: 16),
+                    textBox('Enter email', emailController, 'Email',
+                        emailError.isNotEmpty, context),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Visibility(
+                          visible: emailError.isNotEmpty,
+                          child: Text(
+                            emailError,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(
+                                0xffD80027,
+                              ),
+                            ),
+                          )),
                     ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            textBox('ex. 555-555-5555', phoneController, 'Phone',
-                phoneError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: phoneError.isNotEmpty,
-                  child: Text(
-                    phoneError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
+                    const SizedBox(height: 16),
+                    textBox('ex. 555-555-5555', phoneController, 'Phone',
+                        phoneError.isNotEmpty, context),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Visibility(
+                          visible: phoneError.isNotEmpty,
+                          child: Text(
+                            phoneError,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(
+                                0xffD80027,
+                              ),
+                            ),
+                          )),
                     ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            textBox('Enter address...', addressController, 'Address',
-                addressError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: addressError.isNotEmpty,
-                  child: Text(
-                    addressError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
-                    ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            textBox('Enter city...', cityController, 'City',
-                cityError.isNotEmpty, context),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: cityError.isNotEmpty,
-                  child: Text(
-                    cityError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
-                    ),
-                  )),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                halfTextBox('Select', stateController, 'State',
-                    stateZipError.contains('State'), context),
-                halfTextBox('Zipcode', zipController, 'Zip',
-                    stateZipError.contains('Zipcode'), context),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-              child: Visibility(
-                  visible: stateZipError.isNotEmpty,
-                  child: Text(
-                    stateZipError,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(
-                        0xffD80027,
-                      ),
-                    ),
-                  )),
-            ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.only(top: 32.0),
-              child: GestureDetector(
-                onTap: () {
-                  final validate = validation();
-                  if (validate) {
-                    // final employee = EmployeeCreationModel(cli);
-                  }
-                },
-                child: Container(
-                  height: 56,
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: const Color(0xff333333),
-                  ),
-                  child: const Text(
-                    "Confirm",
-                    style: TextStyle(
-                        fontSize: 16,
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Position",
+                      style: TextStyle(
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Colors.white),
-                  ),
-                ),
-              ),
+                        color: Color(0xff6A7187),
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    roles.isNotEmpty
+                        ? Container(
+                            width: double.infinity,
+                            height: 56,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                border:
+                                    Border.all(color: const Color(0xffC1C4CD))),
+                            child: DropdownButton<String>(
+                              padding:
+                                  EdgeInsets.only(top: 2, left: 16, right: 16),
+                              isExpanded: true,
+                              hint: Text(
+                                "Select",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.primaryColors),
+                              ),
+                              value: dropdownValue == '' ? null : dropdownValue,
+                              icon: const Icon(Icons.keyboard_arrow_down),
+                              elevation: 16,
+                              style: const TextStyle(color: Colors.deepPurple),
+                              underline: Container(color: Colors.transparent),
+                              onChanged: (String? value) {
+                                // This is called when the user selects an item.
+                                setState(() {
+                                  dropdownValue = value!;
+                                });
+                              },
+                              items: roles.map<DropdownMenuItem<String>>(
+                                  (RoleModel role) {
+                                return DropdownMenuItem<String>(
+                                  value: role.name,
+                                  child: Text(
+                                    role.name.toString(),
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.primaryColors,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        : SizedBox(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Visibility(
+                          visible: positionError.isNotEmpty,
+                          child: Text(
+                            positionError,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: Color(
+                                0xffD80027,
+                              ),
+                            ),
+                          )),
+                    ),
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: () async {
+                        final validate = validation();
+                        if (validate) {
+                          final clientId = await AppUtils.getUserID();
+                          bloc.add(
+                            CreateEmployee(
+                              model: EmployeeCreationModel(
+                                clientId: int.parse(clientId),
+                                email: emailController.text.trim(),
+                                firstName: firstNameController.text.trim(),
+                                lastName: lastNameController.text.trim(),
+                                phone: phoneController.text.trim(),
+                                role: dropdownValue,
+                              ),
+                            ),
+                          );
+                          log(clientId.toString() +
+                              ":::::::::::::::Client id:::::::::::");
+                        }
+                      },
+                      child: Container(
+                        height: 56,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.primaryColors,
+                        ),
+                        child: const Text(
+                          "Confirm",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 34),
+                  ],
+                );
+              },
             ),
-            const SizedBox(height: 34),
-          ],
+          ),
         ),
       ),
     );
@@ -474,38 +499,50 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     bool status = true;
     final bool emailValid = RegExp(
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(emailController.text);
-    if (firstNameController.text.isEmpty) {
+        .hasMatch(emailController.text.trim());
+    if (firstNameController.text.trim().isEmpty) {
       firstNameError = 'First name cannot be empty';
       status = false;
-    } else if (firstNameController.text.length < 2) {
+    } else if (firstNameController.text.trim().length < 2) {
       firstNameError = 'Enter a valid first name';
       status = false;
+    } else {
+      firstNameError = '';
     }
-    if (lastNameController.text.isEmpty) {
+
+    if (lastNameController.text.trim().isEmpty) {
       lastNameError = 'Last name cannot be empty';
       status = false;
-    } else if (lastNameController.text.length < 2) {
+    } else if (lastNameController.text.trim().length < 2) {
       lastNameError = 'Enter a valid last name';
       status = false;
+    } else {
+      lastNameError = '';
     }
-    if (positionController.text.isEmpty) {
-      positionError = 'Position cannot be empty';
-      status = false;
-    }
-    if (emailController.text.isEmpty) {
+
+    if (emailController.text.trim().isEmpty) {
       emailError = 'Email cannot be empty';
       status = false;
     } else if (!emailValid) {
       emailError = 'Enter a valid email';
       status = false;
+    } else {
+      emailError = '';
     }
-    if (phoneController.text.isEmpty) {
+    if (phoneController.text.trim().isEmpty) {
       phoneError = 'Phone number cannot be empty';
       status = false;
-    } else if (phoneController.text.length < 2) {
+    } else if (phoneController.text.trim().length < 2) {
       phoneError = 'Enter a valid phone number';
       status = false;
+    } else {
+      phoneError = '';
+    }
+    if (dropdownValue == '') {
+      positionError = 'Position cannot be empty';
+      status = false;
+    } else {
+      positionError = '';
     }
     setState(() {});
     return status;
