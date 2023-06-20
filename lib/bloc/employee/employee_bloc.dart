@@ -90,7 +90,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       }
 
       final token = await AppUtils.getToken();
-      await apiRepo.getEmployees(token, currentPage, event.query).then((value) {
+      await apiRepo.getEmployees(token, currentPage).then((value) {
         if (value.statusCode == 200) {
           final responseBody = jsonDecode(value.body);
           emit(
