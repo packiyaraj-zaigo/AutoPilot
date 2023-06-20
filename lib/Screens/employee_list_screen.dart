@@ -105,7 +105,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                       padding:
                           const EdgeInsets.only(top: 14, bottom: 14, left: 16),
                       onChanged: (value) {
-                        print(value);
                         _debouncer.run(() {
                           employeeList.clear();
                           bloc.currentPage = 1;
@@ -150,10 +149,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                         return const Center(
                             child: CupertinoActivityIndicator());
                       } else {
-                        print('Success');
-                        print(employeeList.length.toString());
                         return ScrollConfiguration(
-                          behavior: ScrollBehavior(),
+                          behavior: const ScrollBehavior(),
                           child: ListView.separated(
                               shrinkWrap: true,
                               controller: controller
@@ -169,7 +166,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                   }
                                 }),
                               itemBuilder: (context, index) {
-                                print(employeeList.length);
                                 final item = employeeList[index];
                                 return Column(
                                   children: [
@@ -238,7 +234,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                         ? const Column(
                                             children: [
                                               SizedBox(height: 24),
-                                              const Center(
+                                              Center(
                                                 child:
                                                     CupertinoActivityIndicator(),
                                               ),
@@ -246,11 +242,14 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                             ],
                                           )
                                         : const SizedBox(),
+                                    index == employeeList.length - 1
+                                        ? const SizedBox(height: 24)
+                                        : const SizedBox(),
                                   ],
                                 );
                               },
                               separatorBuilder: (context, index) =>
-                                  SizedBox(height: 24),
+                                  const SizedBox(height: 24),
                               itemCount: employeeList.length),
                         );
                       }
@@ -258,7 +257,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 24),
             ],
           ),
         ),

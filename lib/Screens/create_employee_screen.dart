@@ -86,6 +86,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 roles.clear();
                 roles.addAll(state.roles);
               } else if (state is EmployeeCreateSuccessState) {
+                BlocProvider.of<EmployeeBloc>(context).add(GetAllEmployees());
                 Navigator.of(context).pop();
               }
             },
