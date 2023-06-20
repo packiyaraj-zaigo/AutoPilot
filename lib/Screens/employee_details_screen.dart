@@ -3,7 +3,7 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:mailto/mailto.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 class EmployeeDetailsScreen extends StatefulWidget {
