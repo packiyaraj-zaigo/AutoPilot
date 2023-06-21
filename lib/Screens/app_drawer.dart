@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
@@ -42,7 +43,7 @@ showDrawer(BuildContext context) {
           onTap: () {
               Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(
-                builder: (context) => DashBoardScreen(),
+                builder: (context) => BottomBarScreen(),
               ),
               (route) => false,
             );
