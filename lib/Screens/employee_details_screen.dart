@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/employee_response_model.dart';
+import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,6 @@ class EmployeeDetailsScreen extends StatefulWidget {
 }
 
 class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
-  final tabBarItems = [
-    SvgPicture.asset('assets/images/employee_info_icon.svg'),
-    SvgPicture.asset('assets/images/employee_message_icon.svg'),
-    SvgPicture.asset('assets/images/employee_payment_icon.svg'),
-  ];
   int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -31,7 +27,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: AppColors.primaryColors,
           ),
           onPressed: () {
             Navigator.of(context).pop();
@@ -50,7 +46,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             },
             child: const Icon(
               Icons.more_horiz,
-              color: Colors.black87,
+              color: AppColors.primaryColors,
             ),
           ),
           const SizedBox(
@@ -82,11 +78,30 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 },
                 groupValue: selectedIndex,
                 children: {
-                  for (int i = 0; i < tabBarItems.length; i++)
-                    i: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: tabBarItems[i],
-                    )
+                  0: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: SvgPicture.asset(
+                      'assets/images/employee_info_icon.svg',
+                      color:
+                          selectedIndex == 0 ? AppColors.primaryColors : null,
+                    ),
+                  ),
+                  1: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: SvgPicture.asset(
+                      'assets/images/employee_message_icon.svg',
+                      color:
+                          selectedIndex == 1 ? AppColors.primaryColors : null,
+                    ),
+                  ),
+                  2: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    child: SvgPicture.asset(
+                      'assets/images/employee_payment_icon.svg',
+                      color:
+                          selectedIndex == 2 ? AppColors.primaryColors : null,
+                    ),
+                  ),
                 },
               ),
             ),
@@ -136,6 +151,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 icon: SvgPicture.asset(
                                   'assets/images/sms_icons.svg',
                                   height: 27,
+                                  color: AppColors.primaryColors,
                                 ),
                               ),
                               const SizedBox(
@@ -153,6 +169,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 icon: SvgPicture.asset(
                                   'assets/images/phone_icon.svg',
                                   height: 27,
+                                  color: AppColors.primaryColors,
                                 ),
                               ),
                             ],
@@ -213,6 +230,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             icon: SvgPicture.asset(
                               'assets/images/mail_icons.svg',
                               height: 23,
+                              color: AppColors.primaryColors,
                             ),
                           ),
                         ],

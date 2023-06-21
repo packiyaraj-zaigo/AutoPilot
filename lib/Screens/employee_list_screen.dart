@@ -8,6 +8,7 @@ import 'package:auto_pilot/Screens/employee_details_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/Models/employee_response_model.dart';
+import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,7 +44,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.menu,
-            color: Colors.black87,
+            color: AppColors.primaryColors,
           ),
           onPressed: () {
             scaffoldKey.currentState!.openDrawer();
@@ -65,7 +66,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             },
             child: const Icon(
               Icons.add,
-              color: Colors.black87,
+              color: AppColors.primaryColors,
               size: 30,
             ),
           ),
