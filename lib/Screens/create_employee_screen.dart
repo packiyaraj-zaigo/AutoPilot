@@ -62,7 +62,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             },
             child: const Icon(
               Icons.close,
-              color: Colors.black87,
+              color: AppColors.primaryColors,
             ),
           ),
           const SizedBox(
@@ -208,12 +208,12 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                               padding:
                                   EdgeInsets.only(top: 2, left: 16, right: 16),
                               isExpanded: true,
-                              hint: Text(
+                              hint: const Text(
                                 "Select",
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: AppColors.primaryColors),
+                                    color: AppColors.greyText),
                               ),
                               value: dropdownValue == '' ? null : dropdownValue,
                               icon: const Icon(Icons.keyboard_arrow_down),
@@ -232,9 +232,9 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                   value: role.name,
                                   child: Text(
                                     role.name.toString(),
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16,
-                                      color: AppColors.primaryColors,
+                                      color: AppColors.greyText,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),

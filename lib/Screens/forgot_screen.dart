@@ -57,9 +57,14 @@ class _ResetPasswordState extends State<ResetPassword> {
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.white,
-                leading: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+                leading: GestureDetector(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.primaryColors,
+                  ),
                 ),
               ),
               body: Column(

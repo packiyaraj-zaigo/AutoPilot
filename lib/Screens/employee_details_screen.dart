@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/employee_response_model.dart';
+import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: Colors.black,
+            color: AppColors.primaryColors,
           ),
           onPressed: () {
             Navigator.of(context).pop();
@@ -50,7 +51,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             },
             child: const Icon(
               Icons.more_horiz,
-              color: Colors.black87,
+             color: AppColors.primaryColors,
             ),
           ),
           const SizedBox(
@@ -135,6 +136,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 },
                                 icon: SvgPicture.asset(
                                   'assets/images/sms_icons.svg',
+                                   color: AppColors.primaryColors,
                                   height: 27,
                                 ),
                               ),
@@ -152,6 +154,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 },
                                 icon: SvgPicture.asset(
                                   'assets/images/phone_icon.svg',
+                                   color: AppColors.primaryColors,
                                   height: 27,
                                 ),
                               ),
@@ -212,6 +215,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             },
                             icon: SvgPicture.asset(
                               'assets/images/mail_icons.svg',
+                               color: AppColors.primaryColors,
                               height: 23,
                             ),
                           ),

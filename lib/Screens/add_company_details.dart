@@ -1,3 +1,5 @@
+import 'package:auto_pilot/Screens/create_employee_screen.dart';
+import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:country_data/country_data.dart';
 import 'package:csc_picker/csc_picker.dart';
@@ -73,28 +75,33 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       appBar:AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.black,
+        foregroundColor: AppColors.primaryColors,
       ),
       bottomNavigationBar:Padding(
         padding: const EdgeInsets.only(bottom:24.0,left:24,right:24),
-        child: Container(
-                      height: 56,
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Color(0xff333333),
-                        
+        child: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+          },
+          child: Container(
+                        height: 56,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.primaryColors,
+                          
+                        ),
+                        child: const Text("Confirm",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white
+                        ),),
                       ),
-                      child: const Text("Confirm",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white
-                      ),),
-                    ),
+        ),
       ) ,
-      body: SingleChildScrollView(child: widget.widgetIndex==0?basicDetailsWidget(): operationDetailsWidget()),
+      body: SingleChildScrollView(child: widget.widgetIndex==0?basicDetailsWidget():widget.widgetIndex==1? operationDetailsWidget():addEmployeeWidget()),
 
     );
   }
@@ -229,10 +236,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                       width: MediaQuery.of(context).size.width/3.6,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: Color(0xffF6F6F6)
+                        color: const Color(0xffF6F6F6)
                       ),
-                      child: Text("1",
-                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Color(0xff6A7187)),),
+                      child: const Text("1",
+                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.primaryColors),),
                     ),
                      Container(
                       alignment: Alignment.center,
@@ -243,7 +250,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         color: Color(0xffF6F6F6)
                       ),
                       child: const Text("2-5",
-                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Color(0xff6A7187)),),
+                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.primaryColors),),
                     ),
                      Container(
                       alignment: Alignment.center,
@@ -251,10 +258,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                       width: MediaQuery.of(context).size.width/3.6,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
-                        color: Color(0xffF6F6F6)
+                        color: const Color(0xffF6F6F6)
                       ),
-                      child: Text("6+",
-                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: Color(0xff6A7187)),),
+                      child: const Text("6+",
+                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w600,color: AppColors.primaryColors),),
                     )
               
                   ],
@@ -672,6 +679,72 @@ Widget stateDropDown() {
           Transform.scale(
             scale: 0.8,
             child: CupertinoSwitch(value: switchValue, onChanged: (value){}))
+        ],
+      ),
+    );
+  }
+
+
+  //Add employee screen widget
+
+  addEmployeeWidget(){
+    return Padding(
+      padding: const EdgeInsets.only(left:24.0,right:24,bottom:24,top:8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+            const Text("Employees",style: TextStyle(
+                    color: AppColors.primaryTitleColor,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600
+                  ),),
+
+                      const Padding(
+                        padding:  EdgeInsets.only(top:8.0),
+                        child:  Text("Get started by adding an employee to your company account.",style: TextStyle(
+                                          color: AppColors.greyText,
+                                          fontSize: 14,
+                                          letterSpacing: 1.2,
+                                          fontWeight: FontWeight.w400
+                                        ),),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(top:52.0),
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                              return CreateEmployeeScreen();
+                            },));
+                          },
+                          child: Container(
+                          height: 56,
+                          alignment: Alignment.center,
+                          width: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: Color(0xffF6F6F6),
+                            
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.add_circle_outline,
+                              color: AppColors.primaryColors,),
+                               Padding(
+                                 padding: EdgeInsets.only(left:8.0),
+                                 child: Text("Add New Employee",
+                                                           style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryColors
+                                                           ),),
+                               ),
+                            ],
+                          ),
+                                            ),
+                        ),
+                      ),
         ],
       ),
     );

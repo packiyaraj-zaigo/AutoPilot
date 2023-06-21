@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
@@ -39,7 +40,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Sfpro"),
         debugShowCheckedModeBanner: false,
         routes: <String, WidgetBuilder>{
-          '/login': (BuildContext context) => WelcomeScreen(),
+          '/login': (BuildContext context) => const WelcomeScreen(),
           '/home': (BuildContext context) => BottomBarScreen(),
         },
       ),

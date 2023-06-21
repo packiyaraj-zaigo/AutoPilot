@@ -40,7 +40,13 @@ showDrawer(BuildContext context) {
           leading: Icon(Icons.data_saver_off),
           title: const Text('DashBoard'),
           onTap: () {
-            Navigator.pop(context);
+              Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => DashBoardScreen(),
+              ),
+              (route) => false,
+            );
+        
           },
         ),
         ListTile(
