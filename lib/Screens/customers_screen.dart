@@ -9,6 +9,7 @@ import 'package:flutter_svg/svg.dart';
 import '../api_provider/api_repository.dart';
 import '../bloc/customer_bloc/customer_bloc.dart';
 import 'app_drawer.dart';
+import 'customer_information_screen.dart';
 import 'new_customer_screen.dart';
 
 class CustomersScreen extends StatefulWidget {
@@ -161,23 +162,34 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                   ),
                                 ],
                               ),
-                              child: ListTile(
-                                title: Text('${id ?? ''}'),
-                                subtitle: Text(
-                                    '${state.data.data.data[k].companyName ?? ''}'),
-                                // trailing: Icon(Icons.add),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    SvgPicture.asset("assets/images/sms.svg"),
-                                    SizedBox(
-                                      width: 28,
-                                    ),
-                                    Icon(
-                                      CupertinoIcons.phone,
-                                      color: Colors.black,
-                                    )
-                                  ],
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              CustomerInformationScreen(
+                                                  customerData: state
+                                                      .data.data.data[k])));
+                                },
+                                child: ListTile(
+                                  title: Text('${id ?? ''}'),
+                                  subtitle: Text(
+                                      '${state.data.data.data[k].companyName ?? ''}'),
+                                  // trailing: Icon(Icons.add),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      SvgPicture.asset("assets/images/sms.svg"),
+                                      SizedBox(
+                                        width: 28,
+                                      ),
+                                      Icon(
+                                        CupertinoIcons.phone,
+                                        color: Colors.black,
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),

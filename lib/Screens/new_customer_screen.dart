@@ -218,127 +218,129 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'State',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: Color(0xff6A7187)),
-                                ),
-                                SizedBox(
-                                  height: 6,
-                                ),
-                                SizedBox(
-                                  height: 56,
-                                  child: Form(
-                                    key: _dropdownFormKey,
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButtonFormField(
-                                          padding: EdgeInsets.zero,
-                                          elevation: 4,
-                                          isExpanded: true,
-                                          isDense: true,
-                                          hint: Text(
-                                            'Select',
-                                            style: TextStyle(
-                                              color:
-                                                  AppColors.primaryBlackColors,
-                                            ),
-                                          ),
-                                          icon: Icon(
-                                              Icons.keyboard_arrow_down_sharp),
-                                          decoration: InputDecoration(
-                                              disabledBorder:
-                                                  OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: AppColors
-                                                        .primaryGrayColors),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: stateErrorStatus ==
-                                                            true
-                                                        ? Color(0xffD80027)
-                                                        : Color(0xffC1C4CD)),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: AppColors
-                                                        .primaryGrayColors),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: AppColors
-                                                        .primaryGrayColors),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                              focusColor:
-                                                  AppColors.primaryGrayColors
-                                              // filled: true,
-                                              // fillColor: AppColors.greyText,
-                                              ),
-                                          autovalidateMode:
-                                              AutovalidateMode.always,
-                                          // validator: (value) =>
-                                          //     value == selectedValue?.isEmpty
-                                          //         ? "States Cant be empty"
-                                          //         : null,
-                                          // dropdownColor: Colors.blueAccent,
-                                          value: selectedValue,
-                                          onChanged: (String? newValue) {
-                                            setState(() {
-                                              selectedValue = newValue!;
-                                              stateErrorStatus = false;
-                                            });
-                                            print('ihihi${selectedValue}');
-                                          },
-                                          items: dropdownItems),
-                                    ),
-                                  ),
-                                ),
-                                // SizedBox(
-                                //   width: 10,
-                                // ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Visibility(
-                                      visible: stateErrorStatus,
-                                      child: Text(
-                                        stateErrorMsg,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(
-                                            0xffD80027,
-                                          ),
-                                        ),
-                                      )),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          halfTextBox("Zipcode", zipCodeController, "Zip",
-                              zipCodeErrorStatus),
-                        ],
-                      ),
+                      textBox("Enter Zipcode...", zipCodeController, "Zip",
+                          zipCodeErrorStatus),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //   children: [
+                      //     Expanded(
+                      //       child: Column(
+                      //         mainAxisAlignment: MainAxisAlignment.start,
+                      //         crossAxisAlignment: CrossAxisAlignment.start,
+                      //         children: [
+                      //           Text(
+                      //             'State',
+                      //             style: TextStyle(
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w500,
+                      //                 color: Color(0xff6A7187)),
+                      //           ),
+                      //           SizedBox(
+                      //             height: 6,
+                      //           ),
+                      //           SizedBox(
+                      //             height: 56,
+                      //             child: Form(
+                      //               key: _dropdownFormKey,
+                      //               child: DropdownButtonHideUnderline(
+                      //                 child: DropdownButtonFormField(
+                      //                     padding: EdgeInsets.zero,
+                      //                     elevation: 4,
+                      //                     isExpanded: true,
+                      //                     isDense: true,
+                      //                     hint: Text(
+                      //                       'Select',
+                      //                       style: TextStyle(
+                      //                         color:
+                      //                             AppColors.primaryBlackColors,
+                      //                       ),
+                      //                     ),
+                      //                     icon: Icon(
+                      //                         Icons.keyboard_arrow_down_sharp),
+                      //                     decoration: InputDecoration(
+                      //                         disabledBorder:
+                      //                             OutlineInputBorder(
+                      //                           borderSide: BorderSide(
+                      //                               color: AppColors
+                      //                                   .primaryGrayColors),
+                      //                           borderRadius:
+                      //                               BorderRadius.circular(10),
+                      //                         ),
+                      //                         enabledBorder: OutlineInputBorder(
+                      //                           borderSide: BorderSide(
+                      //                               color: stateErrorStatus ==
+                      //                                       true
+                      //                                   ? Color(0xffD80027)
+                      //                                   : Color(0xffC1C4CD)),
+                      //                           borderRadius:
+                      //                               BorderRadius.circular(10),
+                      //                         ),
+                      //                         border: OutlineInputBorder(
+                      //                           borderSide: BorderSide(
+                      //                               color: AppColors
+                      //                                   .primaryGrayColors),
+                      //                           borderRadius:
+                      //                               BorderRadius.circular(10),
+                      //                         ),
+                      //                         focusedBorder: OutlineInputBorder(
+                      //                           borderSide: BorderSide(
+                      //                               color: AppColors
+                      //                                   .primaryGrayColors),
+                      //                           borderRadius:
+                      //                               BorderRadius.circular(10),
+                      //                         ),
+                      //                         focusColor:
+                      //                             AppColors.primaryGrayColors
+                      //                         // filled: true,
+                      //                         // fillColor: AppColors.greyText,
+                      //                         ),
+                      //                     autovalidateMode:
+                      //                         AutovalidateMode.always,
+                      //                     // validator: (value) =>
+                      //                     //     value == selectedValue?.isEmpty
+                      //                     //         ? "States Cant be empty"
+                      //                     //         : null,
+                      //                     // dropdownColor: Colors.blueAccent,
+                      //                     value: selectedValue,
+                      //                     onChanged: (String? newValue) {
+                      //                       setState(() {
+                      //                         selectedValue = newValue!;
+                      //                         stateErrorStatus = false;
+                      //                       });
+                      //                       print('ihihi${selectedValue}');
+                      //                     },
+                      //                     items: dropdownItems),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //           // SizedBox(
+                      //           //   width: 10,
+                      //           // ),
+                      //           Padding(
+                      //             padding: const EdgeInsets.all(8.0),
+                      //             child: Visibility(
+                      //                 visible: stateErrorStatus,
+                      //                 child: Text(
+                      //                   stateErrorMsg,
+                      //                   style: const TextStyle(
+                      //                     fontSize: 14,
+                      //                     fontWeight: FontWeight.w500,
+                      //                     color: Color(
+                      //                       0xffD80027,
+                      //                     ),
+                      //                   ),
+                      //                 )),
+                      //           ),
+                      //         ],
+                      //       ),
+                      //     ),
+                      //     SizedBox(
+                      //       width: 10,
+                      //     ),
+                      //     halfTextBox("Zipcode", zipCodeController, "Zip",
+                      //         zipCodeErrorStatus),
+                      //   ],
+                      // ),
                       CheckboxListTile(
                         fillColor: MaterialStatePropertyAll(
                             AppColors.primaryGrayColors),

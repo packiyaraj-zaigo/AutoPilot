@@ -41,6 +41,15 @@ class AppUtils {
     );
   }
 
+  static cardStyle() {
+    return const TextStyle(
+      color: AppColors.primaryColors,
+      fontWeight: FontWeight.w600,
+      fontSize: 17,
+      fontFamily: '.SF Pro Text',
+    );
+  }
+
   static subTitleStyle() {
     return const TextStyle(
       color: AppColors.primaryTextColors,
