@@ -115,7 +115,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       Navigator.pop(context);
                     },
                     child: Icon(Icons.arrow_back)),
-                foregroundColor: Colors.black,
+                foregroundColor: AppColors.primaryColors,
               ),
               // bottomNavigationBar: Padding(
               //   padding: const EdgeInsets.only(bottom: 16.0),
@@ -276,7 +276,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: Color(0xff333333),
+                  color: AppColors.primaryColors,
                 ),
                 child: state is UserLoginLoadingState
                     ? const CupertinoActivityIndicator(
@@ -319,7 +319,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                             Text(
                               "Sign up",
                               style: TextStyle(
-                                color: Color(0xff333333),
+                                color: AppColors.primaryColors,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
@@ -631,7 +631,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 TextSpan(
                     text: " Terms of service",
                     style: TextStyle(
-                        color: Color(0xff061237),
+                        color: AppColors.primaryColors,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1,
@@ -648,7 +648,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 TextSpan(
                     text: " Privacy Policy.",
                     style: TextStyle(
-                        color: Color(0xff061237),
+                        color: AppColors.primaryColors,
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 1,
@@ -682,7 +682,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: Color(0xff333333),
+                  color: AppColors.primaryColors,
                 ),
                 child: state is CreateAccountLoadingState
                     ? const CupertinoActivityIndicator(
@@ -752,7 +752,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                             Text(
                               "Sign in",
                               style: TextStyle(
-                                color: Color(0xff333333),
+                                color: AppColors.primaryColors,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 14,
                               ),
