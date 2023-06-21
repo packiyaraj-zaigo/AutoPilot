@@ -2,11 +2,16 @@ import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+
+import '../Models/vechile_model.dart';
 import '../utils/app_utils.dart';
 
 class VechileInformation extends StatefulWidget {
-  const VechileInformation({Key? key}) : super(key: key);
-
+  VechileInformation({
+    Key? key,
+    required this.vechile,
+  }) : super(key: key);
+  final Datum vechile;
   @override
   State<VechileInformation> createState() => _VechileInformationState();
 }
@@ -33,6 +38,7 @@ class _VechileInformationState extends State<VechileInformation> {
     ),
   ];
   int selectedIndex = 0;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,20 +50,22 @@ class _VechileInformationState extends State<VechileInformation> {
           onPressed: () {
             Navigator.pop(context);
           },
-          color: AppColors.primaryTitleColor,
+          color: AppColors.primaryColors,
           icon: Icon(Icons.arrow_back),
         ),
-        title: Text(
-          "Vehicles Information",
-          style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: AppColors.primaryBlackColors),
+        title: Center(
+          child: Text(
+            "Vehicles Information",
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primaryBlackColors),
+          ),
         ),
         actions: [
           Icon(
             Icons.more_horiz,
-            color: AppColors.primaryTitleColor,
+            color: AppColors.primaryColors,
           )
         ],
       ),
@@ -198,7 +206,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "Mike Stevenson",
+                                      "${widget.vechile.firstName}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -216,7 +224,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "Plaid",
+                                      "${widget.vechile.subModel ?? ""}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -234,7 +242,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "N\A",
+                                      "${widget.vechile.engineSize ?? ""}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -252,7 +260,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "Blue",
+                                      "${widget.vechile.vehicleColor ?? ""}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -270,7 +278,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "WPOAF746JAKB936352",
+                                      "${widget.vechile.vin ?? ""}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -288,7 +296,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "4A63573",
+                                      "${widget.vechile.licencePlate ?? ""}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
@@ -306,7 +314,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                           color: AppColors.primaryGrayColors),
                                     ),
                                     Text(
-                                      "Sedam",
+                                      "${widget.vechile.vehicleType}",
                                       style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
