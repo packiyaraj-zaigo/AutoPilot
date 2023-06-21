@@ -53,7 +53,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: Color(0xff333333),
+                        color: AppColors.primaryColors,
                         
                       ),
                       child: const Text("Confirm",
