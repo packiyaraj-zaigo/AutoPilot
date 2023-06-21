@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
@@ -22,6 +23,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         super(VechileInitial()) {
     on<GetAllVechile>(getAllVechile);
     on<AddVechile>(addAlllVechile);
+    on<DropDownVechile>(dropdownVechile);
   }
 
   Future<void> getAllVechile(
@@ -74,15 +76,40 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         event.make,
       );
       var vechileAdd = _decoder.convert(response.body);
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("${response.statusCode}");
-        ScaffoldMessenger.of((event.context)).showSnackBar(SnackBar(
+        ScaffoldMessenger.of((event.context)).showSnackBar(
+          SnackBar(
             content: Text('${vechileAdd['message']}'),
-            backgroundColor: Colors.green));
+            backgroundColor: Colors.green,
+          ),
+        );
         emit(AddVechileDetailsPageNationLoading());
-        print(
-            "qqqqqqqqqqqqqqqqqqqqqeeeeeeeeeeeeeeeeeeeeeeeeeewwwwwwwwwwwwwwwwwwwwwwwww${vechileAdd['message']}");
+        print("shero${vechileAdd['message']}");
+      }
+    } catch (e) {
+      emit(VechileDetailsErrorState(message: e.toString()));
+      isVechileLoading = false;
+    }
+  }
+
+  Future<void> dropdownVechile(
+    DropDownVechile event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      emit(VechileDetailsLoadingState());
+      DropDown dropdownData;
+      final token = await AppUtils.getToken();
+      Response response = await _apiRepository.dropdownVechile(token);
+      if (response.statusCode == 200) {
+        print("poooooooooo${response.body}");
+        dropdownData = dropDownFromJson(response.body);
+        // print(
+        //     "qqqqqqqqqqqqqqqqqqqqqeeeeeeeeeeeeeeeeeeeeeeeeeewwwwwwwwwwwwwwwwwwwwwwwww${responseBody}");
+        emit(
+          DropdownVechileDetailsSuccessState(dropdownData: dropdownData),
+        );
       }
     } catch (e) {
       emit(VechileDetailsErrorState(message: e.toString()));

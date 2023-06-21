@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../Models/vechile_dropdown_model.dart';
 import '../Models/vechile_model.dart';
 import '../api_provider/api_repository.dart';
 import '../bloc/vechile/vechile_bloc.dart';
@@ -50,6 +51,12 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   String modelErrorMsg = '';
   String makeErrorMsg = '';
   String typeErrorMsg = '';
+
+  final List<Datum> vechile = [];
+
+  List<String> states = [];
+  List<DropdownDatum> dropdownData = [];
+  dynamic _currentSelectedTypeValue;
 
   @override
   Widget build(BuildContext context) {
@@ -170,63 +177,75 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
                       itemBuilder: (_, k, id) {
+                        // final item = vechile[k];
                         return Padding(
                             padding: const EdgeInsets.only(
                                 top: 10, right: 34, left: 24),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    spreadRadius: 1,
-                                    blurRadius: 5,
-                                    offset: Offset(
-                                        0, 7), // changes position of shadow
-                                  ),
-                                ],
-                              ),
-                              child: ListTile(
-                                title: Row(
-                                  children: [
-                                    Text(
-                                      '${state.vechile.data.data[k].vehicleYear}',
-                                      style: TextStyle(
-                                          color: AppColors.primaryTitleColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      '$id',
-                                      style: TextStyle(
-                                          color: AppColors.primaryTitleColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(
-                                      '${state.vechile.data.data[k].vehicleModel}',
-                                      style: TextStyle(
-                                          color: AppColors.primaryTitleColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            VechileInformation(
+                                                vechile: state
+                                                    .vechile.data.data[k])));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 5,
+                                      offset: Offset(
+                                          0, 7), // changes position of shadow
                                     ),
                                   ],
                                 ),
-                                subtitle: Text(
-                                  '${state.vechile.data.data[0].firstName ?? ""}',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 14,
-                                      color: AppColors.greyText),
+                                child: ListTile(
+                                  title: Row(
+                                    children: [
+                                      Text(
+                                        '${state.vechile.data.data[k].vehicleYear}',
+                                        style: TextStyle(
+                                            color: AppColors.primaryTitleColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        '$id',
+                                        style: TextStyle(
+                                            color: AppColors.primaryTitleColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        '${state.vechile.data.data[k].vehicleModel}',
+                                        style: TextStyle(
+                                            color: AppColors.primaryTitleColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ],
+                                  ),
+                                  subtitle: Text(
+                                    '${state.vechile.data.data[0].firstName ?? ""}',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        color: AppColors.greyText),
+                                  ),
+                                  // trailing: Icon(Icons.add),),
                                 ),
-                                // trailing: Icon(Icons.add),),
                               ),
                             ));
                       },
@@ -250,11 +269,14 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
         elevation: 10,
         context: ctx,
         builder: (ctx) => BlocProvider(
-              create: (context) => VechileBloc(apiRepository: ApiRepository()),
+              create: (context) => VechileBloc(apiRepository: ApiRepository())
+                ..add(DropDownVechile()),
               child: BlocListener<VechileBloc, VechileState>(
                 listener: (context, state) {
                   if (state is AddVechileDetailsLoadingState) {
                     // vechileList.addAll(state.vechile.data.data ?? []);
+                  } else if (state is DropdownVechileDetailsSuccessState) {
+                    dropdownData.addAll(state.dropdownData.data.data);
                   }
                 },
                 child: BlocBuilder<VechileBloc, VechileState>(
@@ -342,34 +364,8 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                             ],
                                           ),
                                         ),
-                                        Text(
-                                          "Make",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.greyText),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          child: CupertinoTextField(
-                                            controller: makeController,
-                                            readOnly: false,
-                                            placeholder: 'Select',
-                                            style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryBlackColors),
-                                            suffix: Icon(
-                                                Icons.arrow_drop_down_outlined),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              border: Border.all(
-                                                  color: AppColors.greyText),
-                                            ),
-                                          ),
-                                        ),
+                                        textBox("Enter make...", makeController,
+                                            "Make", makeErrorStatus),
                                         SizedBox(
                                           height: 15,
                                         ),
@@ -402,57 +398,88 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                           ),
                                         ),
                                         textBox(
-                                            "Enter Sub-model...",
-                                            subModelController,
-                                            "Sub-Model",
-                                            subModelErrorStatus),
-                                        textBox(
-                                            "Enter engin...",
-                                            engineController,
-                                            "Engine",
-                                            engineErrorStatus),
-                                        textBox(
-                                            "Enter color...",
-                                            colorController,
-                                            "Color",
-                                            colorErrorStatus),
-                                        textBox(
                                             "Enter number...",
                                             vinController,
                                             "VIN",
                                             vinErrorStatus),
-                                        textBox(
-                                            "Enter number...",
-                                            licController,
-                                            "LIC",
-                                            licErrorStatus),
-                                        Text(
-                                          "Type",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.greyText),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          child: CupertinoTextField(
-                                            controller: typeController,
-                                            readOnly: false,
-                                            placeholder: 'Select',
+                                        ExpansionTile(
+                                          title: Text(
+                                            'Additional fields',
                                             style: TextStyle(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryBlackColors),
-                                            suffix: Icon(
-                                                Icons.arrow_drop_down_outlined),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(10)),
-                                              border: Border.all(
-                                                  color: AppColors.greyText),
-                                            ),
+                                                fontSize: 20,
+                                                color:
+                                                    AppColors.primaryTitleColor,
+                                                fontWeight: FontWeight.w600),
                                           ),
+                                          children: <Widget>[
+                                            ListTile(
+                                                title: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                textBox(
+                                                    "Enter Sub-model...",
+                                                    subModelController,
+                                                    "Sub-Model",
+                                                    subModelErrorStatus),
+                                                textBox(
+                                                    "Enter engin...",
+                                                    engineController,
+                                                    "Engine",
+                                                    engineErrorStatus),
+                                                textBox(
+                                                    "Enter make...",
+                                                    makeController,
+                                                    "Make",
+                                                    makeErrorStatus),
+                                                textBox(
+                                                    "Enter color...",
+                                                    colorController,
+                                                    "Color",
+                                                    colorErrorStatus),
+                                                textBox(
+                                                    "Enter number...",
+                                                    licController,
+                                                    "LIC",
+                                                    licErrorStatus),
+                                                Text(
+                                                  "Type",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color:
+                                                          AppColors.greyText),
+                                                ),
+                                                vechiledropDown()
+                                                // SizedBox(
+                                                //   height: 50,
+                                                //   child: CupertinoTextField(
+                                                //     controller: typeController,
+                                                //     readOnly: false,
+                                                //     placeholder: 'Select',
+                                                //     style: TextStyle(
+                                                //         fontSize: 15,
+                                                //         fontWeight:
+                                                //             FontWeight.w400,
+                                                //         color: AppColors
+                                                //             .primaryBlackColors),
+                                                //     suffix: Icon(Icons
+                                                //         .arrow_drop_down_outlined),
+                                                //     decoration: BoxDecoration(
+                                                //       borderRadius:
+                                                //           BorderRadius.all(
+                                                //               Radius.circular(
+                                                //                   10)),
+                                                //       border: Border.all(
+                                                //           color: AppColors
+                                                //               .greyText),
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                              ],
+                                            )),
+                                          ],
                                         ),
                                         Center(
                                           child: Row(
@@ -609,7 +636,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
             vinNumber: vinController.text,
             licNumber: licController.text,
             make: makeController.text,
-            type: typeController.text,
+            type: _currentSelectedTypeValue,
           ));
     }
   }
@@ -657,6 +684,67 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget vechiledropDown() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 56,
+              // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
+              // padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xffC1C4CD)),
+                  borderRadius: BorderRadius.circular(12)),
+              child: DropdownButtonHideUnderline(
+                child: ButtonTheme(
+                  alignedDropdown: true,
+                  child: DropdownButtonFormField<DropdownDatum>(
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      errorBorder: InputBorder.none,
+                      disabledBorder: InputBorder.none,
+                    ),
+                    menuMaxHeight: 380,
+                    value: _currentSelectedTypeValue,
+                    style: const TextStyle(color: Color(0xff6A7187)),
+                    items: dropdownData.map<DropdownMenuItem<DropdownDatum>>(
+                        (DropdownDatum value) {
+                      return DropdownMenuItem<DropdownDatum>(
+                        alignment: AlignmentDirectional.centerStart,
+                        value: value,
+                        child: Text(value.vehicleTypeName),
+                      );
+                    }).toList(),
+                    hint: const Text(
+                      "Select",
+                      style: TextStyle(
+                          color: Color(0xff6A7187),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    onChanged: (DropdownDatum? value) {
+                      setState(() {
+                        _currentSelectedTypeValue = value;
+                      });
+                    },
+                    //isExpanded: true,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

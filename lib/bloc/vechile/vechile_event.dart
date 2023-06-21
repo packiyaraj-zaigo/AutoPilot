@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
+import '../../Models/vechile_dropdown_model.dart';
 import '../../Models/vechile_model.dart';
 
 abstract class VechileEvent extends Equatable {
@@ -42,3 +43,5 @@ class AddVechile extends VechileEvent {
     required this.make,
   });
 }
+
+class DropDownVechile extends VechileEvent {}

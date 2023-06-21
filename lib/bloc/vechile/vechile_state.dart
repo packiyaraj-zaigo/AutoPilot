@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../Models/vechile_model.dart';
@@ -46,4 +47,25 @@ class AddVechileDetailsPageNationLoading extends VechileState {}
 class AddVechileDetailsErrorState extends VechileState {
   final String message;
   AddVechileDetailsErrorState({required this.message});
+}
+
+class DropdownVechileInitial extends VechileState {
+  List<Object> get props => [];
+}
+
+class DropdownVechileDetailsLoadingState extends VechileState {}
+
+class DropdownVechileDetailsSuccessState extends VechileState {
+  final DropDown dropdownData;
+  DropdownVechileDetailsSuccessState({required this.dropdownData});
+
+  @override
+  List<Object> get props => [];
+}
+
+class DropdownVechileDetailsPageNationLoading extends VechileState {}
+
+class DropdownVechileDetailsErrorState extends VechileState {
+  final String message;
+  DropdownVechileDetailsErrorState({required this.message});
 }
