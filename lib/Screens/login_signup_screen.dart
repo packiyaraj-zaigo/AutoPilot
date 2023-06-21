@@ -1,6 +1,8 @@
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/src/widgets/framework.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'forgot_screen.dart';
 
@@ -293,6 +296,49 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             ),
           ),
         ),
+        SizedBox(height: 16),
+        GestureDetector(
+          onTap: () async {
+            // final auth = FirebaseAuth.instance;
+            // final signIN = await auth.signInWithProvider(GoogleAuthProvider());
+            // final token = await signIN.user!.uid;
+
+            final googleUser = await GoogleSignIn().signIn();
+            final auth = await googleUser?.authentication;
+            final credential = GoogleAuthProvider.credential(
+              accessToken: auth!.accessToken,
+              idToken: auth.idToken,
+            );
+            FirebaseAuth.instance.signInWithCredential(credential);
+            // await GoogleSignIn().signOut();
+            // print(auth!.accessToken.toString() + ":::::::::::::::::::::");
+            // await FirebaseAuth.instance.signOut();
+          },
+          child: Container(
+            height: 56,
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              border: Border.all(color: Color(0xffC1C4CD)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset('assets/images/google_icon.svg'),
+                const SizedBox(width: 10),
+                const Text(
+                  "Sign in with Google",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryTitleColor),
+                ),
+              ],
+            ),
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(bottom: 16.0, top: 24),
           child: Container(
@@ -383,12 +429,11 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       Navigator.push(
                           context,
                           CupertinoPageRoute(
-                              builder: (BuildContext context) => ResetPassword(
-                             
-                                  )));
+                              builder: (BuildContext context) =>
+                                  ResetPassword()));
                     },
                     child: const Text("Forgot Password?",
-                        style:  TextStyle(
+                        style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryColors)),

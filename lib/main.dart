@@ -5,6 +5,7 @@ import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 
 import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   initScreen = prefs.getString(AppConstants.USER_TOKEN);
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
