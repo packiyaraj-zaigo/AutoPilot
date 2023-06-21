@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../Screens/customer_information_screen.dart';
-import '../models/employee_creation_model.dart';
+import '../Models/employee_creation_model.dart';
 
 class ApiProvider {
   //DEV Server
