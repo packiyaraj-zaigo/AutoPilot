@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,7 +11,11 @@ import '../utils/app_strings.dart';
 import '../utils/app_utils.dart';
 
 class CustomerInformationScreen extends StatefulWidget {
-  const CustomerInformationScreen({Key? key}) : super(key: key);
+  CustomerInformationScreen({
+    Key? key,
+    required this.customerData,
+  }) : super(key: key);
+  final Datum customerData;
 
   @override
   State<CustomerInformationScreen> createState() =>
@@ -136,6 +141,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             )
                         },
                       ),
+                      SizedBox(
+                        height: 20,
+                      ),
                       selectedIndex == 0
                           ? Expanded(
                               child: Container(
@@ -143,46 +151,95 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                   color: const Color(0xffF9F9F9),
                                   child: Padding(
                                     padding: const EdgeInsets.only(
-                                        left: 24, top: 20),
+                                        left: 24, right: 24),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          "Phone",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400,
-                                              color:
-                                                  AppColors.primaryGrayColors),
-                                        ),
-                                        Text(
-                                          "${state.data.data.data[0].phone}",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                              color:
-                                                  AppColors.primaryTitleColor),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Phone",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: AppColors
+                                                          .primaryGrayColors),
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  "${widget.customerData.phone.toString()}",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppColors
+                                                          .primaryTitleColor),
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                SvgPicture.asset(
+                                                    "assets/images/sms.svg"),
+                                                SizedBox(
+                                                  width: 20,
+                                                ),
+                                                Icon(CupertinoIcons.phone),
+                                              ],
+                                            )
+                                          ],
                                         ),
                                         AppUtils.verticalDivider(),
                                         SizedBox(
                                           height: 20,
                                         ),
-                                        Text(
-                                          "Email",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400,
-                                              color:
-                                                  AppColors.primaryGrayColors),
-                                        ),
-                                        Text(
-                                          "Plaid",
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                              color:
-                                                  AppColors.primaryTitleColor),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Email",
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: AppColors
+                                                          .primaryGrayColors),
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                Text(
+                                                  "${widget.customerData.email.toString()}",
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: AppColors
+                                                          .primaryTitleColor),
+                                                ),
+                                              ],
+                                            ),
+                                            Icon(CupertinoIcons.mail)
+                                          ],
                                         ),
                                         AppUtils.verticalDivider(),
                                         SizedBox(
@@ -196,8 +253,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
                                         Text(
-                                          "N\A",
+                                          "${widget.customerData.addressLine1.toString()}",
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
@@ -216,8 +276,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
                                         Text(
-                                          "435435",
+                                          "Need to change",
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
@@ -236,8 +299,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
                                         Text(
-                                          "WPOAF746JAKB936352",
+                                          "${widget.customerData.createdAt.toString()}",
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
@@ -256,8 +322,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
                                         Text(
-                                          "Sedam",
+                                          "${widget.customerData.addressLine1.toString()}",
                                           style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
@@ -268,6 +337,146 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                       ],
                                     ),
                                   )),
+                            )
+                          : Container(),
+                      selectedIndex == 1
+                          ? Column(
+                              children: [
+                                SizedBox(
+                                  height: 56,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        backgroundColor:
+                                            AppColors.buttonColors),
+                                    onPressed: () {},
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_circle_outline_rounded,
+                                          color: AppColors.primaryColors,
+                                        ),
+                                        SizedBox(
+                                          width: 10,
+                                        ),
+                                        Text(
+                                          'Add New Note',
+                                          style: AppUtils.cardStyle(),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                // ListView.builder(
+                                //   shrinkWrap: true,
+                                //   itemCount: widget.customerData.clientId
+                                //       .toString()
+                                //       .length,
+                                //   itemBuilder:
+                                //       (BuildContext context, int index) {
+                                //     return
+                                Container(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(20))),
+                                  width: double.infinity,
+                                  child: Card(
+                                    elevation: 5,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 18,
+                                        top: 2,
+                                        bottom: 10,
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '${widget.customerData.createdAt}',
+                                            style: AppUtils.requiredStyle(),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(
+                                            '${widget.customerData.notes}',
+                                            style: AppUtils.summaryStyle(),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  //   );
+                                  // },
+                                )
+                              ],
+                            )
+                          : Container(),
+                      selectedIndex == 2
+                          ? Center(
+                              child: Text('Coming Soon'),
+                            )
+                          : Container(),
+                      selectedIndex == 3
+                          ? Container(
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20))),
+                              width: double.infinity,
+                              child: Card(
+                                elevation: 5,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 18,
+                                    top: 2,
+                                    bottom: 10,
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${widget.customerData.createdAt}',
+                                        style: AppUtils.requiredStyle(),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        '${widget.customerData.notes}',
+                                        style: AppUtils.summaryStyle(),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              //   );
+                              // },
+                            )
+                          : Container(),
+                      selectedIndex == 4
+                          ? Center(
+                              child: Text('Coming Soon'),
                             )
                           : Container()
                     ],

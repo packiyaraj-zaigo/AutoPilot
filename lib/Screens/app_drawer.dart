@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
@@ -61,6 +62,8 @@ showDrawer(BuildContext context) {
           title: const Text('Customers'),
           onTap: () {
             Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CustomersScreen()));
           },
         ),
         ListTile(
