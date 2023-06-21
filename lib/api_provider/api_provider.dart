@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:auto_pilot/Models/employee_creation_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -212,6 +213,64 @@ class ApiProvider {
       return response;
     } catch (e) {
       print(e.toString() + 'get employee error');
+    }
+  }
+
+  Future<dynamic> getVechile(String token) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse(
+        "${BASE_URL}api/vehicles",
+      );
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.request!.method + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> addVechile(
+    BuildContext context,
+    String token,
+    String email,
+    String year,
+    String model,
+    String submodel,
+    String engine,
+    String color,
+    String vinNumber,
+    String licNumber,
+    String type,
+    String make,
+  ) async {
+    print("eeeeeeeeeeeeeeeeeeeeeeeeeee$token");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/vehicles?customer_id=4&client_id=64");
+      var request = http.MultipartRequest("POST", url)
+        ..headers['Authorization'] = "Bearer $token"
+        ..fields['vehicle_type'] = type
+        ..fields['vehicle_year'] = year
+        ..fields['vehicle_make'] = make
+        ..fields['vehicle_model'] = model
+        ..fields['vehicle_color'] = color;
+      var response = await request.send();
+      inspect(response);
+      print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.reasonPhrase}");
+      print(response.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
     }
   }
 
