@@ -153,11 +153,20 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getEmployees(String token, int page) async {
+  Future<dynamic> getEmployees(String token, int page, String query) async {
     try {
-      final url = page == 1
-          ? '${BASE_URL}api/users'
-          : '${BASE_URL}api/users?page=$page';
+      String url = '${BASE_URL}api/users';
+
+      if (page != 1) {
+        url = '$url?page=$page';
+      }
+      if (query != '') {
+        if (url.contains('?')) {
+          url = '$url?first_name=$query';
+        } else {
+          url = '$url&first_name=$query';
+        }
+      }
       var response = http.get(Uri.parse(url), headers: getHeader(token));
       return response;
     } catch (e) {
