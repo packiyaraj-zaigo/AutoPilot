@@ -1,6 +1,8 @@
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -42,6 +44,9 @@ showDrawer(BuildContext context) {
           title: const Text('DashBoard'),
           onTap: () {
             Navigator.pop(context);
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => BottomBarScreen()),
+                (route) => false);
           },
         ),
         ListTile(
@@ -85,6 +90,12 @@ showDrawer(BuildContext context) {
           title: const Text('Service'),
           onTap: () {
             Navigator.pop(context);
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => ServicesListScreen(),
+              ),
+              (route) => false,
+            );
           },
         ),
         ListTile(

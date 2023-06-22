@@ -35,8 +35,12 @@ class ApiRepository {
     return apiProvider.getUserProfile(token);
   }
 
-  Future getEmployees(String token, int currentPage) {
-    return apiProvider.getEmployees(token, currentPage);
+  Future getEmployees(String token, int currentPage, String query) {
+    return apiProvider.getEmployees(token, currentPage, query);
+  }
+
+  Future getServices(String token, int currentPage, String query) {
+    return apiProvider.getServices(token, currentPage, query);
   }
 
   Future customerLoad(
