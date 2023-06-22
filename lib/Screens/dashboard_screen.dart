@@ -147,34 +147,50 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               hideSummary = !hideSummary;
                             });
                           },
-                          child: Row(
+                          child: const Row(
                             children: [
-                              const Text(
+                               Text(
                                 'Today\'s Summary',
                                 style: TextStyle(
                                     fontSize: 20, fontWeight: FontWeight.w500),
                               ),
-                              hideSummary
-                                  ? const Icon(
-                                      Icons.keyboard_arrow_down_outlined,
-                                    )
-                                  : const Icon(
-                                      Icons.keyboard_arrow_up_outlined,
-                                    )
+                              // hideSummary
+                              //     ? const Icon(
+                              //         Icons.keyboard_arrow_down_outlined,
+                              //       )
+                              //     : const Icon(
+                              //         Icons.keyboard_arrow_up_outlined,
+                              //       )
                             ],
                           ),
                         ),
                         Visibility(
                           visible: hideSummary,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: 5,
-                            itemBuilder: (BuildContext context, int index) {
-                              return dashBoardTile(
-                                  dashIconUrl[index], dashTitle[index], dashboardCountList[index]);
-                            },
-                            physics: const NeverScrollableScrollPhysics(),
-                          ),
+                          // child: ListView.builder(
+                          //   shrinkWrap: true,
+                          //   itemCount: 5,
+                          //   itemBuilder: (BuildContext context, int index) {
+                          //     return dashBoardTile(
+                          //         dashIconUrl[index], dashTitle[index], dashboardCountList[index]);
+                          //   },
+                          //   physics: const NeverScrollableScrollPhysics(),
+                          // ),
+
+                           child: Column(
+                          children: [
+                             dashBoardTile(
+                                   'assets/images/sales.svg','Sales', revenueChartData?.sales??""),
+                                dashBoardTile(
+                                    'assets/images/drop.svg','Drop-offs', revenueChartData?.dropoffs.toString()??"") ,
+                                   dashBoardTile(
+                                   'assets/images/pick.svg','Pick-ups', revenueChartData?.pickups.toString()??""),
+                                    dashBoardTile(
+                                   'assets/images/current_vehicle_dash_icon.svg','Current Vehicles', revenueChartData?.currentVehicles.toString()??"") ,
+                                       dashBoardTile(
+                                   'assets/images/staff_dash_icon.svg','Staff', revenueChartData?.staff.toString()??"")               
+
+                          ],
+                         )
                         ),
                         SizedBox(
                           height: 20,
