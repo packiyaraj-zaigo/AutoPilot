@@ -20,7 +20,7 @@ class WelcomeScreen extends StatelessWidget {
       
     
         bottomNavigationBar:  Padding(
-          padding: const EdgeInsets.only(bottom:16.0),
+          padding: const EdgeInsets.only(bottom:32.0),
           child: Container(
           
             child:  Row(
@@ -57,7 +57,7 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                height: MediaQuery.of(context).size.height/2,
+                height: MediaQuery.of(context).size.height/2.6,
                 width: MediaQuery.of(context).size.width,
         
               ),
@@ -73,6 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                            textAlign: TextAlign.center,
                             style: TextStyle(
                   fontSize: 14,
+                  height: 1.8,
                   color: Colors.white,
                   
                   fontWeight: FontWeight.w400

@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Screens/calendar_screen.dart';
+import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
@@ -219,6 +220,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         },
         itemCount: pages.length,
         controller: pageController,
+        physics: const NeverScrollableScrollPhysics(),
       ),
 
       // body: SafeArea(
@@ -266,7 +268,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         child: Column(
           children: [
             bottomSheetTile("New Estimate", "assets/images/estimate_icon.svg",
-                ScannerScreen()),
+                CreateEstimateScreen()),
             bottomSheetTile("New Customer", "assets/images/customer_icon.svg",
                 ScannerScreen()),
             bottomSheetTile("New Vehicle", "assets/images/vehicle_icon.svg",
@@ -318,14 +320,14 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           height: 56,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: AppColors.primaryColors,
+              color: Color(0xffF6F6F6),
               borderRadius: BorderRadius.circular(12)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
                 iconUrl,
-                color: Colors.white,
+                color: AppColors.primaryColors,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
@@ -334,7 +336,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white),
+                      color: AppColors.primaryColors),
                 ),
               ),
             ],
