@@ -150,109 +150,130 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                         return const Center(
                             child: CupertinoActivityIndicator());
                       } else {
-                        return ScrollConfiguration(
-                          behavior: const ScrollBehavior(),
-                          child: ListView.separated(
-                              shrinkWrap: true,
-                              controller: controller
-                                ..addListener(() {
-                                  if (controller.offset ==
-                                          controller.position.maxScrollExtent &&
-                                      !bloc.isPagenationLoading &&
-                                      bloc.currentPage <= bloc.totalPages) {
-                                    _debouncer.run(() {
-                                      bloc.isPagenationLoading = true;
-                                      bloc.add(GetAllEmployees());
-                                    });
-                                  }
-                                }),
-                              itemBuilder: (context, index) {
-                                final item = employeeList[index];
-                                return Column(
-                                  children: [
-                                    GestureDetector(
-                                      behavior: HitTestBehavior.opaque,
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                EmployeeDetailsScreen(
-                                              employee: item,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 77,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black
-                                                  .withOpacity(0.07),
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 10,
-                                            ),
-                                          ],
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                item.firstName ?? "",
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF061237),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
+                        return employeeList.isEmpty
+                            ? const Center(
+                                child: Text(
+                                'No user found',
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryTextColors),
+                              ))
+                            : ScrollConfiguration(
+                                behavior: const ScrollBehavior(),
+                                child: ListView.separated(
+                                    shrinkWrap: true,
+                                    controller: controller
+                                      ..addListener(() {
+                                        if (controller.offset ==
+                                                controller
+                                                    .position.maxScrollExtent &&
+                                            !bloc.isPagenationLoading &&
+                                            bloc.currentPage <=
+                                                bloc.totalPages) {
+                                          _debouncer.run(() {
+                                            bloc.isPagenationLoading = true;
+                                            bloc.add(GetAllEmployees());
+                                          });
+                                        }
+                                      }),
+                                    itemBuilder: (context, index) {
+                                      final item = employeeList[index];
+                                      return Column(
+                                        children: [
+                                          GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      EmployeeDetailsScreen(
+                                                    employee: item,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 77,
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.07),
+                                                    offset: const Offset(0, 4),
+                                                    blurRadius: 10,
+                                                  ),
+                                                ],
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${item.firstName ?? ""} ${item.lastName ?? ""} ',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFF061237),
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 3),
+                                                    Text(
+                                                      item.roles?[0].name ?? '',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFF6A7187),
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                              const SizedBox(height: 3),
-                                              Text(
-                                                item.roles?[0].name ?? '',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF6A7187),
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                            ],
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
-                                    bloc.currentPage <= bloc.totalPages &&
-                                            index == employeeList.length - 1
-                                        ? const Column(
-                                            children: [
-                                              SizedBox(height: 24),
-                                              Center(
-                                                child:
-                                                    CupertinoActivityIndicator(),
-                                              ),
-                                              SizedBox(height: 24),
-                                            ],
-                                          )
-                                        : const SizedBox(),
-                                    index == employeeList.length - 1
-                                        ? const SizedBox(height: 24)
-                                        : const SizedBox(),
-                                  ],
-                                );
-                              },
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(height: 24),
-                              itemCount: employeeList.length),
-                        );
+                                          bloc.currentPage <= bloc.totalPages &&
+                                                  index ==
+                                                      employeeList.length - 1
+                                              ? const Column(
+                                                  children: [
+                                                    SizedBox(height: 24),
+                                                    Center(
+                                                      child:
+                                                          CupertinoActivityIndicator(),
+                                                    ),
+                                                    SizedBox(height: 24),
+                                                  ],
+                                                )
+                                              : const SizedBox(),
+                                          index == employeeList.length - 1
+                                              ? const SizedBox(height: 24)
+                                              : const SizedBox(),
+                                        ],
+                                      );
+                                    },
+                                    separatorBuilder: (context, index) =>
+                                        const SizedBox(height: 24),
+                                    itemCount: employeeList.length),
+                              );
                       }
                     },
                   ),
