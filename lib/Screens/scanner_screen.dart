@@ -108,23 +108,23 @@ class _ScannerScreenState extends State<ScannerScreen>
                 width: MediaQuery.of(context).size.width - 120,
                 child: Stack(
                   children: [
-                    // Center(
-                    //   child: SizedBox(
-                    //     height: MediaQuery.of(context).size.width - 150,
-                    //     width: MediaQuery.of(context).size.width - 150,
-                    //     child: MobileScanner(
-                    //       onDetect: (value) {
-                    //         vinNumber = value.barcodes.last.rawValue.toString();
+                    Center(
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.width - 150,
+                        width: MediaQuery.of(context).size.width - 150,
+                        child: MobileScanner(
+                          onDetect: (value) {
+                            vinNumber = value.barcodes.last.rawValue.toString();
 
-                    //         searchController.text = vinNumber;
-                    //         bloc.add(GetVehiclesFromVin(vin: vinNumber));
-                    //         controller.animateTo(1);
+                            searchController.text = vinNumber;
+                            bloc.add(GetVehiclesFromVin(vin: vinNumber));
+                            controller.animateTo(1);
 
-                    //         log(value.barcodes[0].rawValue.toString());
-                    //       },
-                    //     ),
-                    //   ),
-                    // ),
+                            log(value.barcodes[0].rawValue.toString());
+                          },
+                        ),
+                      ),
+                    ),
                     Positioned(
                       top: 0,
                       left: 0,
