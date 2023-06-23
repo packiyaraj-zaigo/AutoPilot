@@ -16,6 +16,7 @@ import '../bloc/vechile/vechile_event.dart';
 import '../bloc/vechile/vechile_state.dart';
 import '../utils/app_utils.dart';
 import '../utils/common_widgets.dart';
+import 'app_drawer.dart';
 
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({Key? key}) : super(key: key);
@@ -25,6 +26,7 @@ class VehiclesScreen extends StatefulWidget {
 }
 
 class _VehiclesScreenState extends State<VehiclesScreen> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   VechileBloc? _bloc;
 
   final _debouncer = Debouncer();
@@ -84,6 +86,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
@@ -116,11 +119,14 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
               Icons.menu,
               color: Colors.black87,
             ),
-            onPressed: () {},
+            onPressed: () {
+              scaffoldKey.currentState!.openDrawer();
+            },
           ),
           // backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+        drawer: showDrawer(context),
         body: Column(
           children: [
             Padding(
