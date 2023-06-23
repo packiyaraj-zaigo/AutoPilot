@@ -136,6 +136,7 @@ class ApiProvider {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
+
     try {
       var url = Uri.parse(
         "${BASE_URL}api/myprofile",
@@ -153,11 +154,21 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getEmployees(String token, int page) async {
+  Future<dynamic> getEmployees(String token, int page, String query) async {
     try {
-      final url = page == 1
-          ? '${BASE_URL}api/users'
-          : '${BASE_URL}api/users?page=$page';
+      String url = '${BASE_URL}api/users';
+
+      if (page != 1) {
+        url = '$url?page=$page';
+      }
+      if (query != '') {
+        if (url.contains('?')) {
+          url = '$url&first_name=$query';
+        } else {
+          url = '$url?first_name=$query';
+        }
+      }
+      print(url);
       var response = http.get(Uri.parse(url), headers: getHeader(token));
       return response;
     } catch (e) {
@@ -165,26 +176,62 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getVechile(String token) async {
-    print("into provider");
-
-    //  LoadingFormModel? loadingFormModel;
+  Future<dynamic> getServices(String token, int page, String query) async {
     try {
-      var url = Uri.parse(
-        "${BASE_URL}api/vehicles",
-      );
-      var request = http.MultipartRequest("GET", url);
+      String url = '${BASE_URL}api/users';
 
-      request.headers.addAll(getHeader(token));
-      var response = await request.send();
-      inspect(response);
-      print(response.statusCode.toString() + "provider status code");
-      print(response.request!.method + "provider response");
-      return http.Response.fromStream(response);
+      if (page != 1) {
+        url = '$url?page=$page';
+      }
+      if (query != '') {
+        if (url.contains('?')) {
+          url = '$url&first_name=$query';
+        } else {
+          url = '$url?first_name=$query';
+        }
+      }
+      print(url);
+      var response = http.get(Uri.parse(url), headers: getHeader(token));
+      return response;
     } catch (e) {
-      print(e.toString() + "provider error");
+      print(e.toString() + 'get employee error');
     }
   }
+
+  Future<dynamic> getVechile(String token, int page) async {
+    try {
+      final url = page == 1
+          ? '${BASE_URL}api/vehicles'
+          : '${BASE_URL}api/vehicles?page=${page + 1}';
+      var response = http.get(Uri.parse(url), headers: getHeader(token));
+      print(response);
+      return response;
+    } catch (e) {
+      print(e.toString() + 'get employee error');
+    }
+  }
+
+  // Future<dynamic> getVechile(String token) async {
+  //   print("into provider");
+  //
+  //   //  LoadingFormModel? loadingFormModel;
+  //   try {
+  //     var url = Uri.parse(
+  //       "${BASE_URL}api/vehicles",
+  //     );
+  //     var request = http.MultipartRequest("GET", url);
+  //
+  //     request.headers.addAll(getHeader(token));
+  //     var response = await request.send();
+  //     inspect(response);
+  //     print(response.statusCode.toString() + "provider status code");
+  //     print(response.request!.method + "provider response");
+  //     return http.Response.fromStream(response);
+  //   } catch (e, s) {
+  //     print(e.toString() + "provider error");
+  //     print(s);
+  //   }
+  // }
 
   Future<dynamic> addVechile(
     BuildContext context,
@@ -214,7 +261,7 @@ class ApiProvider {
         ..fields['vehicle_color'] = color;
       var response = await request.send();
       inspect(response);
-      print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.reasonPhrase}");
+      print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");
       print(response.toString() + "provider status code");
       print(response.toString() + "provider response");
       return http.Response.fromStream(response);

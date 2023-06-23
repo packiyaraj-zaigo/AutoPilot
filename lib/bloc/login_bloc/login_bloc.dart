@@ -92,6 +92,10 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             return BottomBarScreen();
       },), (route) => false);
       }else{
+        if(userLoginRes.body.contains("email")){
+           emit(UserLoginErrorState(
+          errorMessage: userLoginData['email'][0]));
+        }
         emit(UserLoginErrorState(
           errorMessage: userLoginData['message']
         ));

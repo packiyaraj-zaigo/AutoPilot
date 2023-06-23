@@ -448,6 +448,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              inputFormatters:label=='Phone Number'? [
+                FilteringTextInputFormatter.allow(RegExp("[0-9]"))
+              ]:[],
               keyboardType:
                   label == 'Phone Number' ? TextInputType.number : null,
               maxLength: label == 'Phone Number'
@@ -533,8 +536,17 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             child: TextField(
               controller: controller,
               maxLength: 50,
-              inputFormatters: [
+              inputFormatters: label=='First name'? [
+                
+                FilteringTextInputFormatter.deny(RegExp("[0-9]")),
+                FilteringTextInputFormatter.deny(RegExp(r"[!@#$%^&*()\-_=+{}[\]|;:',<.>/?~]")),
+                FilteringTextInputFormatter.deny(RegExp('["]')),
+
+              ]:[
                 FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                FilteringTextInputFormatter.deny(RegExp("[0-9]")),
+                FilteringTextInputFormatter.deny(RegExp(r"[!@#$%^&*()\-_=+{}[\]|;:',<.>/?~]")),
+                FilteringTextInputFormatter.deny(RegExp('["]')),
               ],
               decoration: InputDecoration(
                   hintText: placeHolder,

@@ -14,12 +14,7 @@ class VechileInitial extends VechileState {
   List<Object> get props => [];
 }
 
-class VechileDetailsLoadingState extends VechileState {}
-
-class VechileDetailsSuccessState extends VechileState {
-  final VechileResponse vechile;
-  VechileDetailsSuccessState({required this.vechile});
-
+class VechileDetailsLoadingState extends VechileState {
   @override
   List<Object> get props => [];
 }
@@ -31,6 +26,14 @@ class VechileDetailsErrorState extends VechileState {
   VechileDetailsErrorState({required this.message});
 }
 
+class VechileDetailsSuccessStates extends VechileState {
+  final VechileResponse vechile;
+  const VechileDetailsSuccessStates({required this.vechile});
+
+  @override
+  List<Object> get props => [vechile];
+}
+
 class AddVechileInitial extends VechileState {
   List<Object> get props => [];
 }
@@ -38,16 +41,19 @@ class AddVechileInitial extends VechileState {
 class AddVechileDetailsLoadingState extends VechileState {}
 
 class AddVechileDetailsSuccessState extends VechileState {
+  final VechileResponse vechiles;
+  const AddVechileDetailsSuccessState({required this.vechiles});
   @override
   List<Object> get props => [];
 }
 
+class AddVechileLoading extends VechileState {
+  AddVechileLoading();
+}
+
 class AddVechileDetailsPageNationLoading extends VechileState {}
 
-class AddVechileDetailsErrorState extends VechileState {
-  final String message;
-  AddVechileDetailsErrorState({required this.message});
-}
+class AddVechileDetailsErrorState extends VechileState {}
 
 class DropdownVechileInitial extends VechileState {
   List<Object> get props => [];

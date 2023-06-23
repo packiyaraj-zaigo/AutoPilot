@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:auto_pilot/Models/revenue_chart_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -87,6 +89,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           } else if(state is GetProfileDetailsState){
             AppUtils.setUserName(state.userProfile.user[0].firstName);
             getUserName();
+            print(userName);
 
 
 
@@ -99,34 +102,34 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             return Scaffold(
               backgroundColor: Colors.grey[100],
               key: scaffoldKey,
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(
-                    Icons.menu,
-                    color: Colors.black87,
-                  ),
-                  onPressed: () {
-                    scaffoldKey.currentState!.openDrawer();
-                  },
-                ),
-                backgroundColor: Colors.white,
-                elevation: 0,
-                title: const Text(
-                  'Autopilot',
-                  style: TextStyle(color: Colors.black87),
-                ),
-                centerTitle: true,
-                actions: [
-                  IconButton(
-                      onPressed: () {},
-                      icon: SvgPicture.asset("assets/images/message.svg")),
-                  IconButton(
-                      onPressed: () {},
-                      icon: SvgPicture.asset(
-                          "assets/images/notification.svg"))
-                ],
-              ),
-              drawer: showDrawer(context),
+              // appBar: AppBar(
+              //   leading: IconButton(
+              //     icon: const Icon(
+              //       Icons.menu,
+              //       color: Colors.black87,
+              //     ),
+              //     onPressed: () {
+              //       scaffoldKey.currentState!.openDrawer();
+              //     },
+              //   ),
+              //   backgroundColor: Colors.white,
+              //   elevation: 0,
+              //   title: const Text(
+              //     'Autopilot',
+              //     style: TextStyle(color: Colors.black87),
+              //   ),
+              //   centerTitle: true,
+              //   actions: [
+              //     IconButton(
+              //         onPressed: () {},
+              //         icon: SvgPicture.asset("assets/images/message.svg")),
+              //     IconButton(
+              //         onPressed: () {},
+              //         icon: SvgPicture.asset(
+              //             "assets/images/notification.svg"))
+              //   ],
+              // ),
+              // drawer: showDrawer(context),
               body:state is DashboardLoadingState?const Center(
                 child: CupertinoActivityIndicator(),
               ): ScrollConfiguration(
@@ -147,34 +150,51 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               hideSummary = !hideSummary;
                             });
                           },
-                          child: Row(
+                          child: const Row(
                             children: [
-                              const Text(
+                               Text(
                                 'Today\'s Summary',
                                 style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.w500),
+                                    fontSize: 20, fontWeight: FontWeight.w500,
+                                    color: AppColors.primaryTitleColor),
                               ),
-                              hideSummary
-                                  ? const Icon(
-                                      Icons.keyboard_arrow_down_outlined,
-                                    )
-                                  : const Icon(
-                                      Icons.keyboard_arrow_up_outlined,
-                                    )
+                              // hideSummary
+                              //     ? const Icon(
+                              //         Icons.keyboard_arrow_down_outlined,
+                              //       )
+                              //     : const Icon(
+                              //         Icons.keyboard_arrow_up_outlined,
+                              //       )
                             ],
                           ),
                         ),
                         Visibility(
                           visible: hideSummary,
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: 5,
-                            itemBuilder: (BuildContext context, int index) {
-                              return dashBoardTile(
-                                  dashIconUrl[index], dashTitle[index], dashboardCountList[index]);
-                            },
-                            physics: const NeverScrollableScrollPhysics(),
-                          ),
+                          // child: ListView.builder(
+                          //   shrinkWrap: true,
+                          //   itemCount: 5,
+                          //   itemBuilder: (BuildContext context, int index) {
+                          //     return dashBoardTile(
+                          //         dashIconUrl[index], dashTitle[index], dashboardCountList[index]);
+                          //   },
+                          //   physics: const NeverScrollableScrollPhysics(),
+                          // ),
+
+                           child: Column(
+                          children: [
+                             dashBoardTile(
+                                   'assets/images/sales.svg','Sales', revenueChartData?.sales??""),
+                                dashBoardTile(
+                                    'assets/images/drop.svg','Drop-offs', revenueChartData?.dropoffs.toString()??"") ,
+                                   dashBoardTile(
+                                   'assets/images/pick.svg','Pick-ups', revenueChartData?.pickups.toString()??""),
+                                    dashBoardTile(
+                                   'assets/images/current_vehicle_dash_icon.svg','Current Vehicles', revenueChartData?.currentVehicles.toString()??"") ,
+                                       dashBoardTile(
+                                   'assets/images/staff_dash_icon.svg','Staff', revenueChartData?.staff.toString()??"")               
+
+                          ],
+                         )
                         ),
                         SizedBox(
                           height: 20,
@@ -182,7 +202,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         const Text(
                           'Weekly Revenue',
                           style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.w500),
+                              fontSize: 20, fontWeight: FontWeight.w500,
+                              color: AppColors.primaryTitleColor),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0),
@@ -197,8 +218,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               child: SfCartesianChart(
                                   primaryXAxis: CategoryAxis(),
                                   // Palette colors
-                                  palette: <Color>[
-                                    Colors.black,
+                                  palette:const <Color> [
+                                    AppColors.primaryColors,
                                     Colors.grey,
                                   ],
                                   series: <CartesianSeries>[
@@ -245,7 +266,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             children: [
               Row(
                 children: [
-                  SvgPicture.asset(iconUrl),
+                  SvgPicture.asset(iconUrl,
+                  color: AppColors.primaryTitleColor,),
                   Padding(
                     padding: const EdgeInsets.only(left: 13.0),
                     child: Text(
@@ -253,7 +275,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xff9A9A9A)),
+                          color: AppColors.primaryTitleColor),
                     ),
                   )
                 ],

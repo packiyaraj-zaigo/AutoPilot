@@ -36,7 +36,8 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
         elevation: 0,
         title: const Text(
           'Employee Information',
-          style: TextStyle(color: Colors.black87, fontSize: 16),
+          style: TextStyle(
+              color: Colors.black87, fontSize: 16, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
         actions: [

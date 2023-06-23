@@ -14,6 +14,8 @@ import '../api_provider/api_repository.dart';
 import '../bloc/vechile/vechile_bloc.dart';
 import '../bloc/vechile/vechile_event.dart';
 import '../bloc/vechile/vechile_state.dart';
+import '../utils/app_utils.dart';
+import '../utils/common_widgets.dart';
 
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({Key? key}) : super(key: key);
@@ -23,6 +25,10 @@ class VehiclesScreen extends StatefulWidget {
 }
 
 class _VehiclesScreenState extends State<VehiclesScreen> {
+  VechileBloc? _bloc;
+
+  final _debouncer = Debouncer();
+
   int selectedIndex = 0;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController yearController = TextEditingController();
@@ -34,6 +40,8 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   final TextEditingController licController = TextEditingController();
   final TextEditingController makeController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
+
+  final ScrollController Listcontroller = ScrollController();
 
   bool yearErrorStaus = false;
   bool modelErrorStatus = false;
@@ -47,10 +55,17 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   bool makeErrorStatus = false;
   bool isChecked = false;
 
+  bool isVechileLoading = false;
+
   String yearErrorMsg = '';
   String modelErrorMsg = '';
   String makeErrorMsg = '';
   String typeErrorMsg = '';
+  String colorErrorMsg = '';
+  String vinErrorMsg = '';
+  String submodelErrorMsg = '';
+  String licErrorMsg = '';
+  String engineErrorMsg = '';
 
   final List<Datum> vechile = [];
 
@@ -59,208 +74,448 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   dynamic _currentSelectedTypeValue;
 
   @override
+  void initState() {
+    super.initState();
+    _bloc = BlocProvider.of<VechileBloc>(context);
+    _bloc?.currentPage = 1;
+    _bloc?.add(GetAllVechile());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Autopilot',
-          style: TextStyle(
-              color: AppColors.primaryBlackColors,
-              fontSize: 18,
-              fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
-        actions: [
-          InkWell(
-            onTap: () {
-              _show(context);
-            },
-            child: SvgPicture.asset(
-              "assets/images/add_icon.svg",
-              color: AppColors.primaryBlackColors,
-              height: 20,
-              width: 20,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Autopilot',
+            style: TextStyle(
+                color: AppColors.primaryBlackColors,
+                fontSize: 18,
+                fontWeight: FontWeight.w500),
+          ),
+          centerTitle: true,
+          actions: [
+            InkWell(
+              onTap: () {
+                _show(context);
+              },
+              child: SvgPicture.asset(
+                "assets/images/add_icon.svg",
+                color: AppColors.primaryBlackColors,
+                height: 20,
+                width: 20,
+              ),
             ),
+            SizedBox(
+              width: 20,
+            )
+          ],
+          leading: IconButton(
+            icon: const Icon(
+              Icons.menu,
+              color: Colors.black87,
+            ),
+            onPressed: () {},
           ),
-          SizedBox(
-            width: 20,
-          )
-        ],
-        leading: IconButton(
-          icon: const Icon(
-            Icons.menu,
-            color: Colors.black87,
-          ),
-          onPressed: () {},
+          // backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
-        // backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: BlocProvider(
-        create: (context) =>
-            VechileBloc(apiRepository: ApiRepository())..add(GetAllVechile()),
-        child: BlocListener<VechileBloc, VechileState>(
-          listener: (context, state) {
-            if (state is VechileDetailsSuccessState) {
-              // vechileList.addAll(state.vechile.data.data ?? []);
-            }
-          },
-          child:
-              BlocBuilder<VechileBloc, VechileState>(builder: (context, state) {
-            if (state is VechileDetailsLoadingState) {
-              return const Center(child: CupertinoActivityIndicator());
-            } else if (state is VechileDetailsSuccessState) {
-              return Column(
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                  left: 24, right: 34, top: 24, bottom: 6),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        left: 24, right: 34, top: 24, bottom: 6),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Vehicles',
-                          style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryBlackColors),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 5,
-                                offset:
-                                    Offset(0, 7), // changes position of shadow
-                              ),
-                            ],
-                          ),
-                          height: 50,
-                          child: CupertinoSearchTextField(
-                            backgroundColor: Colors.white,
-                            placeholder: 'Search Vehicles...',
-                            prefixIcon: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 24, right: 16),
-                              child: Icon(
-                                CupertinoIcons.search,
-                                color: AppColors.primaryTextColors,
-                              ),
-                            ),
-                          ),
+                  Text(
+                    'Vehicles',
+                    style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryBlackColors),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 5,
+                          offset: Offset(0, 7), // changes position of shadow
                         ),
                       ],
                     ),
-                  ),
-                  Expanded(
-                    child: AlphabetScrollView(
-                      list: state.vechile.data.data
-                          .map((e) => AlphaModel(e.vehicleMake))
-                          .toList(),
-                      isAlphabetsFiltered: false,
-                      alignment: LetterAlignment.right,
-                      itemExtent: 200,
-                      unselectedTextStyle: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.grey),
-                      selectedTextStyle: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
-                      itemBuilder: (_, k, id) {
-                        // final item = vechile[k];
-                        return Padding(
-                            padding: const EdgeInsets.only(
-                                top: 10, right: 34, left: 24),
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            VechileInformation(
-                                                vechile: state
-                                                    .vechile.data.data[k])));
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      spreadRadius: 1,
-                                      blurRadius: 5,
-                                      offset: Offset(
-                                          0, 7), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: ListTile(
-                                  title: Row(
-                                    children: [
-                                      Text(
-                                        '${state.vechile.data.data[k].vehicleYear}',
-                                        style: TextStyle(
-                                            color: AppColors.primaryTitleColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        '$id',
-                                        style: TextStyle(
-                                            color: AppColors.primaryTitleColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        '${state.vechile.data.data[k].vehicleModel}',
-                                        style: TextStyle(
-                                            color: AppColors.primaryTitleColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ],
-                                  ),
-                                  subtitle: Text(
-                                    '${state.vechile.data.data[0].firstName ?? ""}',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 14,
-                                        color: AppColors.greyText),
-                                  ),
-                                  // trailing: Icon(Icons.add),),
-                                ),
-                              ),
-                            ));
+                    height: 50,
+                    child: CupertinoSearchTextField(
+                      onChanged: (value) {
+                        _debouncer.run(() {
+                          vechile.clear();
+                          _bloc?.currentPage = 1;
+                          _bloc?.add(GetAllVechile(query: value));
+                        });
                       },
+                      backgroundColor: Colors.white,
+                      placeholder: 'Search Vehicles...',
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 24, right: 16),
+                        child: Icon(
+                          CupertinoIcons.search,
+                          color: AppColors.primaryTextColors,
+                        ),
+                      ),
                     ),
-                    // Text("${state.vechile.data.data[0].vehicleModel}")
-                  )
+                  ),
                 ],
-              );
-            } else {
-              return const Text("data");
-            }
-          }),
-        ),
-      ),
-    );
+              ),
+            ),
+            BlocListener<VechileBloc, VechileState>(
+              listener: (context, state) {
+                if (state is VechileDetailsSuccessStates) {
+                  print(
+                      "-----------=============111111111111111111111111111=================");
+                  vechile.addAll(state.vechile.data.data);
+                }
+              },
+              child: BlocBuilder<VechileBloc, VechileState>(
+                builder: (context, state) {
+                  if (state is VechileDetailsLoadingState &&
+                      !_bloc!.isPagenationLoading) {
+                    print("-----------==============================");
+                    return const Center(child: CupertinoActivityIndicator());
+                  } else {
+                    print(vechile.length);
+                    print(
+                        "-----------======wwwwwwwwwwwwwwwwwwwwwwww========================");
+                    return Expanded(
+                      child: ScrollConfiguration(
+                        behavior: const ScrollBehavior(),
+                        child: ListView.separated(
+                            shrinkWrap: true,
+                            controller: Listcontroller
+                              ..addListener(() {
+                                print('object');
+
+                                if (Listcontroller.offset ==
+                                        Listcontroller
+                                            .position.maxScrollExtent &&
+                                    !_bloc!.isPagenationLoading &&
+                                    _bloc!.currentPage <= _bloc!.totalPages) {
+                                  _debouncer.run(() {
+                                    _bloc?.isPagenationLoading = true;
+                                    _bloc?.add(GetAllVechile());
+                                  });
+                                }
+                              }),
+                            itemBuilder: (context, index) {
+                              final item = vechile[index];
+                              return Column(
+                                children: [
+                                  GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              VechileInformation(
+                                            vechile: item,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 10, right: 10, bottom: 10),
+                                      child: Container(
+                                        height: 77,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.07),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
+                                            ),
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    item.vehicleYear ?? "",
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF061237),
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 10,
+                                                  ),
+                                                  Text(
+                                                    item.vehicleModel ?? "",
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF061237),
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                item.firstName ?? "",
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF061237),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 3),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  _bloc!.currentPage <= _bloc!.totalPages &&
+                                          index == vechile.length - 1
+                                      ? const Column(
+                                          children: [
+                                            SizedBox(height: 24),
+                                            Center(
+                                              child:
+                                                  CupertinoActivityIndicator(),
+                                            ),
+                                            SizedBox(height: 24),
+                                          ],
+                                        )
+                                      : const SizedBox(),
+                                  index == vechile.length - 1
+                                      ? const SizedBox(height: 24)
+                                      : const SizedBox(),
+                                ],
+                              );
+                            },
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(height: 24),
+                            itemCount: vechile.length),
+                      ),
+                    );
+                  }
+                  return Container();
+                },
+              ),
+            ),
+            // ScrollConfiguration(
+            //   behavior: const ScrollBehavior(),
+            //   child: ListView.separated(
+            //       shrinkWrap: true,
+            //       controller: controller
+            //         ..addListener(() {
+            //           if (controller.offset ==
+            //                   controller.position.maxScrollExtent &&
+            //               !_bloc.isPagenationLoading &&
+            //               _bloc.currentPage <= _bloc.totalPages) {
+            //             _debouncer.run(() {
+            //               _bloc.isPagenationLoading = true;
+            //               _bloc.add(GetAllVechile());
+            //             });
+            //           }
+            //         }),
+            //       itemBuilder: (context, index) {
+            //         final item = vechile[index];
+            //         return Column(
+            //           children: [
+            //             GestureDetector(
+            //               behavior: HitTestBehavior.opaque,
+            //               // onTap: () {
+            //               //   Navigator.of(context).push(
+            //               //     MaterialPageRoute(
+            //               //       builder: (context) =>
+            //               //           VechileInformation(
+            //               //         employee: item,
+            //               //       ),
+            //               //     ),
+            //               //   );
+            //               // },
+            //               child: Container(
+            //                 height: 77,
+            //                 width: double.infinity,
+            //                 decoration: BoxDecoration(
+            //                   color: Colors.white,
+            //                   boxShadow: [
+            //                     BoxShadow(
+            //                       color: Colors.black.withOpacity(0.07),
+            //                       offset: const Offset(0, 4),
+            //                       blurRadius: 10,
+            //                     ),
+            //                   ],
+            //                   borderRadius: BorderRadius.circular(12),
+            //                 ),
+            //                 child: Padding(
+            //                   padding: const EdgeInsets.symmetric(
+            //                       horizontal: 16.0),
+            //                   child: Column(
+            //                     mainAxisAlignment:
+            //                         MainAxisAlignment.center,
+            //                     crossAxisAlignment:
+            //                         CrossAxisAlignment.start,
+            //                     children: [
+            //                       Text(
+            //                         item.vehicleModel ?? "",
+            //                         overflow: TextOverflow.ellipsis,
+            //                         style: const TextStyle(
+            //                           color: Color(0xFF061237),
+            //                           fontSize: 16,
+            //                           fontWeight: FontWeight.w500,
+            //                         ),
+            //                       ),
+            //                     ],
+            //                   ),
+            //                 ),
+            //               ),
+            //             ),
+            //             _bloc.currentPage <= _bloc.totalPages &&
+            //                     index == vechile.length - 1
+            //                 ? const Column(
+            //                     children: [
+            //                       SizedBox(height: 24),
+            //                       Center(
+            //                         child: CupertinoActivityIndicator(),
+            //                       ),
+            //                       SizedBox(height: 24),
+            //                     ],
+            //                   )
+            //                 : const SizedBox(),
+            //             index == vechile.length - 1
+            //                 ? const SizedBox(height: 24)
+            //                 : const SizedBox(),
+            //           ],
+            //         );
+            //       },
+            //       separatorBuilder: (context, index) =>
+            //           const SizedBox(height: 24),
+            //       itemCount: vechile.length),
+            // )
+
+            // Expanded(
+            //   child: AlphabetScrollView(
+            //     list: state.vechile.data.data
+            //         .map((e) => AlphaModel(e.vehicleMake))
+            //         .toList(),
+            //     isAlphabetsFiltered: false,
+            //     alignment: LetterAlignment.right,
+            //     itemExtent: 200,
+            //     unselectedTextStyle: TextStyle(
+            //         fontSize: 18,
+            //         fontWeight: FontWeight.normal,
+            //         color: Colors.grey),
+            //     selectedTextStyle: TextStyle(
+            //         fontSize: 20,
+            //         fontWeight: FontWeight.bold,
+            //         color: Colors.black),
+            //     itemBuilder: (_, k, id) {
+            //       // final item = vechile[k];
+            //       return Padding(
+            //           padding: const EdgeInsets.only(
+            //               top: 10, right: 34, left: 24),
+            //           child: InkWell(
+            //             onTap: () {
+            //               Navigator.push(
+            //                   context,
+            //                   MaterialPageRoute(
+            //                       builder: (context) =>
+            //                           VechileInformation(
+            //                               vechile: state
+            //                                   .vechile.data.data[k])));
+            //             },
+            //             child: Container(
+            //               decoration: BoxDecoration(
+            //                 borderRadius: BorderRadius.circular(10),
+            //                 color: Colors.white,
+            //                 boxShadow: [
+            //                   BoxShadow(
+            //                     color: Colors.grey.withOpacity(0.2),
+            //                     spreadRadius: 1,
+            //                     blurRadius: 5,
+            //                     offset: Offset(
+            //                         0, 7), // changes position of shadow
+            //                   ),
+            //                 ],
+            //               ),
+            //               child: ListTile(
+            //                 title: Row(
+            //                   children: [
+            //                     Text(
+            //                       '${state.vechile.data.data[k].vehicleYear}',
+            //                       style: TextStyle(
+            //                           color: AppColors.primaryTitleColor,
+            //                           fontSize: 16,
+            //                           fontWeight: FontWeight.w500),
+            //                     ),
+            //                     SizedBox(
+            //                       width: 10,
+            //                     ),
+            //                     Text(
+            //                       '$id',
+            //                       style: TextStyle(
+            //                           color: AppColors.primaryTitleColor,
+            //                           fontSize: 16,
+            //                           fontWeight: FontWeight.w500),
+            //                     ),
+            //                     SizedBox(
+            //                       width: 10,
+            //                     ),
+            //                     Text(
+            //                       '${state.vechile.data.data[k].vehicleModel}',
+            //                       style: TextStyle(
+            //                           color: AppColors.primaryTitleColor,
+            //                           fontSize: 16,
+            //                           fontWeight: FontWeight.w500),
+            //                     ),
+            //                   ],
+            //                 ),
+            //                 subtitle: Text(
+            //                   '${state.vechile.data.data[0].firstName ?? ""}',
+            //                   style: TextStyle(
+            //                       fontWeight: FontWeight.w400,
+            //                       fontSize: 14,
+            //                       color: AppColors.greyText),
+            //                 ),
+            //                 // trailing: Icon(Icons.add),),
+            //               ),
+            //             ),
+            //           ));
+            //     },
+            //   ),
+            //   // Text("${state.vechile.data.data[0].vehicleModel}")
+            // )
+          ],
+        ));
   }
 
   _show(BuildContext ctx) {
@@ -269,14 +524,185 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
         elevation: 10,
         context: ctx,
         builder: (ctx) => BlocProvider(
-              create: (context) => VechileBloc(apiRepository: ApiRepository())
-                ..add(DropDownVechile()),
+              create: (context) => VechileBloc()..add(DropDownVechile()),
               child: BlocListener<VechileBloc, VechileState>(
                 listener: (context, state) {
                   if (state is AddVechileDetailsLoadingState) {
+                    CommonWidgets().showDialog(
+                        context, 'Something went wrong please try again later');
+                    Navigator.pop(context);
                     // vechileList.addAll(state.vechile.data.data ?? []);
+                  } else if (state is VechileDetailsErrorState) {
+                    CommonWidgets().showDialog(context, state.message);
+                  } else if (state is AddVechileDetailsSuccessState) {
+                    // roles.clear();
+                    // roles.addAll(state.roles);
                   } else if (state is DropdownVechileDetailsSuccessState) {
                     dropdownData.addAll(state.dropdownData.data.data);
+                  } else if (state is AddVechileDetailsErrorState) {
+                    if (BlocProvider.of<VechileBloc>(context)
+                        .errorRes
+                        .isNotEmpty) {
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vehicle_year")) {
+                        print("vehicle_year");
+
+                        yearErrorStaus = true;
+
+                        print(yearErrorStaus);
+                        yearErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vehicle_year'][0];
+                        print(yearErrorMsg);
+                        // }
+                      } else {
+                        yearErrorStaus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vehicle_model")) {
+                        modelErrorStatus = true;
+                        modelErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vehicle_model'][0];
+                      } else {
+                        modelErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vehicle_type")) {
+                        print("vehicle_type");
+
+                        typeErrorStatus = true;
+
+                        print(typeErrorStatus);
+                        typeErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vehicle_type'][0];
+                        print(typeErrorMsg);
+                        // }
+                      } else {
+                        typeErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vehicle_make")) {
+                        print("vehicle_make");
+
+                        makeErrorStatus = true;
+
+                        print(makeErrorStatus);
+                        makeErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vehicle_make'][0];
+                        print(makeErrorMsg);
+                        // }
+                      } else {
+                        makeErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vehicle_color")) {
+                        print("vehicle_color");
+
+                        colorErrorStatus = true;
+
+                        print(colorErrorStatus);
+                        colorErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vehicle_color'][0];
+                        print(colorErrorMsg);
+                        // }
+                      } else {
+                        colorErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vehicle_color")) {
+                        print("vehicle_color");
+
+                        colorErrorStatus = true;
+
+                        print(colorErrorStatus);
+                        colorErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vehicle_color'][0];
+                        print(colorErrorMsg);
+                        // }
+                      } else {
+                        colorErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vin")) {
+                        print("vin");
+
+                        vinErrorStatus = true;
+
+                        print(vinErrorStatus);
+                        vinErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vin'][0];
+                        print(vinErrorMsg);
+                        // }
+                      } else {
+                        vinErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("vin")) {
+                        print("vin");
+
+                        vinErrorStatus = true;
+
+                        print(vinErrorStatus);
+                        vinErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['vin'][0];
+                        print(vinErrorMsg);
+                        // }
+                      } else {
+                        vinErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("sub_model")) {
+                        print("sub_model");
+
+                        subModelErrorStatus = true;
+
+                        print(subModelErrorStatus);
+                        submodelErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['sub_model'][0];
+                        print(submodelErrorMsg);
+                        // }
+                      } else {
+                        subModelErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("licence_plate")) {
+                        print("licence_plate");
+
+                        licErrorStatus = true;
+
+                        print(subModelErrorStatus);
+                        licErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['licence_plate'][0];
+                        print(licErrorMsg);
+                        // }
+                      } else {
+                        licErrorStatus = false;
+                      }
+                      if (BlocProvider.of<VechileBloc>(context)
+                          .errorRes
+                          .containsKey("engine_size")) {
+                        print("engine_size");
+
+                        engineErrorStatus = true;
+
+                        print(engineErrorStatus);
+                        engineErrorMsg = BlocProvider.of<VechileBloc>(context)
+                            .errorRes['engine_size'][0];
+                        print(engineErrorMsg);
+                        // }
+                      } else {
+                        engineErrorStatus = false;
+                      }
+                    }
                   }
                 },
                 child: BlocBuilder<VechileBloc, VechileState>(
@@ -334,36 +760,23 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                               color:
                                                   AppColors.primaryTitleColor),
                                         ),
-                                        textBox(
-                                            "Enter email...",
-                                            nameController,
-                                            "Owner",
-                                            nameErrorStatus),
+                                        // textBox("Enter name...", nameController,
+                                        //     "Owner", nameErrorStatus),
                                         textBox("Enter year...", yearController,
                                             "Year", yearErrorStaus),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Visibility(
-                                                  visible: yearErrorStaus,
-                                                  child: Text(
-                                                    yearErrorMsg,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(
-                                                        0xffD80027,
-                                                      ),
-                                                    ),
-                                                  )),
-                                            ],
-                                          ),
-                                        ),
+                                        Visibility(
+                                            visible: yearErrorStaus,
+                                            child: Text(
+                                              yearErrorMsg,
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color(
+                                                  0xffD80027,
+                                                ),
+                                              ),
+                                            )),
+
                                         textBox("Enter make...", makeController,
                                             "Make", makeErrorStatus),
                                         SizedBox(
@@ -374,29 +787,18 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                             modelController,
                                             "Model",
                                             modelErrorStatus),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 8.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              Visibility(
-                                                  visible: modelErrorStatus,
-                                                  child: Text(
-                                                    modelErrorMsg,
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Color(
-                                                        0xffD80027,
-                                                      ),
-                                                    ),
-                                                  )),
-                                            ],
-                                          ),
-                                        ),
+                                        Visibility(
+                                            visible: modelErrorStatus,
+                                            child: Text(
+                                              modelErrorMsg,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: Color(
+                                                  0xffD80027,
+                                                ),
+                                              ),
+                                            )),
                                         textBox(
                                             "Enter number...",
                                             vinController,
@@ -427,11 +829,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                     engineController,
                                                     "Engine",
                                                     engineErrorStatus),
-                                                textBox(
-                                                    "Enter make...",
-                                                    makeController,
-                                                    "Make",
-                                                    makeErrorStatus),
+                                                // textBox(
+                                                //     "Enter make...",
+                                                //     makeController,
+                                                //     "Make",
+                                                //     makeErrorStatus),
                                                 textBox(
                                                     "Enter color...",
                                                     colorController,
@@ -451,7 +853,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                       color:
                                                           AppColors.greyText),
                                                 ),
-                                                vechiledropDown()
+                                                vechiledropDown(),
                                                 // SizedBox(
                                                 //   height: 50,
                                                 //   child: CupertinoTextField(
@@ -513,9 +915,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                           child: ElevatedButton(
                                             onPressed: () {
                                               validateVechile(
-                                                context,
                                                 yearController.text,
                                                 modelController.text,
+                                                typeController.text,
+                                                context,
+                                                stateUpdate,
                                               );
                                               // Navigator.push(
                                               //     context,
@@ -531,10 +935,16 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                         10.0),
                                               ),
                                             ),
-                                            child: const Text(
-                                              'Confirm',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
+                                            child: state
+                                                    is AddVechileDetailsLoadingState
+                                                ? const CupertinoActivityIndicator(
+                                                    color: Colors.white,
+                                                  )
+                                                : Text(
+                                                    'Confirm',
+                                                    style:
+                                                        TextStyle(fontSize: 15),
+                                                  ),
                                           ),
                                         ),
                                       ]),
@@ -550,65 +960,22 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   }
 
   validateVechile(
-      BuildContext context, String VechileYear, String VechileModel) {
+    String VechileYear,
+    String VechileModel,
+    String VechileType,
+    BuildContext context,
+    StateSetter stateUpdate,
+  ) {
     if (VechileYear.isEmpty) {
-      print("djjjjjjjjjjjjjjjjjhgwjjjjjjjjjjjjjjjjjjjjjjj");
-      setState(() {
+      stateUpdate(() {
         yearErrorMsg = 'Year cant be empty.';
         yearErrorStaus = true;
       });
     } else {
-      print("dkllllllllaaaaaaaaaaaaaaaaaaaaaa");
-      if (VechileYear.length < 4) {
-        setState(() {
-          yearErrorStaus = true;
-          yearErrorMsg = 'Please enter a valid phone number';
-        });
-      } else {
-        setState(() {
-          yearErrorStaus = false;
-        });
-      }
+      yearErrorStaus = false;
     }
-
-    // if (VechileType.isEmpty) {
-    //   setState(() {
-    //     typeErrorMsg = 'Type cant be empty.';
-    //     typeErrorStatus = true;
-    //   });
-    // } else {
-    //   if (VechileYear.length < 4) {
-    //     setState(() {
-    //       typeErrorStatus = true;
-    //       typeErrorMsg = 'Please enter a valid phone number';
-    //     });
-    //   } else {
-    //     setState(() {
-    //       typeErrorStatus = false;
-    //     });
-    //   }
-    // }
-    //
-    // if (VechileMake.isEmpty) {
-    //   setState(() {
-    //     makeErrorMsg = 'Type cant be empty.';
-    //     makeErrorStatus = true;
-    //   });
-    // } else {
-    //   if (VechileYear.length < 4) {
-    //     setState(() {
-    //       makeErrorStatus = true;
-    //       makeErrorMsg = 'Please enter a valid phone number';
-    //     });
-    //   } else {
-    //     setState(() {
-    //       makeErrorStatus = false;
-    //     });
-    //   }
-    // }
-
     if (VechileModel.isEmpty) {
-      setState(() {
+      stateUpdate(() {
         modelErrorMsg = 'Type cant be empty.';
         modelErrorStatus = true;
       });
@@ -616,13 +983,21 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
       if (VechileYear.length < 4) {
         setState(() {
           modelErrorStatus = true;
-          modelErrorMsg = 'Please enter a valid phone number';
+          modelErrorMsg = 'The vehicle model must be at least 2 characters.';
         });
       } else {
         setState(() {
           modelErrorStatus = false;
         });
       }
+    }
+    if (VechileType.isEmpty) {
+      stateUpdate(() {
+        typeErrorMsg = 'Type cant be empty.';
+        typeErrorStatus = true;
+      });
+    } else {
+      typeErrorStatus = false;
     }
     if (!yearErrorStaus && !modelErrorStatus) {
       context.read<VechileBloc>().add(AddVechile(
@@ -636,7 +1011,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
             vinNumber: vinController.text,
             licNumber: licController.text,
             make: makeController.text,
-            type: _currentSelectedTypeValue,
+            type: _currentSelectedTypeValue.toString(),
           ));
     }
   }
