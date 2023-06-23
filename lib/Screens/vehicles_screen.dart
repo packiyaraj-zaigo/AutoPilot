@@ -16,6 +16,7 @@ import '../bloc/vechile/vechile_event.dart';
 import '../bloc/vechile/vechile_state.dart';
 import '../utils/app_utils.dart';
 import '../utils/common_widgets.dart';
+import 'app_drawer.dart';
 
 class VehiclesScreen extends StatefulWidget {
   const VehiclesScreen({Key? key}) : super(key: key);
@@ -25,6 +26,7 @@ class VehiclesScreen extends StatefulWidget {
 }
 
 class _VehiclesScreenState extends State<VehiclesScreen> {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
   VechileBloc? _bloc;
 
   final _debouncer = Debouncer();
@@ -84,6 +86,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
@@ -116,11 +119,14 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
               Icons.menu,
               color: Colors.black87,
             ),
-            onPressed: () {},
+            onPressed: () {
+              scaffoldKey.currentState!.openDrawer();
+            },
           ),
           // backgroundColor: Colors.transparent,
           elevation: 0,
         ),
+        drawer: showDrawer(context),
         body: Column(
           children: [
             Padding(
@@ -189,142 +195,161 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                     print("-----------==============================");
                     return const Center(child: CupertinoActivityIndicator());
                   } else {
-                    print(vechile.length);
-                    print(
-                        "-----------======wwwwwwwwwwwwwwwwwwwwwwww========================");
-                    return Expanded(
-                      child: ScrollConfiguration(
-                        behavior: const ScrollBehavior(),
-                        child: ListView.separated(
-                            shrinkWrap: true,
-                            controller: Listcontroller
-                              ..addListener(() {
-                                print('object');
-
-                                if (Listcontroller.offset ==
-                                        Listcontroller
-                                            .position.maxScrollExtent &&
-                                    !_bloc!.isPagenationLoading &&
-                                    _bloc!.currentPage <= _bloc!.totalPages) {
-                                  _debouncer.run(() {
-                                    _bloc?.isPagenationLoading = true;
-                                    _bloc?.add(GetAllVechile());
-                                  });
-                                }
-                              }),
-                            itemBuilder: (context, index) {
-                              final item = vechile[index];
-                              return Column(
-                                children: [
-                                  GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () {
-                                      Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              VechileInformation(
-                                            vechile: item,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 10, right: 10, bottom: 10),
-                                      child: Container(
-                                        height: 77,
-                                        width: double.infinity,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black
-                                                  .withOpacity(0.07),
-                                              offset: const Offset(0, 4),
-                                              blurRadius: 10,
-                                            ),
-                                          ],
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16.0),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    item.vehicleYear ?? "",
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF061237),
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 10,
-                                                  ),
-                                                  Text(
-                                                    item.vehicleModel ?? "",
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF061237),
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Text(
-                                                item.firstName ?? "",
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF061237),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
+                    return vechile.isEmpty
+                        ? const Center(
+                            child: Text(
+                            'No Vechile found',
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primaryTextColors),
+                          ))
+                        : Expanded(
+                            child: ScrollConfiguration(
+                              behavior: const ScrollBehavior(),
+                              child: ListView.separated(
+                                  shrinkWrap: true,
+                                  controller: Listcontroller
+                                    ..addListener(() {
+                                      print('object');
+                                      if (Listcontroller.offset ==
+                                              Listcontroller
+                                                  .position.maxScrollExtent &&
+                                          !_bloc!.isPagenationLoading &&
+                                          _bloc!.currentPage <=
+                                              _bloc!.totalPages) {
+                                        _debouncer.run(() {
+                                          _bloc?.isPagenationLoading = true;
+                                          _bloc?.add(GetAllVechile());
+                                        });
+                                      }
+                                    }),
+                                  itemBuilder: (context, index) {
+                                    final item = vechile[index];
+                                    return Column(
+                                      children: [
+                                        GestureDetector(
+                                          behavior: HitTestBehavior.opaque,
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    VechileInformation(
+                                                  vechile: item,
                                                 ),
                                               ),
-                                              const SizedBox(height: 3),
-                                            ],
+                                            );
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10,
+                                                right: 10,
+                                                bottom: 10),
+                                            child: Container(
+                                              height: 77,
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.07),
+                                                    offset: const Offset(0, 4),
+                                                    blurRadius: 10,
+                                                  ),
+                                                ],
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          item.vehicleYear ??
+                                                              "",
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Color(
+                                                                0xFF061237),
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Text(
+                                                          item.vehicleModel ??
+                                                              "",
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Color(
+                                                                0xFF061237),
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      item.firstName ?? "",
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFF061237),
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 3),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
-                                  _bloc!.currentPage <= _bloc!.totalPages &&
-                                          index == vechile.length - 1
-                                      ? const Column(
-                                          children: [
-                                            SizedBox(height: 24),
-                                            Center(
-                                              child:
-                                                  CupertinoActivityIndicator(),
-                                            ),
-                                            SizedBox(height: 24),
-                                          ],
-                                        )
-                                      : const SizedBox(),
-                                  index == vechile.length - 1
-                                      ? const SizedBox(height: 24)
-                                      : const SizedBox(),
-                                ],
-                              );
-                            },
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(height: 24),
-                            itemCount: vechile.length),
-                      ),
-                    );
+                                        _bloc!.currentPage <=
+                                                    _bloc!.totalPages &&
+                                                index == vechile.length - 1
+                                            ? const Column(
+                                                children: [
+                                                  SizedBox(height: 24),
+                                                  Center(
+                                                    child:
+                                                        CupertinoActivityIndicator(),
+                                                  ),
+                                                  SizedBox(height: 24),
+                                                ],
+                                              )
+                                            : const SizedBox(),
+                                        index == vechile.length - 1
+                                            ? const SizedBox(height: 24)
+                                            : const SizedBox(),
+                                      ],
+                                    );
+                                  },
+                                  separatorBuilder: (context, index) =>
+                                      const SizedBox(height: 24),
+                                  itemCount: vechile.length),
+                            ),
+                          );
                   }
                   return Container();
                 },

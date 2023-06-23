@@ -37,7 +37,8 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       }
 
       final token = await AppUtils.getToken();
-      Response response = await apiRepo.getVechile(token, currentPage);
+      Response response =
+          await apiRepo.getVechile(token, currentPage, event.query);
       if (response.statusCode == 200) {
         print(response.body);
         final responseBody = jsonDecode(response.body);

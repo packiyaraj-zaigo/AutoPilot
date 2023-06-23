@@ -198,11 +198,20 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getVechile(String token, int page) async {
+  Future<dynamic> getVechile(String token, int page, String query) async {
     try {
-      final url = page == 1
-          ? '${BASE_URL}api/vehicles'
-          : '${BASE_URL}api/vehicles?page=${page + 1}';
+      String url = '${BASE_URL}api/vehicles';
+      if (page != 1) {
+        url = '$url?page=$page';
+      }
+      if (query != '') {
+        if (url.contains('?')) {
+          url = '$url&vehicle_model=$query';
+        } else {
+          url = '$url?vehicle_model=$query';
+        }
+      }
+      // : '${BASE_URL}api/vehicles?page=${page + 1}';
       var response = http.get(Uri.parse(url), headers: getHeader(token));
       print(response);
       return response;
@@ -213,7 +222,6 @@ class ApiProvider {
 
   // Future<dynamic> getVechile(String token) async {
   //   print("into provider");
-  //
   //   //  LoadingFormModel? loadingFormModel;
   //   try {
   //     var url = Uri.parse(
