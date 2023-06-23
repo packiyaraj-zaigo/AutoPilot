@@ -33,6 +33,8 @@ class AddCustomerLoading extends CustomerState {
 }
 
 class AddCustomerError extends CustomerState {
-  final String message;
+  var message;
   AddCustomerError({required this.message});
+  @override
+  List<Object> get props => [message];
 }

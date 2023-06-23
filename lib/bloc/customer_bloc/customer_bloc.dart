@@ -74,13 +74,14 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
         ScaffoldMessenger.of((event.context)).showSnackBar(SnackBar(
             content: Text('${unloadData['message']}'),
             backgroundColor: Colors.green));
-        Navigator.push(event.context,
-            MaterialPageRoute(builder: (context) => CustomersScreen()));
+        Navigator.of(event.context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => CustomersScreen(),
+          ),
+          (route) => false,
+        );
       } else {
-        ScaffoldMessenger.of((event.context)).showSnackBar(SnackBar(
-          content: Text('${unloadData}'),
-          backgroundColor: Colors.red,
-        ));
+        emit(AddCustomerError(message: unloadData));
       }
     } catch (e) {
       showLoading = 0;

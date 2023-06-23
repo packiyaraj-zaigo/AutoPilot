@@ -104,6 +104,15 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         child: BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is AddCustomerError) {
+              if (state.message.containsKey('email')) {
+                emailErrorStatus = true;
+                emailErrorMsg = state.message['email'];
+              }
+              ScaffoldMessenger.of((context)).showSnackBar(SnackBar(
+                content: Text('${state.message}'),
+                backgroundColor: Colors.red,
+              ));
+
               '==========================errrrrrrrrorrrrrrrrr';
             } else if (state is AddCustomerLoading) {
               Center(
@@ -633,6 +642,13 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     if (email.isEmpty) {
       setState(() {
         emailErrorMsg = 'Email cant be empty';
+        emailErrorStatus = true;
+      });
+    } else if (!RegExp(
+            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+        .hasMatch(email)) {
+      setState(() {
+        emailErrorMsg = "The email must be a valid email address.";
         emailErrorStatus = true;
       });
     } else {
