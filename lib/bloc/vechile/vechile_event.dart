@@ -10,7 +10,10 @@ abstract class VechileEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetAllVechile extends VechileEvent {}
+class GetAllVechile extends VechileEvent {
+  final String query;
+  GetAllVechile({this.query = ''});
+}
 
 class CreateVechile extends VechileEvent {
   final VechileResponse model;

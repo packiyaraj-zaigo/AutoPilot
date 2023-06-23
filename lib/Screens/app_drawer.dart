@@ -1,6 +1,7 @@
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -70,7 +71,8 @@ showDrawer(BuildContext context) {
           leading: const Icon(CupertinoIcons.car_detailed),
           title: const Text('Vehicles'),
           onTap: () {
-            Navigator.pop(context);
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => VehiclesScreen()));
           },
         ),
         ListTile(
