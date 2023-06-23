@@ -62,8 +62,12 @@ showDrawer(BuildContext context) {
           title: const Text('Customers'),
           onTap: () {
             Navigator.pop(context);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CustomersScreen()));
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => CustomersScreen(),
+              ),
+              (route) => false,
+            );
           },
         ),
         ListTile(
