@@ -74,8 +74,8 @@ class ApiRepository {
     return apiProvider.getAllRoles(token);
   }
 
-  Future getVechile(String token, int currentPage) {
-    return apiProvider.getVechile(token, currentPage);
+  Future getVechile(String token, int currentPage, String query) {
+    return apiProvider.getVechile(token, currentPage, query);
   }
 
   Future addVechile(
