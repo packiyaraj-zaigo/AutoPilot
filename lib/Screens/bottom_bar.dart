@@ -1,254 +1,457 @@
+// ignore_for_file: deprecated_member_use
+
+import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
+import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 // ignore: must_be_immutable
 class BottomBarScreen extends StatefulWidget {
-  BottomBarScreen({super.key});
+  BottomBarScreen({
+    super.key,
+  });
 
   @override
   State<BottomBarScreen> createState() => _BottomBarScreenState();
 }
 
-class _BottomBarScreenState extends State<BottomBarScreen> {
+class _BottomBarScreenState extends State<BottomBarScreen>
+    with TickerProviderStateMixin {
+  late TabController estimateTabController;
+  late TabController workFlowTabController;
   PageController pageController = PageController();
+  List pages = [];
 
   int currentIndex = 0;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List pages = [
-    DashBoardScreen(),
-    WorkFlowScreen(),
-    CalendarScreen(),
-    EstimateScreen()
-  ];
+  @override
+  void initState() {
+    estimateTabController = TabController(length: 4, vsync: this);
+    workFlowTabController = TabController(length: 2, vsync: this);
+
+    pages = [
+      DashBoardScreen(),
+      WorkFlowScreen(tabController: workFlowTabController),
+      CalendarScreen(),
+      EstimateScreen(
+        tabController: estimateTabController,
+      )
+    ];
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color(0xffFAFAFA),
+    return BlocProvider(
+      create: (context) => DashboardBloc(apiRepository: ApiRepository()) ..add(GetUserProfileEvent()),
+      child: BlocListener<DashboardBloc, DashboardState>(
+        listener: (context, state) {
+           if(state is GetProfileDetailsState){
+            AppUtils.setUserName(state.userProfile.user[0].firstName);
+            getUserName();
+            print(userName);
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primaryColors,
-        elevation: 0,
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (context) {
-              return mainCreateWidget();
-            },
-            isScrollControlled: true,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
-            ),
-          );
+
+
+
+          }
+          // TODO: implement listener
         },
-        child: Icon(Icons.add),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        color: Colors.white,
-        notchMargin: 8,
-        child: SizedBox(
-          height: 68,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      changePage(0);
+        child: BlocBuilder<DashboardBloc, DashboardState>(
+          builder: (context, state) {
+            return Scaffold(
+              backgroundColor: Color(0xffFAFAFA),
+              key: scaffoldKey,
+
+              floatingActionButtonLocation:
+                  FloatingActionButtonLocation.centerDocked,
+              floatingActionButton: FloatingActionButton(
+                backgroundColor: AppColors.primaryColors,
+                elevation: 0,
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return mainCreateWidget();
                     },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: SvgPicture.asset(
-                              "assets/images/bottom_dashboard.svg",
-                              color: currentIndex == 0
-                                  ? AppColors.primaryColors
-                                  : Color(0xff9A9A9A)),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5.0),
-                          child: Text("Dashboard",
-                              style: TextStyle(
-                                  color: currentIndex == 0
-                                      ? AppColors.primaryColors
-                                      : Color(0xff9A9A9A),
-                                  fontWeight: currentIndex == 0
-                                      ? FontWeight.w600
-                                      : FontWeight.w400)),
-                        ),
-                      ],
+                    isScrollControlled: true,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(12.0)),
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      changePage(1);
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: SvgPicture.asset(
-                              "assets/images/workflow_icon.svg",
-                              color: currentIndex == 1
-                                  ? AppColors.primaryColors
-                                  : Color(0xff9A9A9A)),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5.0),
-                          child: Text("Workflow",
-                              style: TextStyle(
-                                  color: currentIndex == 1
-                                      ? AppColors.primaryColors
-                                      : Color(0xff9A9A9A),
-                                  fontWeight: currentIndex == 1
-                                      ? FontWeight.w600
-                                      : FontWeight.w400)),
-                        ),
-                      ],
+                  );
+                },
+                child: Icon(Icons.add),
+              ),
+              appBar: AppBar(
+                  leading: IconButton(
+                    icon: const Icon(
+                      Icons.menu,
+                      color: AppColors.primaryColors,
                     ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      changePage(2);
+                    onPressed: () {
+                      scaffoldKey.currentState!.openDrawer();
                     },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: SvgPicture.asset(
-                              "assets/images/calender_icon.svg",
-                              color: currentIndex == 2
-                                  ? AppColors.primaryColors
-                                  : Color(0xff9A9A9A)),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5.0),
-                          child: Text("Calendar",
-                              style: TextStyle(
-                                  color: currentIndex == 2
-                                      ? AppColors.primaryColors
-                                      : Color(0xff9A9A9A),
-                                  fontWeight: currentIndex == 2
-                                      ? FontWeight.w600
-                                      : FontWeight.w400)),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      changePage(3);
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  title: const Text(
+                    'Autopilot',
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  centerTitle: true,
+                  actions: [
+                    IconButton(
+                        onPressed: () {},
+                        icon: SvgPicture.asset(
+                          "assets/images/message.svg",
+                          color: AppColors.primaryColors,
+                        )),
+                    IconButton(
+                        onPressed: () {},
+                        icon: SvgPicture.asset(
+                          "assets/images/notification.svg",
+                          color: AppColors.primaryColors,
+                        ))
+                  ],
+                  bottom: currentIndex == 3
+                      ? PreferredSize(
+                          preferredSize: const Size(double.infinity, 80),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Text(
+                                  "Estimates",
+                                  style: TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              TabBar(
+                                controller: estimateTabController,
+                                enableFeedback: false,
+                                indicatorColor: AppColors.primaryColors,
+                                unselectedLabelColor: const Color(0xFF9A9A9A),
+                                labelColor: AppColors.primaryColors,
+                                tabs: const [
+                                  SizedBox(
+                                    height: 50,
+                                    child: Center(
+                                      child: Text(
+                                        'Recent',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 50,
+                                    child: Center(
+                                      child: Text(
+                                        'Estimates',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 50,
+                                    child: Center(
+                                      child: Text(
+                                        'Orders',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 50,
+                                    child: Center(
+                                      child: Text(
+                                        'Invoices',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      : currentIndex == 1
+                          ? PreferredSize(
+                              preferredSize: const Size(double.infinity, 90),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 16.0),
+                                    child: Text(
+                                      'Workflow',
+                                      style: TextStyle(
+                                          fontSize: 28,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                  PreferredSize(
+                                    preferredSize:
+                                        const Size(double.infinity, 60),
+                                    child: TabBar(
+                                      controller: workFlowTabController,
+                                      enableFeedback: false,
+                                      indicatorColor: AppColors.primaryColors,
+                                      unselectedLabelColor:
+                                          const Color(0xFF9A9A9A),
+                                      labelColor: AppColors.primaryColors,
+                                      tabs: const [
+                                        SizedBox(
+                                          height: 50,
+                                          child: Center(
+                                            child: Text(
+                                              'Orders',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 50,
+                                          child: Center(
+                                            child: Text(
+                                              'Vehicle',
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : null),
+
+              drawer: showDrawer(context),
+              bottomNavigationBar: BottomAppBar(
+                shape: const CircularNotchedRectangle(),
+                elevation: 100,
+                color: Colors.white,
+                notchMargin: 8,
+                child: SizedBox(
+                  height: 68,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
                       children: [
-                        SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: SvgPicture.asset(
-                            "assets/images/estimate_icon.svg",
-                            color: currentIndex == 3
-                                ? AppColors.primaryColors
-                                : Color(0xff9A9A9A),
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              changePage(0);
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  height: 25,
+                                  width: 25,
+                                  child: SvgPicture.asset(
+                                      "assets/images/bottom_dashboard.svg",
+                                      color: currentIndex == 0
+                                          ? AppColors.primaryColors
+                                          : Color(0xff9A9A9A)),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 5.0),
+                                  child: Text("Dashboard",
+                                      style: TextStyle(
+                                          color: currentIndex == 0
+                                              ? AppColors.primaryColors
+                                              : Color(0xff9A9A9A),
+                                          fontWeight: currentIndex == 0
+                                              ? FontWeight.w600
+                                              : FontWeight.w400)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5.0),
-                          child: Text(
-                            "Estimate",
-                            style: TextStyle(
-                                color: currentIndex == 3
-                                    ? AppColors.primaryColors
-                                    : Color(0xff9A9A9A),
-                                fontWeight: currentIndex == 3
-                                    ? FontWeight.w600
-                                    : FontWeight.w400),
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              changePage(1);
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  height: 25,
+                                  width: 25,
+                                  child: SvgPicture.asset(
+                                      "assets/images/workflow_icon.svg",
+                                      color: currentIndex == 1
+                                          ? AppColors.primaryColors
+                                          : Color(0xff9A9A9A)),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 5.0),
+                                  child: Text("Workflow",
+                                      style: TextStyle(
+                                          color: currentIndex == 1
+                                              ? AppColors.primaryColors
+                                              : Color(0xff9A9A9A),
+                                          fontWeight: currentIndex == 1
+                                              ? FontWeight.w600
+                                              : FontWeight.w400)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              changePage(2);
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  height: 25,
+                                  width: 25,
+                                  child: SvgPicture.asset(
+                                      "assets/images/calender_icon.svg",
+                                      color: currentIndex == 2
+                                          ? AppColors.primaryColors
+                                          : Color(0xff9A9A9A)),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 5.0),
+                                  child: Text("Calendar",
+                                      style: TextStyle(
+                                          color: currentIndex == 2
+                                              ? AppColors.primaryColors
+                                              : Color(0xff9A9A9A),
+                                          fontWeight: currentIndex == 2
+                                              ? FontWeight.w600
+                                              : FontWeight.w400)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              changePage(3);
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  height: 25,
+                                  width: 25,
+                                  child: SvgPicture.asset(
+                                    "assets/images/estimate_icon.svg",
+                                    color: currentIndex == 3
+                                        ? AppColors.primaryColors
+                                        : Color(0xff9A9A9A),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 5.0),
+                                  child: Text(
+                                    "Estimate",
+                                    style: TextStyle(
+                                        color: currentIndex == 3
+                                            ? AppColors.primaryColors
+                                            : Color(0xff9A9A9A),
+                                        fontWeight: currentIndex == 3
+                                            ? FontWeight.w600
+                                            : FontWeight.w400),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
-                )
-              ],
-            ),
-          ),
+                ),
+                // child: Row(
+                //   children: [
+                //     Column(
+
+                //       children: [
+                //         SvgPicture.asset("assets/images/dashboard_icon.svg"),
+                //         Text("Dashboard")
+
+                //       ],
+                //     )
+                //   ],
+                // ),
+              ),
+              body: PageView.builder(
+                itemBuilder: (context, index) {
+                  return pages[index];
+                },
+                itemCount: pages.length,
+                controller: pageController,
+                physics: const NeverScrollableScrollPhysics(),
+              ),
+
+              // body: SafeArea(
+              //   child: Column(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       const Center(
+              //         child: Text("Dashboard screen"),
+              //       ),
+              //       Padding(
+              //         padding: const EdgeInsets.only(top:24.0),
+              //         child: GestureDetector(
+              //           onTap: (){
+              //             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+              //               return const WelcomeScreen();
+              //             },), (route) => false);
+              //             AppUtils.setToken("");
+
+              //           },
+              //           child: Text("Signout",style: TextStyle(
+              //             decoration: TextDecoration.underline,
+              //             fontSize: 16
+              //           ),),
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              //  ),
+            );
+          },
         ),
-        // child: Row(
-        //   children: [
-        //     Column(
-
-        //       children: [
-        //         SvgPicture.asset("assets/images/dashboard_icon.svg"),
-        //         Text("Dashboard")
-
-        //       ],
-        //     )
-        //   ],
-        // ),
       ),
-      body: PageView.builder(
-        itemBuilder: (context, index) {
-          return pages[index];
-        },
-        itemCount: pages.length,
-        controller: pageController,
-        physics: const NeverScrollableScrollPhysics(),
-      ),
-
-      // body: SafeArea(
-      //   child: Column(
-      //     mainAxisAlignment: MainAxisAlignment.center,
-      //     children: [
-      //       const Center(
-      //         child: Text("Dashboard screen"),
-      //       ),
-      //       Padding(
-      //         padding: const EdgeInsets.only(top:24.0),
-      //         child: GestureDetector(
-      //           onTap: (){
-      //             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-      //               return const WelcomeScreen();
-      //             },), (route) => false);
-      //             AppUtils.setToken("");
-
-      //           },
-      //           child: Text("Signout",style: TextStyle(
-      //             decoration: TextDecoration.underline,
-      //             fontSize: 16
-      //           ),),
-      //         ),
-      //       )
-      //     ],
-      //   ),
-      //  ),
     );
   }
 
@@ -345,4 +548,19 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
       ),
     );
   }
+
+
+
+   getUserName()async{
+   
+     await AppUtils.getUserName().then((value) {
+      setState(() {
+        userName=value;
+      });
+     });
+      
+
+
+
+}
 }

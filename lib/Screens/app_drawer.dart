@@ -3,10 +3,13 @@ import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
+import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
+import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 showDrawer(BuildContext context) {
   return Drawer(
@@ -23,11 +26,11 @@ showDrawer(BuildContext context) {
             decoration: const BoxDecoration(color: Colors.white),
             accountName: const Text(
               "Hello",
-              style: TextStyle(fontSize: 18, color: Colors.grey),
+              style: TextStyle(fontSize: 18, color: Colors.grey,fontWeight: FontWeight.w600),
             ),
             accountEmail: Text(
-              userName,
-              style: const TextStyle(fontSize: 28, color: Colors.black),
+             userName.isNotEmpty? "${userName[0].toUpperCase()+userName.substring(1)}":"",
+              style: const TextStyle(fontSize: 28, color: AppColors.primaryTitleColor,fontWeight: FontWeight.w600),
             ),
             // currentAccountPictureSize: Size.square(50),
             // currentAccountPicture: CircleAvatar(
@@ -39,104 +42,83 @@ showDrawer(BuildContext context) {
             // ), //circleAvatar
           ), //UserAccountDrawerHeader
         ), //DrawerHeader
-        ListTile(
-          leading: Icon(Icons.data_saver_off),
-          title: const Text('DashBoard'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => BottomBarScreen()),
-                (route) => false);
-          },
+       drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard", context, BottomBarScreen()),
+        drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees", context, EmployeeListScreen()), 
+       drawerTileWidget("assets/images/customer_drawer_icon.svg", "Customers", context, CustomersScreen()),
+       drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles", context, VehiclesScreen()),
+       drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts", context, BottomBarScreen()),
+       drawerTileWidget("assets/images/service_drawer_icon.svg", "Services", context, BottomBarScreen()),
+       drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports", context, BottomBarScreen()),
+        drawerTileWidget("assets/images/time_card_drawer_icon.svg", "Time Cards", context, BottomBarScreen()),
+        const SizedBox(
+          height: 52,
         ),
-        ListTile(
-          leading: const Icon(Icons.keyboard_alt_outlined),
-          title: const Text('Employees'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => EmployeeListScreen(),
-              ),
-              (route) => false,
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(CupertinoIcons.person_3_fill),
-          title: const Text('Customers'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CustomersScreen()));
-          },
-        ),
-        ListTile(
-          leading: const Icon(CupertinoIcons.car_detailed),
-          title: const Text('Vehicles'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          leading: const Icon(CupertinoIcons.archivebox),
-          title: const Text('Parts'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.car_crash_sharp),
-          title: const Text('Service'),
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => ServicesListScreen(),
-              ),
-              (route) => false,
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.report),
-          title: const Text('Reports'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.access_time_outlined),
-          title: const Text('Time Cards'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        SizedBox(
-          height: 30,
-        ),
-        ListTile(
-          title: const Text('Settings'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          title: const Text('Legal'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          title: const Text('About'),
-          onTap: () {
-            Navigator.pop(context);
-          },
-        ),
-        ListTile(
-          title: const Text('Sign Out'),
-          onTap: () {
-            AppUtils.setToken("");
+      drawerBottomTile("Settings",context,BottomBarScreen()),
+      drawerBottomTile("Legal",context,BottomBarScreen()),
+      drawerBottomTile("About",context,BottomBarScreen()),
+      drawerBottomTile("Sign Out",context,BottomBarScreen()),
+      const SizedBox(height: 20,)
+    
+       
+      ],
+    ),
+  );
+}
+
+
+
+Widget drawerTileWidget(String iconUrl,String label,BuildContext context,constructor){
+  
+
+  return GestureDetector(
+    onTap: (){
+      if(label=="Dashboard"){
+         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+              builder: (context) {
+                return  BottomBarScreen();
+              },
+            ), (route) => false);
+
+      }else{
+         Navigator.pop(context);
+           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+        return constructor;
+
+      },));
+     
+
+      }
+   
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(left:33.0,top: 33),
+      child: Row(
+        children: [
+          SizedBox(
+            height: label=="Parts" ||label=="Vehicles" ?19: 22,
+            width:label=="Parts"||label=="Vehicles"?19: 22,
+            child: SvgPicture.asset(iconUrl)),
+          Padding(
+            padding: const EdgeInsets.only(left:14.0),
+            child: Text(label,style:const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryTitleColor
+                ),),
+          ),
+    
+        ],
+      ),
+    ),
+  );
+}
+
+
+Widget drawerBottomTile(String label,BuildContext context,constructor){
+  return GestureDetector(
+    onTap: (){
+      if(label=="Sign Out"){
+         AppUtils.setToken("");
             AppUtils.setUserName("");
 
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
@@ -144,9 +126,21 @@ showDrawer(BuildContext context) {
                 return const WelcomeScreen();
               },
             ), (route) => false);
-          },
-        ),
-      ],
+
+      }else{
+           Navigator.pop(context);
+
+      }
+
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(left:33.0,top:26),
+      child: Text(label,
+      style: const TextStyle(
+        color: AppColors.primaryTitleColor,
+        fontSize: 16,
+        fontWeight: FontWeight.w500
+      ),),
     ),
   );
 }

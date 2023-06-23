@@ -1,10 +1,12 @@
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class EstimateScreen extends StatefulWidget {
-  const EstimateScreen({super.key});
+  const EstimateScreen({super.key,required this.tabController});
+  final TabController tabController;
 
   @override
   State<EstimateScreen> createState() => _EstimateScreenState();
@@ -12,92 +14,102 @@ class EstimateScreen extends StatefulWidget {
 
 class _EstimateScreenState extends State<EstimateScreen> with TickerProviderStateMixin {
   @override
+  void initState() {
+    //     TabController tabController = TabController(length: 4, vsync: this);
+    // AppUtils().estimateTabController=tabController;
+    // TODO: implement initState
+    super.initState();
+  }
+
+
+  
+  @override
   Widget build(BuildContext context) {
-    TabController tabController = TabController(length: 4, vsync: this);
+
     return  Scaffold(
-      appBar: AppBar(
-        leading: GestureDetector(
-          child: Icon(Icons.menu)),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        foregroundColor:AppColors.primaryColors ,
-        title: const Text("AutoPilot",
-        style: TextStyle(
-          color: Color(0xff061237),
-          fontSize: 16,
-          fontWeight: FontWeight.w600
-        ),),
-        centerTitle: true,
-        actions: [IconButton(onPressed: (){}, icon: const Icon(Icons.search,color: AppColors.primaryColors,))],
-        bottom:PreferredSize(
-          preferredSize: const Size(double.infinity, 80),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-               const Padding(
-                 padding:  EdgeInsets.symmetric(horizontal:16.0),
-                 child: Text("Estimates",style: TextStyle(
-                      color: AppColors.primaryTitleColor,
-                      fontSize: 28,
-                      fontWeight: FontWeight.w500
-                    ),),
-               ),
-              TabBar(
-                controller: tabController,
-                enableFeedback: false,
-                indicatorColor: AppColors.primaryColors,
+      // appBar: AppBar(
+      //   leading: GestureDetector(
+      //     child: Icon(Icons.menu)),
+      //   elevation: 0,
+      //   backgroundColor: Colors.transparent,
+      //   foregroundColor:AppColors.primaryColors ,
+      //   title: const Text("AutoPilot",
+      //   style: TextStyle(
+      //     color: Color(0xff061237),
+      //     fontSize: 16,
+      //     fontWeight: FontWeight.w600
+      //   ),),
+      //   centerTitle: true,
+      //   actions: [IconButton(onPressed: (){}, icon: const Icon(Icons.search,color: AppColors.primaryColors,))],
+      //   bottom:PreferredSize(
+      //     preferredSize: const Size(double.infinity, 80),
+      //     child: Column(
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: [
+      //          const Padding(
+      //            padding:  EdgeInsets.symmetric(horizontal:16.0),
+      //            child: Text("Estimates",style: TextStyle(
+      //                 color: AppColors.primaryTitleColor,
+      //                 fontSize: 28,
+      //                 fontWeight: FontWeight.w500
+      //               ),),
+      //          ),
+      //         TabBar(
+      //           controller: tabController,
+      //           enableFeedback: false,
+      //           indicatorColor: AppColors.primaryColors,
                 
                
 
-                unselectedLabelColor: const Color(0xFF9A9A9A),
-                labelColor: AppColors.primaryColors,
-                tabs: const [
-                  SizedBox(
-                    height: 50,
-                    child: Center(
-                    child: Text(
-                      'Recent',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                    child: Center(
-                    child: Text(
-                      'Estimates',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: 50,
-                    child: Center(
-                    child: Text(
-                      'Orders',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    ),
-                  ),
+      //           unselectedLabelColor: const Color(0xFF9A9A9A),
+      //           labelColor: AppColors.primaryColors,
+      //           tabs: const [
+      //             SizedBox(
+      //               height: 50,
+      //               child: Center(
+      //               child: Text(
+      //                 'Recent',
+      //                 style: TextStyle(fontWeight: FontWeight.w500),
+      //               ),
+      //               ),
+      //             ),
+      //             SizedBox(
+      //               height: 50,
+      //               child: Center(
+      //               child: Text(
+      //                 'Estimates',
+      //                 style: TextStyle(fontWeight: FontWeight.w500),
+      //               ),
+      //               ),
+      //             ),
+      //             SizedBox(
+      //               height: 50,
+      //               child: Center(
+      //               child: Text(
+      //                 'Orders',
+      //                 style: TextStyle(fontWeight: FontWeight.w500),
+      //               ),
+      //               ),
+      //             ),
 
-                     SizedBox(
-                    height: 50,
-                    child: Center(
-                    child: Text(
-                      'Invoices',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ) ,
-      ),
-      drawer: showDrawer(context),
+      //                SizedBox(
+      //               height: 50,
+      //               child: Center(
+      //               child: Text(
+      //                 'Invoices',
+      //                 style: TextStyle(fontWeight: FontWeight.w500),
+      //               ),
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ],
+      //     ),
+      //   ) ,
+      // ),
+    //  drawer: showDrawer(context),
       body:  TabBarView(
-        controller: tabController,
+        controller: widget.tabController,
         children: [
           recentTabWidget(),
           recentTabWidget(),

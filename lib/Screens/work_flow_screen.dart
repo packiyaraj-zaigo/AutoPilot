@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:boardview/boardview.dart';
 
 class WorkFlowScreen extends StatefulWidget {
-  const WorkFlowScreen({super.key});
+  const WorkFlowScreen({super.key,required this.tabController});
+  final TabController tabController;
 
   @override
   State<WorkFlowScreen> createState() => _WorkFlowScreenState();
@@ -17,7 +18,7 @@ class WorkFlowScreen extends StatefulWidget {
 class _WorkFlowScreenState extends State<WorkFlowScreen>
     with SingleTickerProviderStateMixin {
   BoardViewController boardViewController = BoardViewController();
-  late final controller = TabController(length: 2, vsync: this);
+  // late final controller = TabController(length: 2, vsync: this);
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<BoardList> lists = [];
@@ -425,80 +426,80 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: showDrawer(context),
+     // drawer: showDrawer(context),
       key: scaffoldKey,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.menu,
-            color: AppColors.primaryColors,
-          ),
-          onPressed: () {
-            scaffoldKey.currentState!.openDrawer();
-          },
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text(
-          'Autopilot',
-          style: TextStyle(color: Colors.black87),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.search,
-              color: AppColors.primaryColors,
-            ),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 90),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: const Text(
-                  'Workflow',
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
-                ),
-              ),
-              PreferredSize(
-                preferredSize: const Size(double.infinity, 60),
-                child: TabBar(
-                  controller: controller,
-                  enableFeedback: false,
-                  indicatorColor: AppColors.primaryColors,
-                  unselectedLabelColor: const Color(0xFF9A9A9A),
-                  labelColor: AppColors.primaryColors,
-                  tabs: const [
-                    SizedBox(
-                      height: 50,
-                      child: Center(
-                        child: Text(
-                          'Orders',
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 50,
-                      child: Center(
-                        child: Text(
-                          'Vehicle',
-                          style: TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //     icon: const Icon(
+      //       Icons.menu,
+      //       color: AppColors.primaryColors,
+      //     ),
+      //     onPressed: () {
+      //       scaffoldKey.currentState!.openDrawer();
+      //     },
+      //   ),
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   title: const Text(
+      //     'Autopilot',
+      //     style: TextStyle(color: Colors.black87),
+      //   ),
+      //   centerTitle: true,
+      //   actions: [
+      //     IconButton(
+      //       onPressed: () {},
+      //       icon: Icon(
+      //         Icons.search,
+      //         color: AppColors.primaryColors,
+      //       ),
+      //     ),
+      //   ],
+      //   bottom: PreferredSize(
+      //     preferredSize: Size(double.infinity, 90),
+      //     child: Column(
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: [
+      //         Padding(
+      //           padding: const EdgeInsets.only(left: 16.0),
+      //           child: const Text(
+      //             'Workflow',
+      //             style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+      //           ),
+      //         ),
+      //         PreferredSize(
+      //           preferredSize: const Size(double.infinity, 60),
+      //           child: TabBar(
+      //             controller: controller,
+      //             enableFeedback: false,
+      //             indicatorColor: AppColors.primaryColors,
+      //             unselectedLabelColor: const Color(0xFF9A9A9A),
+      //             labelColor: AppColors.primaryColors,
+      //             tabs: const [
+      //               SizedBox(
+      //                 height: 50,
+      //                 child: Center(
+      //                   child: Text(
+      //                     'Orders',
+      //                     style: TextStyle(fontWeight: FontWeight.w500),
+      //                   ),
+      //                 ),
+      //               ),
+      //               SizedBox(
+      //                 height: 50,
+      //                 child: Center(
+      //                   child: Text(
+      //                     'Vehicle',
+      //                     style: TextStyle(fontWeight: FontWeight.w500),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       body: SafeArea(
         // child: Column(
         //   children: [Text("Workflow screen")],
@@ -508,7 +509,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
           child: TabBarView(
-            controller: controller,
+            controller: widget.tabController,
             children: [
               BoardView(
                 width: 240,
