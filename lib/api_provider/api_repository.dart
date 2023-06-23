@@ -111,6 +111,18 @@ class ApiRepository {
   Future dropdownVechile(String token) {
     return apiProvider.dropdownVechile(token);
   }
+
+  Future getVinDetailsGlobal(String vin) {
+    return apiProvider.getVinDetailsGlobal(vin);
+  }
+
+  Future getVinDetailsLocal(String token, String vin) {
+    return apiProvider.getVinDetailsLocal(token, vin);
+  }
+
+  Future getVehicleEstimates(String token, String vehicleId, int page) {
+    return apiProvider.getVehicleEstimates(token, vehicleId, page);
+  }
 }
 
 class NetworkError extends Error {}

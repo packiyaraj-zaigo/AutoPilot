@@ -362,4 +362,37 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+  Future<dynamic> getVinDetailsGlobal(String vin) async {
+    try {
+      final url = Uri.parse(
+          'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/$vin?format=json');
+      final response = http.get(url);
+      return response;
+    } catch (e) {
+      log('Error on getting global response');
+    }
+  }
+
+  Future<dynamic> getVinDetailsLocal(String token, String vin) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/vehicles?vin=$vin');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  Future<dynamic> getVehicleEstimates(
+      String token, String vehicleId, int page) async {
+    try {
+      final url =
+          Uri.parse('${BASE_URL}api/orders?vehicle_id=$vehicleId&page=$page');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
 }
