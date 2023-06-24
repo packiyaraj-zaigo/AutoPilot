@@ -45,8 +45,10 @@ class ApiRepository {
 
   Future customerLoad(
     String token,
+    int currentPage,
+    String query,
   ) {
-    return apiProvider.customerLoad(token);
+    return apiProvider.customerLoad(token, currentPage, query);
   }
 
   Future addCustomerload(

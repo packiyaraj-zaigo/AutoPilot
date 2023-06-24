@@ -100,7 +100,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         ],
       ),
       body: BlocProvider(
-        create: (context) => CustomerBloc(apiRepository: ApiRepository()),
+        create: (context) => CustomerBloc(),
         child: BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is AddCustomerError) {

@@ -5,7 +5,8 @@ abstract class CustomerEvent extends Equatable {
 }
 
 class customerDetails extends CustomerEvent {
-  customerDetails();
+  final String query;
+  customerDetails({required this.query});
 
   @override
   List<Object?> get props => [];

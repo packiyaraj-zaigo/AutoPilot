@@ -97,8 +97,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         ],
       ),
       body: BlocProvider(
-        create: (context) => CustomerBloc(apiRepository: ApiRepository())
-          ..add(customerDetails()),
+        create: (context) => CustomerBloc()..add(customerDetails(query: '')),
         child: BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is CustomerError) {
