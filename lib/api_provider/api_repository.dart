@@ -128,6 +128,10 @@ class ApiRepository {
     Future getEstimate(dynamic token,String orderStatus,int currentPage) {
     return apiProvider.getEstimate(token,orderStatus,currentPage);
   }
+
+  Future getNotifications(String token, String clientId, int page) {
+    return apiProvider.getNotifications(token, clientId, page);
+  }
 }
 
 class NetworkError extends Error {}
