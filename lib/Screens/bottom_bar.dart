@@ -5,6 +5,7 @@ import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
+import 'package:auto_pilot/Screens/notification_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -56,17 +57,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => DashboardBloc(apiRepository: ApiRepository()) ..add(GetUserProfileEvent()),
+      create: (context) => DashboardBloc(apiRepository: ApiRepository())
+        ..add(GetUserProfileEvent()),
       child: BlocListener<DashboardBloc, DashboardState>(
         listener: (context, state) {
-           if(state is GetProfileDetailsState){
+          if (state is GetProfileDetailsState) {
             AppUtils.setUserName(state.userProfile.user[0].firstName);
             getUserName();
             print(userName);
-
-
-
-
           }
           // TODO: implement listener
         },
@@ -121,7 +119,13 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                           color: AppColors.primaryColors,
                         )),
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationScreen(),
+                            ),
+                          );
+                        },
                         icon: SvgPicture.asset(
                           "assets/images/notification.svg",
                           color: AppColors.primaryColors,
@@ -549,18 +553,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     );
   }
 
-
-
-   getUserName()async{
-   
-     await AppUtils.getUserName().then((value) {
+  getUserName() async {
+    await AppUtils.getUserName().then((value) {
       setState(() {
-        userName=value;
+        userName = value;
       });
-     });
-      
-
-
-
-}
+    });
+  }
 }

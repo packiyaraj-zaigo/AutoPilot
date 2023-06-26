@@ -123,6 +123,10 @@ class ApiRepository {
   Future getVehicleEstimates(String token, String vehicleId, int page) {
     return apiProvider.getVehicleEstimates(token, vehicleId, page);
   }
+
+  Future getNotifications(String token, String clientId, int page) {
+    return apiProvider.getNotifications(token, clientId, page);
+  }
 }
 
 class NetworkError extends Error {}

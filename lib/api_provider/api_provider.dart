@@ -415,4 +415,16 @@ class ApiProvider {
       log('Error on getting local response');
     }
   }
+
+  Future<dynamic> getNotifications(
+      String token, String clientId, int page) async {
+    try {
+      final url = Uri.parse(
+          "${BASE_URL}api/notifications?client_id=$clientId&page=$page");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Notification API error");
+    }
+  }
 }

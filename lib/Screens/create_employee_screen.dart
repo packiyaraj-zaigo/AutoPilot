@@ -213,10 +213,13 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: AppColors.greyText),
+                                    color: AppColors.primaryTitleColor),
                               ),
                               value: dropdownValue == '' ? null : dropdownValue,
-                              icon: const Icon(Icons.keyboard_arrow_down),
+                              icon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                color: AppColors.primaryColors,
+                              ),
                               elevation: 16,
                               style: const TextStyle(color: Colors.deepPurple),
                               underline: Container(color: Colors.transparent),
@@ -258,7 +261,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                             ),
                           )),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 77),
                     GestureDetector(
                       onTap: () async {
                         final validate = validation();
