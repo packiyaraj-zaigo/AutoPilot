@@ -121,7 +121,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 'Phone',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 15,
+                                  fontSize: 14,
                                 ),
                               ),
                               SizedBox(height: 5),
@@ -149,15 +149,17 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                     launchUrl(smsLaunchUri);
                                   }
                                 },
-                                icon: SvgPicture.asset(
-                                  'assets/images/sms_icons.svg',
+                                icon: SizedBox(
                                   height: 27,
-                                  color: AppColors.primaryColors,
+                                  width: 18,
+                                  child: SvgPicture.asset(
+                                    'assets/images/sms_icons.svg',
+                                    height: 27,
+                                    color: AppColors.primaryColors,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(
-                                width: 20,
-                              ),
+                              SizedBox(width: 15),
                               IconButton(
                                 onPressed: () {
                                   final Uri emailLaunchUri = Uri(
@@ -167,10 +169,14 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
 
                                   launchUrl(emailLaunchUri);
                                 },
-                                icon: SvgPicture.asset(
-                                  'assets/images/phone_icon.svg',
+                                icon: SizedBox(
                                   height: 27,
-                                  color: AppColors.primaryColors,
+                                  width: 18,
+                                  child: SvgPicture.asset(
+                                    'assets/images/phone_icon.svg',
+                                    height: 27,
+                                    color: AppColors.primaryColors,
+                                  ),
                                 ),
                               ),
                             ],
@@ -193,7 +199,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 'Email',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
-                                  fontSize: 15,
+                                  fontSize: 14,
                                 ),
                               ),
                               SizedBox(height: 5),
@@ -228,10 +234,14 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 launchUrl(emailLaunchUri);
                               }
                             },
-                            icon: SvgPicture.asset(
-                              'assets/images/mail_icons.svg',
-                              height: 23,
-                              color: AppColors.primaryColors,
+                            icon: SizedBox(
+                              height: 27,
+                              width: 18,
+                              child: SvgPicture.asset(
+                                'assets/images/mail_icons.svg',
+                                height: 23,
+                                color: AppColors.primaryColors,
+                              ),
                             ),
                           ),
                         ],
@@ -261,7 +271,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         'Position',
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 15,
+                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 5),
@@ -282,7 +292,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         'Created Date',
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 15,
+                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 5),
