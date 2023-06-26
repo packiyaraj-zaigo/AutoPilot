@@ -26,11 +26,19 @@ showDrawer(BuildContext context) {
             decoration: const BoxDecoration(color: Colors.white),
             accountName: const Text(
               "Hello",
-              style: TextStyle(fontSize: 18, color: Colors.grey,fontWeight: FontWeight.w600),
+              style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.w600),
             ),
             accountEmail: Text(
-             userName.isNotEmpty? "${userName[0].toUpperCase()+userName.substring(1)}":"",
-              style: const TextStyle(fontSize: 28, color: AppColors.primaryTitleColor,fontWeight: FontWeight.w600),
+              userName.isNotEmpty
+                  ? "${userName[0].toUpperCase() + userName.substring(1)}"
+                  : "",
+              style: const TextStyle(
+                  fontSize: 28,
+                  color: AppColors.primaryTitleColor,
+                  fontWeight: FontWeight.w600),
             ),
             // currentAccountPictureSize: Size.square(50),
             // currentAccountPicture: CircleAvatar(
@@ -42,105 +50,105 @@ showDrawer(BuildContext context) {
             // ), //circleAvatar
           ), //UserAccountDrawerHeader
         ), //DrawerHeader
-       drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard", context, BottomBarScreen()),
-        drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees", context, EmployeeListScreen()), 
-       drawerTileWidget("assets/images/customer_drawer_icon.svg", "Customers", context, BottomBarScreen()),
-       drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles", context, BottomBarScreen()),
-       drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts", context, BottomBarScreen()),
-       drawerTileWidget("assets/images/service_drawer_icon.svg", "Services", context, BottomBarScreen()),
-       drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports", context, BottomBarScreen()),
-        drawerTileWidget("assets/images/time_card_drawer_icon.svg", "Time Cards", context, BottomBarScreen()),
+        drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard",
+            context, BottomBarScreen()),
+        drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees",
+            context, EmployeeListScreen()),
+        drawerTileWidget("assets/images/customer_drawer_icon.svg", "Customers",
+            context, BottomBarScreen()),
+        drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles",
+            context, BottomBarScreen()),
+        drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
+            context, BottomBarScreen()),
+        drawerTileWidget("assets/images/service_drawer_icon.svg", "Services",
+            context, BottomBarScreen()),
+        drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
+            context, BottomBarScreen()),
+        drawerTileWidget("assets/images/time_card_drawer_icon.svg",
+            "Time Cards", context, BottomBarScreen()),
         const SizedBox(
           height: 52,
         ),
-      drawerBottomTile("Settings",context,BottomBarScreen()),
-      drawerBottomTile("Legal",context,BottomBarScreen()),
-      drawerBottomTile("About",context,BottomBarScreen()),
-      drawerBottomTile("Sign Out",context,BottomBarScreen()),
-      const SizedBox(height: 20,)
-    
-       
+        drawerBottomTile("Settings", context, BottomBarScreen()),
+        drawerBottomTile("Legal", context, BottomBarScreen()),
+        drawerBottomTile("About", context, BottomBarScreen()),
+        drawerBottomTile("Sign Out", context, BottomBarScreen()),
+        const SizedBox(
+          height: 20,
+        )
       ],
     ),
   );
 }
 
-
-
-Widget drawerTileWidget(String iconUrl,String label,BuildContext context,constructor){
-  
-
+Widget drawerTileWidget(
+    String iconUrl, String label, BuildContext context, constructor) {
   return GestureDetector(
-    onTap: (){
-      if(label=="Dashboard"){
-         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return  BottomBarScreen();
-              },
-            ), (route) => false);
-
-      }else{
-         Navigator.pop(context);
-           Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-        return constructor;
-
-      },));
-     
-
+    onTap: () {
+      if (label == "Dashboard") {
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          builder: (context) {
+            return BottomBarScreen();
+          },
+        ), (route) => false);
+      } else {
+        Navigator.pop(context);
+        Navigator.of(context).push(MaterialPageRoute(
+          builder: (context) {
+            return constructor;
+          },
+        ));
       }
-   
     },
     child: Padding(
-      padding: const EdgeInsets.only(left:33.0,top: 33),
+      padding: const EdgeInsets.only(left: 33.0, top: 33),
       child: Row(
         children: [
           SizedBox(
-            height: label=="Parts" ||label=="Vehicles" ?19: 22,
-            width:label=="Parts"||label=="Vehicles"?19: 22,
-            child: SvgPicture.asset(iconUrl)),
+              height: label == "Parts" || label == "Vehicles" ? 19 : 22,
+              width: label == "Parts" || label == "Vehicles" ? 19 : 22,
+              child: SvgPicture.asset(iconUrl)),
           Padding(
-            padding: const EdgeInsets.only(left:14.0),
-            child: Text(label,style:const TextStyle(
+            padding: const EdgeInsets.only(left: 14.0),
+            child: Text(
+              label,
+              style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.primaryTitleColor
-                ),),
+                  color: AppColors.primaryTitleColor),
+            ),
           ),
-    
         ],
       ),
     ),
   );
 }
 
-
-Widget drawerBottomTile(String label,BuildContext context,constructor){
+Widget drawerBottomTile(String label, BuildContext context, constructor) {
   return GestureDetector(
-    onTap: (){
-      if(label=="Sign Out"){
-         AppUtils.setToken("");
-            AppUtils.setUserName("");
+    onTap: () {
+      if (label == "Sign Out") {
+        AppUtils.setToken("");
+        AppUtils.setUserName("");
 
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return const WelcomeScreen();
-              },
-            ), (route) => false);
-
-      }else{
-           Navigator.pop(context);
-
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          builder: (context) {
+            return const WelcomeScreen();
+          },
+        ), (route) => false);
+      } else {
+        Navigator.pop(context);
       }
-
     },
     child: Padding(
-      padding: const EdgeInsets.only(left:33.0,top:26),
-      child: Text(label,
-      style: const TextStyle(
-        color: AppColors.primaryTitleColor,
-        fontSize: 16,
-        fontWeight: FontWeight.w500
-      ),),
+      padding: const EdgeInsets.only(left: 33.0, top: 26),
+      child: Text(
+        label,
+        style: const TextStyle(
+            color: AppColors.primaryTitleColor,
+            fontSize: 16,
+            fontWeight: FontWeight.w500),
+      ),
     ),
   );
 }
