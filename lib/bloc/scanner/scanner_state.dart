@@ -22,9 +22,11 @@ class VinCodeNotInShopState extends ScannerState {
 }
 
 class VinCodeInShopState extends ScannerState {
-  final SingleVehicleResponseModel vehicle;
+  final Datum vehicle;
   final List<VehicleEstimateResponseModel> estimates;
   const VinCodeInShopState({required this.vehicle, required this.estimates});
+  @override
+  List<Object> get props => [estimates];
 }
 
 class VehicleNotFoundState extends ScannerState {}
@@ -34,4 +36,6 @@ class PageNationErrorState extends ScannerState {}
 class PageNationSucessState extends ScannerState {
   final List<VehicleEstimateResponseModel> estimates;
   const PageNationSucessState({required this.estimates});
+  @override
+  List<Object> get props => [estimates];
 }

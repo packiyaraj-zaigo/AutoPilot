@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
@@ -31,13 +32,13 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     Emitter<ScannerState> emit,
   ) async {
     try {
+      emit(VinSearchLoadingState());
       final token = await AppUtils.getToken();
       final localResponse = await apiRepo.getVinDetailsLocal(token, event.vin);
       if (localResponse.statusCode == 200) {
         final body = jsonDecode(localResponse.body);
         if (body['data']['data'] != null && body['data']['data'].isNotEmpty) {
-          final vehicle =
-              SingleVehicleResponseModel.fromJson(body['data']['data'][0]);
+          final vehicle = Datum.fromJson(body['data']['data'][0]);
           vehicleId = vehicle.id.toString();
           log(vehicleId.toString());
           // Estimate for the above vehicle
@@ -52,11 +53,14 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
                 estimates.add(VehicleEstimateResponseModel.fromJson(estimate));
               });
               emit(VinCodeInShopState(vehicle: vehicle, estimates: estimates));
+              totalEstimatePages = estimateBody['data']['last_page'] ?? 1;
+              currentEstimatePage = estimateBody['data']['current_page'] ?? 1;
               return;
             } else {
               throw '';
             }
           } catch (e) {
+            log(e.toString() + 'errorrrr');
             emit(VinCodeInShopState(vehicle: vehicle, estimates: []));
             return;
           }
@@ -92,7 +96,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     Emitter<ScannerState> emit,
   ) async {
     try {
-      isEstimatePagenationLoading = true;
+      emit(VinSearchLoadingState());
       final token = await AppUtils.getToken();
       currentEstimatePage = currentEstimatePage + 1;
       final response = await apiRepo.getVehicleEstimates(
@@ -106,9 +110,9 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
           });
           emit(PageNationSucessState(estimates: estimates));
         }
-        totalEstimatePages = body['data']['total'] ?? 1;
       }
-    } catch (e) {
+    } catch (e, s) {
+      log(s.toString());
       emit(PageNationErrorState());
     }
     isEstimatePagenationLoading = false;

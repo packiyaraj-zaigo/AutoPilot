@@ -17,12 +17,6 @@ class AppUtils {
     );
   }
 
-
-
-
-
-
-
   static validateEmail(String email) {
     if (!RegExp(r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$")
         .hasMatch(email.trim())) {
@@ -184,10 +178,10 @@ class AppUtils {
   }
 
   static getFormatted(String date) {
-    var inputFormat = DateFormat('dd/MM/yyyy HH:mm');
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('yyyy-MM-dd');
+    var outputFormat = DateFormat('MM/dd/yy hh:mm a');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
