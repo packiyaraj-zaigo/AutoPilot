@@ -123,6 +123,11 @@ class ApiRepository {
   Future getVehicleEstimates(String token, String vehicleId, int page) {
     return apiProvider.getVehicleEstimates(token, vehicleId, page);
   }
+
+
+    Future getEstimate(dynamic token,String orderStatus,int currentPage) {
+    return apiProvider.getEstimate(token,orderStatus,currentPage);
+  }
 }
 
 class NetworkError extends Error {}

@@ -4,6 +4,7 @@ import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
+import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
@@ -43,11 +44,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
     pages = [
       DashBoardScreen(),
-      WorkFlowScreen(tabController: workFlowTabController),
+     // WorkFlowScreen(tabController: workFlowTabController),
+     DummyScreen(name: "Work flow Screen"),
       CalendarScreen(),
-      EstimateScreen(
-        tabController: estimateTabController,
-      )
+      // EstimateScreen(
+      //   tabController: estimateTabController,
+      // )
+
+      DummyScreen(name: "Estimate screen")
     ];
     // TODO: implement initState
     super.initState();

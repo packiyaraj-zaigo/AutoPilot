@@ -34,7 +34,7 @@ class WelcomeScreen extends StatelessWidget {
                   },
                    child:const Wrap(
                     children:  [
-                      Text("Dont have an account?",style: TextStyle(
+                      Text("Don't have an account?",style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w400,
                         fontSize: 14,

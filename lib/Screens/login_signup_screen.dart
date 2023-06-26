@@ -184,6 +184,72 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               //     ),
               //   ),
               // ),
+
+              bottomNavigationBar: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0, top: 0),
+          child: Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                widget.widgetIndex == 0
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            widget.widgetIndex = 1;
+                          });
+                        },
+                        child: const Wrap(
+                          children: [
+                            Text(
+                              "Don't have an account?",
+                              style: TextStyle(
+                                color: Color(0xff061237),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              "Sign up",
+                              style: TextStyle(
+                                color: AppColors.primaryColors,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            widget.widgetIndex = 0;
+                          });
+                        },
+                        child: const Wrap(
+                          children: [
+                            Text(
+                              "Already have an account?",
+                              style: TextStyle(
+                                color: Color(0xff061237),
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                            Text(
+                              "Sign in",
+                              style: TextStyle(
+                                color: AppColors.primaryColors,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+              ],
+            ),
+          ),
+        ),
               body: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -232,7 +298,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               loginErrorStatus),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 16.0),
+          padding: const EdgeInsets.only(top: 18.0),
           child: textBox("Enter your password", loginPasswordController,
               "Password", loginErrorStatus),
         ),
@@ -245,7 +311,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                   visible: loginErrorStatus,
                   child: Text(
                     loginErrorMsg,
-                    style: TextStyle(
+                    style:const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: Color(
@@ -260,150 +326,78 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           padding: const EdgeInsets.only(top: 32.0),
           child: GestureDetector(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) {
-                  return LoginAndSignupScreen(
-                    widgetIndex: 1,
-                  );
-                },
-              ));
+              validateData(loginEmailController.text,
+                  loginPasswordController.text, context);
+
+
+                  print("second tap");
             },
-            child: GestureDetector(
-              onTap: () {
-                validateData(loginEmailController.text,
-                    loginPasswordController.text, context);
-              },
-              child: Container(
-                height: 56,
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: AppColors.primaryColors,
-                ),
-                child: state is UserLoginLoadingState
-                    ? const CupertinoActivityIndicator(
-                        color: Colors.white,
-                      )
-                    : const Text(
-                        "Sign in",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
+            child: Container(
+              height: 56,
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: AppColors.primaryColors,
               ),
+              child: state is UserLoginLoadingState
+                  ? const CupertinoActivityIndicator(
+                      color: Colors.white,
+                    )
+                  : const Text(
+                      "Sign in",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
             ),
           ),
         ),
         SizedBox(height: 16),
-        GestureDetector(
-          onTap: () async {
-            // final auth = FirebaseAuth.instance;
-            // final signIN = await auth.signInWithProvider(GoogleAuthProvider());
-            // final token = await signIN.user!.uid;
+        // GestureDetector(
+        //   onTap: () async {
+        //     // final auth = FirebaseAuth.instance;
+        //     // final signIN = await auth.signInWithProvider(GoogleAuthProvider());
+        //     // final token = await signIN.user!.uid;
 
-            final googleUser = await GoogleSignIn().signIn();
-            final auth = await googleUser?.authentication;
-            final credential = GoogleAuthProvider.credential(
-              accessToken: auth!.accessToken,
-              idToken: auth.idToken,
-            );
-            FirebaseAuth.instance.signInWithCredential(credential);
-            // await GoogleSignIn().signOut();
-            // print(auth!.accessToken.toString() + ":::::::::::::::::::::");
-            // await FirebaseAuth.instance.signOut();
-          },
-          child: Container(
-            height: 56,
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.white,
-              border: Border.all(color: Color(0xffC1C4CD)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset('assets/images/google_icon.svg'),
-                const SizedBox(width: 10),
-                const Text(
-                  "Sign in with Google",
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryTitleColor),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, top: 24),
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                widget.widgetIndex == 0
-                    ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.widgetIndex = 1;
-                          });
-                        },
-                        child: const Wrap(
-                          children: [
-                            Text(
-                              "Dont have an account?",
-                              style: TextStyle(
-                                color: Color(0xff061237),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "Sign up",
-                              style: TextStyle(
-                                color: AppColors.primaryColors,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.widgetIndex = 0;
-                          });
-                        },
-                        child: const Wrap(
-                          children: [
-                            Text(
-                              "Already have an account?",
-                              style: TextStyle(
-                                color: Color(0xff061237),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "Sign in",
-                              style: TextStyle(
-                                color: Color(0xff333333),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-              ],
-            ),
-          ),
-        )
+        //     final googleUser = await GoogleSignIn().signIn();
+        //     final auth = await googleUser?.authentication;
+        //     final credential = GoogleAuthProvider.credential(
+        //       accessToken: auth!.accessToken,
+        //       idToken: auth.idToken,
+        //     );
+        //     FirebaseAuth.instance.signInWithCredential(credential);
+        //     // await GoogleSignIn().signOut();
+        //     // print(auth!.accessToken.toString() + ":::::::::::::::::::::");
+        //     // await FirebaseAuth.instance.signOut();
+        //   },
+        //   child: Container(
+        //     height: 56,
+        //     alignment: Alignment.center,
+        //     width: MediaQuery.of(context).size.width,
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.circular(12),
+        //       color: Colors.white,
+        //       border: Border.all(color: Color(0xffC1C4CD)),
+        //     ),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       children: [
+        //         SvgPicture.asset('assets/images/google_icon.svg'),
+        //         const SizedBox(width: 10),
+        //         const Text(
+        //           "Sign in with Google",
+        //           style: TextStyle(
+        //               fontSize: 16,
+        //               fontWeight: FontWeight.w500,
+        //               color: AppColors.primaryTitleColor),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        
       ],
     );
   }
@@ -424,8 +418,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                   color: Color(0xff6A7187)),
             ),
             label == 'Password' && widget.widgetIndex == 0
-                ? TextButton(
-                    onPressed: () {
+                ? GestureDetector(
+                    onTap: () {
                       Navigator.push(
                           context,
                           CupertinoPageRoute(
@@ -745,7 +739,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                     ? const CupertinoActivityIndicator(
                         color: Colors.white,
                       )
-                    : Text(
+                    : const Text(
                         "Next",
                         style: TextStyle(
                             fontSize: 16,
@@ -756,71 +750,73 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, top: 24),
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                widget.widgetIndex == 0
-                    ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.widgetIndex = 1;
-                          });
-                        },
-                        child: const Wrap(
-                          children: [
-                            Text(
-                              "Dont have an account?",
-                              style: TextStyle(
-                                color: Color(0xff061237),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "Sign up",
-                              style: TextStyle(
-                                color: Color(0xff333333),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.widgetIndex = 0;
-                          });
-                        },
-                        child: const Wrap(
-                          children: [
-                            Text(
-                              "Already have an account?",
-                              style: TextStyle(
-                                color: Color(0xff061237),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "Sign in",
-                              style: TextStyle(
-                                color: AppColors.primaryColors,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-              ],
-            ),
-          ),
-        )
+
+        const SizedBox(height: 20,)
+        // Padding(
+        //   padding: const EdgeInsets.only(bottom: 16.0, top: 24),
+        //   child: Container(
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.center,
+        //       children: [
+        //         widget.widgetIndex == 0
+        //             ? GestureDetector(
+        //                 onTap: () {
+        //                   setState(() {
+        //                     widget.widgetIndex = 1;
+        //                   });
+        //                 },
+        //                 child: const Wrap(
+        //                   children: [
+        //                     Text(
+        //                       "Dont have an account?",
+        //                       style: TextStyle(
+        //                         color: Color(0xff061237),
+        //                         fontWeight: FontWeight.w400,
+        //                         fontSize: 14,
+        //                       ),
+        //                     ),
+        //                     Text(
+        //                       "Sign up",
+        //                       style: TextStyle(
+        //                         color: Color(0xff333333),
+        //                         fontWeight: FontWeight.w600,
+        //                         fontSize: 14,
+        //                       ),
+        //                     )
+        //                   ],
+        //                 ),
+        //               )
+        //             : GestureDetector(
+        //                 onTap: () {
+        //                   setState(() {
+        //                     widget.widgetIndex = 0;
+        //                   });
+        //                 },
+        //                 child: const Wrap(
+        //                   children: [
+        //                     Text(
+        //                       "Already have an account?",
+        //                       style: TextStyle(
+        //                         color: Color(0xff061237),
+        //                         fontWeight: FontWeight.w400,
+        //                         fontSize: 14,
+        //                       ),
+        //                     ),
+        //                     Text(
+        //                       "Sign in",
+        //                       style: TextStyle(
+        //                         color: AppColors.primaryColors,
+        //                         fontWeight: FontWeight.w600,
+        //                         fontSize: 14,
+        //                       ),
+        //                     )
+        //                   ],
+        //                 ),
+        //               ),
+        //       ],
+        //     ),
+        //   ),
+        // )
       ],
     );
   }
