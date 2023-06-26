@@ -44,8 +44,8 @@ showDrawer(BuildContext context) {
         ), //DrawerHeader
        drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard", context, BottomBarScreen()),
         drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees", context, EmployeeListScreen()), 
-       drawerTileWidget("assets/images/customer_drawer_icon.svg", "Customers", context, CustomersScreen()),
-       drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles", context, VehiclesScreen()),
+       drawerTileWidget("assets/images/customer_drawer_icon.svg", "Customers", context, BottomBarScreen()),
+       drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles", context, BottomBarScreen()),
        drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts", context, BottomBarScreen()),
        drawerTileWidget("assets/images/service_drawer_icon.svg", "Services", context, BottomBarScreen()),
        drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports", context, BottomBarScreen()),

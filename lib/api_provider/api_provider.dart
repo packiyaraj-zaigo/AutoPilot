@@ -403,4 +403,27 @@ class ApiProvider {
       log('Error on getting local response');
     }
   }
+
+
+
+   Future<dynamic> getEstimate(String token,String orderStatus,int currentPage) async {
+    print("into provider");
+
+
+    try {
+      var url = Uri.parse(
+      orderStatus==""?  "${BASE_URL}api/orders":orderStatus=="Estimate"?"${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}":orderStatus=="Orders"?"${BASE_URL}api/orders?order_status=Order&page=${currentPage}":"${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}",
+      );
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
 }
