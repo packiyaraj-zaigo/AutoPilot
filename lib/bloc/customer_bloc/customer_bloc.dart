@@ -15,14 +15,15 @@ part 'customer_event.dart';
 part 'customer_state.dart';
 
 class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
-  final ApiRepository _apiRepository;
+  bool isEmployeesLoading = false;
+  bool isPaginationLoading = false;
+  int currentPage = 1;
+  int totalPages = 1;
+  final _apiRepository = ApiRepository();
   int showLoading = 0;
   final JsonDecoder _decoder = const JsonDecoder();
 
-  CustomerBloc({
-    required ApiRepository apiRepository,
-  })  : _apiRepository = apiRepository,
-        super(AddCustomerInitial()) {
+  CustomerBloc() : super(AddCustomerInitial()) {
     on<customerDetails>(CustomerEvent);
     on<AddCustomerDetails>(addCustomerEvent);
   }
@@ -32,15 +33,42 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
   ) async {
     try {
       emit(CustomerLoading());
-      final token = await AppUtils.getToken();
-      Response loadedResponse = await _apiRepository.customerLoad(token);
-      if (loadedResponse.statusCode == 200) {
-        emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
-        print('=======-------------------------${loadedResponse.body}');
+      if (currentPage == 1) {
+        isEmployeesLoading = true;
+      } else {
+        isEmployeesLoading = false;
       }
+      final token = await AppUtils.getToken();
+      Response loadedResponse =
+          await _apiRepository.customerLoad(token, currentPage, event.query);
+      if (loadedResponse.statusCode == 200) {
+        final responseBody = jsonDecode(loadedResponse.body);
+        emit(
+          CustomerReady(
+            customer: Data.fromJson(
+              responseBody['data'],
+            ),
+          ),
+        );
+        final data = responseBody['data'];
+        currentPage = data['current_page'] ?? 1;
+        totalPages = data['last_page'] ?? 1;
+        if (currentPage <= totalPages) {
+          currentPage++;
+        }
+        // emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
+        print('=======-------------------------${loadedResponse.body}');
+      } else {
+        final body = jsonDecode(loadedResponse.body);
+        emit(CustomerError(message: body['message']));
+      }
+      isEmployeesLoading = false;
+      isPaginationLoading = false;
     } catch (e) {
       showLoading = 0;
       emit(CustomerError(message: e.toString()));
+      isEmployeesLoading = false;
+      isPaginationLoading = false;
     }
   }
 
@@ -74,13 +102,14 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
         ScaffoldMessenger.of((event.context)).showSnackBar(SnackBar(
             content: Text('${unloadData['message']}'),
             backgroundColor: Colors.green));
-        Navigator.push(event.context,
-            MaterialPageRoute(builder: (context) => CustomersScreen()));
+        Navigator.of(event.context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => CustomersScreen(),
+          ),
+          (route) => false,
+        );
       } else {
-        ScaffoldMessenger.of((event.context)).showSnackBar(SnackBar(
-          content: Text('${unloadData}'),
-          backgroundColor: Colors.red,
-        ));
+        emit(AddCustomerError(message: unloadData));
       }
     } catch (e) {
       showLoading = 0;

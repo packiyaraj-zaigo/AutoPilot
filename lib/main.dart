@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'bloc/customer_bloc/customer_bloc.dart';
+
 String? initScreen;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +41,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => VechileBloc(),
+        ),
+        BlocProvider(
+          create: (context) => CustomerBloc(),
         ),
         BlocProvider(
           create: (context) => PartsBloc(),

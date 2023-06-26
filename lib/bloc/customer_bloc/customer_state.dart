@@ -14,8 +14,8 @@ class CustomerInitial extends CustomerState {
 class CustomerLoading extends CustomerState {}
 
 class CustomerReady extends CustomerState {
-  final CustomerModel data;
-  CustomerReady({required this.data});
+  final Data customer;
+  CustomerReady({required this.customer});
 }
 
 class CustomerError extends CustomerState {
@@ -33,6 +33,8 @@ class AddCustomerLoading extends CustomerState {
 }
 
 class AddCustomerError extends CustomerState {
-  final String message;
+  var message;
   AddCustomerError({required this.message});
+  @override
+  List<Object> get props => [message];
 }

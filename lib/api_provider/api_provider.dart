@@ -278,9 +278,10 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> customerLoad(String token) async {
+  Future<dynamic> customerLoad(String token, int page, String query) async {
     try {
-      var url = Uri.parse('${BASE_URL}api/customers?client_id=62');
+      var url =
+          Uri.parse('${BASE_URL}api/customers?page=$page&first_name=$query');
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();
