@@ -370,4 +370,98 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+  Future<dynamic> getParts(String token, int page, String query) async {
+    try {
+      String url = '${BASE_URL}api/inventory_parts';
+      if (page != 1) {
+        url = '$url?page=$page';
+      }
+      if (query != '') {
+        if (url.contains('?')) {
+          url = '$url&item_name=$query';
+        } else {
+          url = '$url?item_name=$query';
+        }
+      }
+      var response = http.get(Uri.parse(url), headers: getHeader(token));
+      print(response);
+      return response;
+    } catch (e) {
+      print(e.toString() + 'get parts error');
+    }
+  }
+
+  Future<dynamic> addParts(
+    token,
+    BuildContext context,
+    itemname,
+    serialnumber,
+    type,
+    quantity,
+    fee,
+    supplies,
+    epa,
+    cost,
+  ) async {
+    try {
+      print("${serialnumber}");
+      var url = Uri.parse('${BASE_URL}api/inventory_parts');
+      print('hjjjjjjjjjjjjjjjj${token}');
+      var request = http.MultipartRequest("POST", url)
+        ..headers['Authorization'] = "Bearer $token"
+        ..fields['item_name'] = itemname
+        ..fields['part_name'] = "serialnumber"
+        ..fields['sub_total'] = "120"
+        ..fields['quantity_in_hand'] = "1"
+        ..fields['item_service_note'] = "dhjhjhhjdh"
+        ..fields['vendor_id'] = "12"
+        ..fields['category_id'] = "12"
+        ..fields['bin_location'] = "chennai"
+        ..fields['quantity_critical'] = "12"
+        ..fields['markup'] = "12"
+        ..fields['margin'] = "1"
+        ..fields['unit_price'] = "12"
+        ..fields['client_id'] = "1234";
+      var response = await request.send();
+      print('object===============================');
+      if (response.statusCode == 200 || response.statusCode == 201) {}
+      print(response.statusCode.toString());
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+  // Future<dynamic> addParts(
+  //   BuildContext context,
+  //   String token,
+  //   String itemname,
+  //   String serialnumber,
+  //   String type,
+  //   String quantity,
+  //   String fee,
+  //   String supplies,
+  //   String epa,
+  //   String cost,
+  // ) async {
+  //   print("eeeeeeeeeeeeeeeeeeeeeeeeeee$token");
+  //
+  //   //  LoadingFormModel? loadingFormModel;
+  //   try {
+  //     var url = Uri.parse("${BASE_URL}api/inventory_parts");
+  //     var request = http.MultipartRequest("POST", url)
+  //       ..headers['Authorization'] = "Bearer $token"
+  //       ..fields['item_name'] = itemname
+  //       ..fields['part_name'] = serialnumber
+  //       ..fields['unit_price'] = cost
+  //       ..fields['quantity_in_hand'] = quantity;
+  //     var response = await request.send();
+  //     inspect(response);
+  //     print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");
+  //     print(response.toString() + "provider status code");
+  //     print(response.toString() + "provider response");
+  //     return http.Response.fromStream(response);
+  //   } catch (e) {
+  //     print(e.toString() + "provider error");
+  //   }
 }

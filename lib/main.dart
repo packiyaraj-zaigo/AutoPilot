@@ -4,6 +4,7 @@ import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 
 import 'package:auto_pilot/Screens/welcome_screen.dart';
+import 'package:auto_pilot/bloc/parts_model/parts_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -36,6 +37,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => VechileBloc(),
+        ),
+        BlocProvider(
+          create: (context) => PartsBloc(),
         ),
       ],
       child: MaterialApp(
