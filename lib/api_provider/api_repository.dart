@@ -132,6 +132,26 @@ class ApiRepository {
   Future getNotifications(String token, String clientId, int page) {
     return apiProvider.getNotifications(token, clientId, page);
   }
+
+  Future getParts(String token, int currentPage, String query) {
+    return apiProvider.getParts(token, currentPage, query);
+  }
+
+  Future addParts(
+    BuildContext context,
+    String token,
+    String itemname,
+    String serialnumber,
+    String quantity,
+    String fee,
+    String supplies,
+    String epa,
+    String cost,
+    String type,
+  ) {
+    return apiProvider.addParts(token, context, itemname, serialnumber,
+        quantity, fee, supplies, epa, cost, type);
+  }
 }
 
 class NetworkError extends Error {}
