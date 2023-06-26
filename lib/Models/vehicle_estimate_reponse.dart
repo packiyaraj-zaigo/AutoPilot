@@ -30,7 +30,7 @@ class VehicleEstimateResponseModel {
   int? createdBy;
   DateTime? createdAt;
   DateTime? updatedAt;
-  dynamic customer;
+  Createdby? customer;
   Vehicle? vehicle;
   Createdby? createdby;
   List<dynamic> getOrderPayment;
@@ -70,7 +70,7 @@ class VehicleEstimateResponseModel {
     required this.createdBy,
     required this.createdAt,
     required this.updatedAt,
-    this.customer,
+    required this.customer,
     required this.vehicle,
     required this.createdby,
     required this.getOrderPayment,
@@ -79,7 +79,7 @@ class VehicleEstimateResponseModel {
     required this.inspectionNotes,
   });
 
-  factory VehicleEstimateResponseModel.fromJson(Map<String?, dynamic> json) =>
+  factory VehicleEstimateResponseModel.fromJson(json) =>
       VehicleEstimateResponseModel(
         id: json["id"],
         clientId: json["client_id"],
@@ -112,9 +112,14 @@ class VehicleEstimateResponseModel {
         createdBy: json["created_by"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        customer: json["customer"],
-        vehicle: Vehicle.fromJson(json["vehicle"]),
-        createdby: Createdby.fromJson(json["createdby"]),
+        customer: json["customer"] == null
+            ? null
+            : Createdby.fromJson(json["customer"]),
+        vehicle:
+            json["vehicle"] == null ? null : Vehicle.fromJson(json["vehicle"]),
+        createdby: json["createdBy"] == null
+            ? null
+            : Createdby.fromJson(json["createdby"]),
         getOrderPayment:
             List<dynamic>.from(json["get_order_payment"].map((x) => x)),
         getAuthorize: List<dynamic>.from(json["get_authorize"].map((x) => x)),
@@ -129,19 +134,22 @@ class Createdby {
   String? email;
   String? firstName;
   String? lastName;
+  String? phone;
 
   Createdby({
     required this.id,
     required this.email,
     required this.firstName,
     required this.lastName,
+    this.phone,
   });
 
-  factory Createdby.fromJson(Map<String?, dynamic> json) => Createdby(
+  factory Createdby.fromJson(json) => Createdby(
         id: json["id"],
         email: json["email"],
         firstName: json["first_name"],
         lastName: json["last_name"],
+        phone: json["phone"],
       );
 }
 
@@ -152,8 +160,8 @@ class Vehicle {
   String? vehicleMake;
   String? vehicleModel;
   String? vehicleColor;
-  dynamic licencePlate;
-  dynamic vin;
+  String? licencePlate;
+  String? vin;
   String? kilometers;
 
   Vehicle({
@@ -163,12 +171,12 @@ class Vehicle {
     required this.vehicleMake,
     required this.vehicleModel,
     required this.vehicleColor,
-    this.licencePlate,
-    this.vin,
+    required this.licencePlate,
+    required this.vin,
     required this.kilometers,
   });
 
-  factory Vehicle.fromJson(Map<String?, dynamic> json) => Vehicle(
+  factory Vehicle.fromJson(json) => Vehicle(
         id: json["id"],
         vehicleType: json["vehicle_type"],
         vehicleYear: json["vehicle_year"],

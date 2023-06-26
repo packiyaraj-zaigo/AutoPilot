@@ -129,7 +129,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       // var addVechileData = _decoder.convert(addVechileRes.body);
       //
 
-      Response response = await apiRepo.addVechile(
+      final response = await apiRepo.addVechile(
         event.context,
         token,
         event.email,
@@ -145,7 +145,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       );
       var vechileAdd = _decoder.convert(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("${response.statusCode}");
+        print("${response.body}");
         isVechileLoading = false;
         Navigator.pop(
           event.context,

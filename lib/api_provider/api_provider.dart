@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -259,20 +260,27 @@ class ApiProvider {
 
     //  LoadingFormModel? loadingFormModel;
     try {
-      var url = Uri.parse("${BASE_URL}api/vehicles?customer_id=4&client_id=64");
+      final clientId = await AppUtils.getUserID();
+      var url = Uri.parse(
+          "${BASE_URL}api/vehicles?customer_id=4&client_id=$clientId");
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token"
         ..fields['vehicle_type'] = type
         ..fields['vehicle_year'] = year
         ..fields['vehicle_make'] = make
         ..fields['vehicle_model'] = model
-        ..fields['vehicle_color'] = color;
+        ..fields['vehicle_color'] = color
+        ..fields['engine_size'] = engine
+        ..fields['vin'] = vinNumber
+        ..fields['licence_plate'] = licNumber
+        ..fields['sub_model'] = submodel;
       var response = await request.send();
       inspect(response);
       print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");
       print(response.toString() + "provider status code");
       print(response.toString() + "provider response");
-      return http.Response.fromStream(response);
+      final responseData = await http.Response.fromStream(response);
+      return responseData;
     } catch (e) {
       print(e.toString() + "provider error");
     }
@@ -280,7 +288,9 @@ class ApiProvider {
 
   Future<dynamic> customerLoad(String token) async {
     try {
-      var url = Uri.parse('${BASE_URL}api/customers?client_id=62');
+      final clientId = await AppUtils.getUserID();
+
+      var url = Uri.parse('${BASE_URL}api/customers?client_id=$clientId');
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -305,7 +315,9 @@ class ApiProvider {
     pinCode,
   ) async {
     try {
-      var url = Uri.parse('${BASE_URL}api/customers?client_id=62');
+      final clientId = await AppUtils.getUserID();
+
+      var url = Uri.parse('${BASE_URL}api/customers?client_id=$clientId');
       print('hjjjjjjjjjjjjjjjj${token}');
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token"
