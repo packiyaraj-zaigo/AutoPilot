@@ -44,14 +44,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
     pages = [
       DashBoardScreen(),
-     // WorkFlowScreen(tabController: workFlowTabController),
-     DummyScreen(name: "Work flow Screen"),
+      WorkFlowScreen(tabController: workFlowTabController),
+    // DummyScreen(name: "Work flow Screen"),
       CalendarScreen(),
-      // EstimateScreen(
-      //   tabController: estimateTabController,
-      // )
+      EstimateScreen(
+        tabController: estimateTabController,
+      )
 
-      DummyScreen(name: "Estimate screen")
+     // DummyScreen(name: "Estimate screen")
     ];
     // TODO: implement initState
     super.initState();
@@ -92,7 +92,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                       return mainCreateWidget();
                     },
                     isScrollControlled: true,
-                    shape: RoundedRectangleBorder(
+                    shape: const RoundedRectangleBorder(
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(12.0)),
                     ),
