@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/employee_creation_model.dart';
 import 'package:auto_pilot/Models/role_model.dart';
+import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -86,8 +87,10 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 roles.clear();
                 roles.addAll(state.roles);
               } else if (state is EmployeeCreateSuccessState) {
-                BlocProvider.of<EmployeeBloc>(context).add(GetAllEmployees());
-                Navigator.of(context).pop();
+                // BlocProvider.of<EmployeeBloc>(context).add(GetAllEmployees());
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => EmployeeListScreen(),
+                ));
               }
             },
             child: BlocBuilder<EmployeeBloc, EmployeeState>(
