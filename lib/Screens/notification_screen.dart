@@ -95,29 +95,31 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      isYesterday
-                          ? const Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.0),
-                              child: Text(
-                                'Yesterday',
-                                style: TextStyle(
-                                    color: Color(0xFF9A9A9A),
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            )
-                          : today
-                              ? const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                                  child: Text(
-                                    "Today",
-                                    style: TextStyle(
-                                        color: Color(0xFF9A9A9A),
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                )
-                              : index == 0
-                                  ? notification.createdAt == null
-                                      ? const SizedBox()
+                      index == 0
+                          ? notification.createdAt == null
+                              ? const SizedBox()
+                              : isYesterday
+                                  ? const Padding(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 16.0),
+                                      child: Text(
+                                        'Yesterday',
+                                        style: TextStyle(
+                                            color: Color(0xFF9A9A9A),
+                                            fontWeight: FontWeight.w500),
+                                      ),
+                                    )
+                                  : today
+                                      ? const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 16.0),
+                                          child: Text(
+                                            "Today",
+                                            style: TextStyle(
+                                                color: Color(0xFF9A9A9A),
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        )
                                       : Padding(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 16.0),
@@ -130,10 +132,38 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                 fontWeight: FontWeight.w500),
                                           ),
                                         )
-                                  : notification.createdAt !=
-                                          notifications[index - 1].createdAt
-                                      ? notification.createdAt == null
-                                          ? const SizedBox()
+                          : notification.createdAt
+                                      .toString()
+                                      .substring(0, 10) !=
+                                  notifications[index - 1]
+                                      .createdAt
+                                      .toString()
+                                      .substring(0, 10)
+                              ? notification.createdAt == null
+                                  ? const SizedBox()
+                                  : isYesterday
+                                      ? const Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 16.0),
+                                          child: Text(
+                                            'Yesterday',
+                                            style: TextStyle(
+                                                color: Color(0xFF9A9A9A),
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        )
+                                      : today
+                                          ? const Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 16.0),
+                                              child: Text(
+                                                "Today",
+                                                style: TextStyle(
+                                                    color: Color(0xFF9A9A9A),
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            )
                                           : Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
@@ -148,7 +178,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                         FontWeight.w500),
                                               ),
                                             )
-                                      : const SizedBox(),
+                              : const SizedBox(),
                       Container(
                         height: 77,
                         width: double.infinity,

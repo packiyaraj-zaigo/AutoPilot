@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
@@ -156,17 +157,14 @@ class ApiProvider {
 
   Future<dynamic> getEmployees(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}api/users';
+      final clientId = await AppUtils.getUserID();
+      String url = '${BASE_URL}api/users?client_id=$clientId';
 
       if (page != 1) {
-        url = '$url?page=$page';
+        url = '$url&page=$page';
       }
       if (query != '') {
-        if (url.contains('?')) {
-          url = '$url&first_name=$query';
-        } else {
-          url = '$url?first_name=$query';
-        }
+        url = '$url&first_name=$query';
       }
       print(url);
       var response = http.get(Uri.parse(url), headers: getHeader(token));
@@ -405,15 +403,19 @@ class ApiProvider {
     }
   }
 
-
-
-   Future<dynamic> getEstimate(String token,String orderStatus,int currentPage) async {
+  Future<dynamic> getEstimate(
+      String token, String orderStatus, int currentPage) async {
     print("into provider");
-
 
     try {
       var url = Uri.parse(
-      orderStatus==""?  "${BASE_URL}api/orders":orderStatus=="Estimate"?"${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}":orderStatus=="Orders"?"${BASE_URL}api/orders?order_status=Order&page=${currentPage}":"${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}",
+        orderStatus == ""
+            ? "${BASE_URL}api/orders"
+            : orderStatus == "Estimate"
+                ? "${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}"
+                : orderStatus == "Orders"
+                    ? "${BASE_URL}api/orders?order_status=Order&page=${currentPage}"
+                    : "${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}",
       );
       var request = http.MultipartRequest("GET", url);
 
@@ -499,6 +501,17 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print("errroor draft found ${e.toString()}");
+    }
+  }
+
+  Future<dynamic> getAllTimeCards(String token) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse("${BASE_URL}api/mobilelist?client_id=$clientId");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "  Get all time cards api error");
     }
   }
   // Future<dynamic> addParts(

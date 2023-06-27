@@ -126,9 +126,8 @@ class ApiRepository {
     return apiProvider.getVehicleEstimates(token, vehicleId, page);
   }
 
-
-    Future getEstimate(dynamic token,String orderStatus,int currentPage) {
-    return apiProvider.getEstimate(token,orderStatus,currentPage);
+  Future getEstimate(dynamic token, String orderStatus, int currentPage) {
+    return apiProvider.getEstimate(token, orderStatus, currentPage);
   }
 
   Future getNotifications(String token, String clientId, int page) {
@@ -137,6 +136,10 @@ class ApiRepository {
 
   Future getParts(String token, int currentPage, String query) {
     return apiProvider.getParts(token, currentPage, query);
+  }
+
+  Future getAllTimeCards(String token) {
+    return apiProvider.getAllTimeCards(token);
   }
 
   Future addParts(
