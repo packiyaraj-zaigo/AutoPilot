@@ -17,6 +17,8 @@ import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 
@@ -39,9 +41,17 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
 
   CustomerModel? customerModel;
   vm.VechileResponse?vehicleModel;
+
+
+  final ImagePicker imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
+  XFile? selectedImage;
+
   final vehicleScrollController=ScrollController();
+  final customerScrollController=ScrollController();
    final _debouncer = Debouncer();
    List<vm.Datum>vehicleDataList=[];
+   List<Datum>customerDataList=[];
 
   bool noteErrorStatus = false;
   bool startTimeErrorStatus = false;
@@ -213,7 +223,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    inspectionPhotoWidget(),
+                    GestureDetector(
+                      onTap: (){
+                        showActionSheet(context);
+                      },
+                      child: inspectionPhotoWidget()),
                     inspectionPhotoWidget(),
                     inspectionPhotoWidget(),
                     inspectionPhotoWidget()
@@ -688,11 +702,13 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   Widget customerBottomSheet() {
     return BlocProvider(
       create: (context) =>
-          CustomerBloc(apiRepository: ApiRepository())..add(customerDetails()),
+          CustomerBloc()..add(customerDetails(query: "")),
       child: BlocListener<CustomerBloc, CustomerState>(
         listener: (context, state) {
           if (state is CustomerReady) {
-            customerModel = state.data;
+        //    customerModel = state.customer;
+        customerDataList.addAll(state.customer.data);
+       
           }
           // TODO: implement listener
         },
@@ -718,8 +734,8 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           fontSize: 24,
                           fontWeight: FontWeight.w500),
                     ),
-                    state is CustomerLoading
-                        ? Center(
+                    state is CustomerLoading  &&  !BlocProvider.of<CustomerBloc>(context) .isPaginationLoading
+                        ? const Center(
                             child: CupertinoActivityIndicator(),
                           )
                         : Padding(
@@ -729,38 +745,71 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                   MediaQuery.of(context).size.height / 1.8 - 78,
                               child: ListView.builder(
                                 itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        customerController.text =
-                                            "${customerModel?.data.data[index].firstName ?? ""} ${customerModel?.data.data[index].lastName ?? ""}";
-                                        Navigator.pop(context);
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                            color: Colors.grey[100],
-                                            borderRadius:
-                                                BorderRadius.circular(8)),
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Text(
-                                            "${customerModel?.data.data[index].firstName ?? ""} ${customerModel?.data.data[index].lastName ?? ""}",
-                                            style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w500),
+                                  return Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 12.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            customerController.text =
+                                                "${customerDataList[index].firstName} ${customerDataList[index].lastName}";
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[100],
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            width:
+                                                MediaQuery.of(context).size.width,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: Text(
+                                                "${customerDataList[index].firstName} ${customerDataList[index].lastName}",
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w500),
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
+
+                                       BlocProvider.of<CustomerBloc>(context) .currentPage <=  BlocProvider.of<CustomerBloc>(context).totalPages &&
+                                                  index ==
+                                                      customerDataList .length - 1
+                                              ? const Column(
+                                                  children: [
+                                                    SizedBox(height: 24),
+                                                    Center(
+                                                      child:
+                                                          CupertinoActivityIndicator(),
+                                                    ),
+                                                    SizedBox(height: 24),
+                                                  ],
+                                                )
+                                              : const SizedBox(),
+                                    ],
                                   );
                                 },
-                                itemCount: customerModel?.data.data.length ?? 0,
+                                controller: customerScrollController..addListener(() {
+                                   if (customerScrollController.offset ==
+                                                customerScrollController
+                                                    .position.maxScrollExtent &&
+                                            !BlocProvider.of<CustomerBloc>(context) .isPaginationLoading &&
+                                            BlocProvider.of<CustomerBloc>(context).currentPage <=
+                                                BlocProvider.of<CustomerBloc>(context).totalPages) {
+                                          _debouncer.run(() {
+                                            BlocProvider.of<CustomerBloc>(context).isPaginationLoading = true;
+                                            BlocProvider.of<CustomerBloc>(context).add(
+                                                customerDetails(query: ''));
+                                          });
+                                        }
+                                }),
+                                itemCount: customerDataList.length,
                                 shrinkWrap: true,
-                                physics: ClampingScrollPhysics(),
+                                physics: const ClampingScrollPhysics(),
                               ),
                             ),
                           )
@@ -898,6 +947,84 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
         ),
       ),
     );
+  }
+
+
+
+  void showActionSheet(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+          actions: <CupertinoActionSheetAction>[
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                selectImages("camera");
+              },
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/camera.svg",
+                    width: 24,
+                    height: 24,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 12.0),
+                    child: Text('Camera'),
+                  ),
+                ],
+              ),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                selectImages("lib");
+              },
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/folder.svg",
+                    width: 24,
+                    height: 24,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 12.0),
+                    child: Text('Choose from Library'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            // isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context, 'Cancel');
+            },
+            child: const Text('Cancel'),
+          )),
+    );
+  }
+
+
+  void selectImages(source) async {
+    if (source == "camera") {
+      selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
+      // if (imageFileList != null) {
+      setState(() {
+        imageFileList?.add(selectedImage!);
+      });
+
+      // }
+    } else {
+      final List<XFile> imageFile = await imagePicker.pickMultiImage();
+      //  if (imageFile.isNotEmpty) {
+      setState(() {
+        imageFileList?.addAll(imageFile);
+      });
+
+      //  }
+    }
+    setState(() {});
   }
 
 
