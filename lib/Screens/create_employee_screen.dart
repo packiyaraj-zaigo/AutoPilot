@@ -59,7 +59,9 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => EmployeeListScreen(),
+              ));
             },
             child: const Icon(
               Icons.close,
@@ -80,7 +82,9 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
               if (state is EmployeeRolesErrorState) {
                 CommonWidgets().showDialog(
                     context, 'Something went wrong please try again later');
-                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => EmployeeListScreen(),
+                ));
               } else if (state is EmployeeCreateErrorState) {
                 CommonWidgets().showDialog(context, state.message);
               } else if (state is EmployeeRolesSuccessState) {
