@@ -59,8 +59,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         centerTitle: true,
         actions: [
           GestureDetector(
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
+            onTap: () async {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => const CreateEmployeeScreen(),
               ));
             },
