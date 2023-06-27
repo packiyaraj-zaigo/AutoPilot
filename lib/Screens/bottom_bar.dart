@@ -45,14 +45,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
     pages = [
       DashBoardScreen(),
-      WorkFlowScreen(tabController: workFlowTabController),
-    // DummyScreen(name: "Work flow Screen"),
+    //  WorkFlowScreen(tabController: workFlowTabController),
+     DummyScreen(name: "Work flow Screen"),
       CalendarScreen(),
-      EstimateScreen(
-        tabController: estimateTabController,
-      )
+      // EstimateScreen(
+      //   tabController: estimateTabController,
+      // )
 
-     // DummyScreen(name: "Estimate screen")
+      DummyScreen(name: "Estimate screen")
     ];
     // TODO: implement initState
     super.initState();
@@ -86,6 +86,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                 onPressed: () {
                   showModalBottomSheet(
                     context: context,
+                    
                     builder: (context) {
                       return mainCreateWidget();
                     },
@@ -124,11 +125,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                         )),
                     IconButton(
                         onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const NotificationScreen(),
-                            ),
-                          );
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const NotificationScreen(),
+                          //   ),
+                          // );
                         },
                         icon: SvgPicture.asset(
                           "assets/images/notification.svg",
@@ -471,47 +472,49 @@ class _BottomBarScreenState extends State<BottomBarScreen>
   }
 
   Widget mainCreateWidget() {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.height / 1.6,
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            bottomSheetTile("New Estimate", "assets/images/estimate_icon.svg",
-                CreateEstimateScreen()),
-            bottomSheetTile("New Customer", "assets/images/customer_icon.svg",
-                ScannerScreen()),
-            bottomSheetTile("New Vehicle", "assets/images/vehicle_icon.svg",
-                ScannerScreen()),
-            bottomSheetTile("New Appointment",
-                "assets/images/appointment_icon.svg", ScannerScreen()),
-            bottomSheetTile(
-                "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
-            Padding(
-              padding: const EdgeInsets.only(top: 16.0),
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 56,
-                  width: MediaQuery.of(context).size.width,
-                  decoration:
-                      BoxDecoration(borderRadius: BorderRadius.circular(12)),
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primaryColors),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            children: [
+              bottomSheetTile("New Estimate", "assets/images/estimate_icon.svg",
+                  CreateEstimateScreen()),
+              bottomSheetTile("New Customer", "assets/images/customer_icon.svg",
+                  ScannerScreen()),
+              bottomSheetTile("New Vehicle", "assets/images/vehicle_icon.svg",
+                  ScannerScreen()),
+              bottomSheetTile("New Appointment",
+                  "assets/images/appointment_icon.svg", ScannerScreen()),
+              bottomSheetTile(
+                  "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 56,
+                    width: MediaQuery.of(context).size.width,
+                    decoration:
+                        BoxDecoration(borderRadius: BorderRadius.circular(12)),
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryColors),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -522,9 +525,9 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       padding: const EdgeInsets.only(top: 16.0),
       child: GestureDetector(
         onTap: () {
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => constructor,
-          ));
+          // Navigator.of(context).push(MaterialPageRoute(
+          //   builder: (context) => constructor,
+          // ));
         },
         child: Container(
           alignment: Alignment.center,

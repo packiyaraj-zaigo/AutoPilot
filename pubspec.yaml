@@ -57,6 +57,7 @@ dependencies:
   boardview: ^0.2.2
   url_launcher: ^6.1.11
   firebase_core: ^2.14.0
+  image_picker: ^0.8.7
 
 dev_dependencies:
   flutter_test:
