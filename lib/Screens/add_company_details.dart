@@ -78,22 +78,27 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       ),
       bottomNavigationBar:Padding(
         padding: const EdgeInsets.only(bottom:24.0,left:24,right:24),
-        child: Container(
-                      height: 56,
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.primaryColors,
-                        
+        child: GestureDetector(
+          onTap: (){
+            Navigator.pop(context);
+          },
+          child: Container(
+                        height: 56,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.primaryColors,
+                          
+                        ),
+                        child: const Text("Confirm",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white
+                        ),),
                       ),
-                      child: const Text("Confirm",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white
-                      ),),
-                    ),
+        ),
       ) ,
       body: SingleChildScrollView(child: widget.widgetIndex==0?basicDetailsWidget():widget.widgetIndex==1? operationDetailsWidget():addEmployeeWidget()),
 

@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Screens/add_company_details.dart';
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,11 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
        actions: [Padding(
          padding: const EdgeInsets.only(right:8.0),
          child: GestureDetector(
-          onTap: (){},
+          onTap: (){
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+              return BottomBarScreen();
+            },), (route) => false);
+          },
            child: Row(
               
             children: [
@@ -47,22 +52,29 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
       ),
       bottomNavigationBar:Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Container(
-                      height: 56,
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.primaryColors,
-                        
+        child: GestureDetector(
+          onTap: (){
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+              return BottomBarScreen();
+            },), (route) => false);
+          },
+          child: Container(
+                        height: 56,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.primaryColors,
+                          
+                        ),
+                        child: const Text("Confirm",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white
+                        ),),
                       ),
-                      child: const Text("Confirm",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white
-                      ),),
-                    ),
+        ),
       ), 
       body:  Padding(
         padding:  EdgeInsets.all(24.0),

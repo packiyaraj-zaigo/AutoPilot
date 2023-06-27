@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 
+import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -49,7 +50,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       log("res${createAccRes.body}");
 
       
-      if (createAccRes.statusCode==409) {
+      if (createAccRes.statusCode==201) {
         emit(CreateAccountSuccessState());
       }else if(createAccRes.statusCode==422){
         emit(CreateAccountErrorState());
@@ -89,7 +90,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         AppUtils.setUserID(userLoginData['client_id'].toString());
         Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
           builder: (context) {
-            return BottomBarScreen();
+            return AddCompanyScreen();
       },), (route) => false);
       }else{
         if(userLoginRes.body.contains("email")){
