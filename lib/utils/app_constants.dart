@@ -9,5 +9,6 @@ class AppConstants {
   static const String OTP = "OTP";
   static const String USER_ID = "USER_ID";
   static const String kGoogleApiKey = "AIzaSyBSQft-_3nkzJK-2kFyuUKidm8kldWP1d8";
+  static const String TEMP_VAR="temp_variable";
   
 }

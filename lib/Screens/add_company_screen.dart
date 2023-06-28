@@ -1,6 +1,7 @@
 import 'package:auto_pilot/Screens/add_company_details.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,6 +26,8 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
          padding: const EdgeInsets.only(right:8.0),
          child: GestureDetector(
           onTap: (){
+
+            AppUtils.setTempVar("");
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
               return BottomBarScreen();
             },), (route) => false);
@@ -54,6 +57,8 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
         padding: const EdgeInsets.all(24.0),
         child: GestureDetector(
           onTap: (){
+
+             AppUtils.setTempVar("");
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
               return BottomBarScreen();
             },), (route) => false);

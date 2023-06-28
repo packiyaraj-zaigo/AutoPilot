@@ -17,6 +17,8 @@ class EmployeeDetailsScreen extends StatefulWidget {
 
 class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   int selectedIndex = 0;
+  List<Widget>messageChatWidgetList=[];
+  final messageController=TextEditingController();
   @override
   Widget build(BuildContext context) {
     final date =
@@ -311,11 +313,223 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     ],
                   )
                 : selectedIndex == 1
-                    ? const Text('message')
+                    ? chatWidget()
                     : const Text('payment')
           ],
         ),
       ),
     );
   }
+
+  Widget chatWidget(){
+    return Expanded(
+     // height: MediaQuery.of(context).size.height,
+     // width: MediaQuery.of(context).size.width,
+    
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+       
+        children: [
+          chatBoxWidget(),
+          SizedBox(height: 20,),
+          Padding(
+            padding: const EdgeInsets.only(bottom:20.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  messageChipWidget("Ready for pickup"),
+                  messageChipWidget("Working on.."),
+                  messageChipWidget("We are delayed")
+          
+                ],
+              )),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom:24.0),
+            child: Container(
+              height: 50,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+                color: Colors.white,
+                boxShadow: [BoxShadow(
+                  color: Colors.grey.shade300,
+                  blurRadius: 0.7,
+                  spreadRadius: 1.2,
+                  offset: Offset(3, 2)
+
+
+                )]
+                
+              ),
+
+              // child: Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal:22.0),
+              //   child: Row(
+              //     children: [
+              //       SvgPicture.asset("assets/images/attachment_icon.svg"),
+
+              //       TextField(
+              //         decoration: InputDecoration(
+              //           hintText: "Enter your message..",
+              //           contentPadding: EdgeInsets.all(0)
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              // ),
+
+              child:  TextField(
+                controller: messageController,
+                decoration: InputDecoration(
+                  border:InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 22,
+                    vertical: 18
+                  ),
+                  hintText: "Enter your messsage..",
+
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: SvgPicture.asset("assets/images/attachment_icon.svg")),
+                  ),
+
+                  suffixIcon:  Padding(
+                    padding:  const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: (){
+                        setState(() {
+                          messageChatWidgetList.add(chatBubleWidget(messageController.text));
+
+                          messageController.clear();
+                        });
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: AppColors.primaryColors,
+                        child: SvgPicture.asset("assets/images/send_icon.svg"),
+                      ),
+                    ),
+                  )
+                ),
+
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget messageChipWidget(String text){
+    return Padding(
+      padding: const EdgeInsets.only(left:9.0),
+      child: GestureDetector(
+        onTap: (){
+          messageController.text=text;
+        },
+        child: Container(
+         // height: 30,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(
+              color: AppColors.primaryColors
+            )
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal:15.0,vertical: 13),
+            child: Text(text,style: const TextStyle(
+              color: AppColors.primaryColors,
+              fontSize: 14,
+              fontWeight: FontWeight.w500
+            ),),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget chatBoxWidget(){
+    return Expanded(
+      child: ListView.builder(itemBuilder: (context, index) {
+        return messageChatWidgetList[index];
+      },
+      itemCount: messageChatWidgetList.length,
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
+      ),
+    );
+
+  }
+
+
+  Widget chatBubleWidget(String message){
+    return Padding(
+      padding: const EdgeInsets.only(top:12.0),
+      child: Row(
+        children: [
+          Flexible(
+            child: ConstrainedBox(
+                constraints: BoxConstraints(
+                 // minWidth: 30,
+                  maxWidth: MediaQuery.of(context).size.width/1.8
+                ),
+              child: Container(
+                alignment: Alignment.centerLeft,
+              
+               // width: MediaQuery.of(context).size.width/3,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryColors,
+                  borderRadius: BorderRadius.circular(12)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal:20.0,vertical: 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(message,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                
+                      ),),
+                
+                       Padding(
+                        padding:  const EdgeInsets.only(top:14.0),
+                        child: Row(
+                             
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("8:00 Am",
+                        style:  TextStyle(
+                          fontSize: 12,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                              
+                        ),),
+                
+                        SvgPicture.asset("assets/images/Double_tick_icon.svg")
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
+
+ 
 }

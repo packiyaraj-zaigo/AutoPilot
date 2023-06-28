@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:developer';
 
@@ -5,12 +7,14 @@ import 'dart:developer';
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'login_event.dart';
 part 'login_state.dart';
@@ -52,6 +56,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       
       if (createAccRes.statusCode==201) {
         emit(CreateAccountSuccessState());
+        AppUtils.setTempVar("user_created");
       }else if(createAccRes.statusCode==422){
         emit(CreateAccountErrorState());
         errorRes=createAccData;
@@ -75,6 +80,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     
     try {
+       SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? tempVar = prefs.getString(AppConstants.TEMP_VAR);
       
       emit(UserLoginLoadingState());
 
@@ -88,10 +95,23 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(UserLoginSuccessState());
         AppUtils.setToken(userLoginData['access_token']);
         AppUtils.setUserID(userLoginData['client_id'].toString());
+
+        if(tempVar!=null &&tempVar!=""){
+          
         Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
           builder: (context) {
-            return AddCompanyScreen();
+            return const AddCompanyScreen();
       },), (route) => false);
+
+        }else{
+          
+        Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
+          builder: (context) {
+            return BottomBarScreen();
+      },), (route) => false);
+        }
+
+
       }else{
         if(userLoginRes.body.contains("email")){
            emit(UserLoginErrorState(

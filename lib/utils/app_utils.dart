@@ -250,6 +250,24 @@ class AppUtils {
     String? userID = prefs.getString(AppConstants.USER_ID);
     return userID ?? "";
   }
+
+
+
+  //temp for showing the add company screen.
+  ///////////////////////////////////////////////////////////////
+
+  static Future<void> setTempVar(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(AppConstants.TEMP_VAR, value);
+  }
+
+  static Future<String> getTempVar() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userID = prefs.getString(AppConstants.TEMP_VAR);
+    return userID ?? "";
+  }
+
+  ////////////////////////////////////////////////////////////////
 }
 
 class Debouncer {
