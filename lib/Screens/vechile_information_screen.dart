@@ -63,8 +63,11 @@ class _VechileInformationState extends State<VechileInformation> {
           ),
         ),
         actions: [
-          Icon(
-            Icons.more_horiz,
+          IconButton(
+            onPressed: () {
+              ShowBottomSheet();
+            },
+            icon: Icon(Icons.more_horiz),
             color: AppColors.primaryColors,
           )
         ],
@@ -345,6 +348,197 @@ class _VechileInformationState extends State<VechileInformation> {
           ],
         ),
       ),
+    );
+  }
+
+  ShowBottomSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        // <-- SEE HERE
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(25.0),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: 400,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Center(
+                    child: Container(
+                      height: 6,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                        color: AppColors.primaryBoxtColors,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 18.0),
+                  child: Text(
+                    "Select an option",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                AppUtils.verticalDivider(),
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 18.0, right: 18),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.primaryButtonColors,
+                            elevation: 0,
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              Text(
+                                'New Estimate',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: '.SF Pro Text',
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      // ElevatedButton(
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.center,
+                      //     children: [
+                      //       Icon(Icons.add),
+                      //       Text('Add Vechile'),
+                      //     ],
+                      //   ),
+                      //   onPressed: () => Navigator.pop(context),
+                      // ),
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.primaryButtonColors,
+                            elevation: 0,
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.edit,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              Text(
+                                'Edit Vechile',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: '.SF Pro Text',
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.primaryButtonColors,
+                            elevation: 0,
+                            shape: new RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.delete,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              Text(
+                                'Delete Vechile',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontFamily: '.SF Pro Text',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryColors,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: '.SF Pro Text',
+                            fontSize: 16),
+                      )),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
