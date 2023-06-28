@@ -7,9 +7,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Screens/customer_information_screen.dart';
 import '../Models/employee_creation_model.dart';
+import '../utils/app_constants.dart';
 
 class ApiProvider {
   //DEV Server
@@ -29,16 +31,18 @@ class ApiProvider {
   Future<dynamic> createAccount(String firstName, String lastName, String email,
       String password, String phoneNumber) async {
     print("into provider");
-    final List<String> emptyList=[];
-    Map bodymap={    "email":email,
-          "first_name":firstName,
-          "last_name":lastName,
-          "emp_phone":phoneNumber,
-          "password":password,
-          "users":emptyList};
+    final List<String> emptyList = [];
+    Map bodymap = {
+      "email": email,
+      "first_name": firstName,
+      "last_name": lastName,
+      "emp_phone": phoneNumber,
+      "password": password,
+      "users": emptyList
+    };
 
-          var encodedBody=json.encode(bodymap);
-          log(encodedBody.toString());
+    var encodedBody = json.encode(bodymap);
+    log(encodedBody.toString());
 
     //  LoadingFormModel? loadingFormModel;
     try {
@@ -51,17 +55,14 @@ class ApiProvider {
       //   ..fields['password'] = password
       //   ..fields['users']=json.encode(emptyList);
 
-      var response=  http.post(url,
-        body: encodedBody,
-        headers: { HttpHeaders.contentTypeHeader: 'application/json'});
-
- 
+      var response = http.post(url,
+          body: encodedBody,
+          headers: {HttpHeaders.contentTypeHeader: 'application/json'});
 
       //  request.files.add(http.MultipartFile.fromString("users", emptyList));
-       
 
       // request.headers.addAll(getHeader(token));
-     // var response = await request.send();
+      // var response = await request.send();
       // inspect(response);
       // print(response.statusCode.toString() + "provider status code");
       // print(response.toString() + "provider response");
@@ -300,8 +301,10 @@ class ApiProvider {
 
   Future<dynamic> customerLoad(String token, int page, String query) async {
     try {
-      var url =
-          Uri.parse('${BASE_URL}api/customers?page=$page&first_name=$query');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      var url = Uri.parse(
+          '${BASE_URL}api/customers?client_id=${prefs.getString(AppConstants.USER_ID)}&page=$page&first_name=$query');
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -326,8 +329,12 @@ class ApiProvider {
     pinCode,
   ) async {
     try {
-      var url = Uri.parse('${BASE_URL}api/customers?client_id=62');
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var url = Uri.parse(
+          '${BASE_URL}api/customers?client_id=${prefs.getString(AppConstants.USER_ID)}');
       print('hjjjjjjjjjjjjjjjj${token}');
+      print('xxxxxxxxxxxxxxx${prefs.getString(AppConstants.USER_ID)}');
+
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token"
         ..fields['first_name'] = firstName
