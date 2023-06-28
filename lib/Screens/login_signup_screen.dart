@@ -937,7 +937,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: Color(0xff333333),
+                          color: AppColors.primaryColors,
                         ),
                         child: const Text(
                           "Continue to login",
