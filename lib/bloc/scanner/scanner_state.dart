@@ -39,3 +39,27 @@ class PageNationSucessState extends ScannerState {
   @override
   List<Object> get props => [estimates];
 }
+
+class LicSearchLoadingState extends ScannerState {}
+
+class LicSearchErrorState extends ScannerState {
+  final String message;
+  const LicSearchErrorState({required this.message});
+}
+
+class LicPlateFound extends ScannerState {
+  final Datum vehicle;
+  final List<VehicleEstimateResponseModel> estimates;
+  const LicPlateFound({required this.vehicle, required this.estimates});
+  @override
+  List<Object> get props => [estimates];
+}
+
+class LicPageNationErrorState extends ScannerState {}
+
+class LicPageNationSucessState extends ScannerState {
+  final List<VehicleEstimateResponseModel> estimates;
+  const LicPageNationSucessState({required this.estimates});
+  @override
+  List<Object> get props => [estimates];
+}

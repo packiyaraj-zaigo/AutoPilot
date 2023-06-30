@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -208,7 +209,7 @@ class AppUtils {
     var inputFormat = DateFormat('yyyy-MM-dd');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('MMMM-dd-yyyy');
+    var outputFormat = DateFormat('MM-dd-yyyy');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
@@ -251,8 +252,6 @@ class AppUtils {
     return userID ?? "";
   }
 
-
-
   //temp for showing the add company screen.
   ///////////////////////////////////////////////////////////////
 
@@ -282,6 +281,80 @@ class Debouncer {
     timer = Timer(
       const Duration(milliseconds: Duration.millisecondsPerSecond),
       action,
+    );
+  }
+}
+
+class PhoneInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Remove any non-digit characters from the input
+    String sanitizedText = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Apply the desired format: (555) 555-5555
+    final formattedText = StringBuffer();
+
+    if (sanitizedText.length >= 1) {
+      formattedText.write(
+          '(${sanitizedText.substring(0, sanitizedText.length >= 3 ? 3 : sanitizedText.length)})');
+
+      if (sanitizedText.length > 3) {
+        formattedText.write(
+            ' ${sanitizedText.substring(3, sanitizedText.length >= 6 ? 6 : sanitizedText.length)}');
+      }
+
+      if (sanitizedText.length > 6) {
+        formattedText
+            .write('-${sanitizedText.substring(6, sanitizedText.length)}');
+      }
+    }
+
+    // Determine the selection offset after formatting
+    int selectionOffset = newValue.selection.baseOffset +
+        formattedText.length -
+        newValue.text.length;
+    selectionOffset = selectionOffset.clamp(
+        0, formattedText.length); // Clamp the selection offset to a valid range
+
+    // Handle backspace key
+    if (newValue.text.length < oldValue.text.length &&
+        newValue.selection.baseOffset == newValue.selection.extentOffset) {
+      if (newValue.selection.baseOffset >= 4 &&
+          newValue.selection.baseOffset <= 5) {
+        formattedText.clear();
+        formattedText.write(
+            '(${sanitizedText.substring(0, sanitizedText.length >= 3 ? 3 : sanitizedText.length)})');
+        selectionOffset--;
+      } else if (newValue.selection.baseOffset >= 7 &&
+          newValue.selection.baseOffset <= 9) {
+        formattedText.clear();
+        formattedText.write(
+            '(${sanitizedText.substring(0, sanitizedText.length >= 3 ? 3 : sanitizedText.length)}) ');
+        formattedText.write(sanitizedText.substring(
+            3, sanitizedText.length >= 6 ? 6 : sanitizedText.length));
+      } else if (newValue.selection.baseOffset >= 11 &&
+          newValue.selection.baseOffset <= 15) {
+        formattedText.clear();
+        formattedText.write(
+            '(${sanitizedText.substring(0, sanitizedText.length >= 3 ? 3 : sanitizedText.length)}) ');
+        formattedText.write(sanitizedText.substring(
+            3, sanitizedText.length >= 6 ? 6 : sanitizedText.length));
+        formattedText
+            .write('-${sanitizedText.substring(6, sanitizedText.length)}');
+        // selectionOffset--;
+      }
+      if (newValue.selection.baseOffset == 6) {
+        selectionOffset--;
+      }
+    }
+
+    // Return the updated text value with proper formatting
+    return TextEditingValue(
+      text: formattedText.toString(),
+      selection: TextSelection.collapsed(offset: selectionOffset),
     );
   }
 }

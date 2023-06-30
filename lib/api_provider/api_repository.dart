@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter/material.dart';
@@ -122,6 +123,10 @@ class ApiRepository {
     return apiProvider.getVinDetailsLocal(token, vin);
   }
 
+  Future getLicDetails(String token, String lic) {
+    return apiProvider.getLicDetails(token, lic);
+  }
+
   Future getVehicleEstimates(String token, String vehicleId, int page) {
     return apiProvider.getVehicleEstimates(token, vehicleId, page);
   }
@@ -140,6 +145,10 @@ class ApiRepository {
 
   Future getAllTimeCards(String token) {
     return apiProvider.getAllTimeCards(token);
+  }
+
+  Future createTimeCard(String token, TimeCardCreateModel timeCard) {
+    return apiProvider.createTimeCard(token, timeCard);
   }
 
   Future addParts(

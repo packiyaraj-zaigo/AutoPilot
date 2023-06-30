@@ -8,7 +8,6 @@ import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
-import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -35,8 +34,6 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
   String positionError = '';
   final List<RoleModel> roles = [];
 
-  CountryCode? selectedCountry;
-  final countryPicker = const FlCountryCodePicker();
   late final EmployeeBloc bloc;
 
   @override
@@ -206,7 +203,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('ex. 555-555-5555', phoneController, 'Phone',
+                    textBox('ex. (555) 555-5555', phoneController, 'Phone',
                         phoneError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -369,17 +366,17 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              keyboardType: label == 'Phone' ? TextInputType.number : null,
+              keyboardType: label == 'Phone' ? TextInputType.phone : null,
+              inputFormatters:
+                  label == "Phone" ? [PhoneInputFormatter()] : null,
               maxLength: label == 'Phone'
-                  ? 16
+                  ? 20
                   : label.contains('Name')
                       ? 100
                       : 50,
               decoration: InputDecoration(
                 hintText: placeHolder,
                 counterText: "",
-                prefixIcon:
-                    label == 'Phone' ? countryPickerWidget(context) : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(
@@ -470,69 +467,6 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget countryPickerWidget(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        final code = await countryPicker.showPicker(context: context);
-        if (code != null) {
-          setState(() {
-            selectedCountry = code;
-          });
-        }
-        ;
-      },
-      child: Container(
-        width: 90,
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        decoration: const BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.all(Radius.circular(5.0))),
-        child: Row(
-          children: [
-            // ClipRRect(
-            //   borderRadius: BorderRadius.circular(10),
-            //   child: CircleAvatar(
-            //     radius: 9,
-            //     backgroundColor: Colors.transparent,
-            //     child: selectedCountry!=null?ClipOval(child: selectedCountry!.flagImage):const SizedBox() ,
-
-            //   ),
-            // ),
-
-            Container(
-              height: 20,
-              width: 20,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.grey,
-              ),
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: selectedCountry != null
-                      ? selectedCountry!.flagImage
-                      : const SizedBox()),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(left: 6.0),
-              child: Text(
-                  selectedCountry != null ? selectedCountry!.dialCode : "+1"),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 5.0),
-              child: Container(
-                width: 0.7,
-                color: AppColors.greyText,
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 

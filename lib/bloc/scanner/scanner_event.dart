@@ -13,3 +13,10 @@ class GetVehiclesFromVin extends ScannerEvent {
 }
 
 class EstimatePageNation extends ScannerEvent {}
+
+class GetVehiclesFromLic extends ScannerEvent {
+  final String lic;
+  const GetVehiclesFromLic({required this.lic});
+}
+
+class LicEstimatePageNation extends ScannerEvent {}

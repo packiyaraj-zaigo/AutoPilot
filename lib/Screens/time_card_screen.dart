@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:auto_pilot/Models/time_card_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/create_time_card.dart';
-import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
@@ -141,11 +140,11 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                                             ),
                                           ],
                                         ),
-                                        const Row(
+                                        Row(
                                           children: [
                                             Text(
-                                              'Technician',
-                                              style: TextStyle(
+                                              timeCard.position ?? '',
+                                              style: const TextStyle(
                                                 color: AppColors.greyText,
                                               ),
                                             ),
@@ -192,7 +191,7 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                                             SizedBox(
                                               width: 70,
                                               child: Text(
-                                                  '${timeCard.dayTotal?.substring(0, 5) ?? ''} ${timeCard.weekTotal?.substring(0, 5) == null ? '' : ' hrs'}'),
+                                                  '${timeCard.weekTotal?.substring(0, 5) ?? ''} ${timeCard.weekTotal?.substring(0, 5) == null ? '' : ' hrs'}'),
                                             ),
                                           ],
                                         ),
@@ -215,7 +214,7 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                                             SizedBox(
                                               width: 70,
                                               child: Text(
-                                                  '${timeCard.dayTotal?.substring(0, 5) ?? ''} ${timeCard.monthTatal?.substring(0, 5) == null ? '' : ' hrs'}'),
+                                                  '${timeCard.monthTatal?.substring(0, 5) ?? ''} ${timeCard.monthTatal?.substring(0, 5) == null ? '' : ' hrs'}'),
                                             ),
                                           ],
                                         ),
@@ -246,25 +245,43 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                                                 ),
                                               ),
                                             ),
-                                            Container(
-                                              width: (MediaQuery.of(context)
-                                                          .size
-                                                          .width -
-                                                      96) /
-                                                  2,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: const Color(0xFFF5F5F5),
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  'Add',
-                                                  style: TextStyle(
-                                                    color:
-                                                        AppColors.primaryColors,
-                                                    fontWeight: FontWeight.w600,
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        TimeCardCreate(
+                                                      id: timeCard.employeeId,
+                                                      employee:
+                                                          timeCard.employeeName,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              behavior:
+                                                  HitTestBehavior.translucent,
+                                              child: Container(
+                                                width: (MediaQuery.of(context)
+                                                            .size
+                                                            .width -
+                                                        96) /
+                                                    2,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                  color:
+                                                      const Color(0xFFF5F5F5),
+                                                ),
+                                                child: const Center(
+                                                  child: Text(
+                                                    'Add',
+                                                    style: TextStyle(
+                                                      color: AppColors
+                                                          .primaryColors,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                   ),
                                                 ),
                                               ),

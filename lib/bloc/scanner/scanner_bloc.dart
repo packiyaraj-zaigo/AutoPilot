@@ -18,12 +18,16 @@ part 'scanner_state.dart';
 class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
   int currentEstimatePage = 1;
   int totalEstimatePages = 1;
+  int licCurrentEstimatePage = 1;
+  int licTotalEstimatePages = 1;
   bool isEstimatePagenationLoading = false;
   String vehicleId = '';
   final apiRepo = ApiRepository();
 
   ScannerBloc() : super(ScannerInitial()) {
     on<GetVehiclesFromVin>(getVehicleFromVin);
+    on<LicEstimatePageNation>(licEstimatePageNation);
+    on<GetVehiclesFromLic>(getVehicleFromLic);
     on<EstimatePageNation>(estimatePageNation);
   }
 
@@ -114,6 +118,80 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
     } catch (e, s) {
       log(s.toString());
       emit(PageNationErrorState());
+    }
+    isEstimatePagenationLoading = false;
+  }
+
+  getVehicleFromLic(
+    GetVehiclesFromLic event,
+    Emitter<ScannerState> emit,
+  ) async {
+    try {
+      emit(LicSearchLoadingState());
+      final token = await AppUtils.getToken();
+      final localResponse = await apiRepo.getLicDetails(token, event.lic);
+      if (localResponse.statusCode == 200) {
+        final body = jsonDecode(localResponse.body);
+        if (body['data']['data'] != null && body['data']['data'].isNotEmpty) {
+          final vehicle = Datum.fromJson(body['data']['data'][0]);
+          vehicleId = vehicle.id.toString();
+          log(vehicleId.toString());
+
+          try {
+            final estimateResponse = await apiRepo.getVehicleEstimates(
+                token, vehicleId, licCurrentEstimatePage);
+            if (estimateResponse.statusCode == 200) {
+              final estimateBody = jsonDecode(estimateResponse.body);
+              final List<VehicleEstimateResponseModel> estimates = [];
+              estimateBody['data']['data'].forEach((estimate) {
+                estimates.add(VehicleEstimateResponseModel.fromJson(estimate));
+              });
+              emit(LicPlateFound(vehicle: vehicle, estimates: estimates));
+              licTotalEstimatePages = estimateBody['data']['last_page'] ?? 1;
+              licCurrentEstimatePage =
+                  estimateBody['data']['current_page'] ?? 1;
+              return;
+            } else {
+              throw 'Something went wrong';
+            }
+          } catch (e) {
+            log(e.toString() + 'errorrrr');
+            emit(LicPlateFound(vehicle: vehicle, estimates: []));
+            return;
+          }
+        } else {
+          throw 'No vehicles found';
+        }
+      }
+    } catch (e) {
+      log(e.toString() + "::::::::::::::::::::::::::");
+      emit(LicSearchErrorState(message: e.toString()));
+    }
+  }
+
+  licEstimatePageNation(
+    LicEstimatePageNation event,
+    Emitter<ScannerState> emit,
+  ) async {
+    try {
+      emit(LicSearchLoadingState());
+      final token = await AppUtils.getToken();
+      licCurrentEstimatePage = licCurrentEstimatePage + 1;
+      final response = await apiRepo.getVehicleEstimates(
+          token, vehicleId, licCurrentEstimatePage);
+      if (response.statusCode == 200) {
+        final body = jsonDecode(response.body);
+        if (body['data']['data'] != null) {
+          final List<VehicleEstimateResponseModel> estimates = [];
+          body['data']['data'].forEach((estimate) {
+            estimates.add(VehicleEstimateResponseModel.fromJson(estimate));
+          });
+          emit(LicPageNationSucessState(estimates: estimates));
+        }
+      }
+    } catch (e, s) {
+      log(s.toString());
+      emit(LicPageNationErrorState());
     }
     isEstimatePagenationLoading = false;
   }

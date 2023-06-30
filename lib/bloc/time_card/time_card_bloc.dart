@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:auto_pilot/api_provider/api_provider.dart';
+import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -54,5 +55,24 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
   createTimeCard(
     CreateTimeCardEvent event,
     Emitter<TimeCardState> emit,
-  ) {}
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final Response response =
+          await ApiRepository().createTimeCard(token, event.timeCard);
+      final body = jsonDecode(response.body);
+      if (response.statusCode == 201) {
+        emit(CreateTimeCardSucessState());
+      } else {
+        if (body.containsKey('message')) {
+          emit(CreateTimeCardErrorState(message: body['message'].toString()));
+        } else {
+          emit(const CreateTimeCardErrorState(message: 'Something went wrong'));
+        }
+      }
+    } catch (e) {
+      log(e.toString() + "Create time card bloc error");
+      emit(CreateTimeCardErrorState(message: 'Something went wrong'));
+    }
+  }
 }
