@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
-
-import '../Screens/customer_information_screen.dart';
 import '../Models/employee_creation_model.dart';
 
 class ApiProvider {
@@ -29,16 +27,18 @@ class ApiProvider {
   Future<dynamic> createAccount(String firstName, String lastName, String email,
       String password, String phoneNumber) async {
     print("into provider");
-    final List<String> emptyList=[];
-    Map bodymap={    "email":email,
-          "first_name":firstName,
-          "last_name":lastName,
-          "emp_phone":phoneNumber,
-          "password":password,
-          "users":emptyList};
+    final List<String> emptyList = [];
+    Map bodymap = {
+      "email": email,
+      "first_name": firstName,
+      "last_name": lastName,
+      "emp_phone": phoneNumber,
+      "password": password,
+      "users": emptyList
+    };
 
-          var encodedBody=json.encode(bodymap);
-          log(encodedBody.toString());
+    var encodedBody = json.encode(bodymap);
+    log(encodedBody.toString());
 
     //  LoadingFormModel? loadingFormModel;
     try {
@@ -51,17 +51,14 @@ class ApiProvider {
       //   ..fields['password'] = password
       //   ..fields['users']=json.encode(emptyList);
 
-      var response=  http.post(url,
-        body: encodedBody,
-        headers: { HttpHeaders.contentTypeHeader: 'application/json'});
-
- 
+      var response = http.post(url,
+          body: encodedBody,
+          headers: {HttpHeaders.contentTypeHeader: 'application/json'});
 
       //  request.files.add(http.MultipartFile.fromString("users", emptyList));
-       
 
       // request.headers.addAll(getHeader(token));
-     // var response = await request.send();
+      // var response = await request.send();
       // inspect(response);
       // print(response.statusCode.toString() + "provider status code");
       // print(response.toString() + "provider response");
@@ -541,8 +538,7 @@ class ApiProvider {
     print("into provider");
 
     try {
-      var url = Uri.parse(
-          "${BASE_URL}api/provinces?page=$currentPage");
+      var url = Uri.parse("${BASE_URL}api/provinces?page=$currentPage");
       var request = http.MultipartRequest("GET", url);
 
       request.headers.addAll(getHeader(token));
@@ -565,6 +561,16 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + "  Create time cards api error");
+    }
+  }
+
+  Future<dynamic> getLicDetails(String token, String lic) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/vehicles?licence_plate=$lic');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
     }
   }
   // Future<dynamic> addParts(
