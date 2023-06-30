@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
@@ -118,7 +119,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   centerTitle: true,
                   actions: [
                     IconButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            return AddCompanyScreen();
+                          },));
+                        },
                         icon: SvgPicture.asset(
                           "assets/images/message.svg",
                           color: AppColors.primaryColors,
@@ -525,9 +530,9 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       padding: const EdgeInsets.only(top: 16.0),
       child: GestureDetector(
         onTap: () {
-          // Navigator.of(context).push(MaterialPageRoute(
-          //   builder: (context) => constructor,
-          // ));
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => constructor,
+          ));
         },
         child: Container(
           alignment: Alignment.center,

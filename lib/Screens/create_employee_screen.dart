@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/employee_creation_model.dart';
 import 'package:auto_pilot/Models/role_model.dart';
+import 'package:auto_pilot/Screens/add_company_details.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -14,7 +15,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateEmployeeScreen extends StatefulWidget {
-  const CreateEmployeeScreen({super.key});
+  const CreateEmployeeScreen({super.key,required this.navigation});
+  final String navigation;
 
   @override
   State<CreateEmployeeScreen> createState() => _CreateEmployeeScreenState();
@@ -59,9 +61,19 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
+
+              if(widget.navigation=="add_employee"){
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => EmployeeListScreen(),
               ));
+
+              }else{
+                 Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
+              ));
+
+              }
+             
             },
             child: const Icon(
               Icons.close,
@@ -82,9 +94,17 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
               if (state is EmployeeRolesErrorState) {
                 CommonWidgets().showDialog(
                     context, 'Something went wrong please try again later');
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                if(widget.navigation=="add_employee"){
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => EmployeeListScreen(),
                 ));
+
+                }else{
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
+                ));
+
+                }
               } else if (state is EmployeeCreateErrorState) {
                 CommonWidgets().showDialog(context, state.message);
               } else if (state is EmployeeRolesSuccessState) {
@@ -92,9 +112,19 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 roles.addAll(state.roles);
               } else if (state is EmployeeCreateSuccessState) {
                 // BlocProvider.of<EmployeeBloc>(context).add(GetAllEmployees());
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+
+                if(widget.navigation=="add_employee"){
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => EmployeeListScreen(),
                 ));
+
+                }else{
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
+                ));
+
+                }
+              
               }
             },
             child: BlocBuilder<EmployeeBloc, EmployeeState>(

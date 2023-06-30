@@ -29,16 +29,18 @@ class ApiProvider {
   Future<dynamic> createAccount(String firstName, String lastName, String email,
       String password, String phoneNumber) async {
     print("into provider");
-    final List<String> emptyList=[];
-    Map bodymap={    "email":email,
-          "first_name":firstName,
-          "last_name":lastName,
-          "emp_phone":phoneNumber,
-          "password":password,
-          "users":emptyList};
+    final List<String> emptyList = [];
+    Map bodymap = {
+      "email": email,
+      "first_name": firstName,
+      "last_name": lastName,
+      "emp_phone": phoneNumber,
+      "password": password,
+      "users": emptyList
+    };
 
-          var encodedBody=json.encode(bodymap);
-          log(encodedBody.toString());
+    var encodedBody = json.encode(bodymap);
+    log(encodedBody.toString());
 
     //  LoadingFormModel? loadingFormModel;
     try {
@@ -51,17 +53,14 @@ class ApiProvider {
       //   ..fields['password'] = password
       //   ..fields['users']=json.encode(emptyList);
 
-      var response=  http.post(url,
-        body: encodedBody,
-        headers: { HttpHeaders.contentTypeHeader: 'application/json'});
-
- 
+      var response = http.post(url,
+          body: encodedBody,
+          headers: {HttpHeaders.contentTypeHeader: 'application/json'});
 
       //  request.files.add(http.MultipartFile.fromString("users", emptyList));
-       
 
       // request.headers.addAll(getHeader(token));
-     // var response = await request.send();
+      // var response = await request.send();
       // inspect(response);
       // print(response.statusCode.toString() + "provider status code");
       // print(response.toString() + "provider response");
@@ -534,6 +533,25 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + "  Get all time cards api error");
+    }
+  }
+
+  Future<dynamic> getProvince(String token, int currentPage) async {
+    print("into provider");
+
+    try {
+      var url = Uri.parse(
+          "${BASE_URL}api/provinces?page=$currentPage");
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
     }
   }
   // Future<dynamic> addParts(

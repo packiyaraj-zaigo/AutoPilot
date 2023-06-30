@@ -5,6 +5,7 @@ import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/estimate_details_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -277,20 +278,27 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               taxDetailsWidget("Balance Due", "0.00"),
               Padding(
                 padding: const EdgeInsets.only(top: 32.0),
-                child: Container(
-                  height: 56,
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.primaryColors,
-                  ),
-                  child: const Text(
-                    "Confirm",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      return EstimateDetailsScreen();
+                    },));
+                  },
+                  child: Container(
+                    height: 56,
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primaryColors,
+                    ),
+                    child: const Text(
+                      "Confirm",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
                   ),
                 ),
               ),
