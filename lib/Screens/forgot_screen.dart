@@ -57,9 +57,14 @@ class _ResetPasswordState extends State<ResetPassword> {
               appBar: AppBar(
                 elevation: 0,
                 backgroundColor: Colors.white,
-                leading: const Icon(
-                  Icons.arrow_back,
-                  color: Colors.black,
+                leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Icon(
+                    Icons.arrow_back,
+                    color: AppColors.primaryColors,
+                  ),
                 ),
               ),
               body: Column(
@@ -110,8 +115,8 @@ class _ResetPasswordState extends State<ResetPassword> {
          const Text(
             "Email",
             style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w400,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
                 color: AppColors.greyText),
           ),
           const SizedBox(
@@ -125,7 +130,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
-                  color: emailErrorStatus?Color(0xffD80027):AppColors.primaryColors
+                  color: emailErrorStatus?Color(0xffD80027):Color(0xffC1C4CD)
                 ),
               ),
             ),
@@ -419,7 +424,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                         'Resend',
                                         style: TextStyle(
                                             fontSize: 14,
-                                            color: AppColors.greyText),
+                                            color: AppColors.primaryColors),
                                       ),
                                       onPressed: () {},
                                     )
@@ -468,10 +473,10 @@ class _ResetPasswordState extends State<ResetPassword> {
           SizedBox(
             height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter password...',
+              placeholder: 'Enter password',
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(color: AppColors.greyText),
+                border: Border.all(color: const Color(0xffC1C4CD)),
               ),
             ),
           ),
@@ -492,10 +497,10 @@ class _ResetPasswordState extends State<ResetPassword> {
           SizedBox(
             height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter password...',
+              placeholder: 'Enter password',
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(color: AppColors.greyText),
+                border: Border.all(color: Color(0xffC1C4CD)),
               ),
             ),
           ),

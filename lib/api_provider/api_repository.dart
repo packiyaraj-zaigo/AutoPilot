@@ -172,6 +172,9 @@ class ApiRepository {
   Future getProvince(String token,int currentPage) {
     return apiProvider.getProvince(token,currentPage);
   }
+  Future addCompany(Map<String,dynamic>dataMap,dynamic token,String clientId) {
+    return apiProvider.addCompany(dataMap,token,clientId);
+  }
 }
 
 class NetworkError extends Error {}

@@ -18,8 +18,10 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
 class AddCompanyDetailsScreen extends StatefulWidget {
-  const AddCompanyDetailsScreen({super.key, required this.widgetIndex});
+  const AddCompanyDetailsScreen({super.key, required this.widgetIndex,this.basicDetailsMap,this.operationDetailsMap});
   final int widgetIndex;
+  final Map<String,dynamic>?basicDetailsMap;
+  final Map<String,dynamic>?operationDetailsMap;
 
   @override
   State<AddCompanyDetailsScreen> createState() =>
@@ -113,6 +115,17 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     bloc.currentPage = 1;
     bloc.add(GetAllEmployees());
     // TODO: implement initState
+
+
+    if(widget.widgetIndex==0){
+      if(widget.basicDetailsMap!=null && widget.basicDetailsMap!={}){
+        populateBasicDetails();
+      }
+    }else if(widget.widgetIndex==1){
+      if(widget.operationDetailsMap!=null && widget.operationDetailsMap!={}){
+        populateOperationDetails();
+      }
+    }
     super.initState();
   }
 
@@ -433,9 +446,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 decoration: InputDecoration(
                     hintText: placeHolder,
                     counterText: "",
-                    prefixIcon: label == 'Business Phone'
-                        ? countryPickerWidget()
-                        : null,
+                    // prefixIcon: label == 'Business Phone'
+                    //     ? countryPickerWidget()
+                    //     : null,
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide(
@@ -710,7 +723,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                       disabledBorder: InputBorder.none,
                     ),
                     menuMaxHeight: 380,
-                    value: _currentSelectedValue,
+                    value: _currentSelectedTimezoneValue,
                     style: const TextStyle(color: Color(0xff6A7187)),
                     items: timeZones.map<DropdownMenuItem<tz.Location>>(
                         (tz.Location value) {
@@ -950,7 +963,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "address_1": addressController.text,
         "town_city": cityController.text,
         "zipcode": zipController.text,
-        "province_id":provinceId
+        "province_id":provinceId,
+        "province_name":provinceController.text
       });
 
       Navigator.pop(context, basicDetailsmap);
@@ -1309,5 +1323,53 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         ),
       ),
     );
+  }
+
+
+
+  populateBasicDetails(){
+    busineesNameController.text=widget.basicDetailsMap?['company_name']??"";
+    businessPhoneController.text=widget.basicDetailsMap?['phone']??"";
+    addressController.text=widget.basicDetailsMap?['address_1']??"";
+    cityController.text=widget.basicDetailsMap?['town_city']??"";
+    provinceController.text=widget.basicDetailsMap?['province_name']??"";
+    zipController.text=widget.basicDetailsMap?['zipcode']??"";
+    provinceId=widget.basicDetailsMap?['province_id']??"";
+
+   
+
+    
+
+
+   print(widget.basicDetailsMap);
+  }
+
+
+  populateOperationDetails(){
+    labourRateController.text=widget.operationDetailsMap?['base_labor_cost']??"";
+    taxRateController.text=widget.operationDetailsMap?['sales_tax_rate']??"";
+    if(widget.operationDetailsMap?['employee_count']=="1"){
+      numberOfEmployeeString="1";
+      selectedEmployeeIndex=0;
+    }else if(widget.operationDetailsMap?['employee_count']=="2-5"){
+        numberOfEmployeeString="2-5";
+      selectedEmployeeIndex=1;
+    }else{
+       numberOfEmployeeString="6+";
+      selectedEmployeeIndex=2;
+
+    }
+
+     timeZones.forEach((element) {
+      print(element.name);
+      if(element.name== widget.operationDetailsMap?['time_zone']){
+        print("in condition");
+       setState(() {
+          _currentSelectedTimezoneValue=element;
+        timeZoneString=element.name;
+        print(timeZoneString+"tiiimme zoneee");
+       });
+      }
+    });
   }
 }

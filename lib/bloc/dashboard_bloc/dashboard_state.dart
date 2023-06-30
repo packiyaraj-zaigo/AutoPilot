@@ -42,3 +42,9 @@ class GetProvinceState extends DashboardState{
 
 }
 
+class AddCompanySucessState extends DashboardState{
+
+}
+
+class AddCompanyLoadingState extends DashboardState{}
+

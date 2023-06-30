@@ -35,7 +35,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
          child: GestureDetector(
           onTap: (){
 
-            AppUtils.setTempVar("");
+           // AppUtils.setTempVar("");
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
               return BottomBarScreen();
             },), (route) => false);
@@ -66,14 +66,17 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
         child: GestureDetector(
           onTap: (){
 
-             AppUtils.setTempVar("");
+           //  AppUtils.setTempVar("");
             // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
             //   return BottomBarScreen();
             // },), (route) => false);
 
             if(basicDetailsMap!=null && basicDetailsMap!.isNotEmpty &&operationDetailsMap!=null && operationDetailsMap!.isNotEmpty && isEmployee!=null && isEmployee!){
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return AddCompanyReviewScreen();
+                return AddCompanyReviewScreen(
+                  basicDetailsMap: basicDetailsMap!,
+                  operationDetailsMap: operationDetailsMap!,
+                );
               },));
             }
           },

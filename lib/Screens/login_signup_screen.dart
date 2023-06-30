@@ -1,6 +1,7 @@
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
@@ -186,7 +187,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               // ),
 
               bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0, top: 0),
+          padding: const EdgeInsets.only(bottom: 28.0, top: 0),
           child: Container(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -209,7 +210,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                               ),
                             ),
                             Text(
-                              "Sign up",
+                              " Sign up",
                               style: TextStyle(
                                 color: AppColors.primaryColors,
                                 fontWeight: FontWeight.w600,
@@ -236,7 +237,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                               ),
                             ),
                             Text(
-                              "Sign in",
+                              " Sign in",
                               style: TextStyle(
                                 color: AppColors.primaryColors,
                                 fontWeight: FontWeight.w600,
@@ -294,7 +295,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 28.0),
-          child: textBox("Enter email...", loginEmailController, "Email",
+          child: textBox("Enter your email", loginEmailController, "Email",
               loginErrorStatus,false),
         ),
         Padding(
@@ -354,6 +355,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             ),
           ),
         ),
+
+       
         SizedBox(height: 16),
         // GestureDetector(
         //   onTap: () async {
@@ -397,6 +400,27 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         //     ),
         //   ),
         // ),
+
+
+         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                  builder: (BuildContext context) =>
+                                      ResetPassword()));
+                        },
+                        child: const Text("Forgot Password?",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryColors)),
+                      ),
+           ],
+         ),
         
       ],
     );
@@ -428,22 +452,22 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 ):const SizedBox(),
               ],
             ),
-            label == 'Password' && widget.widgetIndex == 0
-                ? GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (BuildContext context) =>
-                                  ResetPassword()));
-                    },
-                    child: const Text("Forgot Password?",
-                        style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryColors)),
-                  )
-                : const SizedBox(),
+            // label == 'Password' && widget.widgetIndex == 0
+            //     ? GestureDetector(
+            //         onTap: () {
+            //           Navigator.push(
+            //               context,
+            //               CupertinoPageRoute(
+            //                   builder: (BuildContext context) =>
+            //                       ResetPassword()));
+            //         },
+            //         child: const Text("Forgot Password?",
+            //             style: TextStyle(
+            //                 fontSize: 14,
+            //                 fontWeight: FontWeight.w600,
+            //                 color: AppColors.primaryColors)),
+            //       )
+            //     : const SizedBox(),
           ],
         ),
         Padding(
@@ -454,7 +478,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             child: TextField(
               controller: controller,
               inputFormatters:label=='Phone Number'? [
-                FilteringTextInputFormatter.allow(RegExp("[0-9]"))
+                PhoneInputFormatter(),
+               
+              //  FilteringTextInputFormatter.allow(RegExp("[0-9]"))
               ]:[],
               keyboardType:
                   label == 'Phone Number' ? TextInputType.number : null,
@@ -467,8 +493,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
-                  prefixIcon:
-                      label == 'Phone Number' ? countryPickerWidget() : null,
+                  // prefixIcon:
+                  //     label == 'Phone Number' ? countryPickerWidget() : null,
                   suffixIcon: label == "Password"
                       ? GestureDetector(
                           onTap: () {
@@ -628,7 +654,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Enter email...", signUpEmailController, "Email",
+          child: textBox("Enter your email", signUpEmailController, "Email",
               emailErrorStatus,true),
         ),
         Padding(
@@ -646,7 +672,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Enter phone number", phoneNumberController,
+          child: textBox("Enter your phone number", phoneNumberController,
               "Phone Number", phoneNumberErrorStatus,true),
         ),
         Padding(

@@ -616,4 +616,62 @@ class ApiProvider {
   //   } catch (e) {
   //     print(e.toString() + "provider error");
   //   }
+
+
+
+
+  Future<dynamic> addCompany(Map<String,dynamic>dataMap,dynamic token,String clientId) async {
+    print("into provider");
+
+     
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/clients/$clientId");
+      // var request = http.MultipartRequest("PUT", url)
+      //   ..fields['company_name'] = dataMap['company_name']
+      //   ..fields['phone'] = dataMap['phone']
+      //   ..fields['address_1']=dataMap['address_1']
+      //   ..fields['town_city']=dataMap['town_city']
+      //   ..fields['province_id']=dataMap['province_id']
+      //   ..fields['zipcode']=dataMap['zipcode']
+      //   ..fields['employee_count']=dataMap['employee_count']
+      //   ..fields['service_type']=dataMap['service_type']
+      //   ..fields['time_zone']=dataMap['time_zone']
+      //   ..fields['sales_tax_rate']=dataMap['sales_tax_rate']
+      //   ..fields['base_labor_cost']=dataMap['base_labor_cost'];
+
+      //  request.headers.addAll(getHeader(token));
+      // var response = await request.send();
+      Map bodyMap={
+       "company_name":dataMap['company_name'],
+       "phone":dataMap['phone'],
+       "address_1":dataMap['address_1'],
+       "town_city":dataMap['town_city'],
+       "province_id":dataMap['province_id'],
+       "zipcode":dataMap['zipcode'],
+       "employee_count":dataMap['employee_count'],
+       "service_type":"Full service",
+       "time_zone":dataMap['time_zone'],
+       "sales_tax_rate":dataMap['sales_tax_rate'],
+       "base_labor_cost":dataMap['base_labor_cost']
+
+
+      };
+       var encodedBody = json.encode(bodyMap);
+      
+
+
+      var response=http.put(url,
+      body: encodedBody,
+      headers: getHeader(token));
+      inspect(response);
+      // print(response.statusCode.toString() + "provider status code");
+      // print(response.toString() + "provider response");
+      // return http.Response.fromStream(response);
+      return response;
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
 }
