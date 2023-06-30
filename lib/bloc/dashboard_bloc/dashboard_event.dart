@@ -11,3 +11,5 @@ abstract class DashboardEvent extends Equatable {
 class GetRevenueChartDataEvent extends DashboardEvent{}
 
 class GetUserProfileEvent extends DashboardEvent{}
+
+class GetProvinceEvent extends DashboardEvent{}

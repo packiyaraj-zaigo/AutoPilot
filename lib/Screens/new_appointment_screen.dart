@@ -68,7 +68,7 @@ class _NewAppointmentState extends State<NewAppointment> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Text(
+        title: const Text(
           'New Appointment',
           style: TextStyle(
               fontSize: 20,
@@ -80,8 +80,8 @@ class _NewAppointmentState extends State<NewAppointment> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
+            const Padding(
+              padding:  EdgeInsets.only(left: 10),
               child: Text(
                 "Basic Details",
                 style: TextStyle(
@@ -313,7 +313,7 @@ Widget textBox(String placeHolder, TextEditingController controller,
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
               color: Color(0xff6A7187)),

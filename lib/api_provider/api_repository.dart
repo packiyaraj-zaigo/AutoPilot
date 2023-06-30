@@ -157,6 +157,12 @@ class ApiRepository {
     return apiProvider.addParts(token, context, itemname, serialnumber,
         quantity, fee, supplies, epa, cost, type);
   }
+
+
+  
+  Future getProvince(String token,int currentPage) {
+    return apiProvider.getProvince(token,currentPage);
+  }
 }
 
 class NetworkError extends Error {}

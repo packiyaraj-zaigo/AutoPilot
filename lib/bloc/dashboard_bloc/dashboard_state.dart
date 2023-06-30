@@ -30,3 +30,15 @@ class GetUserProfileLoadingState extends DashboardState{
 
 }
 
+
+class GetProvinceState extends DashboardState{
+  final ProvinceModel provinceList;
+  const GetProvinceState({required this.provinceList});
+
+
+  @override
+  @override
+  List<Object> get props => [provinceList];
+
+}
+

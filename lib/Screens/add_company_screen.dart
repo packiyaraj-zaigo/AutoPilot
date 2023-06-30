@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Screens/add_company_details.dart';
+import 'package:auto_pilot/Screens/add_company_review_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -7,15 +8,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AddCompanyScreen extends StatefulWidget {
-  const AddCompanyScreen({super.key});
+  const AddCompanyScreen({super.key,});
+ 
 
   @override
   State<AddCompanyScreen> createState() => _AddCompanyScreenState();
 }
 
 class _AddCompanyScreenState extends State<AddCompanyScreen> {
+
+  List<dynamic>navigationData=[];
+  Map<String,dynamic>?basicDetailsMap={};
+  Map<String,dynamic>?operationDetailsMap={};
+  bool?isEmployee=false;
   @override
   Widget build(BuildContext context) {
+  
     return  Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -59,9 +67,15 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
           onTap: (){
 
              AppUtils.setTempVar("");
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-              return BottomBarScreen();
-            },), (route) => false);
+            // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+            //   return BottomBarScreen();
+            // },), (route) => false);
+
+            if(basicDetailsMap!=null && basicDetailsMap!.isNotEmpty &&operationDetailsMap!=null && operationDetailsMap!.isNotEmpty && isEmployee!=null && isEmployee!){
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return AddCompanyReviewScreen();
+              },));
+            }
           },
           child: Container(
                         height: 56,
@@ -69,7 +83,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: AppColors.primaryColors,
+                          color: basicDetailsMap!=null && basicDetailsMap!.isNotEmpty &&operationDetailsMap!=null && operationDetailsMap!.isNotEmpty && isEmployee!=null && isEmployee!? AppColors.primaryColors:Color.fromARGB(255, 136, 169, 250),
                           
                         ),
                         child: const Text("Confirm",
@@ -105,29 +119,48 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                 padding: const EdgeInsets.only(top:52.0),
                 child: GestureDetector(
                   behavior: HitTestBehavior.translucent,
-                  onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                      return const AddCompanyDetailsScreen(widgetIndex: 0,);
-                    },));
+                  onTap: ()async{
+                    
+                   await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                      return const AddCompanyDetailsScreen(widgetIndex: 0, );
+                    },))
+                    .then((value){
+                      setState(() {
+                       // isBasicDetails=value;
+                       // navigationData=value;
+                       basicDetailsMap=value;
+                        print(value);
+                      });
+                    });
                   },
-                  child: stepTile("Step 1. Basic Details")),
+                  child: stepTile("Step 1. Basic Details",basicDetailsMap!=null &&basicDetailsMap!.isNotEmpty ?true:false )),
               ),
               GestureDetector(
                  behavior: HitTestBehavior.translucent,
-                onTap: (){
-                     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                onTap: ()async{
+                    await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                       return const AddCompanyDetailsScreen(widgetIndex: 1,);
-                    },));
+                    },)).then((value) {
+                      setState(() {
+                        operationDetailsMap=value;
+                        
+                      });
+                    });
                 },
-                child: stepTile("Step 2. Operating Details")),
+                child: stepTile("Step 2. Operating Details",operationDetailsMap!=null &&operationDetailsMap!.isNotEmpty?true:false)),
                GestureDetector(
                  behavior: HitTestBehavior.translucent,
-                onTap: (){
-                     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                onTap: ()async{
+                    await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                       return const AddCompanyDetailsScreen(widgetIndex: 2,);
-                    },));
+                    },)).then((value) {
+                      setState(() {
+                         isEmployee=value;
+                      });
+                     
+                    });
                 },
-                child: stepTile("Step 3. Employees"))
+                child: stepTile("Step 3. Employees",isEmployee!=null &&isEmployee!?true:false))
           ],
         ),
       ),
@@ -138,7 +171,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
   }
 
 
-  Widget stepTile(String title){
+  Widget stepTile(String title,bool? isCompleted){
     return Padding(
       padding: const EdgeInsets.only(bottom:12),
       child: Container(
@@ -162,7 +195,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryTitleColor
               ),),
-              SvgPicture.asset("assets/images/check_disable_icon.svg")
+            isCompleted!=null &&isCompleted?const Icon(Icons.check_circle,color:  Color(0xff12A58C),):  SvgPicture.asset("assets/images/check_disable_icon.svg")
             ],
           ),
         ),

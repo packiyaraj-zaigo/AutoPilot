@@ -61,7 +61,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           GestureDetector(
             onTap: () async {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => const CreateEmployeeScreen(),
+                builder: (context) => const CreateEmployeeScreen(navigation: "add_employee"),
               ));
             },
             child: const Icon(
