@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -548,8 +549,7 @@ class ApiProvider {
     print("into provider");
 
     try {
-      var url = Uri.parse(
-          "${BASE_URL}api/provinces?page=$currentPage");
+      var url = Uri.parse("${BASE_URL}api/provinces?page=$currentPage");
       var request = http.MultipartRequest("GET", url);
 
       request.headers.addAll(getHeader(token));
@@ -572,6 +572,16 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + "  Create time cards api error");
+    }
+  }
+
+  Future<dynamic> getLicDetails(String token, String lic) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/vehicles?licence_plate=$lic');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
     }
   }
   // Future<dynamic> addParts(
