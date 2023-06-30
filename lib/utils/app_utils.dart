@@ -254,6 +254,14 @@ class AppUtils {
 
   //temp for showing the add company screen.
   ///////////////////////////////////////////////////////////////
+  static calendarStyle() {
+    return const TextStyle(
+      color: AppColors.primaryBlackColors,
+      fontWeight: FontWeight.w600,
+      fontSize: 24,
+      fontFamily: '.SF Pro Text',
+    );
+  }
 
   static Future<void> setTempVar(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

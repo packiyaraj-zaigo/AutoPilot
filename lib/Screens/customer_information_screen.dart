@@ -3,15 +3,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-
-import '../api_provider/api_repository.dart';
 import '../bloc/customer_bloc/customer_bloc.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_strings.dart';
 import '../utils/app_utils.dart';
 
 class CustomerInformationScreen extends StatefulWidget {
-  CustomerInformationScreen({
+  const CustomerInformationScreen({
     Key? key,
     required this.customerData,
   }) : super(key: key);
@@ -83,15 +81,16 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         centerTitle: true,
         actions: [
           IconButton(
+              splashColor: Colors.transparent,
               onPressed: () {
-                Navigator.pop(context);
+                showBottomSheet();
               },
               icon: Icon(
                 Icons.more_horiz,
                 size: AppStrings.fontSize20,
                 color: AppColors.primaryBlackColors,
               )),
-          SizedBox(
+          const SizedBox(
             width: 20,
           )
         ],
@@ -106,7 +105,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           child: BlocBuilder<CustomerBloc, CustomerState>(
             builder: (context, state) {
               if (state is CustomerLoading) {
-                return Center(child: CupertinoActivityIndicator());
+                return const Center(child: CupertinoActivityIndicator());
               } else if (state is CustomerReady) {
                 return Padding(
                   padding: const EdgeInsets.only(left: 24, right: 24, top: 22),
@@ -114,14 +113,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Mike Stevenson',
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: AppColors.primaryTitleColor),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       CupertinoSlidingSegmentedControl(
@@ -140,7 +139,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             )
                         },
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       selectedIndex == 0
@@ -165,7 +164,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   "Phone",
                                                   style: TextStyle(
                                                       fontSize: 14,
@@ -174,12 +173,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                                       color: AppColors
                                                           .primaryGrayColors),
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   height: 5,
                                                 ),
                                                 Text(
-                                                  "${widget.customerData.phone.toString()}",
-                                                  style: TextStyle(
+                                                  widget.customerData.phone
+                                                      .toString(),
+                                                  style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -192,16 +192,17 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               children: [
                                                 SvgPicture.asset(
                                                     "assets/images/sms.svg"),
-                                                SizedBox(
+                                                const SizedBox(
                                                   width: 20,
                                                 ),
-                                                Icon(CupertinoIcons.phone),
+                                                const Icon(
+                                                    CupertinoIcons.phone),
                                               ],
                                             )
                                           ],
                                         ),
                                         AppUtils.verticalDivider(),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 20,
                                         ),
                                         Row(
@@ -214,7 +215,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   "Email",
                                                   style: TextStyle(
                                                       fontSize: 14,
@@ -223,12 +224,12 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                                       color: AppColors
                                                           .primaryGrayColors),
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   height: 5,
                                                 ),
                                                 Text(
                                                   "${widget.customerData.email.toString()}",
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -237,14 +238,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                                 ),
                                               ],
                                             ),
-                                            Icon(CupertinoIcons.mail)
+                                            const Icon(CupertinoIcons.mail)
                                           ],
                                         ),
                                         AppUtils.verticalDivider(),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 14,
                                         ),
-                                        Text(
+                                        const Text(
                                           "Address",
                                           style: TextStyle(
                                               fontSize: 14,
@@ -252,22 +253,22 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 5,
                                         ),
                                         Text(
                                           "${widget.customerData.addressLine1.toString()}",
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
                                               color:
                                                   AppColors.primaryTitleColor),
                                         ),
                                         AppUtils.verticalDivider(),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 14,
                                         ),
-                                        Text(
+                                        const Text(
                                           "License Number",
                                           style: TextStyle(
                                               fontSize: 14,
@@ -275,10 +276,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 5,
                                         ),
-                                        Text(
+                                        const Text(
                                           "Need to change",
                                           style: TextStyle(
                                               fontSize: 16,
@@ -287,10 +288,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                                   AppColors.primaryTitleColor),
                                         ),
                                         AppUtils.verticalDivider(),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 14,
                                         ),
-                                        Text(
+                                        const Text(
                                           "Customer Created",
                                           style: TextStyle(
                                               fontSize: 14,
@@ -298,22 +299,22 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 5,
                                         ),
                                         Text(
                                           "${widget.customerData.createdAt.toString()}",
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
                                               color:
                                                   AppColors.primaryTitleColor),
                                         ),
                                         AppUtils.verticalDivider(),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 14,
                                         ),
-                                        Text(
+                                        const Text(
                                           "Address",
                                           style: TextStyle(
                                               fontSize: 14,
@@ -321,12 +322,12 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               color:
                                                   AppColors.primaryGrayColors),
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 5,
                                         ),
                                         Text(
                                           "${widget.customerData.addressLine1.toString()}",
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
                                               color:
@@ -358,11 +359,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.add_circle_outline_rounded,
                                           color: AppColors.primaryColors,
                                         ),
-                                        SizedBox(
+                                        const SizedBox(
                                           width: 10,
                                         ),
                                         Text(
@@ -373,7 +374,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 20,
                                 ),
                                 // ListView.builder(
@@ -385,7 +386,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                 //       (BuildContext context, int index) {
                                 //     return
                                 Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(20))),
                                   width: double.infinity,
@@ -407,14 +408,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                             '${widget.customerData.createdAt}',
                                             style: AppUtils.requiredStyle(),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 5,
                                           ),
                                           Text(
                                             '${widget.customerData.notes}',
                                             style: AppUtils.summaryStyle(),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 5,
                                           ),
                                         ],
@@ -428,13 +429,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             )
                           : Container(),
                       selectedIndex == 2
-                          ? Center(
+                          ? const Center(
                               child: Text('Coming Soon'),
                             )
                           : Container(),
                       selectedIndex == 3
                           ? Container(
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(20))),
                               width: double.infinity,
@@ -455,14 +456,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         '${widget.customerData.createdAt}',
                                         style: AppUtils.requiredStyle(),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 5,
                                       ),
                                       Text(
                                         '${widget.customerData.notes}',
                                         style: AppUtils.summaryStyle(),
                                       ),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 5,
                                       ),
                                     ],
@@ -474,7 +475,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             )
                           : Container(),
                       selectedIndex == 4
-                          ? Center(
+                          ? const Center(
                               child: Text('Coming Soon'),
                             )
                           : Container()
@@ -488,6 +489,235 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  showBottomSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(30),
+        ),
+      ),
+      builder: (BuildContext context) {
+        return SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Center(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                const SizedBox(
+                  height: 18,
+                ),
+                Center(
+                  child: Container(
+                    height: 6,
+                    width: 40,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(50)),
+                      color: AppColors.buttonColors,
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 18.0),
+                  child: Text(
+                    "Select an option",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                ),
+                const SizedBox(
+                  height: 16,
+                ),
+                AppUtils.verticalDivider(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 18.0, right: 18),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.buttonColors,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                'New Estimate',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: '.SF Pro Text',
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.buttonColors,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.add,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                'Add Customer',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: '.SF Pro Text',
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.buttonColors,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.edit,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                'Edit Customer',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: '.SF Pro Text',
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      SizedBox(
+                        height: 57,
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.buttonColors,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.delete,
+                                color: AppColors.primaryColors,
+                                size: 16,
+                              ),
+                              SizedBox(
+                                width: 8,
+                              ),
+                              Text(
+                                'Delete Customer',
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontFamily: '.SF Pro Text',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 16),
+                              ),
+                            ],
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Center(
+                  child: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryColors,
+                            fontWeight: FontWeight.w500,
+                            fontFamily: '.SF Pro Text',
+                            fontSize: 16),
+                      )),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
