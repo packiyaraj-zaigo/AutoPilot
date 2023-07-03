@@ -39,3 +39,20 @@ class AddCustomerDetails extends CustomerEvent {
   @override
   List<Object?> get props => [];
 }
+
+
+class GetCustomerMessageEvent extends CustomerEvent{
+ 
+  @override
+  List<Object?> get props => [];
+}
+
+
+class SendCustomerMessageEvent extends CustomerEvent{
+  final String customerId,messageBody;
+  SendCustomerMessageEvent({required this.customerId,required this.messageBody});
+  
+
+  @override
+  List<Object?> get props=>[];
+}

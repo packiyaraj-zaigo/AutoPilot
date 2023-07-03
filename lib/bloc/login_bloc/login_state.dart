@@ -29,10 +29,21 @@ class ResetPasswordGetOtpErrorState extends LoginState{
 
 }
 
-class ResetPasswordSendOtpState extends LoginState{}
+class ResetPasswordSendOtpState extends LoginState{
+  final String newToken;
+  ResetPasswordSendOtpState({required this.newToken});
+}
 class ResetPasswordSendOtpLoadingState extends LoginState{}
 class ResetPasswordSendOtpErrorState extends LoginState{
   final String errorMsg;
   const ResetPasswordSendOtpErrorState({required this.errorMsg});
 
 }
+
+class CreateNewPasswordState extends LoginState{}
+class CreateNewPasswordErrorState extends LoginState{
+  final String errorMsg;
+  CreateNewPasswordErrorState({required this.errorMsg});
+}
+
+class CreateNewPasswordLoadingState extends LoginState{}

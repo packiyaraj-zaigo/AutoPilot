@@ -34,3 +34,9 @@ class ResetPasswordSendOtpEvent extends LoginEvent{
   final String email,otp;
  const ResetPasswordSendOtpEvent({required this.email,required this.otp});
 }
+
+
+class CreateNewPasswordEvent extends LoginEvent{
+  final String email,password,confirmPassword,newToken;
+  CreateNewPasswordEvent({required this.email,required this.password,required this.confirmPassword,required this.newToken});
+}

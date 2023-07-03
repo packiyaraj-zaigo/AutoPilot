@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/customer_model.dart';
+import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,7 @@ class CustomerInformationScreen extends StatefulWidget {
     required this.customerData,
   }) : super(key: key);
   final Datum customerData;
+
 
   @override
   State<CustomerInformationScreen> createState() =>
@@ -54,7 +56,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
     ),
   ];
   int? selectedIndex = 0;
+  List<Widget> messageChatWidgetList = [];
+  List<cm.Datum>customerMessageList=[];
+  final messageController = TextEditingController();
+  final chatScrollController=ScrollController();
+  int newIndex=0;
   @override
+
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -127,6 +136,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                         onValueChanged: (value) {
                           setState(() {
                             selectedIndex = value ?? 0;
+                            customerMessageList.clear();
                           });
                         },
                         groupValue: selectedIndex,
@@ -428,11 +438,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               ],
                             )
                           : Container(),
-                      selectedIndex == 2
-                          ? const Center(
-                              child: Text('Coming Soon'),
-                            )
-                          : Container(),
+                      selectedIndex == 2 ? chatWidget(context) : Container(),
                       selectedIndex == 3
                           ? Container(
                               decoration: const BoxDecoration(
@@ -718,6 +724,265 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget chatWidget(BuildContext context) {
+   
+    return BlocProvider(
+      create: (context) => CustomerBloc()..add(GetCustomerMessageEvent(
+
+      )),
+      child: BlocListener<CustomerBloc, CustomerState>(
+        listener: (context, state) async{
+          if(state is GetCustomerMessageState){
+            customerMessageList.addAll(state.messageModel.data.data);
+              Future.delayed(Duration(milliseconds: 300)).then((value) {
+                chatScrollController.animateTo(chatScrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.linear);
+              });
+            
+
+           
+          }else if(state is SendCustomerMessageState){
+          
+
+
+          }
+          // TODO: implement listener
+        },
+        child: BlocBuilder<CustomerBloc, CustomerState>(
+          builder: (context, state) {
+            return Expanded(
+             
+              // width: MediaQuery.of(context).size.width,
+
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  chatBoxWidget(customerMessageList),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            messageChipWidget("Ready for pickup"),
+                            messageChipWidget("Working on.."),
+                            messageChipWidget("We are delayed")
+                          ],
+                        )),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: Container(
+                      height: 50,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.grey.shade300,
+                                blurRadius: 0.7,
+                                spreadRadius: 1.2,
+                                offset: Offset(3, 2))
+                          ]),
+              
+                      // child: Padding(
+                      //   padding: const EdgeInsets.symmetric(horizontal:22.0),
+                      //   child: Row(
+                      //     children: [
+                      //       SvgPicture.asset("assets/images/attachment_icon.svg"),
+              
+                      //       TextField(
+                      //         decoration: InputDecoration(
+                      //           hintText: "Enter your message..",
+                      //           contentPadding: EdgeInsets.all(0)
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
+              
+                      child: TextField(
+                        controller: messageController,
+                        decoration: InputDecoration(
+                            border: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 22, vertical: 18),
+                            hintText: "Enter your messsage..",
+                            prefixIcon: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: SvgPicture.asset(
+                                      "assets/images/attachment_icon.svg")),
+                            ),
+                            suffixIcon: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: () async{
+                                  // setState(() {
+                                  //   messageChatWidgetList.add(chatBubleWidget(
+                                  //       messageController.text,""));
+              
+                                  //   messageController.clear();
+                                  // });
+              
+                                  if(messageController.text.isNotEmpty){
+                                    context.read<CustomerBloc>().add(SendCustomerMessageEvent(customerId: widget.customerData.id.toString(), messageBody: messageController.text));
+              
+                                      cm.Datum localMessage=cm.Datum(clientId: widget.customerData.clientId,createdAt: DateTime.now(),id: widget.customerData.id,messageBody: messageController.text,messageType: "SMS",receiverCustomerId: null,status: "Open",updatedAt: DateTime.now(),sendCustomer: "",senderUserId: null);
+                        customerMessageList.add(localMessage);
+                        messageController.clear();
+                        await Future.delayed(Duration(milliseconds: 500)).then((_){
+                         chatScrollController.animateTo(chatScrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.linear);
+              
+                        });
+                  
+              
+                                  }
+              
+                                  
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor: AppColors.primaryColors,
+                                  child: SvgPicture.asset(
+                                      "assets/images/send_icon.svg"),
+                                ),
+                              ),
+                            )),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget messageChipWidget(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 9.0),
+      child: GestureDetector(
+        onTap: () {
+          messageController.text = text;
+        },
+        child: Container(
+          // height: 30,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: AppColors.primaryColors)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 13),
+            child: Text(
+              text,
+              style: const TextStyle(
+                  color: AppColors.primaryColors,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget chatBoxWidget(List<cm.Datum> messsageModelList) {
+    return Expanded(
+      child: ListView.builder(
+        itemBuilder: (context2, index) {
+          newIndex=index;
+
+          return chatBubleWidget(messsageModelList[index].messageBody,messsageModelList[index].createdAt.toString().substring(11,16));
+        },
+        
+        itemCount: messsageModelList.length,
+        shrinkWrap: true,
+        physics: const ClampingScrollPhysics(),
+        controller:chatScrollController
+      ),
+    );
+  }
+
+  Widget chatBubleWidget(String message,String time) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+      
+               Container(
+              
+
+
+                decoration: BoxDecoration(
+                    color: AppColors.primaryColors,
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 12),
+                  child: Column(
+                   
+                     crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width/1.7,
+                          minWidth: 80
+
+                        ),
+                        child: Text(
+                          message,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 14.0),
+
+
+        child:  Row(
+        
+          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+             Text(
+                time,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+          //  Expanded(child: SizedBox()),
+              Padding(
+                padding: const EdgeInsets.only(left:6.0),
+                child: SvgPicture.asset(
+                    "assets/images/Double_tick_icon.svg"),
+              )
+        
+          ],
+        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+         //   ),
+        //  ),
+        ],
+      ),
     );
   }
 }

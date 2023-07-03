@@ -38,3 +38,23 @@ class AddCustomerError extends CustomerState {
   @override
   List<Object> get props => [message];
 }
+
+
+class GetCustomerMessageState extends CustomerState{
+  final cm.CustomerMessageModel messageModel;
+  const GetCustomerMessageState({required this.messageModel});
+}
+
+class GetCustomerMessageLoadingState extends CustomerState{}
+class GetCustomerMessageErrorState extends CustomerState{
+  final String errorMsg;
+ const GetCustomerMessageErrorState({required this.errorMsg});
+}
+
+
+class SendCustomerMessageState extends CustomerState{}
+class SendCustomerMessageLoadingState extends CustomerState{}
+class SendCustomerMessageErrorState extends CustomerState{
+  final String errorMsg;
+  SendCustomerMessageErrorState({required this.errorMsg});
+}
