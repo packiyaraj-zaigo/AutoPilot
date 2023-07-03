@@ -13,3 +13,10 @@ class GetRevenueChartDataEvent extends DashboardEvent{}
 class GetUserProfileEvent extends DashboardEvent{}
 
 class GetProvinceEvent extends DashboardEvent{}
+
+class AddCompanyEvent extends DashboardEvent{
+  final Map<String,dynamic>dataMap;
+  final BuildContext context;
+  AddCompanyEvent({required this.dataMap,required this.context});
+
+}

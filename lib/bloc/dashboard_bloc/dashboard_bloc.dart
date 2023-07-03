@@ -4,10 +4,13 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/province_model.dart';
 import 'package:auto_pilot/Models/revenue_chart_model.dart';
 import 'package:auto_pilot/Models/user_profile_model.dart';
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,6 +33,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
          on<GetRevenueChartDataEvent>(getRevenueChartDataBloc);
          on<GetUserProfileEvent>(getUserProfileBloc);
          on<GetProvinceEvent>(getProvinceBloc);
+         on<AddCompanyEvent>(addCompanyBloc);
         
    
   }
@@ -144,6 +148,49 @@ Future<void> getRevenueChartDataBloc(
         } else {
           currentPage = 0;
         }
+      }
+      // else if(createAccRes.statusCode==422){
+      //   emit(CreateAccountErrorState());
+      //   errorRes=createAccData;
+      // }
+       
+       
+    } catch (e) {
+     // emit(CreateAccountErrorState());
+      
+      print(e.toString());
+     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      print("thisss");
+    }
+  }
+
+
+
+  Future<void> addCompanyBloc(
+    AddCompanyEvent event,
+    Emitter<DashboardState> emit,
+  ) async {
+
+    
+    try {
+           SharedPreferences prefs = await SharedPreferences.getInstance();
+        var token = prefs.getString(AppConstants.USER_TOKEN);
+        var clientId=prefs.getString(AppConstants.USER_ID);
+     
+      
+      emit(AddCompanyLoadingState());
+
+      Response addCompanyResponse = await _apiRepository.addCompany(event.dataMap,token,clientId!);
+     // var getChartData = _decoder.convert(getChartDataRes.body);
+      log("res${addCompanyResponse.body}");
+
+      
+      if (addCompanyResponse.statusCode==200) {
+        emit(AddCompanySucessState());
+        AppUtils.setTempVar("");
+        Navigator.pushReplacement(event.context, MaterialPageRoute(builder: (context) {
+          return BottomBarScreen();
+        },));
       }
       // else if(createAccRes.statusCode==422){
       //   emit(CreateAccountErrorState());
