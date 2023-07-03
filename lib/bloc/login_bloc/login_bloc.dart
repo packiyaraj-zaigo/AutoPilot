@@ -33,6 +33,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           on<UserLoginEvent>(loginBloc);
           on<ResetPasswordGetPasswordEvent>(resetPasswordGetOtpBloc);
           on<ResetPasswordSendOtpEvent>(resetPasswordSendOtpBloc);
+          on<CreateNewPasswordEvent>(createNewPasswordBloc);
    
   }
 
@@ -187,7 +188,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
 
       if (resetPasswordRes.statusCode==200) {
-        emit(ResetPasswordSendOtpState());
+        emit(ResetPasswordSendOtpState(
+          newToken: resetPasswordData['token']
+
+        ));
+
+        print(resetPasswordRes.body);
 
       }else{
         emit(ResetPasswordSendOtpErrorState(
@@ -198,6 +204,44 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
     } catch (e) {
       emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      print("thisss");
+    }
+  }
+
+
+
+   Future<void> createNewPasswordBloc(
+    CreateNewPasswordEvent event,
+    Emitter<LoginState> emit,
+  ) async {
+
+
+    try {
+
+      emit(CreateNewPasswordLoadingState());
+
+      Response createNewPasswordRes = await _apiRepository.createNewPassword(
+        event.email,event.password,event.confirmPassword,event.newToken);
+      var resetPasswordData = _decoder.convert(createNewPasswordRes.body);
+      log("res${createNewPasswordRes.body}");
+
+
+      if (createNewPasswordRes.statusCode==200) {
+        emit(CreateNewPasswordState());
+
+
+       
+
+      }else{
+       emit(CreateNewPasswordErrorState(errorMsg: "Something went wrong"));
+      }
+
+
+    } catch (e) {
+      emit(CreateNewPasswordErrorState(errorMsg: "Something went wrong"));
 
       print(e.toString());
      // emit(LoginInvalidCredentialsState(message: e.toString()));

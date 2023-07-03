@@ -32,6 +32,10 @@ class ApiRepository {
     return apiProvider.resetPasswordSendOtp(emailId, otp);
   }
 
+    Future createNewPassword(String email,String password,String passwordConfirm,String newToken) {
+    return apiProvider.createNewPassword(email, password, passwordConfirm, newToken);
+  }
+
   Future getUserProfile(String token) {
     return apiProvider.getUserProfile(token);
   }
@@ -175,6 +179,18 @@ class ApiRepository {
   Future addCompany(Map<String,dynamic>dataMap,dynamic token,String clientId) {
     return apiProvider.addCompany(dataMap,token,clientId);
   }
+
+
+   Future getCustomerMessages(String token,String clientId,int currentPage) {
+    return apiProvider.getCustomerMessages(token, clientId, currentPage);
+  }
+
+     Future sendCustomerMessage(String token,String clientId,String customerId,String messageBody) {
+    return apiProvider.sendCustomerMessage(token, clientId, customerId, messageBody);
+  }
+
+
+   
 }
 
 class NetworkError extends Error {}

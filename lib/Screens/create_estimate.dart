@@ -716,6 +716,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
           if (state is CustomerReady) {
         //    customerModel = state.customer;
         customerDataList.addAll(state.customer.data);
+        print(customerDataList.length.toString()+"cus length");
        
           }
           // TODO: implement listener
@@ -751,7 +752,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                             child: LimitedBox(
                               maxHeight:
                                   MediaQuery.of(context).size.height / 1.8 - 78,
-                              child: ListView.builder(
+                              child:customerDataList.isEmpty?const Center(
+                                child: Text("No Customer Found!",style: TextStyle(
+                                  fontSize: 16
+                                ),),
+                              ): ListView.builder(
                                 itemBuilder: (context, index) {
                                   return Column(
                                     children: [

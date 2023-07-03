@@ -140,11 +140,35 @@ class ApiProvider {
     //  LoadingFormModel? loadingFormModel;
     try {
       var url = Uri.parse(
-        "${BASE_URL}api/password/find",
+        "${BASE_URL}api/password/find?email=$email&code=$otp",
       );
-      var request = http.MultipartRequest("GET", url)
-        ..fields['email'] = email
-        ..fields['code'] = otp;
+      var request = http.MultipartRequest("GET", url);
+        // ..fields['email'] = email
+        // ..fields['code'] = otp;
+
+      // request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
+  Future<dynamic> createNewPassword(String email, String password,String passwordConfirm,String newToken) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse(
+        "${BASE_URL}api/password/reset?email=$email&password=$password&password_confirmation=$passwordConfirm&token=$newToken",
+      );
+      var request = http.MultipartRequest("POST", url);
+        // ..fields['email'] = email
+        // ..fields['code'] = otp;
 
       // request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -200,7 +224,7 @@ class ApiProvider {
 
   Future<dynamic> getServices(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}api/users';
+      String url = '${BASE_URL}order_services';
 
       if (page != 1) {
         url = '$url?page=$page';
@@ -674,4 +698,52 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+
+
+   Future<dynamic> getCustomerMessages(String token, String clientId,int currentPage) async {
+    print("into provider");
+
+    try {
+      var url = Uri.parse("${BASE_URL}api/sentmessages?client_id=$clientId&page=$currentPage");
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
+   Future<dynamic> sendCustomerMessage(String token, String clientId,String customerId,String messageBody) async {
+    print("into provider");
+
+    try {
+      var url = Uri.parse("${BASE_URL}api/sentmessages");
+      var request = http.MultipartRequest("POST", url)
+      ..fields['sender_user_id']=clientId
+      ..fields['receiver_customer_id']=customerId
+      ..fields['message_type']="SMS"
+      ..fields['message_body']=messageBody
+      ..fields['message_info']=json.encode({})
+      ..fields['status']="Open";
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+
+  
 }

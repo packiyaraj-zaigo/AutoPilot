@@ -1,7 +1,9 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:auto_pilot/Screens/login_signup_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,11 +26,14 @@ class _ResetPasswordState extends State<ResetPassword> {
   final TextEditingController otpController = TextEditingController();
   String otp = '';
   final TextEditingController emailController = TextEditingController();
+  final newPasswordController=TextEditingController();
+  final newConfirmPasswordController=TextEditingController();
   int widgetIndex = 0;
   bool otpErrorStatus = false;
   String otpErrorMsg = '';
   bool emailErrorStatus=false;
   String emailErrorMsg="";
+  String newToken="";
 
   @override
   Widget build(BuildContext context) {
@@ -44,8 +49,24 @@ class _ResetPasswordState extends State<ResetPassword> {
           }else if(state is ResetPasswordGetOtpErrorState){
             emailErrorMsg=state.errorMsg;
             emailErrorStatus=true;
-          }else if(state is ResetPasswordSendOtpState){
-            widgetIndex++;
+          }
+          // else if(state is ResetPasswordSendOtpState){
+          //   // print("state emitted");
+          //   // Navigator.pop(context);
+          //   // widgetIndex++;
+          //   // newToken=state.newToken;
+            
+          // }
+          else if(state is CreateNewPasswordState){
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+              return LoginAndSignupScreen(widgetIndex: 0);
+            },), (route) => false);
+
+            CommonWidgets().showDialog(context, "Password changed successfully");
+
+          }else if(state is CreateNewPasswordErrorState){
+             CommonWidgets().showDialog(context, state.errorMsg);
+
           }
 
           // TODO: implement listener
@@ -72,7 +93,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   widgetIndex == 0
                       ? resetpasswordscreen(context, state)
                       : widgetIndex == 2
-                          ? newpassword(context)
+                          ? newpassword(context,state)
                           : resetpasswordscreen(context, state)
                   // widget.widgetIndex == 0
                   //     ? resetpasswordscreen()
@@ -268,7 +289,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         enableDrag: false,
         isDismissible: false,
         backgroundColor: Colors.transparent,
-        builder: (context) => StatefulBuilder(
+        builder: (ctx) => StatefulBuilder(
           builder: (context,StateSetter newSetState) {
             return BlocProvider(
                   create: (context) => LoginBloc(apiRepository: ApiRepository()),
@@ -278,6 +299,14 @@ class _ResetPasswordState extends State<ResetPassword> {
                         otpErrorStatus=true;
                         otpErrorMsg=state.errorMsg;
                         
+                      }else if(state is ResetPasswordSendOtpState){
+                        Navigator.pop(ctx);
+                        setState(() {
+                            widgetIndex++;
+                          
+                        });
+                      
+                        newToken=state.newToken;
                       }
                       // TODO: implement listener
                     },
@@ -426,7 +455,9 @@ class _ResetPasswordState extends State<ResetPassword> {
                                             fontSize: 14,
                                             color: AppColors.primaryColors),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                      },
                                     )
                                   ],
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -443,23 +474,23 @@ class _ResetPasswordState extends State<ResetPassword> {
         ));
   }
 
-  Widget newpassword(BuildContext context) {
+  Widget newpassword(BuildContext context,state) {
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Create a new password",
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 28,
                 color: AppColors.primaryTitleColor),
           ),
-          SizedBox(
+          const SizedBox(
             height: 26,
           ),
-          Text(
+          const Text(
             "New password",
             style: TextStyle(
                 fontSize: 15,
@@ -467,23 +498,25 @@ class _ResetPasswordState extends State<ResetPassword> {
                 fontFamily: "SF Pro",
                 color: AppColors.greyText),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           SizedBox(
             height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter password',
+              placeholder: 'Enter new password',
+              controller: newPasswordController,
+              obscureText: true,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
                 border: Border.all(color: const Color(0xffC1C4CD)),
               ),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 20,
           ),
-          Text(
+          const Text(
             "Confirm New password",
             style: TextStyle(
                 fontSize: 15,
@@ -491,34 +524,39 @@ class _ResetPasswordState extends State<ResetPassword> {
                 fontFamily: "SF Pro",
                 color: AppColors.greyText),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           SizedBox(
             height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter password',
+              placeholder: 'Confirm new password',
+              controller: newConfirmPasswordController,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10)),
-                border: Border.all(color: Color(0xffC1C4CD)),
+                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                border: Border.all(color: const Color(0xffC1C4CD)),
               ),
             ),
           ),
-          SizedBox(
+         const  SizedBox(
             height: 40,
           ),
           SizedBox(
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                context.read<LoginBloc>().add(CreateNewPasswordEvent(email: emailController.text, password: newPasswordController.text, confirmPassword: newConfirmPasswordController.text, newToken: newToken));
+              },
               style: ElevatedButton.styleFrom(
                 primary: AppColors.primaryColors,
-                shape: new RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(10.0),
+                shape:  RoundedRectangleBorder(
+                  borderRadius:  BorderRadius.circular(10.0),
                 ),
               ),
-              child: const Text(
+              child:state is CreateNewPasswordLoadingState?const Center(
+                child: CupertinoActivityIndicator(),
+              ):  const Text(
                 'Confirm',
                 style: TextStyle(fontSize: 15),
               ),
