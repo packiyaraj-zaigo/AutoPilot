@@ -7,6 +7,7 @@ import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
+import 'package:auto_pilot/Screens/no_internet_screen.dart';
 import 'package:auto_pilot/Screens/notification_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
@@ -57,10 +58,33 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     ];
     // TODO: implement initState
     super.initState();
+    // networkCheck();
+    networkCheck().then((value) {
+      // if (!network) {
+      setState(() {});
+    });
+  }
+
+  bool network = false;
+
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await networkCheck().then((value) {
+        if (value != network) {
+          setState(() {
+            network = value;
+          });
+        }
+      });
+    });
     return BlocProvider(
       create: (context) => DashboardBloc(apiRepository: ApiRepository())
         ..add(GetUserProfileEvent()),
@@ -119,9 +143,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   actions: [
                     IconButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) {
-                            return AddCompanyScreen();
-                          },));
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return AddCompanyScreen();
+                            },
+                          ));
                         },
                         icon: SvgPicture.asset(
                           "assets/images/message.svg",
@@ -129,11 +155,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                         )),
                     IconButton(
                         onPressed: () {
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const NotificationScreen(),
-                          //   ),
-                          // );
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const NotificationScreen(),
+                            ),
+                          );
                         },
                         icon: SvgPicture.asset(
                           "assets/images/notification.svg",
@@ -428,7 +454,9 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               ),
               body: PageView.builder(
                 itemBuilder: (context, index) {
-                  return pages[index];
+                  return !network
+                      ? NoInternetScreen(state: setState)
+                      : pages[index];
                 },
                 itemCount: pages.length,
                 controller: pageController,
@@ -472,6 +500,9 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     setState(() {
       currentIndex = index;
       pageController.jumpToPage(index);
+    });
+    networkCheck().then((value) {
+      setState(() {});
     });
   }
 
@@ -528,7 +559,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => constructor,
           ));
