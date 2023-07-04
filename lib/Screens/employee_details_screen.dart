@@ -119,17 +119,17 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Phone',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
                                 ),
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Text(
-                                '(${widget.employee.phone!.substring(0, 3)})    ${widget.employee.phone!.substring(3, 6)} - ${widget.employee.phone!.substring(6)}',
-                                style: TextStyle(
+                               '(${widget.employee.phone!.substring(0, 3)})${widget.employee.phone!.substring(3, 6)} - ${widget.employee.phone!.substring(6)}',
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                 ),

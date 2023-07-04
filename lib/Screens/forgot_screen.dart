@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, sort_child_properties_last
 
 import 'package:auto_pilot/Screens/login_signup_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -114,7 +114,7 @@ class _ResetPasswordState extends State<ResetPassword> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Reset Password",
+            "Forgot Password",
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 28,
@@ -341,7 +341,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                                   height: 24,
                                 ),
                                 const Text(
-                                  "5-Digit Code",
+                                  "4-Digit Code",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       fontSize: 28,
@@ -442,11 +442,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                                           ),
                                   ),
                                 ),
-                                SizedBox(
+                               const SizedBox(
                                   height: 10,
                                 ),
-                                Row(
-                                  children: <Widget>[
+                                 Row(
+                                   mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
                                     const Text('Don\'t receive a code?'),
                                     TextButton(
                                       child: const Text(
@@ -456,11 +457,12 @@ class _ResetPasswordState extends State<ResetPassword> {
                                             color: AppColors.primaryColors),
                                       ),
                                       onPressed: () {
-                                        Navigator.pop(ctx);
+                                       context.read<LoginBloc>().add(ResetPasswordGetPasswordEvent(emailId: emailController.text));
+
                                       },
                                     )
                                   ],
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                 
                                 ),
                               ],
                             ),
@@ -532,6 +534,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             child: CupertinoTextField(
               placeholder: 'Confirm new password',
               controller: newConfirmPasswordController,
+              obscureText: true,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 border: Border.all(color: const Color(0xffC1C4CD)),

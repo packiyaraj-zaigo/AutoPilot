@@ -42,6 +42,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
   bool emailErrorStatus = false;
   bool phoneNumberErrorStatus = false;
   bool passwordErrorStatus = false;
+  bool lastNameErrorStatus=false;
   bool isObscure = true;
 
   String loginErrorMsg = '';
@@ -49,6 +50,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
   String emailErrorMsg = '';
   String phoneErrorMsg = '';
   String passwordErrorMsg = '';
+  String lastNameErrorMsg='';
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +59,13 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is CreateAccountSuccessState) {
+            firstNameController.clear();
+            lastNameController.clear();
+            signUpEmailController.clear();
+            phoneNumberController.clear();
+            signUpPasswordController.clear();
+
+
             showModalBottomSheet(
               context: context,
               useSafeArea: true,
@@ -635,22 +644,42 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               halfTextBox("Enter first name", firstNameController, "First name",
                   nameErrorStaus),
               halfTextBox("Enter last name", lastNameController, "Last name",
-                  nameErrorStaus),
+                  lastNameErrorStatus),
             ],
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
-          child: Visibility(
-              visible: nameErrorStaus,
-              child: Text(
-                nameErrorMsg,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFD80027),
-                ),
-              )),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Visibility(
+                  visible: nameErrorStaus,
+                  child: Text(
+                    nameErrorMsg,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFD80027),
+                    ),
+                  )),
+
+                   Visibility(
+                  visible: lastNameErrorStatus,
+                  child: Text(
+                    lastNameErrorMsg,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFFD80027),
+                    ),
+                  )),
+
+
+
+                  
+            ],
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
@@ -998,32 +1027,50 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
 
   validateSignup(String firstName, String lastName, String email,
       String phoneNumber, String password, BuildContext context) {
-    if (firstName.isEmpty && lastName.isEmpty) {
+    if (firstName.isEmpty) {
       setState(() {
-        nameErrorMsg = 'First and last names cant be empty';
+        nameErrorMsg = "First name can't be empty";
         nameErrorStaus = true;
       });
-    } else if (firstName.isEmpty) {
-      setState(() {
-        nameErrorMsg = 'First name cant be empty';
-        nameErrorStaus = true;
+    } else{
+      if(firstName.length<3){
+        setState(() {
+          nameErrorMsg="Please enter a valid first name";
+        });
+      }else{
+         setState(() {
+        nameErrorStaus=false;
       });
-    } else if (lastName.isEmpty) {
+
+      }
+     
+    }if (lastName.isEmpty) {
       {
         setState(() {
-          nameErrorMsg = 'last name cant be empty';
-          nameErrorStaus = true;
+          lastNameErrorMsg = "Last name can't be empty";
+          lastNameErrorStatus = true;
         });
       }
     } else {
-      setState(() {
-        nameErrorStaus = false;
+
+      if(lastName.length<2){
+        setState(() {
+          lastNameErrorMsg="Please enter a valid last name";
+          lastNameErrorStatus=true;
+        });
+      }else{
+
+        setState(() {
+        lastNameErrorStatus = false;
       });
+
+      }
+      
     }
 
     if (email.isEmpty) {
       setState(() {
-        emailErrorMsg = 'Email cant be empty';
+        emailErrorMsg = "Email can't be empty";
         emailErrorStatus = true;
       });
     } else {
@@ -1043,7 +1090,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
     }
     if (phoneNumber.isEmpty) {
       setState(() {
-        phoneErrorMsg = 'Phone number cant be empty.';
+        phoneErrorMsg = "Phone number can't be empty";
         phoneNumberErrorStatus = true;
       });
     } else {
@@ -1061,7 +1108,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
     if (password.isEmpty) {
       setState(() {
         passwordErrorStatus = true;
-        passwordErrorMsg = 'Password cant be empty';
+        passwordErrorMsg = "Password can't be empty";
       });
     } else {
       if (password.length < 8) {

@@ -125,7 +125,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                   onTap: ()async{
                     
                    await Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                      return const AddCompanyDetailsScreen(widgetIndex: 0, );
+                      return  AddCompanyDetailsScreen(widgetIndex: 0,basicDetailsMap: basicDetailsMap, );
                     },))
                     .then((value){
                       setState(() {

@@ -43,6 +43,9 @@ class AddCustomerError extends CustomerState {
 class GetCustomerMessageState extends CustomerState{
   final cm.CustomerMessageModel messageModel;
   const GetCustomerMessageState({required this.messageModel});
+
+     @override
+  List<Object> get props => [messageModel];
 }
 
 class GetCustomerMessageLoadingState extends CustomerState{}
@@ -58,3 +61,17 @@ class SendCustomerMessageErrorState extends CustomerState{
   final String errorMsg;
   SendCustomerMessageErrorState({required this.errorMsg});
 }
+
+
+
+class GetCustomerMessagePaginationState extends CustomerState{
+   final cm.CustomerMessageModel messageModel;
+   const GetCustomerMessagePaginationState({required this.messageModel});
+
+     @override
+  List<Object> get props => [messageModel];
+
+
+}
+
+class GetCustomerMessagePaginationLoadingState extends CustomerState{}
