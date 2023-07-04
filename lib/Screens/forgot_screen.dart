@@ -2,6 +2,8 @@
 
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,8 +29,8 @@ class _ResetPasswordState extends State<ResetPassword> {
   int widgetIndex = 0;
   bool otpErrorStatus = false;
   String otpErrorMsg = '';
-  bool emailErrorStatus=false;
-  String emailErrorMsg="";
+  bool emailErrorStatus = false;
+  String emailErrorMsg = "";
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +43,10 @@ class _ResetPasswordState extends State<ResetPassword> {
             displayBottomSheet(context, state);
           } else if (state is ResetPasswordSendOtpErrorState) {
             otpErrorMsg = state.errorMsg;
-          }else if(state is ResetPasswordGetOtpErrorState){
-            emailErrorMsg=state.errorMsg;
-            emailErrorStatus=true;
-          }else if(state is ResetPasswordSendOtpState){
+          } else if (state is ResetPasswordGetOtpErrorState) {
+            emailErrorMsg = state.errorMsg;
+            emailErrorStatus = true;
+          } else if (state is ResetPasswordSendOtpState) {
             widgetIndex++;
           }
 
@@ -107,7 +109,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           const SizedBox(
             height: 40,
           ),
-         const Text(
+          const Text(
             "Email",
             style: TextStyle(
                 fontSize: 20,
@@ -125,19 +127,21 @@ class _ResetPasswordState extends State<ResetPassword> {
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
-                  color: emailErrorStatus?Color(0xffD80027):AppColors.primaryColors
-                ),
+                    color: emailErrorStatus
+                        ? Color(0xffD80027)
+                        : AppColors.primaryColors),
               ),
             ),
           ),
-             const SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Visibility(
-            visible: emailErrorStatus,
-            child: Text(emailErrorMsg,style: const TextStyle(
-            color: Color(0xffD80027)
-          ),)),
+              visible: emailErrorStatus,
+              child: Text(
+                emailErrorMsg,
+                style: const TextStyle(color: Color(0xffD80027)),
+              )),
           const SizedBox(
             height: 40,
           ),
@@ -145,9 +149,15 @@ class _ResetPasswordState extends State<ResetPassword> {
             width: double.infinity,
             height: 50,
             child: ElevatedButton(
-              onPressed: () {
-                context.read<LoginBloc>().add(ResetPasswordGetPasswordEvent(
-                    emailId: emailController.text));
+              onPressed: () async {
+                final network = await AppUtils.getConnectivity();
+                if (network) {
+                  context.read<LoginBloc>().add(ResetPasswordGetPasswordEvent(
+                      emailId: emailController.text));
+                } else {
+                  CommonWidgets().showDialog(context,
+                      'Please check your internet connection and try again');
+                }
               },
               style: ElevatedButton.styleFrom(
                 primary: emailSent ? AppColors.primaryColors : Colors.white,
@@ -263,179 +273,188 @@ class _ResetPasswordState extends State<ResetPassword> {
         enableDrag: false,
         isDismissible: false,
         backgroundColor: Colors.transparent,
-        builder: (context) => StatefulBuilder(
-          builder: (context,StateSetter newSetState) {
-            return BlocProvider(
-                  create: (context) => LoginBloc(apiRepository: ApiRepository()),
-                  child: BlocListener<LoginBloc, LoginState>(
-                    listener: (context, state) {
-                      if(state is ResetPasswordSendOtpErrorState){
-                        otpErrorStatus=true;
-                        otpErrorMsg=state.errorMsg;
-                        
-                      }
-                      // TODO: implement listener
-                    },
-                    child: BlocBuilder<LoginBloc, LoginState>(
-                      builder: (context, state) {
-                        return Container(
-                          height: MediaQuery.of(context).size.height * 0.800,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30)),
-                            color: Colors.white,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: Container(
-                                    width: 60,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.dividerColors,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
+        builder: (context) =>
+            StatefulBuilder(builder: (context, StateSetter newSetState) {
+              return BlocProvider(
+                create: (context) => LoginBloc(apiRepository: ApiRepository()),
+                child: BlocListener<LoginBloc, LoginState>(
+                  listener: (context, state) {
+                    if (state is ResetPasswordSendOtpErrorState) {
+                      otpErrorStatus = true;
+                      otpErrorMsg = state.errorMsg;
+                    }
+                    // TODO: implement listener
+                  },
+                  child: BlocBuilder<LoginBloc, LoginState>(
+                    builder: (context, state) {
+                      return Container(
+                        height: MediaQuery.of(context).size.height * 0.800,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30)),
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 60,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.dividerColors,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 24,
+                              ),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              const Text(
+                                "5-Digit Code",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 28,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Please enter the code we\'ve sent to ${emailController.text}.",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                    color: AppColors.greyText),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              PinCodeTextField(
+                                appContext: context,
+                                pastedTextStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const Text(
-                                  "5-Digit Code",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 28,
-                                      color: AppColors.primaryTitleColor),
+                                length: 4,
+                                validator: (v) {
+                                  // if (v!.length < 4) {
+                                  //   return "Enter a valid OTP";
+                                  // } else {
+                                  //   return null;
+                                  // }
+                                },
+                                pinTheme: PinTheme(
+                                  selectedColor: Colors.black,
+                                  inactiveColor: AppColors.greyText,
+                                  activeColor: otpErrorStatus
+                                      ? Color(0xffD80027)
+                                      : const Color(0xff808B9E),
+                                  errorBorderColor: otpErrorStatus
+                                      ? Color(0xffD80027)
+                                      : const Color(0xff808B9E),
+                                  shape: PinCodeFieldShape.box,
+                                  borderRadius: BorderRadius.circular(15),
+                                  fieldHeight: 57,
+                                  fieldWidth: 55,
+                                  //activeColor: Colors.black
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Please enter the code we\'ve sent to ${emailController.text}.",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15,
-                                      color: AppColors.greyText),
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                PinCodeTextField(
-                                  appContext: context,
-                                  pastedTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
+                                cursorColor: Colors.black,
+                                keyboardType: TextInputType.number,
+                                boxShadows: const [
+                                  BoxShadow(
+                                    offset: Offset.zero,
+                                    color: Color(0xffFFFFFF),
+                                    blurRadius: 0,
                                   ),
-                                  length: 4,
-                                  validator: (v) {
-                                    // if (v!.length < 4) {
-                                    //   return "Enter a valid OTP";
-                                    // } else {
-                                    //   return null;
-                                    // }
-                                  },
-                                  pinTheme: PinTheme(
-                                    selectedColor: Colors.black,
-                                    inactiveColor: AppColors.greyText,
-                                    activeColor:otpErrorStatus?Color(0xffD80027): const Color(0xff808B9E),
-                                    errorBorderColor: otpErrorStatus?Color(0xffD80027): const Color(0xff808B9E),
-                                    shape: PinCodeFieldShape.box,
-                                    borderRadius: BorderRadius.circular(15),
-                                    fieldHeight: 57,
-                                    fieldWidth: 55,
-                                    //activeColor: Colors.black
-                                  ),
-                                  cursorColor: Colors.black,
-                                  keyboardType: TextInputType.number,
-                                  boxShadows: const [
-                                    BoxShadow(
-                                      offset: Offset.zero,
-                                      color: Color(0xffFFFFFF),
-                                      blurRadius: 0,
-                                    ),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      otp = value;
-                                    });
-                                  },
-                                ),
-                                  const SizedBox(
-                                  height: 5,
-                                ),
-                                 Visibility(
-                                    visible: otpErrorStatus,
-                                    child: Text(
-                                      otpErrorMsg,
-                                      style:
-                                          const TextStyle(color: Color(0xffD80027)),
-                                    )),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                               
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 50,
-                                  child: ElevatedButton(
-                                    onPressed: () {
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    otp = value;
+                                  });
+                                },
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Visibility(
+                                  visible: otpErrorStatus,
+                                  child: Text(
+                                    otpErrorMsg,
+                                    style: const TextStyle(
+                                        color: Color(0xffD80027)),
+                                  )),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    final network =
+                                        await AppUtils.getConnectivity();
+                                    if (network) {
                                       context.read<LoginBloc>().add(
                                           ResetPasswordSendOtpEvent(
                                               email: emailController.text,
                                               otp: otp));
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: AppColors.primaryColors,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
-                                      ),
+                                    } else {
+                                      CommonWidgets().showDialog(context,
+                                          'Please check your internet connection and try again');
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    primary: AppColors.primaryColors,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
                                     ),
-                                    child: state is ResetPasswordSendOtpLoadingState
-                                        ? const Center(
-                                            child: CupertinoActivityIndicator(
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const Text(
-                                            'Continue',
-                                            style: TextStyle(fontSize: 15),
-                                          ),
                                   ),
+                                  child:
+                                      state is ResetPasswordSendOtpLoadingState
+                                          ? const Center(
+                                              child: CupertinoActivityIndicator(
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Continue',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
                                 ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: <Widget>[
-                                    const Text('Don\'t receive a code?'),
-                                    TextButton(
-                                      child: const Text(
-                                        'Resend',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: AppColors.greyText),
-                                      ),
-                                      onPressed: () {},
-                                    )
-                                  ],
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                children: <Widget>[
+                                  const Text('Don\'t receive a code?'),
+                                  TextButton(
+                                    child: const Text(
+                                      'Resend',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.greyText),
+                                    ),
+                                    onPressed: () {},
+                                  )
+                                ],
+                                mainAxisAlignment: MainAxisAlignment.center,
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                );
-          }
-        ));
+                ),
+              );
+            }));
   }
 
   Widget newpassword(BuildContext context) {

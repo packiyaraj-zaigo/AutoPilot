@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -272,6 +273,17 @@ class AppUtils {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userID = prefs.getString(AppConstants.TEMP_VAR);
     return userID ?? "";
+  }
+
+  static Future<bool> getConnectivity() async {
+    final connectivity = await Connectivity().checkConnectivity();
+    if (connectivity == ConnectivityResult.other ||
+        connectivity == ConnectivityResult.bluetooth ||
+        connectivity == ConnectivityResult.none) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   ////////////////////////////////////////////////////////////////
