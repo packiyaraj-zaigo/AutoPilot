@@ -221,13 +221,29 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      "Position",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xff6A7187),
-                      ),
+                    const Row(
+                      children: [
+                         Text(
+                          "Position",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff6A7187),
+                          ),
+                        ),
+
+
+                          Text(
+              " *",
+              style:  TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(
+                                0xffD80027,
+                              ),
+              ),
+            ),
+                      ],
                     ),
                     SizedBox(height: 10),
                     roles.isNotEmpty
@@ -242,7 +258,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                               padding:
                                   EdgeInsets.only(top: 2, left: 16, right: 16),
                               isExpanded: true,
-                              hint: Text(
+                              hint: const Text(
                                 "Select",
                                 style: TextStyle(
                                     fontSize: 16,
@@ -268,8 +284,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                 return DropdownMenuItem<String>(
                                   value: role.name,
                                   child: Text(
-                                    role.name.toString(),
-                                    style: TextStyle(
+                                    role.name.toString().toUpperCase(),
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       color: AppColors.greyText,
                                       fontWeight: FontWeight.w400,
@@ -301,6 +317,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                         final validate = validation();
                         if (validate) {
                           final clientId = await AppUtils.getUserID();
+                          print(phoneController.text.trim().replaceAll(RegExp(r'[^\w\s]+'),'').replaceAll(" ", ""));
                           bloc.add(
                             CreateEmployee(
                               model: EmployeeCreationModel(
@@ -308,7 +325,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                 email: emailController.text.trim(),
                                 firstName: firstNameController.text.trim(),
                                 lastName: lastNameController.text.trim(),
-                                phone: phoneController.text.trim(),
+                                phone: phoneController.text.trim().replaceAll(RegExp(r'[^\w\s]+'),''),
                                 role: dropdownValue,
                               ),
                             ),
@@ -350,13 +367,28 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xff6A7187),
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff6A7187),
+              ),
+            ),
+
+             const Text(
+              " *",
+              style:  TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(
+                                0xffD80027,
+                              ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 3),
         Padding(
@@ -370,7 +402,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
               inputFormatters:
                   label == "Phone" ? [PhoneInputFormatter()] : null,
               maxLength: label == 'Phone'
-                  ? 20
+                  ? 19
                   : label.contains('Name')
                       ? 100
                       : 50,
@@ -476,7 +508,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
         .hasMatch(emailController.text.trim());
     if (firstNameController.text.trim().isEmpty) {
-      firstNameError = 'First name cannot be empty';
+      firstNameError = "First name can't be empty";
       status = false;
     } else if (firstNameController.text.trim().length < 2) {
       firstNameError = 'Enter a valid first name';
@@ -486,7 +518,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     }
 
     if (lastNameController.text.trim().isEmpty) {
-      lastNameError = 'Last name cannot be empty';
+      lastNameError = "Last name can't be empty";
       status = false;
     } else if (lastNameController.text.trim().length < 2) {
       lastNameError = 'Enter a valid last name';
@@ -496,7 +528,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     }
 
     if (emailController.text.trim().isEmpty) {
-      emailError = 'Email cannot be empty';
+      emailError = "Email can't be empty";
       status = false;
     } else if (!emailValid) {
       emailError = 'Enter a valid email';
@@ -505,16 +537,16 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
       emailError = '';
     }
     if (phoneController.text.trim().isEmpty) {
-      phoneError = 'Phone number cannot be empty';
+      phoneError = "Phone number can't be empty";
       status = false;
-    } else if (phoneController.text.trim().length < 2) {
+    } else if (phoneController.text.replaceAll(RegExp(r'[^\w\s]+'),'').replaceAll(" ", "").length < 6) {
       phoneError = 'Enter a valid phone number';
       status = false;
     } else {
       phoneError = '';
     }
     if (dropdownValue == '') {
-      positionError = 'Position cannot be empty';
+      positionError = 'Please select a position';
       status = false;
     } else {
       positionError = '';

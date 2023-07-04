@@ -56,3 +56,15 @@ class SendCustomerMessageEvent extends CustomerEvent{
   @override
   List<Object?> get props=>[];
 }
+
+
+
+class GetCustomerMessagePaginationEvent extends CustomerEvent{
+
+  
+  GetCustomerMessagePaginationEvent();
+
+    @override
+  List<Object?> get props=>[];
+
+}

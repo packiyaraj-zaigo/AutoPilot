@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:flutter/cupertino.dart';
@@ -16,6 +18,7 @@ class CustomerInformationScreen extends StatefulWidget {
   }) : super(key: key);
   final Datum customerData;
 
+ 
 
   @override
   State<CustomerInformationScreen> createState() =>
@@ -57,13 +60,20 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   ];
   int? selectedIndex = 0;
   List<Widget> messageChatWidgetList = [];
-  List<cm.Datum>customerMessageList=[];
+  List<cm.Datum> customerMessageList = [];
   final messageController = TextEditingController();
-  final chatScrollController=ScrollController();
-  int newIndex=0;
+  final chatScrollController = ScrollController();
+  int newIndex = 0;
+   late Bloc bloc;
+   final _debouncer = Debouncer();
   @override
 
 
+  void initState() {
+    bloc=BlocProvider.of<CustomerBloc>(context);
+    // TODO: implement initState
+    super.initState();
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -728,32 +738,33 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   }
 
   Widget chatWidget(BuildContext context) {
-   
+
+    log("re build");
     return BlocProvider(
-      create: (context) => CustomerBloc()..add(GetCustomerMessageEvent(
-
-      )),
+      create: (context) => CustomerBloc()..add(GetCustomerMessageEvent()),
       child: BlocListener<CustomerBloc, CustomerState>(
-        listener: (context, state) async{
-          if(state is GetCustomerMessageState){
+        listener: (context, state) async {
+          if (state is GetCustomerMessageState) {
             customerMessageList.addAll(state.messageModel.data.data);
-              Future.delayed(Duration(milliseconds: 300)).then((value) {
-                chatScrollController.animateTo(chatScrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.linear);
-              });
-            
-
-           
-          }else if(state is SendCustomerMessageState){
-          
-
-
+            Future.delayed(Duration(milliseconds: 300)).then((value) {
+              chatScrollController.animateTo(
+                  chatScrollController.position.maxScrollExtent,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.linear);
+            });
+          } else if (state is SendCustomerMessageState) {}
+          else if(state is GetCustomerMessagePaginationState){
+            customerMessageList.addAll(state.messageModel.data.data);
+            print("pagniation state emited");
+            print(customerMessageList.length);
           }
           // TODO: implement listener
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
           builder: (context, state) {
+
+            log(BlocProvider.of<CustomerBloc>(context).messageCurrentPage.toString()+"in char widget");
             return Expanded(
-             
               // width: MediaQuery.of(context).size.width,
 
               child: Column(
@@ -761,7 +772,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   chatBoxWidget(customerMessageList),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Padding(
@@ -791,13 +802,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                 spreadRadius: 1.2,
                                 offset: Offset(3, 2))
                           ]),
-              
+
                       // child: Padding(
                       //   padding: const EdgeInsets.symmetric(horizontal:22.0),
                       //   child: Row(
                       //     children: [
                       //       SvgPicture.asset("assets/images/attachment_icon.svg"),
-              
+
                       //       TextField(
                       //         decoration: InputDecoration(
                       //           hintText: "Enter your message..",
@@ -807,7 +818,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                       //     ],
                       //   ),
                       // ),
-              
+
                       child: TextField(
                         controller: messageController,
                         decoration: InputDecoration(
@@ -826,29 +837,45 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             suffixIcon: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: GestureDetector(
-                                onTap: () async{
+                                onTap: () async {
                                   // setState(() {
                                   //   messageChatWidgetList.add(chatBubleWidget(
                                   //       messageController.text,""));
-              
+
                                   //   messageController.clear();
                                   // });
-              
-                                  if(messageController.text.isNotEmpty){
-                                    context.read<CustomerBloc>().add(SendCustomerMessageEvent(customerId: widget.customerData.id.toString(), messageBody: messageController.text));
-              
-                                      cm.Datum localMessage=cm.Datum(clientId: widget.customerData.clientId,createdAt: DateTime.now(),id: widget.customerData.id,messageBody: messageController.text,messageType: "SMS",receiverCustomerId: null,status: "Open",updatedAt: DateTime.now(),sendCustomer: "",senderUserId: null);
-                        customerMessageList.add(localMessage);
-                        messageController.clear();
-                        await Future.delayed(Duration(milliseconds: 500)).then((_){
-                         chatScrollController.animateTo(chatScrollController.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.linear);
-              
-                        });
-                  
-              
+
+                                  if (messageController.text.isNotEmpty) {
+                                    context.read<CustomerBloc>().add(
+                                        SendCustomerMessageEvent(
+                                            customerId: widget.customerData.id
+                                                .toString(),
+                                            messageBody:
+                                                messageController.text));
+
+                                    cm.Datum localMessage = cm.Datum(
+                                        clientId: widget.customerData.clientId,
+                                        createdAt: DateTime.now(),
+                                        id: widget.customerData.id,
+                                        messageBody: messageController.text,
+                                        messageType: "SMS",
+                                        receiverCustomerId: null,
+                                        status: "Open",
+                                        updatedAt: DateTime.now(),
+                                        sendCustomer: "",
+                                        senderUserId: null);
+                                    customerMessageList.add(localMessage);
+                                    messageController.clear();
+                                    await Future.delayed(
+                                            Duration(milliseconds: 500))
+                                        .then((_) {
+                                      chatScrollController.animateTo(
+                                          chatScrollController
+                                              .position.maxScrollExtent,
+                                          duration: Duration(milliseconds: 300),
+                                          curve: Curves.linear);
+                                    });
                                   }
-              
-                                  
                                 },
                                 child: CircleAvatar(
                                   backgroundColor: AppColors.primaryColors,
@@ -897,90 +924,93 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   }
 
   Widget chatBoxWidget(List<cm.Datum> messsageModelList) {
+    log("re build");
     return Expanded(
       child: ListView.builder(
-        itemBuilder: (context2, index) {
-          newIndex=index;
+          itemBuilder: (context2, index) {
+            newIndex = index;
 
-          return chatBubleWidget(messsageModelList[index].messageBody,messsageModelList[index].createdAt.toString().substring(11,16));
-        },
-        
-        itemCount: messsageModelList.length,
-        shrinkWrap: true,
-        physics: const ClampingScrollPhysics(),
-        controller:chatScrollController
-      ),
+            return chatBubleWidget(
+                messsageModelList[index].messageBody,
+                messsageModelList[index]
+                    .createdAt
+                    .toString()
+                    .substring(11, 16));
+          },
+          itemCount: messsageModelList.length,
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          controller: chatScrollController..addListener(() {
+            if(chatScrollController.position.pixels==0){
+              print("pagination called");
+               _debouncer.run(() {
+                                               log(BlocProvider.of<CustomerBloc>(context).messageCurrentPage.toString());
+              bloc.add(GetCustomerMessagePaginationEvent());
+                                              });
+            
+             
+            }
+          })),
     );
   }
 
-  Widget chatBubleWidget(String message,String time) {
+  Widget chatBubleWidget(String message, String time) {
     return Padding(
       padding: const EdgeInsets.only(top: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-      
-               Container(
-              
-
-
-                decoration: BoxDecoration(
-                    color: AppColors.primaryColors,
-                    borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 12),
-                  child: Column(
-                   
-                     crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width/1.7,
-                          minWidth: 80
-
-                        ),
-                        child: Text(
-                          message,
+          Container(
+            decoration: BoxDecoration(
+                color: AppColors.primaryColors,
+                borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width / 1.7,
+                        minWidth: 80),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14.0),
+                    child: Row(
+                      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          time,
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 12,
                             color: Colors.white,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w400,
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 14.0),
-
-
-        child:  Row(
-        
-          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-             Text(
-                time,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w400,
-                ),
+                        //  Expanded(child: SizedBox()),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6.0),
+                          child: SvgPicture.asset(
+                              "assets/images/Double_tick_icon.svg"),
+                        )
+                      ],
+                    ),
+                  )
+                ],
               ),
-          //  Expanded(child: SizedBox()),
-              Padding(
-                padding: const EdgeInsets.only(left:6.0),
-                child: SvgPicture.asset(
-                    "assets/images/Double_tick_icon.svg"),
-              )
-        
-          ],
-        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-         //   ),
-        //  ),
+            ),
+          ),
+          //   ),
+          //  ),
         ],
       ),
     );

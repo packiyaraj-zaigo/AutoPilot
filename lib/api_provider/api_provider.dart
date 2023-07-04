@@ -703,6 +703,7 @@ class ApiProvider {
 
    Future<dynamic> getCustomerMessages(String token, String clientId,int currentPage) async {
     print("into provider");
+    print(currentPage);
 
     try {
       var url = Uri.parse("${BASE_URL}api/sentmessages?client_id=$clientId&page=$currentPage");

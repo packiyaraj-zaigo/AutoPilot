@@ -155,9 +155,26 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(ResetPasswordGetOtpState());
 
       }else{
-        emit(ResetPasswordGetOtpErrorState(
+         if(resetPasswordRes.body.contains("email")){
+          print("correct");
+           emit(ResetPasswordGetOtpErrorState(
+          errorMsg: resetPasswordData['email'][0]));
+        }else if(resetPasswordRes.body.contains("message")){
+
+            emit(ResetPasswordGetOtpErrorState(
           errorMsg: resetPasswordData['message']
         ));
+
+        }else{
+               emit(const ResetPasswordGetOtpErrorState(
+          errorMsg: "Something went wrong"
+        ));
+
+        }
+      
+        // emit(ResetPasswordGetOtpErrorState(
+        //   errorMsg: resetPasswordData['message']
+        // ));
       }
 
 
@@ -236,7 +253,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
        
 
       }else{
-       emit(CreateNewPasswordErrorState(errorMsg: "Something went wrong"));
+        if(createNewPasswordRes.body.contains("password")){
+           emit(CreateNewPasswordErrorState(errorMsg: resetPasswordData['password'][0]));
+        }else{
+          emit(CreateNewPasswordErrorState(errorMsg: "Something went wrong"));
+        }
+
+
+       
       }
 
 

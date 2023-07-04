@@ -136,6 +136,13 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black,
+        leading: GestureDetector(
+          onTap: (){
+            showBackDialog(context,"The enterd data will be lost until you confim it.");
+           
+            
+          },
+          child: Icon(Icons.arrow_back)),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.only(bottom: 24.0, left: 24, right: 24,top:0),
@@ -1371,5 +1378,34 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
        });
       }
     });
+  }
+
+
+
+    Future showBackDialog(BuildContext context, message) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+         title: const Text("Do you really want to go back?"),
+        content: Text(message),
+        actions: <Widget>[
+          CupertinoDialogAction(
+            child: const Text("Yes"),
+            onPressed: (){
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+          ),
+
+            CupertinoDialogAction(
+            child: const Text("No"),
+            onPressed: (){
+              Navigator.pop(context);
+              
+            },
+          ),
+        ],
+      ),
+    );
   }
 }
