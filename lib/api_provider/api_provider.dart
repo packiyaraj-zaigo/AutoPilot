@@ -352,6 +352,7 @@ class ApiProvider {
     state,
     city,
     pinCode,
+    stateId,
   ) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -368,12 +369,13 @@ class ApiProvider {
         ..fields['phone'] = mobileNo
         ..fields['notes'] = customerNotes
         ..fields['address_line_1'] = address
-        ..fields['state'] = state
+        ..fields['province_name'] = state
+        ..fields['province_id'] = stateId
         ..fields['town_city'] = city
         ..fields['zipcode'] = pinCode;
 
       var response = await request.send();
-      print('object===============================');
+      print('object========id: ${stateId}=name:=${state}=====================');
       if (response.statusCode == 200 || response.statusCode == 201) {}
       print(response.statusCode.toString());
       return http.Response.fromStream(response);
