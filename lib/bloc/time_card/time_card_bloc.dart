@@ -28,7 +28,9 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
     Emitter<TimeCardState> emit,
   ) async {
     emit(GetAllTimeCardsLoadingState());
-    isLoading = true;
+    if (currentPage != 1) {
+      isLoading = true;
+    }
     try {
       final token = await AppUtils.getToken();
       final Response response = await ApiProvider().getAllTimeCards(token);

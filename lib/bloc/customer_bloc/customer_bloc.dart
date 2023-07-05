@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
+import 'dart:developer';
 
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 
@@ -149,32 +149,28 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
       Response messageResponse = await _apiRepository.getCustomerMessages(
           token, clientId, messageCurrentPage);
       if (messageResponse.statusCode == 200) {
-        
         messageModel = cm.customerMessageModelFromJson(messageResponse.body);
-        messageCurrentPage=messageModel.data.lastPage;
+        messageCurrentPage = messageModel.data.lastPage;
 
-
-        print(messageCurrentPage.toString()+"firstt curreent");
+        print(messageCurrentPage.toString() + "firstt curreent");
         Response newMessageRes = await _apiRepository.getCustomerMessages(
-          token, clientId, messageCurrentPage);
-          messageModel = cm.customerMessageModelFromJson(newMessageRes.body);
-
-
+            token, clientId, messageCurrentPage);
+        messageModel = cm.customerMessageModelFromJson(newMessageRes.body);
 
         emit(GetCustomerMessageState(messageModel: messageModel));
 
-       
-
-       // messageCurrentPage = messageModel.data.currentPage;
+        // messageCurrentPage = messageModel.data.currentPage;
         // messageTotalPage = messageModel.data.lastPage;
         // if (messageCurrentPage <= messageTotalPage) {
         //   messageCurrentPage--;
         // }
         // emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
-        print('=======-------------------------${messageResponse.body}');
+        log('=======-------------------------${messageResponse.body}');
+        messageCurrentPage--;
       } else {
         emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
       }
+
       isEmployeesLoading = false;
       isPaginationLoading = false;
     } catch (e) {
@@ -207,44 +203,38 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     }
   }
 
-
-
-
   Future<void> getCustomerMessagePaginationBloc(
     GetCustomerMessagePaginationEvent event,
     Emitter<CustomerState> emit,
   ) async {
     try {
+      print(messageCurrentPage.toString() + "currrent paggee");
+      // emit(GetCustomerMessagePaginationLoadingState());
 
-      print(messageCurrentPage.toString()+"currrent paggee");
-     // emit(GetCustomerMessagePaginationLoadingState());
-     
       final token = await AppUtils.getToken();
       final clientId = await AppUtils.getUserID();
       cm.CustomerMessageModel messageModel;
-
-      await _apiRepository.getCustomerMessages(
-          token, clientId, messageCurrentPage).then((messageResponse){
-            if (messageResponse.statusCode == 200) {
-
-        print("sucesss condition");
-         messageModel = cm.customerMessageModelFromJson(messageResponse.body);
-         emit(GetCustomerMessagePaginationState(messageModel: messageModel));
-        
-
-        if(messageModel.data.currentPage>1){
-
-          print("thiss workss");
-          messageCurrentPage--;
-          print(messageCurrentPage);
-
-
-        }
-
-        print('=======-------------------------${messageResponse.body}');
+      log(messageCurrentPage.toString() + ":::::::::::::::::");
+      if (messageCurrentPage < 1) {
+        return;
       }
+      await _apiRepository
+          .getCustomerMessages(token, clientId, messageCurrentPage)
+          .then((messageResponse) {
+        if (messageResponse.statusCode == 200) {
+          print("sucesss condition");
+          messageModel = cm.customerMessageModelFromJson(messageResponse.body);
+          emit(GetCustomerMessagePaginationState(messageModel: messageModel));
 
-          });
+          if (messageModel.data.currentPage >= 1) {
+            print("thiss workss");
+            messageCurrentPage--;
+            print(messageCurrentPage);
+          }
+
+          print('=======-------------------------${messageResponse.body}');
+        }
+      });
       //  else {
       //   emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
       // }

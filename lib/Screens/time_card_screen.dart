@@ -92,227 +92,258 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                       child: CupertinoActivityIndicator(),
                     );
                   } else {
-                    return Expanded(
-                      child: ScrollConfiguration(
-                        behavior: const ScrollBehavior(),
-                        child: ListView.builder(
-                          itemBuilder: (context, index) {
-                            final timeCard = timeCards[index];
-                            return Column(
-                              children: [
-                                Container(
-                                  height: 213,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(12),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.07),
-                                        offset: const Offset(0, 7),
-                                        blurRadius: 10,
-                                      )
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 16,
-                                      right: 16,
-                                      top: 16,
-                                      bottom: 20,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Text(
-                                              timeCard.employeeName ?? '',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                color:
-                                                    AppColors.primaryTitleColor,
-                                              ),
-                                            ),
+                    return timeCards.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No time cards found',
+                              style: TextStyle(
+                                  color: AppColors.greyText, fontSize: 18),
+                            ),
+                          )
+                        : Expanded(
+                            child: ScrollConfiguration(
+                              behavior: const ScrollBehavior(),
+                              child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  final timeCard = timeCards[index];
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        height: 213,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.07),
+                                              offset: const Offset(0, 7),
+                                              blurRadius: 10,
+                                            )
                                           ],
                                         ),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              timeCard.position ?? '',
-                                              style: const TextStyle(
-                                                color: AppColors.greyText,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const SizedBox(
-                                              width: 70,
-                                              child: Text('Today'),
-                                            ),
-                                            Container(
-                                              height: 1,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  250,
-                                              color: AppColors.dividerColors,
-                                            ),
-                                            SizedBox(
-                                              width: 70,
-                                              child: Text(
-                                                  '${timeCard.dayTotal?.substring(0, 5) ?? ''} ${timeCard.dayTotal?.substring(0, 5) == null ? '' : ' hrs'}'),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const SizedBox(
-                                                width: 70,
-                                                child: Text('This Week ')),
-                                            Container(
-                                              height: 1,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  250,
-                                              color: AppColors.dividerColors,
-                                            ),
-                                            SizedBox(
-                                              width: 70,
-                                              child: Text(
-                                                  '${timeCard.weekTotal?.substring(0, 5) ?? ''} ${timeCard.weekTotal?.substring(0, 5) == null ? '' : ' hrs'}'),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            const SizedBox(
-                                              width: 70,
-                                              child: Text('This Month'),
-                                            ),
-                                            Container(
-                                              height: 1,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width -
-                                                  250,
-                                              color: AppColors.dividerColors,
-                                            ),
-                                            SizedBox(
-                                              width: 70,
-                                              child: Text(
-                                                  '${timeCard.monthTatal?.substring(0, 5) ?? ''} ${timeCard.monthTatal?.substring(0, 5) == null ? '' : ' hrs'}'),
-                                            ),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              width: (MediaQuery.of(context)
-                                                          .size
-                                                          .width -
-                                                      96) /
-                                                  2,
-                                              height: 40,
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                                color: const Color(0xFFF5F5F5),
-                                              ),
-                                              child: const Center(
-                                                child: Text(
-                                                  'Edit',
-                                                  style: TextStyle(
-                                                    color:
-                                                        AppColors.primaryColors,
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            GestureDetector(
-                                              onTap: () {
-                                                Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        TimeCardCreate(
-                                                      id: timeCard.employeeId,
-                                                      employee:
-                                                          timeCard.employeeName,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                              behavior:
-                                                  HitTestBehavior.translucent,
-                                              child: Container(
-                                                width: (MediaQuery.of(context)
-                                                            .size
-                                                            .width -
-                                                        96) /
-                                                    2,
-                                                height: 40,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                  color:
-                                                      const Color(0xFFF5F5F5),
-                                                ),
-                                                child: const Center(
-                                                  child: Text(
-                                                    'Add',
-                                                    style: TextStyle(
-                                                      color: AppColors
-                                                          .primaryColors,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 16,
+                                            right: 16,
+                                            top: 16,
+                                            bottom: 20,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    timeCard.employeeName ?? '',
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w600,
+                                                      color: AppColors
+                                                          .primaryTitleColor,
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                bloc.currentPage < bloc.totalPages &&
-                                        index == timeCards.length - 1
-                                    ? const Column(
-                                        children: [
-                                          SizedBox(height: 16),
-                                          Center(
-                                            child: CupertinoActivityIndicator(),
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    timeCard.position ?? '',
+                                                    style: const TextStyle(
+                                                      color: AppColors.greyText,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  const SizedBox(
+                                                    width: 70,
+                                                    child: Text('Today'),
+                                                  ),
+                                                  Container(
+                                                    height: 1,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width -
+                                                            250,
+                                                    color:
+                                                        AppColors.dividerColors,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 70,
+                                                    child: Text(
+                                                        '${timeCard.dayTotal?.substring(0, 5) ?? ''} ${timeCard.dayTotal?.substring(0, 5) == null ? '' : ' hrs'}'),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  const SizedBox(
+                                                      width: 70,
+                                                      child:
+                                                          Text('This Week ')),
+                                                  Container(
+                                                    height: 1,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width -
+                                                            250,
+                                                    color:
+                                                        AppColors.dividerColors,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 70,
+                                                    child: Text(
+                                                        '${timeCard.weekTotal?.substring(0, 5) ?? ''} ${timeCard.weekTotal?.substring(0, 5) == null ? '' : ' hrs'}'),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  const SizedBox(
+                                                    width: 70,
+                                                    child: Text('This Month'),
+                                                  ),
+                                                  Container(
+                                                    height: 1,
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width -
+                                                            250,
+                                                    color:
+                                                        AppColors.dividerColors,
+                                                  ),
+                                                  SizedBox(
+                                                    width: 70,
+                                                    child: Text(
+                                                        '${timeCard.monthTatal?.substring(0, 5) ?? ''} ${timeCard.monthTatal?.substring(0, 5) == null ? '' : ' hrs'}'),
+                                                  ),
+                                                ],
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        (MediaQuery.of(context)
+                                                                    .size
+                                                                    .width -
+                                                                96) /
+                                                            2,
+                                                    height: 40,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      color: const Color(
+                                                          0xFFF5F5F5),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Text(
+                                                        'Edit',
+                                                        style: TextStyle(
+                                                          color: AppColors
+                                                              .primaryColors,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      Navigator.of(context)
+                                                          .push(
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              TimeCardCreate(
+                                                            id: timeCard
+                                                                .employeeId,
+                                                            employee: timeCard
+                                                                .employeeName,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                    behavior: HitTestBehavior
+                                                        .translucent,
+                                                    child: Container(
+                                                      width: (MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width -
+                                                              96) /
+                                                          2,
+                                                      height: 40,
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        color: const Color(
+                                                            0xFFF5F5F5),
+                                                      ),
+                                                      child: const Center(
+                                                        child: Text(
+                                                          'Add',
+                                                          style: TextStyle(
+                                                            color: AppColors
+                                                                .primaryColors,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            ],
                                           ),
-                                          SizedBox(height: 16),
-                                        ],
-                                      )
-                                    : const SizedBox(
-                                        height: 16,
-                                      )
-                              ],
-                            );
-                          },
-                          itemCount: timeCards.length,
-                        ),
-                      ),
-                    );
+                                        ),
+                                      ),
+                                      bloc.currentPage < bloc.totalPages &&
+                                              index == timeCards.length - 1
+                                          ? const Column(
+                                              children: [
+                                                SizedBox(height: 16),
+                                                Center(
+                                                  child:
+                                                      CupertinoActivityIndicator(),
+                                                ),
+                                                SizedBox(height: 16),
+                                              ],
+                                            )
+                                          : const SizedBox(
+                                              height: 16,
+                                            )
+                                    ],
+                                  );
+                                },
+                                itemCount: timeCards.length,
+                              ),
+                            ),
+                          );
                   }
                 },
               ),
