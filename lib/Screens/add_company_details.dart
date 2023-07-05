@@ -18,10 +18,14 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 
 class AddCompanyDetailsScreen extends StatefulWidget {
-  const AddCompanyDetailsScreen({super.key, required this.widgetIndex,this.basicDetailsMap,this.operationDetailsMap});
+  const AddCompanyDetailsScreen(
+      {super.key,
+      required this.widgetIndex,
+      this.basicDetailsMap,
+      this.operationDetailsMap});
   final int widgetIndex;
-  final Map<String,dynamic>?basicDetailsMap;
-  final Map<String,dynamic>?operationDetailsMap;
+  final Map<String, dynamic>? basicDetailsMap;
+  final Map<String, dynamic>? operationDetailsMap;
 
   @override
   State<AddCompanyDetailsScreen> createState() =>
@@ -63,9 +67,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   bool countryErrorStatus = false;
   bool stateErrorStatus = false;
 
-  bool numberOfEmployeeErrorStatus=false;
-  bool timeZoneErrorStatus=false;
-  
+  bool numberOfEmployeeErrorStatus = false;
+  bool timeZoneErrorStatus = false;
+
   String countryValue = "";
   String stateValue = "";
   late String selectedState;
@@ -78,29 +82,27 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   String stateErrorMsg = '';
   String zipErrorMsg = '';
 
-
-  String numberOfEmployeeErrorMsg='';
-  String timeZoneErrorMsg='';
-  String taxRateErrorMsg='';
-  String laborRateErrorMsg='';
+  String numberOfEmployeeErrorMsg = '';
+  String timeZoneErrorMsg = '';
+  String taxRateErrorMsg = '';
+  String laborRateErrorMsg = '';
 
   bool taxLabourSwitchValue = false;
   bool taxPartSwitchValue = false;
   bool taxMaterialSwitchValue = false;
 
   Map<String, dynamic> basicDetailsmap = {};
-  Map<String,dynamic>operationDetailsMap={};
-  List<ProvinceData>proviceList=[];
-  ScrollController provinceScrollController=ScrollController();
-  final provinceController=TextEditingController();
+  Map<String, dynamic> operationDetailsMap = {};
+  List<ProvinceData> proviceList = [];
+  ScrollController provinceScrollController = ScrollController();
+  final provinceController = TextEditingController();
   int? provinceId;
-  String numberOfEmployeeString="";
-  String timeZoneString='';
+  String numberOfEmployeeString = "";
+  String timeZoneString = '';
 
-
-  List<Employee>employeeList=[];
+  List<Employee> employeeList = [];
   late EmployeeBloc bloc;
-  ScrollController employeeScrollController=ScrollController();
+  ScrollController employeeScrollController = ScrollController();
   final _debouncer = Debouncer();
 
   @override
@@ -111,18 +113,18 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       return element.name.contains("America/");
     });
     print(timeZones);
-     bloc = BlocProvider.of<EmployeeBloc>(context);
+    bloc = BlocProvider.of<EmployeeBloc>(context);
     bloc.currentPage = 1;
     bloc.add(GetAllEmployees());
     // TODO: implement initState
 
-
-    if(widget.widgetIndex==0){
-      if(widget.basicDetailsMap!=null && widget.basicDetailsMap!={}){
+    if (widget.widgetIndex == 0) {
+      if (widget.basicDetailsMap != null && widget.basicDetailsMap != {}) {
         populateBasicDetails();
       }
-    }else if(widget.widgetIndex==1){
-      if(widget.operationDetailsMap!=null && widget.operationDetailsMap!={}){
+    } else if (widget.widgetIndex == 1) {
+      if (widget.operationDetailsMap != null &&
+          widget.operationDetailsMap != {}) {
         populateOperationDetails();
       }
     }
@@ -137,27 +139,47 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         elevation: 0,
         foregroundColor: Colors.black,
         leading: GestureDetector(
-          onTap: (){
-            showBackDialog(context,"The enterd data will be lost until you confim it.");
-           
-            
-          },
-          child: Icon(Icons.arrow_back)),
+            onTap: () {
+              if (widget.widgetIndex == 0) {
+                if (busineesNameController.text.isNotEmpty ||
+                    businessPhoneController.text.isNotEmpty ||
+                    businessWebsiteController.text.isNotEmpty ||
+                    addressController.text.isNotEmpty ||
+                    cityController.text.isNotEmpty ||
+                    zipController.text.isNotEmpty) {
+                  showBackDialog(context,
+                      "The enterd data will be lost until you confim it.");
+                } else {
+                  Navigator.pop(context);
+                }
+              } else if (widget.widgetIndex == 1) {
+                if (labourRateController.text.isNotEmpty ||
+                    taxRateController.text.isNotEmpty ||
+                    numberOfEmployeeString.isNotEmpty) {
+                  showBackDialog(context,
+                      "The enterd data will be lost until you confim it.");
+                } else {
+                  Navigator.pop(context);
+                }
+              } else {
+                Navigator.pop(context);
+              }
+            },
+            child: Icon(Icons.arrow_back)),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 24.0, left: 24, right: 24,top:0),
+        padding:
+            const EdgeInsets.only(bottom: 24.0, left: 24, right: 24, top: 0),
         child: GestureDetector(
           onTap: () {
-            if(widget.widgetIndex==0){
-                  validateBasicDetails();
-            print("hellooo");
-
-            }else if(widget.widgetIndex==1){
+            if (widget.widgetIndex == 0) {
+              validateBasicDetails();
+              print("hellooo");
+            } else if (widget.widgetIndex == 1) {
               validateOperationDetails();
-            }else if(widget.widgetIndex==2){
-              Navigator.pop(context,true);
+            } else if (widget.widgetIndex == 2) {
+              Navigator.pop(context, true);
             }
-        
           },
           child: Container(
             height: 56,
@@ -188,7 +210,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   Widget basicDetailsWidget() {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, right: 24, bottom: 24, top: 8),
+        padding:
+            const EdgeInsets.only(left: 24.0, right: 24, bottom: 24, top: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -276,7 +299,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   Widget operationDetailsWidget() {
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, right: 24, bottom: 24, top: 8),
+        padding:
+            const EdgeInsets.only(left: 24.0, right: 24, bottom: 24, top: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -291,16 +315,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               padding: const EdgeInsets.only(top: 28.0),
               child: numberOfEmployeeWidget(),
             ),
-            errorMessageWidget(numberOfEmployeeErrorMsg, numberOfEmployeeErrorStatus),
+            errorMessageWidget(
+                numberOfEmployeeErrorMsg, numberOfEmployeeErrorStatus),
             timeZoneDropdown(),
             errorMessageWidget(timeZoneErrorMsg, timeZoneErrorStatus),
-    
             textBox("Ex. \$45", labourRateController, "Shop Hourly Labor Rate",
                 labourRateErrorStatus),
-            errorMessageWidget(laborRateErrorMsg, labourRateErrorStatus),    
+            errorMessageWidget(laborRateErrorMsg, labourRateErrorStatus),
             textBox("Enter percentage rate", taxRateController, "Tax Rate",
                 taxRateErrorStatus),
-            errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),    
+            errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),
             taxSwitchWidget("Tax Labour", taxLabourSwitchValue),
             taxSwitchWidget("Tax Parts", taxPartSwitchValue),
             taxSwitchWidget("Tax Material", taxMaterialSwitchValue)
@@ -330,7 +354,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 onTap: () {
                   setState(() {
                     selectedEmployeeIndex = 0;
-                    numberOfEmployeeString="1";
+                    numberOfEmployeeString = "1";
                   });
                 },
                 child: Container(
@@ -357,7 +381,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 onTap: () {
                   setState(() {
                     selectedEmployeeIndex = 1;
-                     numberOfEmployeeString="2-5";
+                    numberOfEmployeeString = "2-5";
                   });
                 },
                 child: Container(
@@ -384,7 +408,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 onTap: () {
                   setState(() {
                     selectedEmployeeIndex = 2;
-                    numberOfEmployeeString="6+";
+                    numberOfEmployeeString = "6+";
                   });
                 },
                 child: Container(
@@ -443,6 +467,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   : MediaQuery.of(context).size.width,
               child: TextField(
                 controller: controller,
+                inputFormatters:
+                    label == "Phone Number" ? [PhoneInputFormatter()] : [],
                 keyboardType:
                     label == 'Phone Number' ? TextInputType.number : null,
                 maxLength: label == 'Phone Number'
@@ -453,6 +479,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 decoration: InputDecoration(
                     hintText: placeHolder,
                     counterText: "",
+
                     // prefixIcon: label == 'Business Phone'
                     //     ? countryPickerWidget()
                     //     : null,
@@ -716,7 +743,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
               // padding: const EdgeInsets.all(5),
               decoration: BoxDecoration(
-                  border: Border.all(color:timeZoneErrorStatus?const Color(0xffD80027): const Color(0xffC1C4CD)),
+                  border: Border.all(
+                      color: timeZoneErrorStatus
+                          ? const Color(0xffD80027)
+                          : const Color(0xffC1C4CD)),
                   borderRadius: BorderRadius.circular(12)),
               child: DropdownButtonHideUnderline(
                 child: ButtonTheme(
@@ -750,7 +780,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     onChanged: (tz.Location? value) {
                       setState(() {
                         _currentSelectedTimezoneValue = value;
-                        timeZoneString=value!.name.toString();
+                        timeZoneString = value!.name.toString();
                       });
                     },
                     //isExpanded: true,
@@ -817,7 +847,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) {
-                    return const CreateEmployeeScreen(navigation: "add_company");
+                    return const CreateEmployeeScreen(
+                        navigation: "add_company");
                   },
                 ));
               },
@@ -854,54 +885,48 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
           // Employee list
           employeeListWidget()
-
-
-                  ],
+        ],
       ),
     );
   }
 
   void validateBasicDetails() {
-    if(busineesNameController.text.isEmpty){
+    if (busineesNameController.text.isEmpty) {
       setState(() {
-        businessNameErrorStatus=true;
-        businessNameErrorMsg="Business name can't be empty";
+        businessNameErrorStatus = true;
+        businessNameErrorMsg = "Business name can't be empty";
       });
-    }else{
-
+    } else {
       setState(() {
-           businessNameErrorStatus=false;
+        businessNameErrorStatus = false;
       });
-
     }
-    if(businessPhoneController.text.isEmpty){
+    if (businessPhoneController.text.isEmpty) {
       setState(() {
-        businessPhoneErrorStatus=true;
-        phoneErrorMsg="Business phone can't be empty";
+        businessPhoneErrorStatus = true;
+        phoneErrorMsg = "Business phone can't be empty";
       });
-    }else{
-     if(businessPhoneController.text.length<6){
-      setState(() {
-        businessPhoneErrorStatus=true;
-        phoneErrorMsg="Please enter a valid business phone";
-      });
-     }else{
-      setState(() {
-        businessPhoneErrorStatus=false;
-      });
-     }
+    } else {
+      if (businessPhoneController.text.length < 6) {
+        setState(() {
+          businessPhoneErrorStatus = true;
+          phoneErrorMsg = "Please enter a valid business phone";
+        });
+      } else {
+        setState(() {
+          businessPhoneErrorStatus = false;
+        });
+      }
     }
-    if(addressController.text.isEmpty){
+    if (addressController.text.isEmpty) {
       setState(() {
-        addressErrorStatus=true;
-        addressErrorMsg="Address can't be empty";
+        addressErrorStatus = true;
+        addressErrorMsg = "Address can't be empty";
       });
-    }else{
-
+    } else {
       setState(() {
-         addressErrorStatus=false;
+        addressErrorStatus = false;
       });
-
     }
     // if(selectedCountryString.isEmpty){
     //   setState(() {
@@ -916,43 +941,40 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     //   });
 
     // }
-    if(cityController.text.isEmpty){
+    if (cityController.text.isEmpty) {
       setState(() {
-        cityErrorStatus=true;
-        cityErrorMsg="City cant't be empty";
+        cityErrorStatus = true;
+        cityErrorMsg = "City cant't be empty";
       });
-    }else{
+    } else {
       setState(() {
-        cityErrorStatus=false;
-      });
-    }
-    if(provinceId==null){
-      setState(() {
-        stateErrorStatus=true;
-        stateErrorMsg="Please select a state";
-      });
-    }else{
-      setState(() {
-           stateErrorStatus=false;
+        cityErrorStatus = false;
       });
     }
-    if(zipController.text.isEmpty){
+    if (provinceId == null || provinceId == 0) {
       setState(() {
-
-        zipErrorStatus=true;
-        zipErrorMsg="Zip can't be empty";
+        stateErrorStatus = true;
+        stateErrorMsg = "Please select a state";
       });
-    }else{
-      if(zipController.text.length<2){
+    } else {
+      setState(() {
+        stateErrorStatus = false;
+      });
+    }
+    if (zipController.text.isEmpty) {
+      setState(() {
+        zipErrorStatus = true;
+        zipErrorMsg = "Zip can't be empty";
+      });
+    } else {
+      if (zipController.text.length < 2) {
         setState(() {
-                zipErrorStatus=true;
-        zipErrorMsg="Please enter a valid zip code";
-
+          zipErrorStatus = true;
+          zipErrorMsg = "Please enter a valid zip code";
         });
-      }else{
+      } else {
         setState(() {
-          zipErrorStatus=false;
-
+          zipErrorStatus = false;
         });
       }
     }
@@ -970,8 +992,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "address_1": addressController.text,
         "town_city": cityController.text,
         "zipcode": zipController.text,
-        "province_id":provinceId,
-        "province_name":provinceController.text
+        "province_id": provinceId,
+        "province_name": provinceController.text,
+        "website": businessWebsiteController.text
       });
 
       Navigator.pop(context, basicDetailsmap);
@@ -998,12 +1021,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   Widget provinceBottomSheet() {
     return BlocProvider(
       create: (context) => DashboardBloc(apiRepository: ApiRepository())
-      ..add(GetProvinceEvent()),
+        ..add(GetProvinceEvent()),
       child: BlocListener<DashboardBloc, DashboardState>(
         listener: (context, state) {
-          if(state is GetProvinceState){
+          if (state is GetProvinceState) {
             proviceList.addAll(state.provinceList.data.data);
-
 
             print(proviceList);
           }
@@ -1029,84 +1051,79 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top:12.0),
+                      padding: const EdgeInsets.only(top: 12.0),
                       child: LimitedBox(
                         maxHeight: MediaQuery.of(context).size.height / 2 - 90,
                         child: ListView.builder(
                           itemBuilder: (context, index) {
-
-                              if (index == proviceList. length) {
-                                          return BlocProvider.of<DashboardBloc>(
-                                                              context)
-                                                          .currentPage <=
-                                                      BlocProvider.of<
-                                                                  DashboardBloc>(
-                                                              context)
-                                                          .totalPages &&
-                                                  BlocProvider.of<DashboardBloc>(
-                                                              context)
-                                                          .currentPage !=
-                                                      0
-                                              ? const SizedBox(
-                                                  height: 40,
-                                                  child: CupertinoActivityIndicator(
-                                                    color: AppColors.primaryColors,
-                                                  ))
-                                              : Container();
-                                        }
-
+                            if (index == proviceList.length) {
+                              return BlocProvider.of<DashboardBloc>(context)
+                                              .currentPage <=
+                                          BlocProvider.of<DashboardBloc>(
+                                                  context)
+                                              .totalPages &&
+                                      BlocProvider.of<DashboardBloc>(context)
+                                              .currentPage !=
+                                          0
+                                  ? const SizedBox(
+                                      height: 40,
+                                      child: CupertinoActivityIndicator(
+                                        color: AppColors.primaryColors,
+                                      ))
+                                  : Container();
+                            }
 
                             return Padding(
-                              padding: const EdgeInsets.only(top:12.0),
+                              padding: const EdgeInsets.only(top: 12.0),
                               child: GestureDetector(
-                                onTap: (){
+                                onTap: () {
                                   print("heyy");
-                                
-                                    provinceController.text=proviceList[index].provinceName;
-                                  provinceId=proviceList[index].id;
+
+                                  provinceController.text =
+                                      proviceList[index].provinceName;
+                                  provinceId = proviceList[index].id;
 
                                   Navigator.pop(context);
-                                 
                                 },
                                 child: Container(
-                                                height: 50,
-                                                decoration: BoxDecoration(
-                                                    color: Colors.grey[100],
-                                                    borderRadius:
-                                                        BorderRadius.circular(8)),
-                                                width:
-                                                    MediaQuery.of(context).size.width,
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(12.0),
-                                                  child: Text(
-                                                    proviceList[index].provinceName,
-                                                    style: const TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.w500),
-                                                  ),
-                                                ),
-                                              ),
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(8)),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      proviceList[index].provinceName,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ),
                               ),
                             );
                           },
-                          itemCount: proviceList.length+1,
-                          controller: provinceScrollController..addListener(() {
-                             if((BlocProvider.of<DashboardBloc>(context).currentPage<=BlocProvider.of<DashboardBloc>(context).totalPages) && provinceScrollController
-                                                      .offset ==
-                                                  provinceScrollController
-                                                      .position.maxScrollExtent  && BlocProvider.of<DashboardBloc>(
-                                                          context)
-                                                      .currentPage !=
-                                                  0 &&
-                                              !BlocProvider.of<DashboardBloc>(
-                                                      context)
-                                                  .isFetching ){
-                                                        context.read<DashboardBloc>()
-                                              ..isFetching = true
-                                              ..add(GetProvinceEvent());
-                                                  }
-                            
-                          }),
+                          itemCount: proviceList.length + 1,
+                          controller: provinceScrollController
+                            ..addListener(() {
+                              if ((BlocProvider.of<DashboardBloc>(context)
+                                          .currentPage <=
+                                      BlocProvider.of<DashboardBloc>(context)
+                                          .totalPages) &&
+                                  provinceScrollController.offset ==
+                                      provinceScrollController
+                                          .position.maxScrollExtent &&
+                                  BlocProvider.of<DashboardBloc>(context)
+                                          .currentPage !=
+                                      0 &&
+                                  !BlocProvider.of<DashboardBloc>(context)
+                                      .isFetching) {
+                                context.read<DashboardBloc>()
+                                  ..isFetching = true
+                                  ..add(GetProvinceEvent());
+                              }
+                            }),
                         ),
                       ),
                     )
@@ -1120,288 +1137,264 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     );
   }
 
-
-  validateOperationDetails(){
-    if(numberOfEmployeeString.isEmpty){
+  validateOperationDetails() {
+    if (numberOfEmployeeString.isEmpty) {
       setState(() {
-        numberOfEmployeeErrorStatus=true;
-        numberOfEmployeeErrorMsg="Please select number of employees";
-        
+        numberOfEmployeeErrorStatus = true;
+        numberOfEmployeeErrorMsg = "Please select number of employees";
       });
-    }else{
+    } else {
       setState(() {
-        numberOfEmployeeErrorStatus=false;
+        numberOfEmployeeErrorStatus = false;
       });
     }
-    if(timeZoneString.isEmpty){
+    if (timeZoneString.isEmpty) {
       setState(() {
-        timeZoneErrorStatus=true;
-        timeZoneErrorMsg="Please select a time zone";
+        timeZoneErrorStatus = true;
+        timeZoneErrorMsg = "Please select a time zone";
       });
-    }else{
+    } else {
       setState(() {
-        timeZoneErrorStatus=false;
-      });
-    }
-    if(labourRateController.text.isEmpty){
-      setState(() {
-        labourRateErrorStatus=true;
-        laborRateErrorMsg="Labor rate can't be empty";
-      });
-    }else{
-      setState(() {
-        labourRateErrorStatus=false;
+        timeZoneErrorStatus = false;
       });
     }
-    if(taxRateController.text.isEmpty){
+    if (labourRateController.text.isEmpty) {
       setState(() {
-        taxRateErrorStatus=true;
-        taxRateErrorMsg="Tax rate can't be empty";
+        labourRateErrorStatus = true;
+        laborRateErrorMsg = "Labor rate can't be empty";
       });
-    }else{
+    } else {
       setState(() {
-        taxRateErrorStatus=false;
-        
+        labourRateErrorStatus = false;
+      });
+    }
+    if (taxRateController.text.isEmpty) {
+      setState(() {
+        taxRateErrorStatus = true;
+        taxRateErrorMsg = "Tax rate can't be empty";
+      });
+    } else {
+      setState(() {
+        taxRateErrorStatus = false;
       });
     }
 
-    if(!numberOfEmployeeErrorStatus && !timeZoneErrorStatus && !labourRateErrorStatus && !taxRateErrorStatus){
+    if (!numberOfEmployeeErrorStatus &&
+        !timeZoneErrorStatus &&
+        !labourRateErrorStatus &&
+        !taxRateErrorStatus) {
       operationDetailsMap.addAll({
-        "employee_count":numberOfEmployeeString,
-        "time_zone":timeZoneString,
-        "base_labor_cost":labourRateController.text,
-        "sales_tax_rate":taxRateController.text
+        "employee_count": numberOfEmployeeString,
+        "time_zone": timeZoneString,
+        "base_labor_cost": labourRateController.text,
+        "sales_tax_rate": taxRateController.text
       });
 
-      Navigator.pop(context,operationDetailsMap);
+      Navigator.pop(context, operationDetailsMap);
     }
   }
 
-
-
-  Widget employeeListWidget(){
+  Widget employeeListWidget() {
     return Padding(
-      padding: const EdgeInsets.only(top:24.0),
+      padding: const EdgeInsets.only(top: 24.0),
       child: Container(
-        height: MediaQuery.of(context).size.width-49,
+        height: MediaQuery.of(context).size.width - 49,
         child: SingleChildScrollView(
-          controller: employeeScrollController ..addListener(() {
-                                            if (employeeScrollController.offset ==
-                                                    employeeScrollController
-                                                        .position.maxScrollExtent &&
-                                                !bloc.isPagenationLoading &&
-                                                bloc.currentPage <=
-                                                    bloc.totalPages) {
-                                              _debouncer.run(() {
-                                                bloc.isPagenationLoading = true;
-                                                bloc.add(GetAllEmployees());
-                                              });
-                                            }
-                                          }),
+          controller: employeeScrollController
+            ..addListener(() {
+              if (employeeScrollController.offset ==
+                      employeeScrollController.position.maxScrollExtent &&
+                  !bloc.isPagenationLoading &&
+                  bloc.currentPage <= bloc.totalPages) {
+                _debouncer.run(() {
+                  bloc.isPagenationLoading = true;
+                  bloc.add(GetAllEmployees());
+                });
+              }
+            }),
           child: BlocListener<EmployeeBloc, EmployeeState>(
-                      listener: (context, state) {
-                        if (state is EmployeeDetailsSuccessState) {
-                          employeeList.addAll(state.employees.employeeList ?? []);
-                        }
-                      },
-                      child: BlocBuilder<EmployeeBloc, EmployeeState>(
-                        builder: (context, state) {
-                          if (state is EmployeeDetailsLoadingState &&
-                              !bloc.isPagenationLoading) {
-                            return const Center(
-                                child: CupertinoActivityIndicator());
-                          } else {
-                            return employeeList.isEmpty
-                                ? const Center(
-                                    child: Text(
-                                    '',
-                                    style: TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primaryTextColors),
-                                  ))
-                                : ScrollConfiguration(
-                                    behavior: const ScrollBehavior(),
-                                    child: ListView.separated(
-                                        shrinkWrap: true,
-                                        physics: NeverScrollableScrollPhysics(),
-                                         
-                                        itemBuilder: (context, index) {
-                                          final item = employeeList[index];
-                                          return Column(
+            listener: (context, state) {
+              if (state is EmployeeDetailsSuccessState) {
+                employeeList.addAll(state.employees.employeeList ?? []);
+              }
+            },
+            child: BlocBuilder<EmployeeBloc, EmployeeState>(
+              builder: (context, state) {
+                if (state is EmployeeDetailsLoadingState &&
+                    !bloc.isPagenationLoading) {
+                  return const Center(child: CupertinoActivityIndicator());
+                } else {
+                  return employeeList.isEmpty
+                      ? const Center(
+                          child: Text(
+                          '',
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primaryTextColors),
+                        ))
+                      : ScrollConfiguration(
+                          behavior: const ScrollBehavior(),
+                          child: ListView.separated(
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final item = employeeList[index];
+                                return Column(
+                                  children: [
+                                    GestureDetector(
+                                      behavior: HitTestBehavior.opaque,
+                                      onTap: () {
+                                        // Navigator.of(context).push(
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) =>
+                                        //         EmployeeDetailsScreen(
+                                        //       employee: item,
+                                        //     ),
+                                        //   ),
+                                        // );
+                                      },
+                                      child: Container(
+                                        height: 77,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black
+                                                  .withOpacity(0.07),
+                                              offset: const Offset(0, 4),
+                                              blurRadius: 10,
+                                            ),
+                                          ],
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16.0),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              GestureDetector(
-                                                behavior: HitTestBehavior.opaque,
-                                                onTap: () {
-                                                  // Navigator.of(context).push(
-                                                  //   MaterialPageRoute(
-                                                  //     builder: (context) =>
-                                                  //         EmployeeDetailsScreen(
-                                                  //       employee: item,
-                                                  //     ),
-                                                  //   ),
-                                                  // );
-                                                },
-                                                child: Container(
-                                                  height: 77,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.07),
-                                                        offset: const Offset(0, 4),
-                                                        blurRadius: 10,
-                                                      ),
-                                                    ],
-                                                    borderRadius:
-                                                        BorderRadius.circular(12),
-                                                  ),
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.symmetric(
-                                                            horizontal: 16.0),
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(
-                                                          '${item.firstName ?? ""} ${item.lastName ?? ""} ',
-                                                          overflow:
-                                                              TextOverflow.ellipsis,
-                                                          maxLines: 1,
-                                                          style: const TextStyle(
-                                                            color:
-                                                                Color(0xFF061237),
-                                                            fontSize: 16,
-                                                            fontWeight:
-                                                                FontWeight.w500,
-                                                          ),
-                                                        ),
-                                                        const SizedBox(height: 3),
-                                                        Text(
-                                                          item.roles?[0].name ?? '',
-                                                          overflow:
-                                                              TextOverflow.ellipsis,
-                                                          maxLines: 1,
-                                                          style: const TextStyle(
-                                                            color:
-                                                                Color(0xFF6A7187),
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                              Text(
+                                                '${item.firstName ?? ""} ${item.lastName ?? ""} ',
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF061237),
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
                                               ),
-                                              bloc.currentPage <= bloc.totalPages &&
-                                                      index ==
-                                                          employeeList.length - 1
-                                                  ? const Column(
-                                                      children: [
-                                                        SizedBox(height: 24),
-                                                        Center(
-                                                          child:
-                                                              CupertinoActivityIndicator(),
-                                                        ),
-                                                        SizedBox(height: 24),
-                                                      ],
-                                                    )
-                                                  : const SizedBox(),
-                                              index == employeeList.length - 1
-                                                  ? const SizedBox(height: 24)
-                                                  : const SizedBox(),
+                                              const SizedBox(height: 3),
+                                              Text(
+                                                item.roles?[0].name ?? '',
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 1,
+                                                style: const TextStyle(
+                                                  color: Color(0xFF6A7187),
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
                                             ],
-                                          );
-                                        },
-                                        separatorBuilder: (context, index) =>
-                                            const SizedBox(height: 24),
-                                        itemCount: employeeList.length),
-                                  );
-                          }
-                        },
-                      ),
-                    ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    bloc.currentPage <= bloc.totalPages &&
+                                            index == employeeList.length - 1
+                                        ? const Column(
+                                            children: [
+                                              SizedBox(height: 24),
+                                              Center(
+                                                child:
+                                                    CupertinoActivityIndicator(),
+                                              ),
+                                              SizedBox(height: 24),
+                                            ],
+                                          )
+                                        : const SizedBox(),
+                                    index == employeeList.length - 1
+                                        ? const SizedBox(height: 24)
+                                        : const SizedBox(),
+                                  ],
+                                );
+                              },
+                              separatorBuilder: (context, index) =>
+                                  const SizedBox(height: 24),
+                              itemCount: employeeList.length),
+                        );
+                }
+              },
+            ),
+          ),
         ),
       ),
     );
   }
 
+  populateBasicDetails() {
+    busineesNameController.text = widget.basicDetailsMap?['company_name'] ?? "";
+    businessPhoneController.text = widget.basicDetailsMap?['phone'] ?? "";
+    addressController.text = widget.basicDetailsMap?['address_1'] ?? "";
+    cityController.text = widget.basicDetailsMap?['town_city'] ?? "";
+    provinceController.text = widget.basicDetailsMap?['province_name'] ?? "";
+    zipController.text = widget.basicDetailsMap?['zipcode'] ?? "";
+    provinceId = widget.basicDetailsMap?['province_id'] ?? 0;
 
-
-  populateBasicDetails(){
-    busineesNameController.text=widget.basicDetailsMap?['company_name']??"";
-    businessPhoneController.text=widget.basicDetailsMap?['phone']??"";
-    addressController.text=widget.basicDetailsMap?['address_1']??"";
-    cityController.text=widget.basicDetailsMap?['town_city']??"";
-    provinceController.text=widget.basicDetailsMap?['province_name']??"";
-    zipController.text=widget.basicDetailsMap?['zipcode']??"";
-    provinceId=widget.basicDetailsMap?['province_id']??"";
-
-   
-
-    
-
-
-   print(widget.basicDetailsMap);
+    print(widget.basicDetailsMap);
   }
 
-
-  populateOperationDetails(){
-    labourRateController.text=widget.operationDetailsMap?['base_labor_cost']??"";
-    taxRateController.text=widget.operationDetailsMap?['sales_tax_rate']??"";
-    if(widget.operationDetailsMap?['employee_count']=="1"){
-      numberOfEmployeeString="1";
-      selectedEmployeeIndex=0;
-    }else if(widget.operationDetailsMap?['employee_count']=="2-5"){
-        numberOfEmployeeString="2-5";
-      selectedEmployeeIndex=1;
-    }else{
-       numberOfEmployeeString="6+";
-      selectedEmployeeIndex=2;
-
+  populateOperationDetails() {
+    labourRateController.text =
+        widget.operationDetailsMap?['base_labor_cost'] ?? "";
+    taxRateController.text =
+        widget.operationDetailsMap?['sales_tax_rate'] ?? "";
+    if (widget.operationDetailsMap?['employee_count'] == "1") {
+      numberOfEmployeeString = "1";
+      selectedEmployeeIndex = 0;
+    } else if (widget.operationDetailsMap?['employee_count'] == "2-5") {
+      numberOfEmployeeString = "2-5";
+      selectedEmployeeIndex = 1;
+    } else {
+      numberOfEmployeeString = "6+";
+      selectedEmployeeIndex = 2;
     }
 
-     timeZones.forEach((element) {
+    timeZones.forEach((element) {
       print(element.name);
-      if(element.name== widget.operationDetailsMap?['time_zone']){
+      if (element.name == widget.operationDetailsMap?['time_zone']) {
         print("in condition");
-       setState(() {
-          _currentSelectedTimezoneValue=element;
-        timeZoneString=element.name;
-        print(timeZoneString+"tiiimme zoneee");
-       });
+        setState(() {
+          _currentSelectedTimezoneValue = element;
+          timeZoneString = element.name;
+          print(timeZoneString + "tiiimme zoneee");
+        });
       }
     });
   }
 
-
-
-    Future showBackDialog(BuildContext context, message) {
+  Future showBackDialog(BuildContext context, message) {
     return showCupertinoDialog(
       context: context,
       builder: (context) => CupertinoAlertDialog(
-         title: const Text("Do you really want to go back?"),
+        title: const Text("Do you really want to go back?"),
         content: Text(message),
         actions: <Widget>[
           CupertinoDialogAction(
             child: const Text("Yes"),
-            onPressed: (){
+            onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
             },
           ),
-
-            CupertinoDialogAction(
+          CupertinoDialogAction(
             child: const Text("No"),
-            onPressed: (){
+            onPressed: () {
               Navigator.pop(context);
-              
             },
           ),
         ],
