@@ -65,13 +65,23 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
         emit(EmployeeCreateSuccessState());
       } else {
         final body = jsonDecode(response.body);
+        log(body.toString());
+        if (body.keys.isNotEmpty) {
+          if (body.containsKey('error')) {
+            emit(EmployeeCreateErrorState(message: body['error']));
+          } else if (body.containsKey('message')) {
+            emit(EmployeeCreateErrorState(message: body['message']));
+          } else {
+            emit(EmployeeCreateErrorState(message: body[body.keys.first][0]));
+          }
+        } else {
+          throw 'Something went wrong';
+        }
         if (body.containsKey('error')) {
           emit(EmployeeCreateErrorState(message: body['error']));
         } else if (body.containsKey('email')) {
           emit(EmployeeCreateErrorState(message: body['email'][0]));
-        } else {
-          throw 'Something went wrong';
-        }
+        } else {}
       }
     } catch (e) {
       log(e.toString() + 'Create employee bloc error');
