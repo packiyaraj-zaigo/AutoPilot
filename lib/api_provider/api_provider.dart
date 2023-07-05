@@ -143,8 +143,8 @@ class ApiProvider {
         "${BASE_URL}api/password/find?email=$email&code=$otp",
       );
       var request = http.MultipartRequest("GET", url);
-        // ..fields['email'] = email
-        // ..fields['code'] = otp;
+      // ..fields['email'] = email
+      // ..fields['code'] = otp;
 
       // request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -157,8 +157,8 @@ class ApiProvider {
     }
   }
 
-
-  Future<dynamic> createNewPassword(String email, String password,String passwordConfirm,String newToken) async {
+  Future<dynamic> createNewPassword(String email, String password,
+      String passwordConfirm, String newToken) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -167,8 +167,8 @@ class ApiProvider {
         "${BASE_URL}api/password/reset?email=$email&password=$password&password_confirmation=$passwordConfirm&token=$newToken",
       );
       var request = http.MultipartRequest("POST", url);
-        // ..fields['email'] = email
-        // ..fields['code'] = otp;
+      // ..fields['email'] = email
+      // ..fields['code'] = otp;
 
       // request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -437,7 +437,10 @@ class ApiProvider {
 
   Future<dynamic> getVinDetailsLocal(String token, String vin) async {
     try {
-      final url = Uri.parse('${BASE_URL}api/vehicles?vin=$vin');
+      final clientId = await AppUtils.getUserID();
+
+      final url =
+          Uri.parse('${BASE_URL}api/vehicles?vin=$vin&client_id=$clientId');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -448,8 +451,9 @@ class ApiProvider {
   Future<dynamic> getVehicleEstimates(
       String token, String vehicleId, int page) async {
     try {
-      final url =
-          Uri.parse('${BASE_URL}api/orders?vehicle_id=$vehicleId&page=$page');
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/orders?vehicle_id=$vehicleId&page=$page&client_id=$clientId');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -462,14 +466,16 @@ class ApiProvider {
     print("into provider");
 
     try {
+      final clientId = await AppUtils.getUserID();
+
       var url = Uri.parse(
         orderStatus == ""
             ? "${BASE_URL}api/orders"
             : orderStatus == "Estimate"
-                ? "${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}"
+                ? "${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}&client_id=$clientId"
                 : orderStatus == "Orders"
-                    ? "${BASE_URL}api/orders?order_status=Order&page=${currentPage}"
-                    : "${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}",
+                    ? "${BASE_URL}api/orders?order_status=Order&page=${currentPage}&client_id=$clientId"
+                    : "${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}&client_id=$clientId",
       );
       var request = http.MultipartRequest("GET", url);
 
@@ -641,13 +647,9 @@ class ApiProvider {
   //     print(e.toString() + "provider error");
   //   }
 
-
-
-
-  Future<dynamic> addCompany(Map<String,dynamic>dataMap,dynamic token,String clientId) async {
+  Future<dynamic> addCompany(
+      Map<String, dynamic> dataMap, dynamic token, String clientId) async {
     print("into provider");
-
-     
 
     //  LoadingFormModel? loadingFormModel;
     try {
@@ -667,28 +669,23 @@ class ApiProvider {
 
       //  request.headers.addAll(getHeader(token));
       // var response = await request.send();
-      Map bodyMap={
-       "company_name":dataMap['company_name'],
-       "phone":dataMap['phone'],
-       "address_1":dataMap['address_1'],
-       "town_city":dataMap['town_city'],
-       "province_id":dataMap['province_id'],
-       "zipcode":dataMap['zipcode'],
-       "employee_count":dataMap['employee_count'],
-       "service_type":"Full service",
-       "time_zone":dataMap['time_zone'],
-       "sales_tax_rate":dataMap['sales_tax_rate'],
-       "base_labor_cost":dataMap['base_labor_cost']
-
-
+      Map bodyMap = {
+        "company_name": dataMap['company_name'],
+        "phone": dataMap['phone'],
+        "address_1": dataMap['address_1'],
+        "town_city": dataMap['town_city'],
+        "province_id": dataMap['province_id'],
+        "zipcode": dataMap['zipcode'],
+        "employee_count": dataMap['employee_count'],
+        "service_type": "Full service",
+        "time_zone": dataMap['time_zone'],
+        "sales_tax_rate": dataMap['sales_tax_rate'],
+        "base_labor_cost": dataMap['base_labor_cost']
       };
-       var encodedBody = json.encode(bodyMap);
-      
+      var encodedBody = json.encode(bodyMap);
 
-
-      var response=http.put(url,
-      body: encodedBody,
-      headers: getHeader(token));
+      var response =
+          http.put(url, body: encodedBody, headers: getHeader(token));
       inspect(response);
       // print(response.statusCode.toString() + "provider status code");
       // print(response.toString() + "provider response");
@@ -699,14 +696,14 @@ class ApiProvider {
     }
   }
 
-
-
-   Future<dynamic> getCustomerMessages(String token, String clientId,int currentPage) async {
+  Future<dynamic> getCustomerMessages(
+      String token, String clientId, int currentPage) async {
     print("into provider");
-    print(currentPage);
+    log(currentPage.toString() + ":::::::::::::::::");
 
     try {
-      var url = Uri.parse("${BASE_URL}api/sentmessages?client_id=$clientId&page=$currentPage");
+      var url = Uri.parse(
+          "${BASE_URL}api/sentmessages?client_id=$clientId&page=$currentPage");
       var request = http.MultipartRequest("GET", url);
 
       request.headers.addAll(getHeader(token));
@@ -720,19 +717,19 @@ class ApiProvider {
     }
   }
 
-
-   Future<dynamic> sendCustomerMessage(String token, String clientId,String customerId,String messageBody) async {
+  Future<dynamic> sendCustomerMessage(String token, String clientId,
+      String customerId, String messageBody) async {
     print("into provider");
 
     try {
       var url = Uri.parse("${BASE_URL}api/sentmessages");
       var request = http.MultipartRequest("POST", url)
-      ..fields['sender_user_id']=clientId
-      ..fields['receiver_customer_id']=customerId
-      ..fields['message_type']="SMS"
-      ..fields['message_body']=messageBody
-      ..fields['message_info']=json.encode({})
-      ..fields['status']="Open";
+        ..fields['sender_user_id'] = clientId
+        ..fields['receiver_customer_id'] = customerId
+        ..fields['message_type'] = "SMS"
+        ..fields['message_body'] = messageBody
+        ..fields['message_info'] = json.encode({})
+        ..fields['status'] = "Open";
 
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -744,7 +741,4 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
-
-
-  
 }
