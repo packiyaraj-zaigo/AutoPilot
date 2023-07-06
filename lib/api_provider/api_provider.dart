@@ -746,6 +746,32 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> createNewEstimate(
+      int customerId, int vehicleId, dynamic token) async {
+    print("into provider");
+
+    Map bodymap = {
+      "customer_id": customerId,
+      "vehicle_id": vehicleId,
+      "estimation_name": "name",
+    };
+
+    var encodedBody = json.encode(bodymap);
+    log(encodedBody.toString());
+
+    try {
+      var url = Uri.parse("${BASE_URL}api/orders");
+
+      var response =
+          http.post(url, body: encodedBody, headers: getHeader(token));
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
   Future<dynamic> getAllWorkflows(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();
