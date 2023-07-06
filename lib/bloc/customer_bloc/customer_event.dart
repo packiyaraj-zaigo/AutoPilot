@@ -22,7 +22,8 @@ class AddCustomerDetails extends CustomerEvent {
       address,
       state,
       city,
-      pinCode;
+      pinCode,
+      stateId;
 
   const AddCustomerDetails(
       {required this.context,
@@ -34,37 +35,35 @@ class AddCustomerDetails extends CustomerEvent {
       required this.address,
       required this.state,
       required this.city,
-      required this.pinCode});
+      required this.pinCode,
+      required this.stateId});
 
   @override
   List<Object?> get props => [];
 }
 
-
-class GetCustomerMessageEvent extends CustomerEvent{
- 
+class GetProvinceEvent extends CustomerEvent {
   @override
   List<Object?> get props => [];
 }
 
-
-class SendCustomerMessageEvent extends CustomerEvent{
-  final String customerId,messageBody;
-  SendCustomerMessageEvent({required this.customerId,required this.messageBody});
-  
-
+class GetCustomerMessageEvent extends CustomerEvent {
   @override
-  List<Object?> get props=>[];
+  List<Object?> get props => [];
 }
 
+class SendCustomerMessageEvent extends CustomerEvent {
+  final String customerId, messageBody;
+  SendCustomerMessageEvent(
+      {required this.customerId, required this.messageBody});
 
+  @override
+  List<Object?> get props => [];
+}
 
-class GetCustomerMessagePaginationEvent extends CustomerEvent{
-
-  
+class GetCustomerMessagePaginationEvent extends CustomerEvent {
   GetCustomerMessagePaginationEvent();
 
-    @override
-  List<Object?> get props=>[];
-
+  @override
+  List<Object?> get props => [];
 }

@@ -143,11 +143,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   actions: [
                     IconButton(
                         onPressed: () {
-                          // Navigator.push(context, MaterialPageRoute(
-                          //   builder: (context) {
-                          //     return AddCompanyScreen();
-                          //   },
-                          // ));
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return AddCompanyScreen();
+                            },
+                          ));
                         },
                         icon: SvgPicture.asset(
                           "assets/images/message.svg",

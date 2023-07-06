@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
-import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -353,6 +352,7 @@ class ApiProvider {
     state,
     city,
     pinCode,
+    stateId,
   ) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -369,14 +369,31 @@ class ApiProvider {
         ..fields['phone'] = mobileNo
         ..fields['notes'] = customerNotes
         ..fields['address_line_1'] = address
-        ..fields['state'] = state
+        ..fields['province_name'] = state
+        ..fields['province_id'] = stateId
         ..fields['town_city'] = city
         ..fields['zipcode'] = pinCode;
 
       var response = await request.send();
-      print('object===============================');
+      print('object========id: ${stateId}=name:=${state}=====================');
       if (response.statusCode == 200 || response.statusCode == 201) {}
       print(response.statusCode.toString());
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
+  Future<dynamic> calendarload(String token, DateTime selectedDate) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      var url = Uri.parse(
+          '${BASE_URL}api/calendar_events_mobile?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1)}');
+      var request = http.MultipartRequest("GET", url);
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      print('callllllllllllllllll${response.statusCode.toString()}');
       return http.Response.fromStream(response);
     } catch (e) {
       print("errroor draft found ${e.toString()}");
@@ -740,57 +757,6 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");
-    }
-  }
-
-  Future<dynamic> createNewEstimate(
-      int customerId, int vehicleId, dynamic token) async {
-    print("into provider");
-
-    Map bodymap = {
-      "customer_id": customerId,
-      "vehicle_id": vehicleId,
-      "estimation_name": "name",
-    };
-
-    var encodedBody = json.encode(bodymap);
-    log(encodedBody.toString());
-
-    try {
-      var url = Uri.parse("${BASE_URL}api/orders");
-
-      var response =
-          http.post(url, body: encodedBody, headers: getHeader(token));
-
-      inspect(response);
-      return response;
-    } catch (e) {
-      print(e.toString() + "provider error");
-    }
-  }
-
-  Future<dynamic> getAllWorkflows(String token, int page) async {
-    try {
-      final clientId = await AppUtils.getUserID();
-      final url = Uri.parse(
-          '${BASE_URL}api/workflowbuckets?page=$page&updated_by=$clientId');
-      final response = await http.get(url, headers: getHeader(token));
-      return response;
-    } catch (e) {
-      log(e.toString() + "Get workflows error");
-    }
-  }
-
-  Future<dynamic> editWorkflowPosition(
-      String token, WorkflowBucketModel workflow) async {
-    try {
-      final clientId = await AppUtils.getUserID();
-      final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');
-      final response = await http.put(url,
-          headers: getHeader(token), body: jsonEncode(workflow.toJson()));
-      return response;
-    } catch (e) {
-      log(e.toString() + "put workflows error");
     }
   }
 }
