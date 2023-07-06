@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/service_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
@@ -13,6 +14,7 @@ part 'service_state.dart';
 class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
   bool isEmployeesLoading = false;
   bool isPagenationLoading = false;
+  bool isFetching = false;
   final apiRepo = ApiRepository();
   int currentPage = 1;
   int totalPages = 1;
@@ -53,42 +55,37 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     GetAllServicess event,
     Emitter<ServiceState> emit,
   ) async {
+    ServiceModel serviceModel;
     try {
-      emit(ServiceDetailsLoadingState());
       if (currentPage == 1) {
-        isEmployeesLoading = true;
+        emit(GetServiceLoadingState());
       }
 
       final token = await AppUtils.getToken();
-      await apiRepo.getEmployees(token, currentPage, event.query).then((value) {
-        if (value.statusCode == 200) {
-          final responseBody = jsonDecode(value.body);
-          emit(
-            ServiceDetailsSuccessState(
-                // employees: AllEmployeeResponse.fromJson(
-                //   responseBody['data'],
-                // ),
-                ),
-          );
-          final data = responseBody['data'];
-          currentPage = data['current_page'] ?? 1;
-          totalPages = data['last_page'] ?? 1;
-          if (currentPage <= totalPages) {
-            currentPage++;
-          }
-          print(value.body.toString());
+      Response serviceResponse =
+          await apiRepo.getServices(token, currentPage, event.query);
+      if (serviceResponse.statusCode == 200) {
+        serviceModel = serviceModelFromJson(serviceResponse.body);
+        final responseBody = jsonDecode(serviceResponse.body);
+        isFetching = false;
+        emit(GetServiceSucessState(serviceModel: serviceModel));
+        currentPage = serviceModel.data.currentPage;
+        totalPages = serviceModel.data.lastPage;
+
+        if (totalPages > currentPage && currentPage != 0) {
+          currentPage += 1;
         } else {
-          log(value.body.toString());
-          final body = jsonDecode(value.body);
-          emit(ServiceDetailsErrorState(message: body['message']));
+          currentPage = 0;
         }
-        isEmployeesLoading = false;
-        isPagenationLoading = false;
-      });
+        print(serviceResponse.body.toString());
+      } else {
+        log(serviceResponse.body.toString());
+        final body = jsonDecode(serviceResponse.body);
+        emit(GetServiceErrorState(errorMessage: body['message']));
+      }
     } catch (e) {
-      emit(ServiceDetailsErrorState(message: e.toString()));
-      isEmployeesLoading = false;
-      isPagenationLoading = false;
+      print(e.toString() + "bloc error");
+      emit(GetServiceErrorState(errorMessage: e.toString()));
     }
   }
 }
