@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
+import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -739,6 +740,31 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> getAllWorkflows(String token, int page) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/workflowbuckets?page=$page&updated_by=$clientId');
+      final response = await http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Get workflows error");
+    }
+  }
+
+  Future<dynamic> editWorkflowPosition(
+      String token, WorkflowBucketModel workflow) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');
+      final response = await http.put(url,
+          headers: getHeader(token), body: jsonEncode(workflow.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + "put workflows error");
     }
   }
 }
