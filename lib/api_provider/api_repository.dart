@@ -1,9 +1,5 @@
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
-import '../Models/vechile_dropdown_model.dart';
 import '../Models/employee_creation_model.dart';
 import 'api_provider.dart';
 
@@ -82,6 +78,13 @@ class ApiRepository {
 
   Future getAllRoles(String token) {
     return apiProvider.getAllRoles(token);
+  }
+
+  Future calendarload(
+    String token,
+    DateTime selectedDate,
+  ) {
+    return apiProvider.calendarload(token, selectedDate);
   }
 
   Future getVechile(String token, int currentPage, String query) {
