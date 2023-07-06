@@ -608,7 +608,10 @@ class ApiProvider {
 
   Future<dynamic> getLicDetails(String token, String lic) async {
     try {
-      final url = Uri.parse('${BASE_URL}api/vehicles?licence_plate=$lic');
+      final clientId = await AppUtils.getUserID();
+
+      final url = Uri.parse(
+          '${BASE_URL}api/vehicles?licence_plate=$lic&client_id=$clientId');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
