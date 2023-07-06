@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vehicle_estimate_reponse.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
+import 'package:auto_pilot/Screens/no_internet_screen.dart';
 import 'package:auto_pilot/Screens/vechile_information_screen.dart';
 import 'package:auto_pilot/bloc/scanner/scanner_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -35,6 +36,15 @@ class _ScannerScreenState extends State<ScannerScreen>
   Datum? vehicle;
   Datum? licVehicle;
 
+  bool network = false;
+
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +53,15 @@ class _ScannerScreenState extends State<ScannerScreen>
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await networkCheck().then((value) {
+        if (value != network) {
+          setState(() {
+            network = value;
+          });
+        }
+      });
+    });
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFFFAFAFA),
@@ -80,7 +99,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 height: 50,
                 child: Center(
                   child: Text(
-                    'VIN Code',
+                    'VIN Scan',
                     style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -89,7 +108,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                 height: 50,
                 child: Center(
                   child: Text(
-                    'VIN Scan',
+                    'VIN Code',
                     style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -107,14 +126,16 @@ class _ScannerScreenState extends State<ScannerScreen>
           ),
         ),
       ),
-      body: TabBarView(
-        controller: controller,
-        children: [
-          scannerTab(context),
-          vinSearchTab(),
-          licPlateTab(context),
-        ],
-      ),
+      body: network
+          ? TabBarView(
+              controller: controller,
+              children: [
+                scannerTab(context),
+                vinSearchTab(),
+                licPlateTab(context),
+              ],
+            )
+          : NoInternetScreen(state: setState),
     );
   }
 
@@ -135,13 +156,19 @@ class _ScannerScreenState extends State<ScannerScreen>
                         width: MediaQuery.of(context).size.width - 150,
                         child: MobileScanner(
                           onDetect: (value) {
-                            vinNumber = value.barcodes.last.rawValue.toString();
+                            networkCheck().then((val) => setState(() {
+                                  if (network) {
+                                    vinNumber =
+                                        value.barcodes.last.rawValue.toString();
 
-                            searchController.text = vinNumber;
-                            bloc.add(GetVehiclesFromVin(vin: vinNumber));
-                            controller.animateTo(1);
+                                    searchController.text = vinNumber;
+                                    bloc.add(
+                                        GetVehiclesFromVin(vin: vinNumber));
+                                    controller.animateTo(1);
 
-                            log(value.barcodes[0].rawValue.toString());
+                                    log(value.barcodes[0].rawValue.toString());
+                                  }
+                                }));
                           },
                         ),
                       ),
@@ -237,14 +264,18 @@ class _ScannerScreenState extends State<ScannerScreen>
             child: CupertinoTextField(
               placeholder: "Enter the lic number to check",
               onChanged: (value) {
-                _debouncer.run(() {
-                  searchController.clear();
-                  if (value.isNotEmpty) {
-                    licEstimates.clear();
-                    bloc.licCurrentEstimatePage = 1;
-                    bloc.add(GetVehiclesFromLic(lic: value));
-                  }
-                });
+                networkCheck().then((val) => setState(() {
+                      if (network) {
+                        _debouncer.run(() {
+                          searchController.clear();
+                          if (value.isNotEmpty) {
+                            licEstimates.clear();
+                            bloc.licCurrentEstimatePage = 1;
+                            bloc.add(GetVehiclesFromLic(lic: value));
+                          }
+                        });
+                      }
+                    }));
               },
               padding: const EdgeInsets.only(left: 14),
               decoration: BoxDecoration(
@@ -518,13 +549,17 @@ class _ScannerScreenState extends State<ScannerScreen>
             child: CupertinoTextField(
               controller: searchController,
               onChanged: (value) {
-                _debouncer.run(() {
-                  if (value.isNotEmpty) {
-                    estimates.clear();
-                    bloc.currentEstimatePage = 1;
-                    bloc.add(GetVehiclesFromVin(vin: value));
-                  }
-                });
+                networkCheck().then((val) => setState(() {
+                      if (network) {
+                        _debouncer.run(() {
+                          if (value.isNotEmpty) {
+                            estimates.clear();
+                            bloc.currentEstimatePage = 1;
+                            bloc.add(GetVehiclesFromVin(vin: value));
+                          }
+                        });
+                      }
+                    }));
               },
               padding: const EdgeInsets.only(top: 14, left: 14),
               decoration: BoxDecoration(
