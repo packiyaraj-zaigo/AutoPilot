@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
+import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -224,19 +225,23 @@ class ApiProvider {
 
   Future<dynamic> getServices(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}api/canned_services?page=$page';
+      String url = '${BASE_URL}order_services';
 
-      if (query != '') {
-        url = '$url&service_name=$query';
-      } else {
-        url = '${BASE_URL}api/canned_services?page=$page';
+      if (page != 1) {
+        url = '$url?page=$page';
       }
-
+      if (query != '') {
+        if (url.contains('?')) {
+          url = '$url&first_name=$query';
+        } else {
+          url = '$url?first_name=$query';
+        }
+      }
       print(url);
       var response = http.get(Uri.parse(url), headers: getHeader(token));
       return response;
     } catch (e) {
-      print(e.toString() + 'get service error');
+      print(e.toString() + 'get employee error');
     }
   }
 
@@ -761,6 +766,31 @@ class ApiProvider {
       return response;
     } catch (e) {
       print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> getAllWorkflows(String token, int page) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/workflowbuckets?page=$page&updated_by=$clientId');
+      final response = await http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Get workflows error");
+    }
+  }
+
+  Future<dynamic> editWorkflowPosition(
+      String token, WorkflowBucketModel workflow) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');
+      final response = await http.put(url,
+          headers: getHeader(token), body: jsonEncode(workflow.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + "put workflows error");
     }
   }
 }
