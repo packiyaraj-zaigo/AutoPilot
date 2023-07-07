@@ -49,7 +49,8 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       DashBoardScreen(),
       //  WorkFlowScreen(tabController: workFlowTabController),
       DummyScreen(name: "Work flow Screen"),
-      CalendarScreen(),
+      DummyScreen(name: "Calendar Screen"),
+      //  CalendarScreen(),
       // EstimateScreen(
       //   tabController: estimateTabController,
       // )
@@ -155,11 +156,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                         )),
                     IconButton(
                         onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const NotificationScreen(),
-                            ),
-                          );
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const NotificationScreen(),
+                          //   ),
+                          // );
                         },
                         icon: SvgPicture.asset(
                           "assets/images/notification.svg",
@@ -515,16 +516,36 @@ class _BottomBarScreenState extends State<BottomBarScreen>
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
-              bottomSheetTile("New Estimate", "assets/images/estimate_icon.svg",
-                  CreateEstimateScreen()),
-              bottomSheetTile("New Customer", "assets/images/customer_icon.svg",
-                  ScannerScreen()),
-              bottomSheetTile("New Vehicle", "assets/images/vehicle_icon.svg",
-                  ScannerScreen()),
-              bottomSheetTile("New Appointment",
-                  "assets/images/appointment_icon.svg", ScannerScreen()),
               bottomSheetTile(
-                  "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
+                  "New Estimate",
+                  "assets/images/estimate_icon.svg",
+                  DummyScreen(
+                    name: "Create estimate screen",
+                  )),
+              bottomSheetTile(
+                  "New Customer",
+                  "assets/images/customer_icon.svg",
+                  DummyScreen(
+                    name: "New Customer Screen",
+                  )),
+              bottomSheetTile(
+                  "New Vehicle",
+                  "assets/images/vehicle_icon.svg",
+                  DummyScreen(
+                    name: "Vehicle Screen",
+                  )),
+              bottomSheetTile(
+                  "New Appointment",
+                  "assets/images/appointment_icon.svg",
+                  DummyScreen(
+                    name: "New Appointment Screen",
+                  )),
+              bottomSheetTile(
+                  "Scanner",
+                  "assets/images/scanner_icon.svg",
+                  DummyScreen(
+                    name: "Scanner Screen",
+                  )),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: GestureDetector(

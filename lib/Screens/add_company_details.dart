@@ -56,6 +56,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   final zipController = TextEditingController();
   final labourRateController = TextEditingController();
   final taxRateController = TextEditingController();
+  final numberOfEmployeeController = TextEditingController();
   bool businessNameErrorStatus = false;
   bool businessPhoneErrorStatus = false;
   bool businessWebsiteErrorStatus = false;
@@ -93,6 +94,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
   Map<String, dynamic> basicDetailsmap = {};
   Map<String, dynamic> operationDetailsMap = {};
+  Map<String, dynamic> employeeDetailsMap = {};
   List<ProvinceData> proviceList = [];
   ScrollController provinceScrollController = ScrollController();
   final provinceController = TextEditingController();
@@ -178,7 +180,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             } else if (widget.widgetIndex == 1) {
               validateOperationDetails();
             } else if (widget.widgetIndex == 2) {
-              Navigator.pop(context, true);
+              validateEmployeeDetails();
             }
           },
           child: Container(
@@ -258,7 +260,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
-              child: textBox("Enter business name", busineesNameController,
+              child: textBox("Enter Business Name", busineesNameController,
                   "Business Name", businessNameErrorStatus),
             ),
             errorMessageWidget(businessNameErrorMsg, businessNameErrorStatus),
@@ -305,7 +307,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Operation Details",
+              "Operating Details",
               style: TextStyle(
                   color: AppColors.primaryTitleColor,
                   fontSize: 28,
@@ -322,7 +324,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             textBox("Ex. \$45", labourRateController, "Shop Hourly Labor Rate",
                 labourRateErrorStatus),
             errorMessageWidget(laborRateErrorMsg, labourRateErrorStatus),
-            textBox("Enter percentage rate", taxRateController, "Tax Rate",
+            textBox("Enter Percentage Rate", taxRateController, "Tax Rate",
                 taxRateErrorStatus),
             errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),
             taxSwitchWidget("Tax Labour", taxLabourSwitchValue),
@@ -338,102 +340,15 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Number of employees",
-          style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff6A7187)),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedEmployeeIndex = 0;
-                    numberOfEmployeeString = "1";
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 56,
-                  width: MediaQuery.of(context).size.width / 3.6,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: selectedEmployeeIndex == 0
-                          ? AppColors.primaryColors
-                          : const Color(0xffF6F6F6)),
-                  child: Text(
-                    "1",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: selectedEmployeeIndex == 0
-                            ? Colors.white
-                            : Color(0xff6A7187)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedEmployeeIndex = 1;
-                    numberOfEmployeeString = "2-5";
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 56,
-                  width: MediaQuery.of(context).size.width / 3.6,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: selectedEmployeeIndex == 1
-                          ? AppColors.primaryColors
-                          : Color(0xffF6F6F6)),
-                  child: Text(
-                    "2-5",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: selectedEmployeeIndex == 1
-                            ? Colors.white
-                            : Color(0xff6A7187)),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedEmployeeIndex = 2;
-                    numberOfEmployeeString = "6+";
-                  });
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 56,
-                  width: MediaQuery.of(context).size.width / 3.6,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: selectedEmployeeIndex == 2
-                          ? AppColors.primaryColors
-                          : const Color(0xffF6F6F6)),
-                  child: Text(
-                    "6+",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: selectedEmployeeIndex == 2
-                            ? Colors.white
-                            : const Color(0xff6A7187)),
-                  ),
-                ),
-              )
-            ],
-          ),
-        )
+        // const Text(
+        //   "Number of employees",
+        //   style: TextStyle(
+        //       fontSize: 14,
+        //       fontWeight: FontWeight.w500,
+        //       color: Color(0xff6A7187)),
+        // ),
+        textBox("Enter Number of Employees", numberOfEmployeeController,
+            "Number of Employees", numberOfEmployeeErrorStatus)
       ],
     );
   }
@@ -468,17 +383,52 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               child: TextField(
                 controller: controller,
                 inputFormatters:
-                    label == "Phone Number" ? [PhoneInputFormatter()] : [],
-                keyboardType:
-                    label == 'Phone Number' ? TextInputType.number : null,
-                maxLength: label == 'Phone Number'
-                    ? 16
+                    label == "Business Phone" ? [PhoneInputFormatter()] : [],
+                keyboardType: label == 'Phone Number' ||
+                        label == "Number of Employees" ||
+                        label == "Shop Hourly Labor Rate" ||
+                        label == "Tax Rate"
+                    ? TextInputType.number
+                    : null,
+                maxLength: label == 'Business Phone'
+                    ? 19
                     : label == 'Password'
                         ? 12
                         : 50,
                 decoration: InputDecoration(
                     hintText: placeHolder,
                     counterText: "",
+                    suffixIcon: label == "Shop Hourly Labor Rate"
+                        ? const Padding(
+                            padding: EdgeInsets.only(right: 10.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "per hour",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.primaryTitleColor),
+                                ),
+                              ],
+                            ),
+                          )
+                        : label == "Tax Rate"
+                            ? const Padding(
+                                padding: EdgeInsets.only(right: 10.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "%",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          color: AppColors.primaryColors),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
 
                     // prefixIcon: label == 'Business Phone'
                     //     ? countryPickerWidget()
@@ -710,7 +660,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     },
                     decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Select state",
+                        hintText: "Select State",
                         suffixIcon: Icon(Icons.arrow_drop_down)),
                   ),
                 )),
@@ -1044,7 +994,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Provinces",
+                      "State",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
@@ -1138,7 +1088,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   }
 
   validateOperationDetails() {
-    if (numberOfEmployeeString.isEmpty) {
+    if (numberOfEmployeeController.text.isEmpty) {
       setState(() {
         numberOfEmployeeErrorStatus = true;
         numberOfEmployeeErrorMsg = "Please select number of employees";
@@ -1184,7 +1134,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         !labourRateErrorStatus &&
         !taxRateErrorStatus) {
       operationDetailsMap.addAll({
-        "employee_count": numberOfEmployeeString,
+        "employee_count": numberOfEmployeeController.text,
         "time_zone": timeZoneString,
         "base_labor_cost": labourRateController.text,
         "sales_tax_rate": taxRateController.text
@@ -1291,7 +1241,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                               ),
                                               const SizedBox(height: 3),
                                               Text(
-                                                item.roles?[0].name ?? '',
+                                                item.roles?[0].name!
+                                                        .toUpperCase() ??
+                                                    '',
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 1,
                                                 style: const TextStyle(
@@ -1344,6 +1296,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     provinceController.text = widget.basicDetailsMap?['province_name'] ?? "";
     zipController.text = widget.basicDetailsMap?['zipcode'] ?? "";
     provinceId = widget.basicDetailsMap?['province_id'] ?? 0;
+    businessWebsiteController.text = widget.basicDetailsMap?['website'] ?? "";
 
     print(widget.basicDetailsMap);
   }
@@ -1353,16 +1306,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         widget.operationDetailsMap?['base_labor_cost'] ?? "";
     taxRateController.text =
         widget.operationDetailsMap?['sales_tax_rate'] ?? "";
-    if (widget.operationDetailsMap?['employee_count'] == "1") {
-      numberOfEmployeeString = "1";
-      selectedEmployeeIndex = 0;
-    } else if (widget.operationDetailsMap?['employee_count'] == "2-5") {
-      numberOfEmployeeString = "2-5";
-      selectedEmployeeIndex = 1;
-    } else {
-      numberOfEmployeeString = "6+";
-      selectedEmployeeIndex = 2;
-    }
+    numberOfEmployeeController.text =
+        widget.operationDetailsMap?['employee_count'] ?? "";
 
     timeZones.forEach((element) {
       print(element.name);
@@ -1400,5 +1345,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         ],
       ),
     );
+  }
+
+  validateEmployeeDetails() {
+    employeeList.forEach((element) {
+      employeeDetailsMap.addAll(
+          {element.id.toString(): "${element.firstName} ${element.lastName}"});
+    });
+
+    print(employeeDetailsMap);
+
+    Navigator.pop(context, employeeDetailsMap);
   }
 }
