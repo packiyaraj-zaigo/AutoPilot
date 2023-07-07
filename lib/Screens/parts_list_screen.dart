@@ -84,7 +84,7 @@ class _PartsScreenState extends State<PartsScreen> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           automaticallyImplyLeading: false,
-          title: Text(
+          title: const Text(
             'Autopilot',
             style: TextStyle(
                 color: AppColors.primaryBlackColors,
@@ -104,7 +104,7 @@ class _PartsScreenState extends State<PartsScreen> {
                 width: 20,
               ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 20,
             )
           ],
@@ -130,14 +130,14 @@ class _PartsScreenState extends State<PartsScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Parts',
                     style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryBlackColors),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Container(
@@ -147,7 +147,8 @@ class _PartsScreenState extends State<PartsScreen> {
                           color: Colors.grey.withOpacity(0.1),
                           spreadRadius: 1,
                           blurRadius: 5,
-                          offset: Offset(0, 7), // changes position of shadow
+                          offset:
+                              const Offset(0, 7), // changes position of shadow
                         ),
                       ],
                     ),
@@ -161,9 +162,9 @@ class _PartsScreenState extends State<PartsScreen> {
                         });
                       },
                       backgroundColor: Colors.white,
-                      placeholder: 'Search Inventory...',
-                      prefixIcon: Padding(
-                        padding: const EdgeInsets.only(left: 24, right: 16),
+                      placeholder: 'Search Inventory',
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(left: 24, right: 16),
                         child: Icon(
                           CupertinoIcons.search,
                           color: AppColors.primaryTextColors,
@@ -280,7 +281,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                                                 FontWeight.w500,
                                                           ),
                                                         ),
-                                                        SizedBox(
+                                                        const SizedBox(
                                                           width: 10,
                                                         ),
                                                         Text(
@@ -314,7 +315,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                                                 FontWeight.w500,
                                                           ),
                                                         ),
-                                                        SizedBox(
+                                                        const SizedBox(
                                                           width: 10,
                                                         ),
                                                         Text(
@@ -331,7 +332,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                                                 FontWeight.w500,
                                                           ),
                                                         ),
-                                                        SizedBox(
+                                                        const SizedBox(
                                                           width: 10,
                                                         ),
                                                         Text(
@@ -429,7 +430,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(),
-                                  Text(
+                                  const Text(
                                     "New Item",
                                     style: TextStyle(
                                         fontSize: 16,
@@ -458,7 +459,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
+                                        const Text(
                                           "Basic Details",
                                           style: TextStyle(
                                               fontSize: 18,
@@ -469,7 +470,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                         // textBox("Enter name...", nameController,
                                         //     "Owner", nameErrorStatus),
                                         textBox(
-                                            "Enter ItemName...",
+                                            "Enter ItemName",
                                             itemnameController,
                                             "Item Name",
                                             itemnameErrorStaus),
@@ -488,31 +489,31 @@ class _PartsScreenState extends State<PartsScreen> {
                                         //     )),
 
                                         textBox(
-                                            "Enter number...",
+                                            "Enter Number",
                                             serialnumberController,
                                             "Serial Number",
                                             serialnumberErrorStatus),
-                                        SizedBox(
+                                        const SizedBox(
                                           height: 15,
                                         ),
                                         textBox(
-                                            "Enter quanitynumber...",
+                                            "Enter Quantity Number",
                                             quantityController,
                                             "Quantity",
                                             quantityErrorStatus),
-                                        textBox("Enter fee...", feeController,
+                                        textBox("Enter Fee", feeController,
                                             "Fee", feeErrorStatus),
                                         textBox(
-                                            "Enter supplies...",
+                                            "Enter Supplies",
                                             suppliesController,
                                             "Supplies",
                                             suppliesErrorStatus),
                                         textBox(
-                                            "Enter epanumber...",
+                                            "Enter Epa Number",
                                             epaController,
                                             "Supplies",
                                             epaErrorStatus),
-                                        textBox("Enter cost...", costController,
+                                        textBox("Enter Cost", costController,
                                             "Supplies", costErrorStatus),
                                         SizedBox(
                                           width: double.infinity,
@@ -545,7 +546,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                                 ? const CupertinoActivityIndicator(
                                                     color: Colors.white,
                                                   )
-                                                : Text(
+                                                : const Text(
                                                     'Confirm',
                                                     style:
                                                         TextStyle(fontSize: 15),
@@ -572,7 +573,7 @@ class _PartsScreenState extends State<PartsScreen> {
   ) {
     if (PartsItemname.isEmpty) {
       stateUpdate(() {
-        itemnameErrorMsg = 'Itemname cant be empty.';
+        itemnameErrorMsg = 'Item name cant be empty.';
         itemnameErrorStaus = true;
       });
     } else {
@@ -580,7 +581,7 @@ class _PartsScreenState extends State<PartsScreen> {
     }
     if (serialnumber.isEmpty) {
       stateUpdate(() {
-        serialnumberErrorMsg = 'Itemname cant be empty.';
+        serialnumberErrorMsg = 'Item name cant be empty.';
         serialnumberErrorStatus = true;
       });
     } else {
@@ -610,7 +611,7 @@ Widget textBox(String placeHolder, TextEditingController controller,
     children: [
       Text(
         label,
-        style: TextStyle(
+        style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
             color: Color(0xff6A7187)),
@@ -627,20 +628,20 @@ Widget textBox(String placeHolder, TextEditingController controller,
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
                         color: errorStatus == true
-                            ? Color(0xffD80027)
-                            : Color(0xffC1C4CD))),
+                            ? const Color(0xffD80027)
+                            : const Color(0xffC1C4CD))),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
                         color: errorStatus == true
-                            ? Color(0xffD80027)
-                            : Color(0xffC1C4CD))),
+                            ? const Color(0xffD80027)
+                            : const Color(0xffC1C4CD))),
                 focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
                         color: errorStatus == true
-                            ? Color(0xffD80027)
-                            : Color(0xffC1C4CD)))),
+                            ? const Color(0xffD80027)
+                            : const Color(0xffC1C4CD)))),
           ),
         ),
       ),

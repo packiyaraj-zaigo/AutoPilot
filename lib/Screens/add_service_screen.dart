@@ -125,8 +125,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter name...', serviceNameController,
-                        'Service Name', serviceNameError.isNotEmpty, context),
+                    textBox('Enter Name', serviceNameController, 'Service Name',
+                        serviceNameError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Visibility(
@@ -144,7 +144,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
                     const SizedBox(height: 16),
                     textBox(
-                        'Enter Description...',
+                        'Enter Description',
                         laborDescriptionController,
                         'Labour Description',
                         laborDescriptionError.isNotEmpty,
@@ -187,7 +187,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   EdgeInsets.only(top: 2, left: 16, right: 16),
                               isExpanded: true,
                               hint: Text(
-                                "Select",
+                                "Select Category",
                                 style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
@@ -237,7 +237,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter rate', rateController, 'Rate',
+                    textBox('Enter Rate', rateController, 'Rate',
                         rateError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -255,7 +255,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter rate...', taxController, 'Tax',
+                    textBox('Enter Tax', taxController, 'Tax',
                         taxError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -273,7 +273,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter percentage rate...', taxRateController,
+                    textBox('Enter Percentage Rate', taxRateController,
                         'Tax Rate', taxRateError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -352,13 +352,32 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xff6A7187),
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff6A7187),
+              ),
+            ),
+            label == 'Service Name' ||
+                    label == 'Labour Description' ||
+                    label == 'Rate' ||
+                    label == 'Tax Rate'
+                ? Text(
+                    " *",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )
+                : Text('')
+          ],
         ),
         const SizedBox(height: 3),
         Padding(
@@ -509,7 +528,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       categoryError = '';
     }
     if (taxRateError == '') {
-      taxRateError = 'Tax Rate canot be empty';
+      taxRateError = 'Tax rate cannot be empty';
     }
     setState(() {});
     return status;

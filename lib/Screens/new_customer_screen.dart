@@ -44,9 +44,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
   bool zipCodeErrorStatus = false;
   bool nameErrorStaus = false;
   bool stateErrorStatus = false;
-
   bool check = false;
-
   String firstNameErrorMsg = '';
   String lastNameErrorMsg = '';
   String emailErrorMsg = '';
@@ -57,21 +55,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
   String cityErrorMsg = '';
   String stateErrorMsg = '';
   String zipCodeErrorMsg = '';
-
-  String? _dropDownValues;
   String? selectedValue;
-
   List? dropdownList;
-  final _dropdownFormKey = GlobalKey<FormState>();
-  List<DropdownMenuItem<String>> get dropdownItems {
-    List<DropdownMenuItem<String>> menuItems = [
-      DropdownMenuItem(child: Text("USA"), value: "USA"),
-      DropdownMenuItem(child: Text("Canada"), value: "Canada"),
-      DropdownMenuItem(child: Text("Brazil"), value: "Brazil"),
-      DropdownMenuItem(child: Text("England"), value: "England"),
-    ];
-    return menuItems;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +118,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      textBox("Enter Name...", firstNameController,
+                      textBox("Enter First Name", firstNameController,
                           "First Name", firstNameErrorStatus),
                       Visibility(
                           visible: firstNameErrorStatus,
@@ -147,8 +132,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("Enter Name...", lastNameController, "Last Name",
-                          lastNameErrorStatus),
+                      textBox("Enter Last Name", lastNameController,
+                          "Last Name", lastNameErrorStatus),
                       Visibility(
                           visible: lastNameErrorStatus,
                           child: Text(
@@ -161,7 +146,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("Enter email...", emailController, "Email",
+                      textBox("Enter Email", emailController, "Email",
                           emailErrorStatus),
                       Visibility(
                           visible: emailErrorStatus,
@@ -189,7 +174,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("Enter notes...", customerNotesController,
+                      textBox("Enter Notes", customerNotesController,
                           "Customer Notes", customerErrorStatus),
                       Visibility(
                           visible: customerErrorStatus,
@@ -203,7 +188,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("Enter address...", addressController, "Address",
+                      textBox("Enter Address", addressController, "Address",
                           addressErrorStatus),
                       Visibility(
                           visible: addressErrorStatus,
@@ -217,7 +202,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("Enter city...", cityController, "City",
+                      textBox("Enter City", cityController, "City",
                           cityErrorStatus),
                       Visibility(
                           visible: cityErrorStatus,
@@ -240,8 +225,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           SizedBox(
                             width: 10,
                           ),
-                          halfTextBox("Enter zipcode...", zipCodeController,
-                              "Zip", zipCodeErrorStatus),
+                          halfTextBox("Enter Zipcode", zipCodeController, "Zip",
+                              zipCodeErrorStatus),
                         ],
                       ),
                       CheckboxListTile(
@@ -326,7 +311,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text(
               label,
@@ -335,6 +320,21 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
+            label == 'First Name' ||
+                    label == 'Last Name' ||
+                    label == 'Email' ||
+                    label == 'Phone'
+                ? Text(
+                    " *",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )
+                : Text(''),
           ],
         ),
         Padding(
@@ -663,7 +663,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   },
                   decoration: const InputDecoration(
                       border: InputBorder.none,
-                      hintText: "Select state",
+                      hintText: "Select State",
                       suffixIcon: Icon(Icons.arrow_drop_down)),
                 ),
               )),

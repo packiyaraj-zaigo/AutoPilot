@@ -167,7 +167,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                         });
                       },
                       backgroundColor: Colors.white,
-                      placeholder: 'Search Vehicles...',
+                      placeholder: 'Search Vehicles',
                       prefixIcon: Padding(
                         padding: const EdgeInsets.only(left: 24, right: 16),
                         child: Icon(
@@ -787,7 +787,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                         ),
                                         // textBox("Enter name...", nameController,
                                         //     "Owner", nameErrorStatus),
-                                        textBox("Enter year...", yearController,
+                                        textBox("Enter Year", yearController,
                                             "Year", yearErrorStaus),
                                         Visibility(
                                             visible: yearErrorStaus,
@@ -802,16 +802,13 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                               ),
                                             )),
 
-                                        textBox("Enter make...", makeController,
+                                        textBox("Enter Make", makeController,
                                             "Make", makeErrorStatus),
                                         SizedBox(
                                           height: 15,
                                         ),
-                                        textBox(
-                                            "Enter model...",
-                                            modelController,
-                                            "Model",
-                                            modelErrorStatus),
+                                        textBox("Enter Model", modelController,
+                                            "Model", modelErrorStatus),
                                         Visibility(
                                             visible: modelErrorStatus,
                                             child: Text(
@@ -824,14 +821,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                 ),
                                               ),
                                             )),
-                                        textBox(
-                                            "Enter number...",
-                                            vinController,
-                                            "VIN",
-                                            vinErrorStatus),
+                                        textBox("Enter Number", vinController,
+                                            "VIN", vinErrorStatus),
                                         ExpansionTile(
                                           title: Text(
-                                            'Additional fields',
+                                            'Additional Fields',
                                             style: TextStyle(
                                                 fontSize: 20,
                                                 color:
@@ -845,12 +839,12 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                   CrossAxisAlignment.start,
                                               children: [
                                                 textBox(
-                                                    "Enter Sub-model...",
+                                                    "Enter Sub-Model",
                                                     subModelController,
                                                     "Sub-Model",
                                                     subModelErrorStatus),
                                                 textBox(
-                                                    "Enter engin...",
+                                                    "Enter Engine",
                                                     engineController,
                                                     "Engine",
                                                     engineErrorStatus),
@@ -860,12 +854,12 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                 //     "Make",
                                                 //     makeErrorStatus),
                                                 textBox(
-                                                    "Enter color...",
+                                                    "Enter Color",
                                                     colorController,
                                                     "Color",
                                                     colorErrorStatus),
                                                 textBox(
-                                                    "Enter number...",
+                                                    "Enter Number",
                                                     licController,
                                                     "LIC",
                                                     licErrorStatus),

@@ -21,8 +21,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 
-
-
 class CreateEstimateScreen extends StatefulWidget {
   const CreateEstimateScreen({super.key});
 
@@ -41,18 +39,17 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   final vehicleController = TextEditingController();
 
   CustomerModel? customerModel;
-  vm.VechileResponse?vehicleModel;
-
+  vm.VechileResponse? vehicleModel;
 
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
   XFile? selectedImage;
 
-  final vehicleScrollController=ScrollController();
-  final customerScrollController=ScrollController();
-   final _debouncer = Debouncer();
-   List<vm.Datum>vehicleDataList=[];
-   List<Datum>customerDataList=[];
+  final vehicleScrollController = ScrollController();
+  final customerScrollController = ScrollController();
+  final _debouncer = Debouncer();
+  List<vm.Datum> vehicleDataList = [];
+  List<Datum> customerDataList = [];
 
   bool noteErrorStatus = false;
   bool startTimeErrorStatus = false;
@@ -66,18 +63,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   String dateErrorMsg = '';
   String appointmentErrorMsg = '';
 
-
-
-
-
   int selectedIndex = 0;
- 
-
- 
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +168,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: textBox(
-                    "Enter note", notesController, "Note", noteErrorStatus),
+                    "Enter Note", notesController, "Note", noteErrorStatus),
               ),
               subTitleWidget("Appointment"),
               Padding(
@@ -190,9 +176,9 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    halfTextBox("Select time", startTimeController,
+                    halfTextBox("Select Time", startTimeController,
                         "Start time", startTimeErrorStatus),
-                    halfTextBox("Select time", endTimeController, "End time",
+                    halfTextBox("Select Time", endTimeController, "End time",
                         endTimeErrorStatus)
                   ],
                 ),
@@ -200,11 +186,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: textBox(
-                    "Select date", dateController, "Date", dateErrorStatus),
+                    "Select Date", dateController, "Date", dateErrorStatus),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
-                child: textBox("Enter appointment note", appointmentController,
+                child: textBox("Enter Appointment Note", appointmentController,
                     "Appointment note", appointmentErrorStatus),
               ),
 
@@ -225,10 +211,10 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     GestureDetector(
-                      onTap: (){
-                        showActionSheet(context);
-                      },
-                      child: inspectionPhotoWidget()),
+                        onTap: () {
+                          showActionSheet(context);
+                        },
+                        child: inspectionPhotoWidget()),
                     inspectionPhotoWidget(),
                     inspectionPhotoWidget(),
                     inspectionPhotoWidget()
@@ -279,10 +265,12 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 32.0),
                 child: GestureDetector(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return EstimateDetailsScreen();
-                    },));
+                  onTap: () {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return EstimateDetailsScreen();
+                      },
+                    ));
                   },
                   child: Container(
                     height: 56,
@@ -418,25 +406,23 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             label == "Customer" || label == "Vehicle"
                 ? GestureDetector(
                     onTap: () {
-                      if(label=="Customer"){
-                         showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return NewCustomerScreen();
-                          },
-                          isScrollControlled: true,
-                          useSafeArea: true);
-
-                      }else if(label=="Vehicle"){
-                          showModalBottomSheet(context: context, builder: (context) {
-                            return CreateVehicleScreen();
-                          },
-                          isScrollControlled: true,
-                          useSafeArea: true
-                          );
-
+                      if (label == "Customer") {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return NewCustomerScreen();
+                            },
+                            isScrollControlled: true,
+                            useSafeArea: true);
+                      } else if (label == "Vehicle") {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return CreateVehicleScreen();
+                            },
+                            isScrollControlled: true,
+                            useSafeArea: true);
                       }
-                     
                     },
                     child: const Row(
                       children: [
@@ -483,10 +469,13 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                         return customerBottomSheet();
                       },
                       backgroundColor: Colors.transparent);
-                }else if(label=='Vehicle'){
-                  showModalBottomSheet(context: context, builder: (context) {
-                    return vehicleBottomSheet();
-                  },);
+                } else if (label == 'Vehicle') {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return vehicleBottomSheet();
+                    },
+                  );
                 }
               },
               keyboardType:
@@ -709,15 +698,13 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
 
   Widget customerBottomSheet() {
     return BlocProvider(
-      create: (context) =>
-          CustomerBloc()..add(customerDetails(query: "")),
+      create: (context) => CustomerBloc()..add(customerDetails(query: "")),
       child: BlocListener<CustomerBloc, CustomerState>(
         listener: (context, state) {
           if (state is CustomerReady) {
-        //    customerModel = state.customer;
-        customerDataList.addAll(state.customer.data);
-        print(customerDataList.length.toString()+"cus length");
-       
+            //    customerModel = state.customer;
+            customerDataList.addAll(state.customer.data);
+            print(customerDataList.length.toString() + "cus length");
           }
           // TODO: implement listener
         },
@@ -743,7 +730,9 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           fontSize: 24,
                           fontWeight: FontWeight.w500),
                     ),
-                    state is CustomerLoading  &&  !BlocProvider.of<CustomerBloc>(context) .isPaginationLoading
+                    state is CustomerLoading &&
+                            !BlocProvider.of<CustomerBloc>(context)
+                                .isPaginationLoading
                         ? const Center(
                             child: CupertinoActivityIndicator(),
                           )
@@ -752,78 +741,106 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                             child: LimitedBox(
                               maxHeight:
                                   MediaQuery.of(context).size.height / 1.8 - 78,
-                              child:customerDataList.isEmpty?const Center(
-                                child: Text("No Customer Found!",style: TextStyle(
-                                  fontSize: 16
-                                ),),
-                              ): ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 12.0),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            customerController.text =
-                                                "${customerDataList[index].firstName} ${customerDataList[index].lastName}";
-                                            Navigator.pop(context);
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                                color: Colors.grey[100],
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            width:
-                                                MediaQuery.of(context).size.width,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(12.0),
-                                              child: Text(
-                                                "${customerDataList[index].firstName} ${customerDataList[index].lastName}",
-                                                style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w500),
+                              child: customerDataList.isEmpty
+                                  ? const Center(
+                                      child: Text(
+                                        "No Customer Found!",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    )
+                                  : ListView.builder(
+                                      itemBuilder: (context, index) {
+                                        return Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 12.0),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  customerController.text =
+                                                      "${customerDataList[index].firstName} ${customerDataList[index].lastName}";
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Container(
+                                                  height: 50,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.grey[100],
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8)),
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12.0),
+                                                    child: Text(
+                                                      "${customerDataList[index].firstName} ${customerDataList[index].lastName}",
+                                                      style: const TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.w500),
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
-                                      ),
-
-                                       BlocProvider.of<CustomerBloc>(context) .currentPage <=  BlocProvider.of<CustomerBloc>(context).totalPages &&
-                                                  index ==
-                                                      customerDataList .length - 1
-                                              ? const Column(
-                                                  children: [
-                                                    SizedBox(height: 24),
-                                                    Center(
-                                                      child:
-                                                          CupertinoActivityIndicator(),
-                                                    ),
-                                                    SizedBox(height: 24),
-                                                  ],
-                                                )
-                                              : const SizedBox(),
-                                    ],
-                                  );
-                                },
-                                controller: customerScrollController..addListener(() {
-                                   if (customerScrollController.offset ==
-                                                customerScrollController
-                                                    .position.maxScrollExtent &&
-                                            !BlocProvider.of<CustomerBloc>(context) .isPaginationLoading &&
-                                            BlocProvider.of<CustomerBloc>(context).currentPage <=
-                                                BlocProvider.of<CustomerBloc>(context).totalPages) {
-                                          _debouncer.run(() {
-                                            BlocProvider.of<CustomerBloc>(context).isPaginationLoading = true;
-                                            BlocProvider.of<CustomerBloc>(context).add(
-                                                customerDetails(query: ''));
-                                          });
-                                        }
-                                }),
-                                itemCount: customerDataList.length,
-                                shrinkWrap: true,
-                                physics: const ClampingScrollPhysics(),
-                              ),
+                                            BlocProvider.of<CustomerBloc>(
+                                                                context)
+                                                            .currentPage <=
+                                                        BlocProvider.of<
+                                                                    CustomerBloc>(
+                                                                context)
+                                                            .totalPages &&
+                                                    index ==
+                                                        customerDataList
+                                                                .length -
+                                                            1
+                                                ? const Column(
+                                                    children: [
+                                                      SizedBox(height: 24),
+                                                      Center(
+                                                        child:
+                                                            CupertinoActivityIndicator(),
+                                                      ),
+                                                      SizedBox(height: 24),
+                                                    ],
+                                                  )
+                                                : const SizedBox(),
+                                          ],
+                                        );
+                                      },
+                                      controller: customerScrollController
+                                        ..addListener(() {
+                                          if (customerScrollController.offset ==
+                                                  customerScrollController
+                                                      .position
+                                                      .maxScrollExtent &&
+                                              !BlocProvider.of<CustomerBloc>(
+                                                      context)
+                                                  .isPaginationLoading &&
+                                              BlocProvider.of<CustomerBloc>(
+                                                          context)
+                                                      .currentPage <=
+                                                  BlocProvider.of<CustomerBloc>(
+                                                          context)
+                                                      .totalPages) {
+                                            _debouncer.run(() {
+                                              BlocProvider.of<CustomerBloc>(
+                                                      context)
+                                                  .isPaginationLoading = true;
+                                              BlocProvider.of<CustomerBloc>(
+                                                      context)
+                                                  .add(customerDetails(
+                                                      query: ''));
+                                            });
+                                          }
+                                        }),
+                                      itemCount: customerDataList.length,
+                                      shrinkWrap: true,
+                                      physics: const ClampingScrollPhysics(),
+                                    ),
                             ),
                           )
                   ],
@@ -841,8 +858,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
       create: (context) => VechileBloc()..add(GetAllVechile()),
       child: BlocListener<VechileBloc, VechileState>(
         listener: (context, state) {
-
-          if(state is VechileDetailsSuccessStates){
+          if (state is VechileDetailsSuccessStates) {
             vehicleDataList.addAll(state.vechile.data.data);
           }
 
@@ -871,11 +887,10 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           fontWeight: FontWeight.w500),
                     ),
                     state is VechileDetailsPageNationLoading
-                       
-                        ?  const Center(
+                        ? const Center(
                             child: CupertinoActivityIndicator(),
-                          ):
-                        Padding(
+                          )
+                        : Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child: LimitedBox(
                               maxHeight:
@@ -898,24 +913,30 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                                 color: Colors.grey[100],
                                                 borderRadius:
                                                     BorderRadius.circular(8)),
-                                            width:
-                                                MediaQuery.of(context).size.width,
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
                                             child: Padding(
-                                              padding: const EdgeInsets.all(12.0),
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
                                               child: Text(
                                                 "${vehicleDataList[index].vehicleYear} ${vehicleDataList[index].vehicleModel}",
                                                 style: const TextStyle(
                                                     fontSize: 18,
-                                                    fontWeight: FontWeight.w500),
+                                                    fontWeight:
+                                                        FontWeight.w500),
                                               ),
                                             ),
                                           ),
                                         ),
-
-
-                                        BlocProvider.of<VechileBloc>(context) .currentPage <=
-                                                    BlocProvider.of<VechileBloc>(context).totalPages &&
-                                                index == vehicleDataList.length - 1
+                                        BlocProvider.of<VechileBloc>(context)
+                                                        .currentPage <=
+                                                    BlocProvider.of<
+                                                                VechileBloc>(
+                                                            context)
+                                                        .totalPages &&
+                                                index ==
+                                                    vehicleDataList.length - 1
                                             ? const Column(
                                                 children: [
                                                   SizedBox(height: 24),
@@ -933,25 +954,30 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                 },
                                 itemCount: vehicleDataList.length,
                                 shrinkWrap: true,
-                                controller: vehicleScrollController..addListener(() {
-                                   if (vehicleScrollController.offset ==
-                                              vehicleScrollController
-                                                  .position.maxScrollExtent &&
-                                          !BlocProvider.of<VechileBloc>(context) .isPagenationLoading &&
-                                         BlocProvider.of<VechileBloc>(context).currentPage <=
-                                             BlocProvider.of<VechileBloc>(context).totalPages) {
-                                        _debouncer.run(() {
-                                         BlocProvider.of<VechileBloc>(context).isPagenationLoading = true;
-                                          BlocProvider.of<VechileBloc>(context).add(GetAllVechile());
-                                        });
-                                      }
-                                  
-
-                                }),
+                                controller: vehicleScrollController
+                                  ..addListener(() {
+                                    if (vehicleScrollController.offset ==
+                                            vehicleScrollController
+                                                .position.maxScrollExtent &&
+                                        !BlocProvider.of<VechileBloc>(context)
+                                            .isPagenationLoading &&
+                                        BlocProvider.of<VechileBloc>(context)
+                                                .currentPage <=
+                                            BlocProvider.of<VechileBloc>(
+                                                    context)
+                                                .totalPages) {
+                                      _debouncer.run(() {
+                                        BlocProvider.of<VechileBloc>(context)
+                                            .isPagenationLoading = true;
+                                        BlocProvider.of<VechileBloc>(context)
+                                            .add(GetAllVechile());
+                                      });
+                                    }
+                                  }),
                                 physics: ClampingScrollPhysics(),
                               ),
                             ),
-                          ) 
+                          )
                   ],
                 ),
               ),
@@ -961,8 +987,6 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
       ),
     );
   }
-
-
 
   void showActionSheet(BuildContext context) {
     showCupertinoModalPopup<void>(
@@ -1018,7 +1042,6 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
     );
   }
 
-
   void selectImages(source) async {
     if (source == "camera") {
       selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
@@ -1039,19 +1062,4 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
     }
     setState(() {});
   }
-
-
-
-
-
-
-
-
-
- 
-
-  
-
-
-  
 }

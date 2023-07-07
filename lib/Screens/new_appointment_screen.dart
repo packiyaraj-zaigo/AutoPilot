@@ -81,7 +81,7 @@ class _NewAppointmentState extends State<NewAppointment> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Padding(
-              padding:  EdgeInsets.only(left: 10),
+              padding: EdgeInsets.only(left: 10),
               child: Text(
                 "Basic Details",
                 style: TextStyle(
@@ -106,23 +106,23 @@ class _NewAppointmentState extends State<NewAppointment> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                halfTextBox("Enter date...", startDateController, "Start date",
+                halfTextBox("Enter Date", startDateController, "Start Date",
                     startDateErrorMsg),
-                halfTextBox("Enter date...", completionDateController,
-                    "Completion date", startDateErrorMsg),
+                halfTextBox("Enter Date", completionDateController,
+                    "Completion Date", startDateErrorMsg),
               ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                halfTextTime("Select", startTimeController, "Start time",
+                halfTextTime("Select", startTimeController, "Start Time",
                     startTimeErrorMsg),
                 halfTextTime(
                     "Select", endTimeController, "End Time", endTimeErrorMsg),
               ],
             ),
-            textBox("Enter name...", nameController, "Name", nameErrorMsg),
-            textBox("Enter notes...", notesController, "Appointment notes",
+            textBox("Enter Name", nameController, "Name", nameErrorMsg),
+            textBox("Enter Notes", notesController, "Appointment notes",
                 notesErrorMsg),
           ],
         ),

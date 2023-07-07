@@ -395,7 +395,7 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                 ),
               ],
             ),
-            placeholder: 'Search User...',
+            placeholder: 'Search User',
             maxLines: 1,
             placeholderStyle: const TextStyle(
               color: Color(0xFF7F808C),

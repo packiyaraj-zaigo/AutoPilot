@@ -20,6 +20,10 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'create_vehicle_screen.dart';
+import 'new_appointment_screen.dart';
+import 'new_customer_screen.dart';
+
 // ignore: must_be_immutable
 class BottomBarScreen extends StatefulWidget {
   BottomBarScreen({
@@ -518,11 +522,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile("New Estimate", "assets/images/estimate_icon.svg",
                   CreateEstimateScreen()),
               bottomSheetTile("New Customer", "assets/images/customer_icon.svg",
-                  ScannerScreen()),
+                  NewCustomerScreen()),
               bottomSheetTile("New Vehicle", "assets/images/vehicle_icon.svg",
-                  ScannerScreen()),
+                  CreateVehicleScreen()),
               bottomSheetTile("New Appointment",
-                  "assets/images/appointment_icon.svg", ScannerScreen()),
+                  "assets/images/appointment_icon.svg", NewAppointment()),
               bottomSheetTile(
                   "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
               Padding(

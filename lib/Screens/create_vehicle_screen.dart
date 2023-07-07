@@ -325,7 +325,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                               // textBox("Enter name...", nameController,
                               //     "Owner", nameErrorStatus),
                               textBox(
-                                  "Enter year...",
+                                  "Enter Year",
                                   yearController,
                                   "Year",
                                   yearErrorStaus,
@@ -345,7 +345,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                   )),
 
                               textBox(
-                                  "Enter make...",
+                                  "Enter Make",
                                   makeController,
                                   "Make",
                                   makeErrorStatus,
@@ -355,7 +355,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                 height: 15,
                               ),
                               textBox(
-                                  "Enter model...",
+                                  "Enter Model",
                                   modelController,
                                   "Model",
                                   modelErrorStatus,
@@ -374,7 +374,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                     ),
                                   )),
                               textBox(
-                                  "Enter number...",
+                                  "Enter Number",
                                   vinController,
                                   "VIN",
                                   vinErrorStatus,
@@ -395,12 +395,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       textBox(
-                                          "Enter Sub-model...",
+                                          "Enter Sub-Model",
                                           subModelController,
                                           "Sub-Model",
                                           subModelErrorStatus),
                                       textBox(
-                                          "Enter engin...",
+                                          "Enter Engine",
                                           engineController,
                                           "Engine",
                                           engineErrorStatus,
@@ -413,12 +413,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                       //     "Make",
                                       //     makeErrorStatus),
                                       textBox(
-                                        "Enter color...",
+                                        "Enter Color",
                                         colorController,
                                         "Color",
                                         colorErrorStatus,
                                       ),
-                                      textBox("Enter number...", licController,
+                                      textBox("Enter Number", licController,
                                           "LIC", licErrorStatus),
                                       typeController.text.isNotEmpty
                                           ? SizedBox()
@@ -597,12 +597,28 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff6A7187)),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+            label == 'Year' || label == 'Model'
+                ? Text(
+                    " *",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )
+                : Text('')
+          ],
         ),
         Padding(
           padding: const EdgeInsets.only(top: 6.0, bottom: 15),
@@ -681,7 +697,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                             );
                           }).toList(),
                           hint: const Text(
-                            "Select",
+                            "Select Type",
                             style: TextStyle(
                                 color: Color(0xff6A7187),
                                 fontSize: 16,

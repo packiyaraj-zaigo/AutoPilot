@@ -120,7 +120,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                           ),
                         ],
                       ),
-                      placeholder: 'Search Services...',
+                      placeholder: 'Search Services',
                       maxLines: 1,
                       placeholderStyle: const TextStyle(
                         color: Color(0xFF7F808C),
