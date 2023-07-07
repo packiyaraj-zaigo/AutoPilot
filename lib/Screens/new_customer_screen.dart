@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../Models/province_model.dart';
 import '../api_provider/api_repository.dart';
 import '../bloc/customer_bloc/customer_bloc.dart';
 import '../utils/app_colors.dart';
@@ -29,7 +30,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
 
   final countryPicker = const FlCountryCodePicker();
   CountryCode? selectedCountry;
-
+  List<ProvinceData> proviceList = [];
+  ScrollController provinceScrollController = ScrollController();
+  final provinceController = TextEditingController();
+  int? provinceId;
   bool firstNameErrorStatus = false;
   bool lastNameErrorStatus = false;
   bool emailErrorStatus = false;
@@ -227,129 +231,19 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("Enter Zipcode...", zipCodeController, "Zip",
-                          zipCodeErrorStatus),
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //   children: [
-                      //     Expanded(
-                      //       child: Column(
-                      //         mainAxisAlignment: MainAxisAlignment.start,
-                      //         crossAxisAlignment: CrossAxisAlignment.start,
-                      //         children: [
-                      //           Text(
-                      //             'State',
-                      //             style: TextStyle(
-                      //                 fontSize: 14,
-                      //                 fontWeight: FontWeight.w500,
-                      //                 color: Color(0xff6A7187)),
-                      //           ),
-                      //           SizedBox(
-                      //             height: 6,
-                      //           ),
-                      //           SizedBox(
-                      //             height: 56,
-                      //             child: Form(
-                      //               key: _dropdownFormKey,
-                      //               child: DropdownButtonHideUnderline(
-                      //                 child: DropdownButtonFormField(
-                      //                     padding: EdgeInsets.zero,
-                      //                     elevation: 4,
-                      //                     isExpanded: true,
-                      //                     isDense: true,
-                      //                     hint: Text(
-                      //                       'Select',
-                      //                       style: TextStyle(
-                      //                         color:
-                      //                             AppColors.primaryBlackColors,
-                      //                       ),
-                      //                     ),
-                      //                     icon: Icon(
-                      //                         Icons.keyboard_arrow_down_sharp),
-                      //                     decoration: InputDecoration(
-                      //                         disabledBorder:
-                      //                             OutlineInputBorder(
-                      //                           borderSide: BorderSide(
-                      //                               color: AppColors
-                      //                                   .primaryGrayColors),
-                      //                           borderRadius:
-                      //                               BorderRadius.circular(10),
-                      //                         ),
-                      //                         enabledBorder: OutlineInputBorder(
-                      //                           borderSide: BorderSide(
-                      //                               color: stateErrorStatus ==
-                      //                                       true
-                      //                                   ? Color(0xffD80027)
-                      //                                   : Color(0xffC1C4CD)),
-                      //                           borderRadius:
-                      //                               BorderRadius.circular(10),
-                      //                         ),
-                      //                         border: OutlineInputBorder(
-                      //                           borderSide: BorderSide(
-                      //                               color: AppColors
-                      //                                   .primaryGrayColors),
-                      //                           borderRadius:
-                      //                               BorderRadius.circular(10),
-                      //                         ),
-                      //                         focusedBorder: OutlineInputBorder(
-                      //                           borderSide: BorderSide(
-                      //                               color: AppColors
-                      //                                   .primaryGrayColors),
-                      //                           borderRadius:
-                      //                               BorderRadius.circular(10),
-                      //                         ),
-                      //                         focusColor:
-                      //                             AppColors.primaryGrayColors
-                      //                         // filled: true,
-                      //                         // fillColor: AppColors.greyText,
-                      //                         ),
-                      //                     autovalidateMode:
-                      //                         AutovalidateMode.always,
-                      //                     // validator: (value) =>
-                      //                     //     value == selectedValue?.isEmpty
-                      //                     //         ? "States Cant be empty"
-                      //                     //         : null,
-                      //                     // dropdownColor: Colors.blueAccent,
-                      //                     value: selectedValue,
-                      //                     onChanged: (String? newValue) {
-                      //                       setState(() {
-                      //                         selectedValue = newValue!;
-                      //                         stateErrorStatus = false;
-                      //                       });
-                      //                       print('ihihi${selectedValue}');
-                      //                     },
-                      //                     items: dropdownItems),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //           // SizedBox(
-                      //           //   width: 10,
-                      //           // ),
-                      //           Padding(
-                      //             padding: const EdgeInsets.all(8.0),
-                      //             child: Visibility(
-                      //                 visible: stateErrorStatus,
-                      //                 child: Text(
-                      //                   stateErrorMsg,
-                      //                   style: const TextStyle(
-                      //                     fontSize: 14,
-                      //                     fontWeight: FontWeight.w500,
-                      //                     color: Color(
-                      //                       0xffD80027,
-                      //                     ),
-                      //                   ),
-                      //                 )),
-                      //           ),
-                      //         ],
-                      //       ),
-                      //     ),
-                      //     SizedBox(
-                      //       width: 10,
-                      //     ),
-                      //     halfTextBox("Zipcode", zipCodeController, "Zip",
-                      //         zipCodeErrorStatus),
-                      //   ],
-                      // ),
+                      // textBox("Enter Zipcode...", zipCodeController, "Zip",
+                      //     zipCodeErrorStatus),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          stateDropDown(),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          halfTextBox("Enter zipcode...", zipCodeController,
+                              "Zip", zipCodeErrorStatus),
+                        ],
+                      ),
                       CheckboxListTile(
                         fillColor: MaterialStatePropertyAll(
                             AppColors.primaryGrayColors),
@@ -531,21 +425,21 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Visibility(
-              visible: zipCodeErrorStatus,
-              child: Text(
-                zipCodeErrorMsg,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(
-                    0xffD80027,
-                  ),
-                ),
-              )),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child: Visibility(
+        //       visible: zipCodeErrorStatus,
+        //       child: Text(
+        //         zipCodeErrorMsg,
+        //         style: const TextStyle(
+        //           fontSize: 14,
+        //           fontWeight: FontWeight.w500,
+        //           color: Color(
+        //             0xffD80027,
+        //           ),
+        //         ),
+        //       )),
+        // ),
       ],
     );
   }
@@ -614,6 +508,170 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     );
   }
 
+  Widget provinceBottomSheet() {
+    return BlocProvider(
+      create: (context) => CustomerBloc()..add(GetProvinceEvent()),
+      child: BlocListener<CustomerBloc, CustomerState>(
+        listener: (context, state) {
+          if (state is GetProvinceState) {
+            proviceList.addAll(state.provinceList.data.data);
+
+            print(proviceList);
+          }
+          // TODO: implement listener
+        },
+        child: BlocBuilder<CustomerBloc, CustomerState>(
+          builder: (context, state) {
+            return Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Provinces",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: LimitedBox(
+                        maxHeight: MediaQuery.of(context).size.height / 2 - 90,
+                        child: ListView.builder(
+                          itemBuilder: (context, index) {
+                            if (index == proviceList.length) {
+                              return BlocProvider.of<CustomerBloc>(context)
+                                              .currentPage <=
+                                          BlocProvider.of<CustomerBloc>(context)
+                                              .totalPages &&
+                                      BlocProvider.of<CustomerBloc>(context)
+                                              .currentPage !=
+                                          0
+                                  ? const SizedBox(
+                                      height: 40,
+                                      child: CupertinoActivityIndicator(
+                                        color: AppColors.primaryColors,
+                                      ))
+                                  : Container();
+                            }
+
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  print("heyy");
+
+                                  provinceController.text =
+                                      proviceList[index].provinceName;
+                                  provinceId = proviceList[index].id;
+
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(8)),
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Text(
+                                      proviceList[index].provinceName,
+                                      style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          itemCount: proviceList.length + 1,
+                          controller: provinceScrollController
+                            ..addListener(() {
+                              if ((BlocProvider.of<CustomerBloc>(context)
+                                          .currentPage <=
+                                      BlocProvider.of<CustomerBloc>(context)
+                                          .totalPages) &&
+                                  provinceScrollController.offset ==
+                                      provinceScrollController
+                                          .position.maxScrollExtent &&
+                                  BlocProvider.of<CustomerBloc>(context)
+                                          .currentPage !=
+                                      0 &&
+                                  !BlocProvider.of<CustomerBloc>(context)
+                                      .isFetching) {
+                                context.read<CustomerBloc>()
+                                  ..isFetching = true
+                                  ..add(GetProvinceEvent());
+                              }
+                            }),
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget stateDropDown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "State",
+          style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff6A7187)),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: Container(
+              alignment: Alignment.center,
+              width: MediaQuery.of(context).size.width / 2.6,
+              height: 56,
+              // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
+              // padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xffC1C4CD)),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10.0),
+                child: TextField(
+                  readOnly: true,
+                  controller: provinceController,
+                  onTap: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return provinceBottomSheet();
+                        },
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent);
+                  },
+                  decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      hintText: "Select state",
+                      suffixIcon: Icon(Icons.arrow_drop_down)),
+                ),
+              )),
+        ),
+      ],
+    );
+  }
+
   validateConfirm(
       String firstName,
       String lastName,
@@ -675,7 +733,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           customerNotes: customerNotesController.text,
           address: addressController.text,
           city: cityController.text,
-          state: selectedValue ?? '',
+          state: provinceController.text,
+          stateId: provinceId.toString(),
           pinCode: zipCodeController.text));
       print('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
     } else {

@@ -1,10 +1,5 @@
 import 'package:auto_pilot/Models/time_card_create_model.dart';
-import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
-import '../Models/vechile_dropdown_model.dart';
 import '../Models/employee_creation_model.dart';
 import 'api_provider.dart';
 
@@ -33,8 +28,10 @@ class ApiRepository {
     return apiProvider.resetPasswordSendOtp(emailId, otp);
   }
 
-    Future createNewPassword(String email,String password,String passwordConfirm,String newToken) {
-    return apiProvider.createNewPassword(email, password, passwordConfirm, newToken);
+  Future createNewPassword(
+      String email, String password, String passwordConfirm, String newToken) {
+    return apiProvider.createNewPassword(
+        email, password, passwordConfirm, newToken);
   }
 
   Future getUserProfile(String token) {
@@ -69,9 +66,10 @@ class ApiRepository {
     state,
     city,
     pinCode,
+    stateId,
   ) {
     return apiProvider.addCustomerload(token, context, firstName, lastName,
-        email, mobileNo, customerNotes, address, state, city, pinCode);
+        email, mobileNo, customerNotes, address, state, city, pinCode, stateId);
   }
 
   Future createEmployee(String token, EmployeeCreationModel model) {
@@ -80,6 +78,20 @@ class ApiRepository {
 
   Future getAllRoles(String token) {
     return apiProvider.getAllRoles(token);
+  }
+
+  Future calendarload(
+    String token,
+    DateTime selectedDate,
+  ) {
+    return apiProvider.calendarload(token, selectedDate);
+  }
+
+  Future calendarWeekLoad(
+    String token,
+    DateTime selectedDate,
+  ) {
+    return apiProvider.calendarWeekLoad(token, selectedDate);
   }
 
   Future getVechile(String token, int currentPage, String query) {
@@ -172,33 +184,23 @@ class ApiRepository {
         quantity, fee, supplies, epa, cost, type);
   }
 
-
-  
-  Future getProvince(String token,int currentPage) {
-    return apiProvider.getProvince(token,currentPage);
-  }
-  Future addCompany(Map<String,dynamic>dataMap,dynamic token,String clientId) {
-    return apiProvider.addCompany(dataMap,token,clientId);
+  Future getProvince(String token, int currentPage) {
+    return apiProvider.getProvince(token, currentPage);
   }
 
+  Future addCompany(
+      Map<String, dynamic> dataMap, dynamic token, String clientId) {
+    return apiProvider.addCompany(dataMap, token, clientId);
+  }
 
-   Future getCustomerMessages(String token,String clientId,int currentPage) {
+  Future getCustomerMessages(String token, String clientId, int currentPage) {
     return apiProvider.getCustomerMessages(token, clientId, currentPage);
   }
 
-     Future sendCustomerMessage(String token,String clientId,String customerId,String messageBody) {
-    return apiProvider.sendCustomerMessage(token, clientId, customerId, messageBody);
-  }
-
-  Future getAllWorkflows(String token, int page) {
-    return apiProvider.getAllWorkflows(token, page);
-  }
-
-  Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
-    return apiProvider.editWorkflowPosition(token, workflow);
-  }
-  Future createNewEstimate(int customerId, int vehicleId, dynamic token) {
-    return apiProvider.createNewEstimate(customerId, vehicleId, token);
+  Future sendCustomerMessage(
+      String token, String clientId, String customerId, String messageBody) {
+    return apiProvider.sendCustomerMessage(
+        token, clientId, customerId, messageBody);
   }
 }
 

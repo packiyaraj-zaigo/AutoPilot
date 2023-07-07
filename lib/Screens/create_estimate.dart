@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart' as vm;
-import 'package:auto_pilot/Models/service_model.dart' as sm;
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/estimate_details_screen.dart';
@@ -11,8 +10,6 @@ import 'package:auto_pilot/Screens/new_customer_screen.dart';
 
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
-import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
-import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
@@ -23,6 +20,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+
+
 
 class CreateEstimateScreen extends StatefulWidget {
   const CreateEstimateScreen({super.key});
@@ -40,25 +39,20 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   final appointmentController = TextEditingController();
   final customerController = TextEditingController();
   final vehicleController = TextEditingController();
-  final serviceController = TextEditingController();
 
   CustomerModel? customerModel;
-  vm.VechileResponse? vehicleModel;
+  vm.VechileResponse?vehicleModel;
+
 
   final ImagePicker imagePicker = ImagePicker();
   List<XFile>? imageFileList = [];
   XFile? selectedImage;
 
-  final vehicleScrollController = ScrollController();
-  final customerScrollController = ScrollController();
-  final serviceScrollController = ScrollController();
-  final _debouncer = Debouncer();
-  List<vm.Datum> vehicleDataList = [];
-  List<Datum> customerDataList = [];
-  List<sm.Datum> serviceList = [];
-
-  int? customerId;
-  int? vehicleId;
+  final vehicleScrollController=ScrollController();
+  final customerScrollController=ScrollController();
+   final _debouncer = Debouncer();
+   List<vm.Datum>vehicleDataList=[];
+   List<Datum>customerDataList=[];
 
   bool noteErrorStatus = false;
   bool startTimeErrorStatus = false;
@@ -67,278 +61,249 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   bool appointmentErrorStatus = false;
   bool customerErrorStatus = false;
   bool vehicleErrorStatus = false;
-  bool serviceErrorStatus = false;
 
   String noteErrorMsg = '';
   String dateErrorMsg = '';
   String appointmentErrorMsg = '';
 
+
+
+
+
   int selectedIndex = 0;
+ 
+
+ 
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => EstimateBloc(apiRepository: ApiRepository()),
-      child: BlocListener<EstimateBloc, EstimateState>(
-        listener: (context, state) {
-          if (state is CreateNewEstimateState) {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) {
-                return EstimateDetailsScreen(
-                  estimateDetails: state.estimateDetails,
-                );
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: AppColors.primaryColors,
+        leading: const SizedBox(),
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.pop(context);
               },
-            ));
-          }
-          // TODO: implement listener
-        },
-        child: BlocBuilder<EstimateBloc, EstimateState>(
-          builder: (context, state) {
-            return Scaffold(
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                foregroundColor: AppColors.primaryColors,
-                leading: const SizedBox(),
-                actions: [
-                  IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(Icons.close))
-                ],
+              icon: const Icon(Icons.close))
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding:
+              const EdgeInsets.only(top: 8.0, left: 24, right: 24, bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "Estimate Details",
+                style: TextStyle(
+                    color: AppColors.primaryTitleColor,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600),
               ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      top: 8.0, left: 24, right: 24, bottom: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        "Estimate Details",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          "Follow the steps to create an estimate.",
+              const Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "Follow the steps to create an estimate.",
+                  style: TextStyle(
+                      color: AppColors.greyText,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400),
+                ),
+              ),
+              subTitleWidget("Customer Details"),
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                // child:  Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Text("Customer",style: TextStyle(
+                //       color: AppColors.greyText,
+                //       fontSize: 14,
+                //       fontWeight: FontWeight.w500
+                //     ),),
+                //     Row(
+                //       children: [
+                //         Icon(Icons.add,color: AppColors.primaryColors,),
+                //           Text("Add new",style: TextStyle(
+                //       color: AppColors.primaryColors,
+                //       fontSize: 14,
+                //       fontWeight: FontWeight.w600
+                //     ),)
+
+                //       ],
+                //     )
+                //   ],
+                // ),
+
+                child: textBox("Select Existing", customerController,
+                    "Customer", customerErrorStatus),
+              ),
+              //  customerDropdown(),
+
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                // child:  Row(
+                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   children: [
+                //     Text("Vehicle",style: TextStyle(
+                //       color: AppColors.greyText,
+                //       fontSize: 14,
+                //       fontWeight: FontWeight.w500
+                //     ),),
+                //     Row(
+                //       children: [
+                //         Icon(Icons.add,color: AppColors.primaryColors,),
+                //           Text("Add new",style: TextStyle(
+                //       color: AppColors.primaryColors,
+                //       fontSize: 14,
+                //       fontWeight: FontWeight.w600
+                //     ),)
+
+                //       ],
+                //     )
+                //   ],
+                // ),
+
+                child: textBox("Select Existing", vehicleController, "Vehicle",
+                    vehicleErrorStatus),
+              ),
+              // customerDropdown(),
+
+              subTitleWidget("Estimate Notes"),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox(
+                    "Enter note", notesController, "Note", noteErrorStatus),
+              ),
+              subTitleWidget("Appointment"),
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    halfTextBox("Select time", startTimeController,
+                        "Start time", startTimeErrorStatus),
+                    halfTextBox("Select time", endTimeController, "End time",
+                        endTimeErrorStatus)
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox(
+                    "Select date", dateController, "Date", dateErrorStatus),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox("Enter appointment note", appointmentController,
+                    "Appointment note", appointmentErrorStatus),
+              ),
+
+              subTitleWidget("Inspection Photos"),
+              const Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Text(
+                  "Upload photo",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xff6A7187)),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: (){
+                        showActionSheet(context);
+                      },
+                      child: inspectionPhotoWidget()),
+                    inspectionPhotoWidget(),
+                    inspectionPhotoWidget(),
+                    inspectionPhotoWidget()
+                  ],
+                ),
+              ),
+              subTitleWidget("Services"),
+              const Padding(
+                padding: EdgeInsets.only(top: 24.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Select Services",
+                      style: TextStyle(
+                          color: AppColors.greyText,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500),
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: AppColors.primaryColors,
+                        ),
+                        Text(
+                          "Add new",
                           style: TextStyle(
-                              color: AppColors.greyText,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400),
-                        ),
-                      ),
-                      subTitleWidget("Customer Details"),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 24.0),
-                        // child:  Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //   children: [
-                        //     Text("Customer",style: TextStyle(
-                        //       color: AppColors.greyText,
-                        //       fontSize: 14,
-                        //       fontWeight: FontWeight.w500
-                        //     ),),
-                        //     Row(
-                        //       children: [
-                        //         Icon(Icons.add,color: AppColors.primaryColors,),
-                        //           Text("Add new",style: TextStyle(
-                        //       color: AppColors.primaryColors,
-                        //       fontSize: 14,
-                        //       fontWeight: FontWeight.w600
-                        //     ),)
-
-                        //       ],
-                        //     )
-                        //   ],
-                        // ),
-
-                        child: textBox("Select Existing", customerController,
-                            "Customer", customerErrorStatus),
-                      ),
-                      //  customerDropdown(),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 24.0),
-                        // child:  Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        //   children: [
-                        //     Text("Vehicle",style: TextStyle(
-                        //       color: AppColors.greyText,
-                        //       fontSize: 14,
-                        //       fontWeight: FontWeight.w500
-                        //     ),),
-                        //     Row(
-                        //       children: [
-                        //         Icon(Icons.add,color: AppColors.primaryColors,),
-                        //           Text("Add new",style: TextStyle(
-                        //       color: AppColors.primaryColors,
-                        //       fontSize: 14,
-                        //       fontWeight: FontWeight.w600
-                        //     ),)
-
-                        //       ],
-                        //     )
-                        //   ],
-                        // ),
-
-                        child: textBox("Select Existing", vehicleController,
-                            "Vehicle", vehicleErrorStatus),
-                      ),
-                      // customerDropdown(),
-
-                      subTitleWidget("Estimate Notes"),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Enter note", notesController, "Note",
-                            noteErrorStatus),
-                      ),
-                      subTitleWidget("Appointment"),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 24.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            halfTextBox("Select time", startTimeController,
-                                "Start time", startTimeErrorStatus),
-                            halfTextBox("Select time", endTimeController,
-                                "End time", endTimeErrorStatus)
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Select date", dateController, "Date",
-                            dateErrorStatus),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox(
-                            "Enter appointment note",
-                            appointmentController,
-                            "Appointment note",
-                            appointmentErrorStatus),
-                      ),
-
-                      subTitleWidget("Inspection Photos"),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16.0),
-                        child: Text(
-                          "Upload photo",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187)),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
-                                onTap: () {
-                                  showActionSheet(context);
-                                },
-                                child: inspectionPhotoWidget()),
-                            inspectionPhotoWidget(),
-                            inspectionPhotoWidget(),
-                            inspectionPhotoWidget()
-                          ],
-                        ),
-                      ),
-                      subTitleWidget("Services"),
-                      // const Padding(
-                      //   padding: EdgeInsets.only(top: 24.0),
-                      //   child: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //     children: [
-                      //       Text(
-                      //         "Select Services",
-                      //         style: TextStyle(
-                      //             color: AppColors.greyText,
-                      //             fontSize: 14,
-                      //             fontWeight: FontWeight.w500),
-                      //       ),
-                      //       Row(
-                      //         children: [
-                      //           Icon(
-                      //             Icons.add,
-                      //             color: AppColors.primaryColors,
-                      //           ),
-                      //           Text(
-                      //             "Add new",
-                      //             style: TextStyle(
-                      //                 color: AppColors.primaryColors,
-                      //                 fontSize: 14,
-                      //                 fontWeight: FontWeight.w600),
-                      //           )
-                      //         ],
-                      //       )
-                      //     ],
-                      //   ),
-                      // ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: textBox("Select Existing", serviceController,
-                            "Service", serviceErrorStatus),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: taxDetailsWidget("Total Material", "0.00"),
-                      ),
-                      taxDetailsWidget("Total Labor", "0.00"),
-                      taxDetailsWidget("Tax", "0.00"),
-                      taxDetailsWidget("Discount", "0.00"),
-                      taxDetailsWidget("Total", "0.00"),
-                      taxDetailsWidget("Balance Due", "0.00"),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 32.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            if (vehicleId != null && customerId != null) {
-                              context
-                                  .read<EstimateBloc>()
-                                  .add(CreateNewEstimateEvent(
-                                    customerId: customerId!,
-                                    vehicleId: vehicleId!,
-                                  ));
-                            }
-                          },
-                          child: Container(
-                            height: 56,
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
                               color: AppColors.primaryColors,
-                            ),
-                            child: state is CreateNewEstimateLoadingState
-                                ? const Center(
-                                    child: CupertinoActivityIndicator(),
-                                  )
-                                : const Text(
-                                    "Confirm",
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+              customerDropdown(),
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: taxDetailsWidget("Total Material", "0.00"),
+              ),
+              taxDetailsWidget("Total Labor", "0.00"),
+              taxDetailsWidget("Tax", "0.00"),
+              taxDetailsWidget("Discount", "0.00"),
+              taxDetailsWidget("Total", "0.00"),
+              taxDetailsWidget("Balance Due", "0.00"),
+              Padding(
+                padding: const EdgeInsets.only(top: 32.0),
+                child: GestureDetector(
+                  onTap: (){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      return EstimateDetailsScreen();
+                    },));
+                  },
+                  child: Container(
+                    height: 56,
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primaryColors,
+                    ),
+                    child: const Text(
+                      "Confirm",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
+                    ),
                   ),
                 ),
               ),
-            );
-          },
+            ],
+          ),
         ),
       ),
     );
@@ -453,23 +418,25 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             label == "Customer" || label == "Vehicle"
                 ? GestureDetector(
                     onTap: () {
-                      if (label == "Customer") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return NewCustomerScreen();
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
-                      } else if (label == "Vehicle") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return CreateVehicleScreen();
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
+                      if(label=="Customer"){
+                         showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return NewCustomerScreen();
+                          },
+                          isScrollControlled: true,
+                          useSafeArea: true);
+
+                      }else if(label=="Vehicle"){
+                          showModalBottomSheet(context: context, builder: (context) {
+                            return CreateVehicleScreen();
+                          },
+                          isScrollControlled: true,
+                          useSafeArea: true
+                          );
+
                       }
+                     
                     },
                     child: const Row(
                       children: [
@@ -497,12 +464,10 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              readOnly: label == 'Date' ||
-                      label == "Vehicle" ||
-                      label == "Customer" ||
-                      label == "Service"
-                  ? true
-                  : false,
+              readOnly:
+                  label == 'Date' || label == "Vehicle" || label == "Customer"
+                      ? true
+                      : false,
               onTap: () {
                 if (label == 'Date') {
                   showCupertinoModalPopup(
@@ -518,20 +483,10 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                         return customerBottomSheet();
                       },
                       backgroundColor: Colors.transparent);
-                } else if (label == 'Vehicle') {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return vehicleBottomSheet();
-                    },
-                  );
-                } else if (label == "Service") {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return servicesBottomSheet();
-                    },
-                  );
+                }else if(label=='Vehicle'){
+                  showModalBottomSheet(context: context, builder: (context) {
+                    return vehicleBottomSheet();
+                  },);
                 }
               },
               keyboardType:
@@ -544,9 +499,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
-                  suffixIcon: label == "Customer" ||
-                          label == "Vehicle" ||
-                          label == "Service"
+                  suffixIcon: label == "Customer" || label == "Vehicle"
                       ? const Icon(
                           Icons.arrow_drop_down,
                           color: AppColors.greyText,
@@ -756,13 +709,15 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
 
   Widget customerBottomSheet() {
     return BlocProvider(
-      create: (context) => CustomerBloc()..add(customerDetails(query: "")),
+      create: (context) =>
+          CustomerBloc()..add(customerDetails(query: "")),
       child: BlocListener<CustomerBloc, CustomerState>(
         listener: (context, state) {
           if (state is CustomerReady) {
-            //    customerModel = state.customer;
-            customerDataList.addAll(state.customer.data);
-            print(customerDataList.length.toString() + "cus length");
+        //    customerModel = state.customer;
+        customerDataList.addAll(state.customer.data);
+        print(customerDataList.length.toString()+"cus length");
+       
           }
           // TODO: implement listener
         },
@@ -788,9 +743,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           fontSize: 24,
                           fontWeight: FontWeight.w500),
                     ),
-                    state is CustomerLoading &&
-                            !BlocProvider.of<CustomerBloc>(context)
-                                .isPaginationLoading
+                    state is CustomerLoading  &&  !BlocProvider.of<CustomerBloc>(context) .isPaginationLoading
                         ? const Center(
                             child: CupertinoActivityIndicator(),
                           )
@@ -799,110 +752,78 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                             child: LimitedBox(
                               maxHeight:
                                   MediaQuery.of(context).size.height / 1.8 - 78,
-                              child: customerDataList.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                        "No Customer Found!",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    )
-                                  : ListView.builder(
-                                      itemBuilder: (context, index) {
-                                        return Column(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 12.0),
-                                              child: GestureDetector(
-                                                onTap: () {
-                                                  customerController.text =
-                                                      "${customerDataList[index].firstName} ${customerDataList[index].lastName}";
-
-                                                  customerId =
-                                                      customerDataList[index]
-                                                          .id;
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Container(
-                                                  height: 50,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.grey[100],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8)),
-                                                  width: MediaQuery.of(context)
-                                                      .size
-                                                      .width,
-                                                  child: Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            12.0),
-                                                    child: Text(
-                                                      "${customerDataList[index].firstName} ${customerDataList[index].lastName}",
-                                                      style: const TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight:
-                                                              FontWeight.w500),
-                                                    ),
-                                                  ),
-                                                ),
+                              child:customerDataList.isEmpty?const Center(
+                                child: Text("No Customer Found!",style: TextStyle(
+                                  fontSize: 16
+                                ),),
+                              ): ListView.builder(
+                                itemBuilder: (context, index) {
+                                  return Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 12.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            customerController.text =
+                                                "${customerDataList[index].firstName} ${customerDataList[index].lastName}";
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[100],
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            width:
+                                                MediaQuery.of(context).size.width,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(12.0),
+                                              child: Text(
+                                                "${customerDataList[index].firstName} ${customerDataList[index].lastName}",
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w500),
                                               ),
                                             ),
-                                            BlocProvider.of<CustomerBloc>(
-                                                                context)
-                                                            .currentPage <=
-                                                        BlocProvider.of<
-                                                                    CustomerBloc>(
-                                                                context)
-                                                            .totalPages &&
-                                                    index ==
-                                                        customerDataList
-                                                                .length -
-                                                            1
-                                                ? const Column(
-                                                    children: [
-                                                      SizedBox(height: 24),
-                                                      Center(
-                                                        child:
-                                                            CupertinoActivityIndicator(),
-                                                      ),
-                                                      SizedBox(height: 24),
-                                                    ],
-                                                  )
-                                                : const SizedBox(),
-                                          ],
-                                        );
-                                      },
-                                      controller: customerScrollController
-                                        ..addListener(() {
-                                          if (customerScrollController.offset ==
-                                                  customerScrollController
-                                                      .position
-                                                      .maxScrollExtent &&
-                                              !BlocProvider.of<CustomerBloc>(
-                                                      context)
-                                                  .isPaginationLoading &&
-                                              BlocProvider.of<CustomerBloc>(
-                                                          context)
-                                                      .currentPage <=
-                                                  BlocProvider.of<CustomerBloc>(
-                                                          context)
-                                                      .totalPages) {
-                                            _debouncer.run(() {
-                                              BlocProvider.of<CustomerBloc>(
-                                                      context)
-                                                  .isPaginationLoading = true;
-                                              BlocProvider.of<CustomerBloc>(
-                                                      context)
-                                                  .add(customerDetails(
-                                                      query: ''));
-                                            });
-                                          }
-                                        }),
-                                      itemCount: customerDataList.length,
-                                      shrinkWrap: true,
-                                      physics: const ClampingScrollPhysics(),
-                                    ),
+                                          ),
+                                        ),
+                                      ),
+
+                                       BlocProvider.of<CustomerBloc>(context) .currentPage <=  BlocProvider.of<CustomerBloc>(context).totalPages &&
+                                                  index ==
+                                                      customerDataList .length - 1
+                                              ? const Column(
+                                                  children: [
+                                                    SizedBox(height: 24),
+                                                    Center(
+                                                      child:
+                                                          CupertinoActivityIndicator(),
+                                                    ),
+                                                    SizedBox(height: 24),
+                                                  ],
+                                                )
+                                              : const SizedBox(),
+                                    ],
+                                  );
+                                },
+                                controller: customerScrollController..addListener(() {
+                                   if (customerScrollController.offset ==
+                                                customerScrollController
+                                                    .position.maxScrollExtent &&
+                                            !BlocProvider.of<CustomerBloc>(context) .isPaginationLoading &&
+                                            BlocProvider.of<CustomerBloc>(context).currentPage <=
+                                                BlocProvider.of<CustomerBloc>(context).totalPages) {
+                                          _debouncer.run(() {
+                                            BlocProvider.of<CustomerBloc>(context).isPaginationLoading = true;
+                                            BlocProvider.of<CustomerBloc>(context).add(
+                                                customerDetails(query: ''));
+                                          });
+                                        }
+                                }),
+                                itemCount: customerDataList.length,
+                                shrinkWrap: true,
+                                physics: const ClampingScrollPhysics(),
+                              ),
                             ),
                           )
                   ],
@@ -920,7 +841,8 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
       create: (context) => VechileBloc()..add(GetAllVechile()),
       child: BlocListener<VechileBloc, VechileState>(
         listener: (context, state) {
-          if (state is VechileDetailsSuccessStates) {
+
+          if(state is VechileDetailsSuccessStates){
             vehicleDataList.addAll(state.vechile.data.data);
           }
 
@@ -949,10 +871,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           fontWeight: FontWeight.w500),
                     ),
                     state is VechileDetailsPageNationLoading
-                        ? const Center(
+                       
+                        ?  const Center(
                             child: CupertinoActivityIndicator(),
-                          )
-                        : Padding(
+                          ):
+                        Padding(
                             padding: const EdgeInsets.only(top: 12.0),
                             child: LimitedBox(
                               maxHeight:
@@ -967,9 +890,6 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                           onTap: () {
                                             vehicleController.text =
                                                 "${vehicleDataList[index].vehicleYear} ${vehicleDataList[index].vehicleModel}";
-
-                                            vehicleId =
-                                                vehicleDataList[index].id;
                                             Navigator.pop(context);
                                           },
                                           child: Container(
@@ -978,30 +898,24 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                                 color: Colors.grey[100],
                                                 borderRadius:
                                                     BorderRadius.circular(8)),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
+                                            width:
+                                                MediaQuery.of(context).size.width,
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
+                                              padding: const EdgeInsets.all(12.0),
                                               child: Text(
                                                 "${vehicleDataList[index].vehicleYear} ${vehicleDataList[index].vehicleModel}",
                                                 style: const TextStyle(
                                                     fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w500),
+                                                    fontWeight: FontWeight.w500),
                                               ),
                                             ),
                                           ),
                                         ),
-                                        BlocProvider.of<VechileBloc>(context)
-                                                        .currentPage <=
-                                                    BlocProvider.of<
-                                                                VechileBloc>(
-                                                            context)
-                                                        .totalPages &&
-                                                index ==
-                                                    vehicleDataList.length - 1
+
+
+                                        BlocProvider.of<VechileBloc>(context) .currentPage <=
+                                                    BlocProvider.of<VechileBloc>(context).totalPages &&
+                                                index == vehicleDataList.length - 1
                                             ? const Column(
                                                 children: [
                                                   SizedBox(height: 24),
@@ -1019,30 +933,25 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                 },
                                 itemCount: vehicleDataList.length,
                                 shrinkWrap: true,
-                                controller: vehicleScrollController
-                                  ..addListener(() {
-                                    if (vehicleScrollController.offset ==
-                                            vehicleScrollController
-                                                .position.maxScrollExtent &&
-                                        !BlocProvider.of<VechileBloc>(context)
-                                            .isPagenationLoading &&
-                                        BlocProvider.of<VechileBloc>(context)
-                                                .currentPage <=
-                                            BlocProvider.of<VechileBloc>(
-                                                    context)
-                                                .totalPages) {
-                                      _debouncer.run(() {
-                                        BlocProvider.of<VechileBloc>(context)
-                                            .isPagenationLoading = true;
-                                        BlocProvider.of<VechileBloc>(context)
-                                            .add(GetAllVechile());
-                                      });
-                                    }
-                                  }),
+                                controller: vehicleScrollController..addListener(() {
+                                   if (vehicleScrollController.offset ==
+                                              vehicleScrollController
+                                                  .position.maxScrollExtent &&
+                                          !BlocProvider.of<VechileBloc>(context) .isPagenationLoading &&
+                                         BlocProvider.of<VechileBloc>(context).currentPage <=
+                                             BlocProvider.of<VechileBloc>(context).totalPages) {
+                                        _debouncer.run(() {
+                                         BlocProvider.of<VechileBloc>(context).isPagenationLoading = true;
+                                          BlocProvider.of<VechileBloc>(context).add(GetAllVechile());
+                                        });
+                                      }
+                                  
+
+                                }),
                                 physics: ClampingScrollPhysics(),
                               ),
                             ),
-                          )
+                          ) 
                   ],
                 ),
               ),
@@ -1052,6 +961,8 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
       ),
     );
   }
+
+
 
   void showActionSheet(BuildContext context) {
     showCupertinoModalPopup<void>(
@@ -1107,6 +1018,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
     );
   }
 
+
   void selectImages(source) async {
     if (source == "camera") {
       selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
@@ -1128,142 +1040,18 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
     setState(() {});
   }
 
-  Widget servicesBottomSheet() {
-    return BlocProvider(
-      create: (context) => ServiceBloc()..add(GetAllServicess(query: "")),
-      child: BlocListener<ServiceBloc, ServiceState>(
-        listener: (context, state) {
-          if (state is GetServiceSucessState) {
-            print(serviceList.length);
-            serviceList.addAll(state.serviceModel.data.data);
-          }
 
-          // TODO: implement listener
-        },
-        child: BlocBuilder<ServiceBloc, ServiceState>(
-          builder: (context, state) {
-            return Container(
-              height: MediaQuery.of(context).size.height / 1.8,
-              width: MediaQuery.of(context).size.width / 1.8,
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      topRight: Radius.circular(8))),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Services",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    state is GetServiceLoadingState
-                        ? const Center(
-                            child: CupertinoActivityIndicator(),
-                          )
-                        : Padding(
-                            padding: const EdgeInsets.only(top: 12.0),
-                            child: LimitedBox(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height / 1.8 - 78,
-                              child: ListView.builder(
-                                itemBuilder: (context, index) {
-                                  if (index == serviceList.length) {
-                                    return BlocProvider.of<ServiceBloc>(context)
-                                                    .currentPage <=
-                                                BlocProvider.of<ServiceBloc>(
-                                                        context)
-                                                    .totalPages &&
-                                            BlocProvider.of<ServiceBloc>(
-                                                        context)
-                                                    .currentPage !=
-                                                0
-                                        ? const SizedBox(
-                                            height: 40,
-                                            child: CupertinoActivityIndicator(
-                                              color: AppColors.primaryColors,
-                                            ))
-                                        : Container();
-                                  }
 
-                                  return Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: Column(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            serviceController.text =
-                                                serviceList[index].serviceName;
-                                            Navigator.pop(context);
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                                color: Colors.grey[100],
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              child: Text(
-                                                serviceList[index].serviceName,
-                                                style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                                itemCount: serviceList.length + 1,
-                                shrinkWrap: true,
-                                controller: serviceScrollController
-                                  ..addListener(() {
-                                    if ((BlocProvider.of<ServiceBloc>(context)
-                                                .currentPage <=
-                                            BlocProvider.of<ServiceBloc>(
-                                                    context)
-                                                .totalPages) &&
-                                        serviceScrollController.offset ==
-                                            serviceScrollController
-                                                .position.maxScrollExtent &&
-                                        BlocProvider.of<ServiceBloc>(context)
-                                                .currentPage !=
-                                            0 &&
-                                        !BlocProvider.of<ServiceBloc>(context)
-                                            .isFetching) {
-                                      _debouncer.run(() {
-                                        BlocProvider.of<ServiceBloc>(context)
-                                            .add(GetAllServicess(query: ""));
 
-                                        BlocProvider.of<ServiceBloc>(context)
-                                            .isFetching = true;
-                                      });
-                                    }
-                                  }),
-                                physics: ClampingScrollPhysics(),
-                              ),
-                            ),
-                          )
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+
+
+
+
+
+ 
+
+  
+
+
+  
 }
