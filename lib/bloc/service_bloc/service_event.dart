@@ -9,7 +9,7 @@ abstract class ServiceEvent extends Equatable {
 
 class GetAllServicess extends ServiceEvent {
   final String query;
-  GetAllServicess({this.query = ''});
+  GetAllServicess({required this.query});
 }
 
 class CreateServices extends ServiceEvent {
