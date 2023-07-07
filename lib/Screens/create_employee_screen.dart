@@ -142,7 +142,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter Your First Name', firstNameController,
+                    textBox('Enter First Name', firstNameController,
                         'First Name', firstNameError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -160,8 +160,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter Your Last Name', lastNameController,
-                        'Last Name', lastNameError.isNotEmpty, context),
+                    textBox('Enter Last Name', lastNameController, 'Last Name',
+                        lastNameError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Visibility(

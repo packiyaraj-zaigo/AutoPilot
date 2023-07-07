@@ -167,7 +167,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 Navigator.pop(context);
               }
             },
-            child: Icon(Icons.arrow_back)),
+            child: const Icon(
+              Icons.arrow_back,
+              color: AppColors.primaryColors,
+            )),
       ),
       bottomNavigationBar: Padding(
         padding:
@@ -180,7 +183,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             } else if (widget.widgetIndex == 1) {
               validateOperationDetails();
             } else if (widget.widgetIndex == 2) {
-              validateEmployeeDetails();
+              employeeList.forEach((element) {
+                employeeDetailsMap.addAll({
+                  element.id.toString():
+                      "${element.firstName} ${element.lastName}"
+                });
+              });
+
+              print(employeeDetailsMap);
+
+              Navigator.pop(context, employeeDetailsMap);
             }
           },
           child: Container(
@@ -327,7 +339,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             textBox("Enter Percentage Rate", taxRateController, "Tax Rate",
                 taxRateErrorStatus),
             errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),
-            taxSwitchWidget("Tax Labour", taxLabourSwitchValue),
+            taxSwitchWidget("Tax Labor", taxLabourSwitchValue),
             taxSwitchWidget("Tax Parts", taxPartSwitchValue),
             taxSwitchWidget("Tax Material", taxMaterialSwitchValue)
           ],
@@ -679,7 +691,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Timezone",
+            "Time Zone",
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
@@ -759,7 +771,27 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           ),
           Transform.scale(
               scale: 0.8,
-              child: CupertinoSwitch(value: switchValue, onChanged: (value) {}))
+              child: CupertinoSwitch(
+                  value: label == "Tax Labor"
+                      ? taxLabourSwitchValue
+                      : label == "Tax Parts"
+                          ? taxPartSwitchValue
+                          : taxMaterialSwitchValue,
+                  onChanged: (value) {
+                    if (label == "Tax Labor") {
+                      setState(() {
+                        taxLabourSwitchValue = value;
+                      });
+                    } else if (label == "Tax Parts") {
+                      setState(() {
+                        taxPartSwitchValue = value;
+                      });
+                    } else if (label == "Tax Material") {
+                      setState(() {
+                        taxMaterialSwitchValue = value;
+                      });
+                    }
+                  }))
         ],
       ),
     );
@@ -1166,6 +1198,17 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             listener: (context, state) {
               if (state is EmployeeDetailsSuccessState) {
                 employeeList.addAll(state.employees.employeeList ?? []);
+
+                // if (employeeList.isNotEmpty) {
+                //   employeeList.forEach((element) {
+                //     employeeDetailsMap.addAll({
+                //       element.id.toString():
+                //           "${element.firstName} ${element.lastName}"
+                //     });
+                //   });
+
+                //   print(employeeDetailsMap);
+                // }
               }
             },
             child: BlocBuilder<EmployeeBloc, EmployeeState>(

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Screens/add_company_details.dart';
 import 'package:auto_pilot/Screens/add_company_review_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
@@ -21,7 +23,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
   Map<String, dynamic>? basicDetailsMap = {};
   Map<String, dynamic>? operationDetailsMap = {};
   Map<String, dynamic>? employeeDetailsMap = {};
-  bool? isEmployee = false;
+  // bool? isEmployee = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -168,8 +170,9 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                 onTap: () async {
                   await Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) {
-                      return const AddCompanyDetailsScreen(
+                      return AddCompanyDetailsScreen(
                         widgetIndex: 1,
+                        operationDetailsMap: operationDetailsMap,
                       );
                     },
                   )).then((value) {
@@ -196,6 +199,7 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                   )).then((value) {
                     setState(() {
                       employeeDetailsMap = value;
+                      log(employeeDetailsMap.toString());
                     });
                   });
                 },

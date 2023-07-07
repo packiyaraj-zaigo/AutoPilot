@@ -303,12 +303,12 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 28.0),
-          child: textBox("Enter your email", loginEmailController, "Email",
+          child: textBox("Enter Your Email", loginEmailController, "Email",
               loginErrorStatus, false),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 18.0),
-          child: textBox("Enter your password", loginPasswordController,
+          child: textBox("Enter Your Password", loginPasswordController,
               "Password", loginErrorStatus, false),
         ),
         Padding(
@@ -588,7 +588,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             child: TextField(
               controller: controller,
               maxLength: 50,
-              inputFormatters: label == 'First name'
+              inputFormatters: label == 'First Name'
                   ? [
                       FilteringTextInputFormatter.deny(RegExp("[0-9]")),
                       FilteringTextInputFormatter.deny(
@@ -646,9 +646,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              halfTextBox("Enter first name", firstNameController, "First name",
+              halfTextBox("Enter First Name", firstNameController, "First Name",
                   nameErrorStaus),
-              halfTextBox("Enter last name", lastNameController, "Last name",
+              halfTextBox("Enter Last Name", lastNameController, "Last Name",
                   lastNameErrorStatus),
             ],
           ),
@@ -683,7 +683,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Enter your email", signUpEmailController, "Email",
+          child: textBox("Enter Your Email", signUpEmailController, "Email",
               emailErrorStatus, true),
         ),
         Padding(
@@ -701,7 +701,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Enter your phone number", phoneNumberController,
+          child: textBox("Enter Your Phone Number", phoneNumberController,
               "Phone Number", phoneNumberErrorStatus, true),
         ),
         Padding(
@@ -721,7 +721,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Min. 8 characters", signUpPasswordController,
+          child: textBox("Minimum 8 characters", signUpPasswordController,
               "Password", passwordErrorStatus, true),
         ),
         Padding(
@@ -906,7 +906,10 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 widget.widgetIndex = 0;
               });
             },
-            child: Icon(Icons.close)),
+            child: const Icon(
+              Icons.close,
+              color: AppColors.primaryColors,
+            )),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black,
@@ -977,7 +980,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xff333333)),
+                              color: AppColors.primaryColors),
                         ),
                       ),
                     ),
