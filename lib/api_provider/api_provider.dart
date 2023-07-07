@@ -400,6 +400,22 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> calendarWeekLoad(String token, DateTime selectedDate) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      var url = Uri.parse(
+          '${BASE_URL}api/calendar_events_weekly?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 6)}');
+      var request = http.MultipartRequest("GET", url);
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      print('callllllllllllllllll${response.statusCode.toString()}');
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
   Future<dynamic> createEmployee(
       String token, EmployeeCreationModel model) async {
     try {

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 
 import '../../Models/calendar_model.dart';
+import '../../Models/calendar_week_model.dart';
 import '../../api_provider/api_repository.dart';
 import '../../utils/app_utils.dart';
 import 'calendar_event.dart';
@@ -12,13 +13,12 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
   final ApiRepository _apiRepository;
   int showLoading = 0;
   DateTime? selectedDate;
-
   CalendarBloc({
     required ApiRepository apiRepository,
   })  : _apiRepository = apiRepository,
         super(CalendarInitial()) {
     on<CalendarDetails>(calendarEvent);
-    // on<CalendarButtonUpdate>(calendarButtonUpdate);
+    on<CalendarWeekDetails>(calendarWeekEvent);
   }
   Future<void> calendarEvent(
     CalendarDetails event,
@@ -37,6 +37,26 @@ class CalendarBloc extends Bloc<CalendarEvent, CalendarState> {
     } catch (e) {
       showLoading = 0;
       emit(CalendarError(message: e.toString()));
+    }
+  }
+
+  Future<void> calendarWeekEvent(
+    CalendarWeekDetails event,
+    Emitter<CalendarState> emit,
+  ) async {
+    try {
+      emit(CalendarWeekLoading());
+      final token = await AppUtils.getToken();
+      Response loadedResponse =
+          await _apiRepository.calendarWeekLoad(token, event.startDate);
+      if (loadedResponse.statusCode == 200) {
+        emit(CalendarWeekReady(
+            calendarWeekModel: calendarWeekModelFromJson(loadedResponse.body)));
+        print('=======-------------------------${loadedResponse.body}');
+      }
+    } catch (e) {
+      showLoading = 0;
+      emit(CalendarWeekError(message: e.toString()));
     }
   }
 }

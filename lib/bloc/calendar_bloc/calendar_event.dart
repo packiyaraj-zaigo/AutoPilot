@@ -12,3 +12,12 @@ class CalendarDetails extends CalendarEvent {
   @override
   List<Object?> get props => [];
 }
+
+class CalendarWeekDetails extends CalendarEvent {
+  final DateTime startDate;
+  final DateTime endDate;
+  CalendarWeekDetails({required this.startDate, required this.endDate});
+
+  @override
+  List<Object?> get props => [];
+}
