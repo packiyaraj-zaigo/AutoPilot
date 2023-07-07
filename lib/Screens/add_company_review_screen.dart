@@ -10,9 +10,11 @@ class AddCompanyReviewScreen extends StatefulWidget {
   const AddCompanyReviewScreen(
       {super.key,
       required this.basicDetailsMap,
-      required this.operationDetailsMap});
+      required this.operationDetailsMap,
+      required this.employeeDetailsMap});
   final Map<String, dynamic> basicDetailsMap;
   final Map<String, dynamic> operationDetailsMap;
+  final Map<String, dynamic> employeeDetailsMap;
 
   @override
   State<AddCompanyReviewScreen> createState() => _AddCompanyReviewScreenState();
@@ -43,9 +45,8 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                     Map<String, dynamic> finalDataMap = {}
                       ..addAll(widget.basicDetailsMap)
                       ..addAll(widget.operationDetailsMap);
-                    context
-                        .read<DashboardBloc>()
-                        .add(AddCompanyEvent(dataMap: finalDataMap,context: context));
+                    context.read<DashboardBloc>().add(AddCompanyEvent(
+                        dataMap: finalDataMap, context: context));
                   },
                   child: Container(
                     height: 56,
@@ -55,17 +56,19 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                       borderRadius: BorderRadius.circular(12),
                       color: AppColors.primaryColors,
                     ),
-                    child:state is AddCompanyLoadingState?const Center(
-                      child: CupertinoActivityIndicator(
-                        color: Colors.white,
-                      ),
-                    ): const Text(
-                      "Confirm",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    ),
+                    child: state is AddCompanyLoadingState
+                        ? const Center(
+                            child: CupertinoActivityIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Confirm",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          ),
                   ),
                 ),
               ),
@@ -104,19 +107,20 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                     detailsWidget(
                         "Phone", widget.basicDetailsMap['phone'], "basic"),
                     dividerLine(),
-                    detailsWidget("Website", "", "basic"),
+                    detailsWidget(
+                        "Website", widget.basicDetailsMap['website'], "basic"),
                     dividerLine(),
                     detailsWidget("Timezone",
                         widget.operationDetailsMap['time_zone'], "operation"),
                     dividerLine(),
                     detailsWidget(
                         "Tax Rate",
-                        widget.operationDetailsMap['sales_tax_rate'],
+                        "${widget.operationDetailsMap['sales_tax_rate']} %",
                         "operation"),
                     dividerLine(),
                     detailsWidget(
                         "Base Labor Cost",
-                        widget.operationDetailsMap['base_labor_cost'],
+                        "${widget.operationDetailsMap['base_labor_cost']} \$ per hour",
                         "operation"),
                     dividerLine(),
                     detailsWidget("Employees", "", "employee"),

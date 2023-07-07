@@ -275,8 +275,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                                           const SizedBox(
                                                               height: 3),
                                                           Text(
-                                                            item.roles?[0]
-                                                                    .name ??
+                                                            item.roles?[0].name
+                                                                    ?.toUpperCase() ??
                                                                 '',
                                                             overflow:
                                                                 TextOverflow

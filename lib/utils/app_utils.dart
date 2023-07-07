@@ -224,12 +224,9 @@ class AppUtils {
     return outputDate;
   }
 
-  static getTimeFormatted(String time) {
-    var inputFormat = DateFormat('HH:mm');
-    var inputTime = inputFormat.parse(time);
-
-    var outputFormat = DateFormat('h a');
-    var outputTime = outputFormat.format(inputTime);
+  static getTimeFormatted(DateTime date) {
+    var outputFormat = DateFormat('M/d h:mm a');
+    var outputTime = outputFormat.format(date);
     return outputTime;
   }
 
