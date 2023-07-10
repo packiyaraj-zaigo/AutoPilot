@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,9 @@ import '../utils/app_colors.dart';
 import '../utils/app_strings.dart';
 
 class NewCustomerScreen extends StatefulWidget {
-  const NewCustomerScreen({Key? key}) : super(key: key);
+  const NewCustomerScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<NewCustomerScreen> createState() => _NewCustomerScreenState();

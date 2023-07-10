@@ -44,6 +44,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<SendCustomerMessageEvent>(sendCustomerMessageBloc);
     on<GetProvinceEvent>(getProvinceBloc);
     on<GetCustomerMessagePaginationEvent>(getCustomerMessagePaginationBloc);
+    on<DeleteCustomerEvent>(deleteCustomer);
   }
   Future<void> CustomerEvent(
     customerDetails event,
@@ -294,6 +295,31 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
       emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
       isEmployeesLoading = false;
       isPaginationLoading = false;
+    }
+  }
+
+  Future<void> deleteCustomer(
+    DeleteCustomerEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      Response loadedResponse = await _apiRepository.deleteCustomer(token, event.customerId);
+      if (loadedResponse.statusCode == 200) {
+        print('lllllllllll');
+        final responseBody = jsonDecode(loadedResponse.body);
+        emit(
+          DeleteCustomer(
+            customer: Data.fromJson(
+              responseBody['data'],
+            ),
+          ),
+        );
+      }
+      print('ccccccccc${loadedResponse.body}ccccccc');
+    } catch (e) {
+      showLoading = 0;
+      emit(DeleteCustomerErrorState(errorMsg: "Something went wrong"));
     }
   }
 }

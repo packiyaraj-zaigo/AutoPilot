@@ -384,12 +384,25 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> deleteCustomer(token, customerId) async {
+    try {
+      var url = Uri.parse('${BASE_URL}api/customers/$customerId');
+      var request = http.MultipartRequest("DELETE", url)
+        ..headers['Authorization'] = "Bearer $token";
+      var response = await request.send();
+      print('hggggggggggggg${response.statusCode.toString()}');
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
   Future<dynamic> calendarload(String token, DateTime selectedDate) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       var url = Uri.parse(
-          '${BASE_URL}api/calendar_events_mobile?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1)}');
+          '${BASE_URL}api/calendar_events_mobile?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1, selectedDate.minute - 1)}');
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();

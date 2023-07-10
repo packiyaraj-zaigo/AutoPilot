@@ -81,3 +81,15 @@ class GetCustomerMessagePaginationState extends CustomerState {
 }
 
 class GetCustomerMessagePaginationLoadingState extends CustomerState {}
+
+class DeleteCustomer extends CustomerState {
+  final Data customer;
+  DeleteCustomer({required this.customer});
+}
+
+class DeleteCustomerErrorState extends CustomerState {
+  final String errorMsg;
+  const DeleteCustomerErrorState({required this.errorMsg});
+  @override
+  List<Object> get props => [errorMsg];
+}
