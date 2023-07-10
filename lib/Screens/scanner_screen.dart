@@ -405,48 +405,48 @@ class _ScannerScreenState extends State<ScannerScreen>
         borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Row(children: [
-              Icon(
+              const Icon(
                 CupertinoIcons.calendar,
                 size: 18,
                 color: Color(0xFF9A9A9A),
               ),
-              SizedBox(width: 3),
+              const SizedBox(width: 3),
               Text(
                 estimate.createdAt == null
                     ? ''
                     : AppUtils.getFormatted(
                         estimate.createdAt.toString(),
                       ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF9A9A9A),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Icon(
+              const Icon(
                 CupertinoIcons.minus,
                 size: 18,
                 color: Color(0xFF9A9A9A),
               ),
-              Icon(
+              const Icon(
                 CupertinoIcons.calendar,
                 size: 18,
                 color: Color(0xFF9A9A9A),
               ),
-              SizedBox(width: 3),
+              const SizedBox(width: 3),
               Text(
                 estimate.completionDate == null
                     ? ''
                     : AppUtils.getFormatted(
                         estimate.createdAt.toString(),
                       ),
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFF9A9A9A),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
@@ -455,21 +455,21 @@ class _ScannerScreenState extends State<ScannerScreen>
             ]),
             Text(
               'Estimate #${estimate.id ?? ''} - ${estimate.estimationName}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Color(0xFF333333),
               ),
             ),
             Text(
               '${estimate.customer?.firstName ?? ""} ${estimate.customer?.lastName ?? ""}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),
               ),
             ),
             Text(
               '${estimate.vehicle?.vehicleYear ?? ''} ${estimate.vehicle?.vehicleModel ?? ''}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),
               ),
@@ -517,7 +517,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       ),
                     ),
                     Text(
-                      '${vehicle.vehicleColor == null ? '' : vehicle.vehicleColor == '' ? '' : '${vehicle.vehicleColor!}, '} ${vehicle.vehicleType}',
+                      '${vehicle.vehicleColor == null ? '' : vehicle.vehicleColor == '' ? '' : '${vehicle.vehicleColor!}, '}${vehicle.vehicleType}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF333333),
@@ -811,11 +811,11 @@ class _ScannerScreenState extends State<ScannerScreen>
                   separatorBuilder: (context, index) =>
                       const SizedBox(height: 16),
                   itemCount: estimates.length),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               bloc.currentEstimatePage < bloc.totalEstimatePages
                   ? const Center(child: CupertinoActivityIndicator())
                   : const SizedBox(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           ),
         ),

@@ -826,4 +826,24 @@ class ApiProvider {
       log(e.toString() + "put workflows error");
     }
   }
+
+  Future<dynamic> getTechniciansOnly(String token) async {
+    print("into provider");
+
+    try {
+      var url = Uri.parse(
+        "${BASE_URL}api/users/role/Technician",
+      );
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
 }
