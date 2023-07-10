@@ -167,7 +167,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 Navigator.pop(context);
               }
             },
-            child: Icon(Icons.arrow_back)),
+            child: const Icon(
+              Icons.arrow_back,
+              color: AppColors.primaryColors,
+            )),
       ),
       bottomNavigationBar: Padding(
         padding:
@@ -702,6 +705,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 child: ButtonTheme(
                   alignedDropdown: true,
                   child: DropdownButtonFormField<tz.Location>(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      color: AppColors.primaryColors,
+                    ),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       focusedBorder: InputBorder.none,
