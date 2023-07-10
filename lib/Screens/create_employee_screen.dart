@@ -14,7 +14,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateEmployeeScreen extends StatefulWidget {
-  const CreateEmployeeScreen({super.key,required this.navigation});
+  const CreateEmployeeScreen({super.key, required this.navigation});
   final String navigation;
 
   @override
@@ -58,19 +58,15 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-
-              if(widget.navigation=="add_employee"){
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => EmployeeListScreen(),
-              ));
-
-              }else{
-                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
-              ));
-
+              if (widget.navigation == "add_employee") {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => EmployeeListScreen(),
+                ));
+              } else {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
+                ));
               }
-             
             },
             child: const Icon(
               Icons.close,
@@ -91,16 +87,15 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
               if (state is EmployeeRolesErrorState) {
                 CommonWidgets().showDialog(
                     context, 'Something went wrong please try again later');
-                if(widget.navigation=="add_employee"){
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => EmployeeListScreen(),
-                ));
-
-                }else{
+                if (widget.navigation == "add_employee") {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
-                ));
-
+                    builder: (context) => EmployeeListScreen(),
+                  ));
+                } else {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) =>
+                        AddCompanyDetailsScreen(widgetIndex: 2),
+                  ));
                 }
               } else if (state is EmployeeCreateErrorState) {
                 CommonWidgets().showDialog(context, state.message);
@@ -110,18 +105,16 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
               } else if (state is EmployeeCreateSuccessState) {
                 // BlocProvider.of<EmployeeBloc>(context).add(GetAllEmployees());
 
-                if(widget.navigation=="add_employee"){
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => EmployeeListScreen(),
-                ));
-
-                }else{
+                if (widget.navigation == "add_employee") {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
-                ));
-
+                    builder: (context) => EmployeeListScreen(),
+                  ));
+                } else {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) =>
+                        AddCompanyDetailsScreen(widgetIndex: 2),
+                  ));
                 }
-              
               }
             },
             child: BlocBuilder<EmployeeBloc, EmployeeState>(
@@ -149,8 +142,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter your first name', firstNameController, 'First Name',
-                        firstNameError.isNotEmpty, context),
+                    textBox('Enter First Name', firstNameController,
+                        'First Name', firstNameError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Visibility(
@@ -167,7 +160,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter your last name', lastNameController, 'Last Name',
+                    textBox('Enter Last Name', lastNameController, 'Last Name',
                         lastNameError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -185,7 +178,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('Enter your email', emailController, 'Email',
+                    textBox('Enter Your Email', emailController, 'Email',
                         emailError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -203,7 +196,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 16),
-                    textBox('ex. (555) 555-5555', phoneController, 'Phone',
+                    textBox('Ex. (555) 555-5555', phoneController, 'Phone',
                         phoneError.isNotEmpty, context),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
@@ -223,7 +216,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                     const SizedBox(height: 16),
                     const Row(
                       children: [
-                         Text(
+                        Text(
                           "Position",
                           style: TextStyle(
                             fontSize: 14,
@@ -231,18 +224,16 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                             color: Color(0xff6A7187),
                           ),
                         ),
-
-
-                          Text(
-              " *",
-              style:  TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Color(
-                                0xffD80027,
-                              ),
-              ),
-            ),
+                        Text(
+                          " *",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(
+                              0xffD80027,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     SizedBox(height: 10),
@@ -317,7 +308,10 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                         final validate = validation();
                         if (validate) {
                           final clientId = await AppUtils.getUserID();
-                          print(phoneController.text.trim().replaceAll(RegExp(r'[^\w\s]+'),'').replaceAll(" ", ""));
+                          print(phoneController.text
+                              .trim()
+                              .replaceAll(RegExp(r'[^\w\s]+'), '')
+                              .replaceAll(" ", ""));
                           bloc.add(
                             CreateEmployee(
                               model: EmployeeCreationModel(
@@ -325,7 +319,9 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                 email: emailController.text.trim(),
                                 firstName: firstNameController.text.trim(),
                                 lastName: lastNameController.text.trim(),
-                                phone: phoneController.text.trim().replaceAll(RegExp(r'[^\w\s]+'),''),
+                                phone: phoneController.text
+                                    .trim()
+                                    .replaceAll(RegExp(r'[^\w\s]+'), ''),
                                 role: dropdownValue,
                               ),
                             ),
@@ -377,15 +373,14 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 color: Color(0xff6A7187),
               ),
             ),
-
-             const Text(
+            const Text(
               " *",
-              style:  TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 color: Color(
-                                0xffD80027,
-                              ),
+                  0xffD80027,
+                ),
               ),
             ),
           ],
@@ -539,7 +534,11 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     if (phoneController.text.trim().isEmpty) {
       phoneError = "Phone number can't be empty";
       status = false;
-    } else if (phoneController.text.replaceAll(RegExp(r'[^\w\s]+'),'').replaceAll(" ", "").length < 6) {
+    } else if (phoneController.text
+            .replaceAll(RegExp(r'[^\w\s]+'), '')
+            .replaceAll(" ", "")
+            .length <
+        6) {
       phoneError = 'Enter a valid phone number';
       status = false;
     } else {

@@ -224,23 +224,19 @@ class ApiProvider {
 
   Future<dynamic> getServices(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}order_services';
+      String url = '${BASE_URL}api/canned_services?page=$page';
 
-      if (page != 1) {
-        url = '$url?page=$page';
-      }
       if (query != '') {
-        if (url.contains('?')) {
-          url = '$url&first_name=$query';
-        } else {
-          url = '$url?first_name=$query';
-        }
+        url = '$url&service_name=$query';
+      } else {
+        url = '${BASE_URL}api/canned_services?page=$page';
       }
+
       print(url);
       var response = http.get(Uri.parse(url), headers: getHeader(token));
       return response;
     } catch (e) {
-      print(e.toString() + 'get employee error');
+      print(e.toString() + 'get service error');
     }
   }
 
@@ -771,6 +767,32 @@ class ApiProvider {
       print(response.statusCode.toString() + "provider status code");
       print(response.toString() + "provider response");
       return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createNewEstimate(
+      int customerId, int vehicleId, dynamic token) async {
+    print("into provider");
+
+    Map bodymap = {
+      "customer_id": customerId,
+      "vehicle_id": vehicleId,
+      "estimation_name": "name",
+    };
+
+    var encodedBody = json.encode(bodymap);
+    log(encodedBody.toString());
+
+    try {
+      var url = Uri.parse("${BASE_URL}api/orders");
+
+      var response =
+          http.post(url, body: encodedBody, headers: getHeader(token));
+
+      inspect(response);
+      return response;
     } catch (e) {
       print(e.toString() + "provider error");
     }

@@ -42,7 +42,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
   bool emailErrorStatus = false;
   bool phoneNumberErrorStatus = false;
   bool passwordErrorStatus = false;
-  bool lastNameErrorStatus=false;
+  bool lastNameErrorStatus = false;
   bool isObscure = true;
 
   String loginErrorMsg = '';
@@ -50,7 +50,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
   String emailErrorMsg = '';
   String phoneErrorMsg = '';
   String passwordErrorMsg = '';
-  String lastNameErrorMsg='';
+  String lastNameErrorMsg = '';
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +64,6 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             signUpEmailController.clear();
             phoneNumberController.clear();
             signUpPasswordController.clear();
-
 
             showModalBottomSheet(
               context: context,
@@ -196,70 +195,70 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               // ),
 
               bottomNavigationBar: Padding(
-          padding: const EdgeInsets.only(bottom: 28.0, top: 0),
-          child: Container(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                widget.widgetIndex == 0
-                    ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.widgetIndex = 1;
-                          });
-                        },
-                        child: const Wrap(
-                          children: [
-                            Text(
-                              "Don't have an account?",
-                              style: TextStyle(
-                                color: Color(0xff061237),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              " Sign up",
-                              style: TextStyle(
-                                color: AppColors.primaryColors,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            )
-                          ],
-                        ),
-                      )
-                    : GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.widgetIndex = 0;
-                          });
-                        },
-                        child: const Wrap(
-                          children: [
-                            Text(
-                              "Already have an account?",
-                              style: TextStyle(
-                                color: Color(0xff061237),
-                                fontWeight: FontWeight.w400,
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              " Sign in",
-                              style: TextStyle(
-                                color: AppColors.primaryColors,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
+                padding: const EdgeInsets.only(bottom: 28.0, top: 0),
+                child: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      widget.widgetIndex == 0
+                          ? GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  widget.widgetIndex = 1;
+                                });
+                              },
+                              child: const Wrap(
+                                children: [
+                                  Text(
+                                    "Don't have an account? ",
+                                    style: TextStyle(
+                                      color: Color(0xff061237),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Text(
+                                    " Sign up",
+                                    style: TextStyle(
+                                      color: AppColors.primaryColors,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  )
+                                ],
                               ),
                             )
-                          ],
-                        ),
-                      ),
-              ],
-            ),
-          ),
-        ),
+                          : GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  widget.widgetIndex = 0;
+                                });
+                              },
+                              child: const Wrap(
+                                children: [
+                                  Text(
+                                    "Already have an account?",
+                                    style: TextStyle(
+                                      color: Color(0xff061237),
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  Text(
+                                    " Sign in",
+                                    style: TextStyle(
+                                      color: AppColors.primaryColors,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                    ],
+                  ),
+                ),
+              ),
               body: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
@@ -304,13 +303,13 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 28.0),
-          child: textBox("Enter your email", loginEmailController, "Email",
-              loginErrorStatus,false),
+          child: textBox("Enter Your Email", loginEmailController, "Email",
+              loginErrorStatus, false),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 18.0),
-          child: textBox("Enter your password", loginPasswordController,
-              "Password", loginErrorStatus,false),
+          child: textBox("Enter Your Password", loginPasswordController,
+              "Password", loginErrorStatus, false),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -321,7 +320,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                   visible: loginErrorStatus,
                   child: Text(
                     loginErrorMsg,
-                    style:const TextStyle(
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: Color(
@@ -332,6 +331,28 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             ],
           ),
         ),
+
+        Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      CupertinoPageRoute(
+                          builder: (BuildContext context) => ResetPassword()));
+                },
+                child: const Text("Forgot Password?",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryColors)),
+              ),
+            ],
+          ),
+        ),
         Padding(
           padding: const EdgeInsets.only(top: 32.0),
           child: GestureDetector(
@@ -339,8 +360,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               validateData(loginEmailController.text,
                   loginPasswordController.text, context);
 
-
-                  print("second tap");
+              print("second tap");
             },
             child: Container(
               height: 56,
@@ -365,7 +385,6 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           ),
         ),
 
-       
         SizedBox(height: 16),
         // GestureDetector(
         //   onTap: () async {
@@ -409,34 +428,12 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         //     ),
         //   ),
         // ),
-
-
-         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-           children: [
-             GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                  builder: (BuildContext context) =>
-                                      ResetPassword()));
-                        },
-                        child: const Text("Forgot Password?",
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryColors)),
-                      ),
-           ],
-         ),
-        
       ],
     );
   }
 
   Widget textBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus,bool isRequired) {
+      String label, bool errorStatus, bool isRequired) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -452,13 +449,15 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       fontWeight: FontWeight.w500,
                       color: Color(0xff6A7187)),
                 ),
-                isRequired? const Text(
-                  " *",
-                  style:  TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color:Color(0xFFD80027)),
-                ):const SizedBox(),
+                isRequired
+                    ? const Text(
+                        " *",
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(0xFFD80027)),
+                      )
+                    : const SizedBox(),
               ],
             ),
             // label == 'Password' && widget.widgetIndex == 0
@@ -486,11 +485,13 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              inputFormatters:label=='Phone Number'? [
-                PhoneInputFormatter(),
-               
-              //  FilteringTextInputFormatter.allow(RegExp("[0-9]"))
-              ]:[],
+              inputFormatters: label == 'Phone Number'
+                  ? [
+                      PhoneInputFormatter(),
+
+                      //  FilteringTextInputFormatter.allow(RegExp("[0-9]"))
+                    ]
+                  : [],
               keyboardType:
                   label == 'Phone Number' ? TextInputType.number : null,
               maxLength: label == 'Phone Number'
@@ -559,17 +560,19 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       fontWeight: FontWeight.w500,
                       color: Color(0xff6A7187)),
                 ),
-                const Text(" *",style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color:Color(0xFFD80027)
-                ),)
+                const Text(
+                  " *",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFFD80027)),
+                )
               ],
             ),
             label == 'Password'
                 ? const Text(
                     "Forgot Password?",
-                    style:  TextStyle(
+                    style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryColors),
@@ -585,18 +588,20 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             child: TextField(
               controller: controller,
               maxLength: 50,
-              inputFormatters: label=='First name'? [
-                
-                FilteringTextInputFormatter.deny(RegExp("[0-9]")),
-                FilteringTextInputFormatter.deny(RegExp(r"[!@#$%^&*()\-_=+{}[\]|;:',<.>/?~]")),
-                FilteringTextInputFormatter.deny(RegExp('["]')),
-
-              ]:[
-                FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                FilteringTextInputFormatter.deny(RegExp("[0-9]")),
-                FilteringTextInputFormatter.deny(RegExp(r"[!@#$%^&*()\-_=+{}[\]|;:',<.>/?~]")),
-                FilteringTextInputFormatter.deny(RegExp('["]')),
-              ],
+              inputFormatters: label == 'First Name'
+                  ? [
+                      FilteringTextInputFormatter.deny(RegExp("[0-9]")),
+                      FilteringTextInputFormatter.deny(
+                          RegExp(r"[!@#$%^&*()\-_=+{}[\]|;:',<.>/?~]")),
+                      FilteringTextInputFormatter.deny(RegExp('["]')),
+                    ]
+                  : [
+                      FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                      FilteringTextInputFormatter.deny(RegExp("[0-9]")),
+                      FilteringTextInputFormatter.deny(
+                          RegExp(r"[!@#$%^&*()\-_=+{}[\]|;:',<.>/?~]")),
+                      FilteringTextInputFormatter.deny(RegExp('["]')),
+                    ],
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
@@ -641,9 +646,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              halfTextBox("Enter first name", firstNameController, "First name",
+              halfTextBox("Enter First Name", firstNameController, "First Name",
                   nameErrorStaus),
-              halfTextBox("Enter last name", lastNameController, "Last name",
+              halfTextBox("Enter Last Name", lastNameController, "Last Name",
                   lastNameErrorStatus),
             ],
           ),
@@ -663,8 +668,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       color: Color(0xFFD80027),
                     ),
                   )),
-
-                   Visibility(
+              Visibility(
                   visible: lastNameErrorStatus,
                   child: Text(
                     lastNameErrorMsg,
@@ -674,17 +678,13 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       color: Color(0xFFD80027),
                     ),
                   )),
-
-
-
-                  
             ],
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Enter your email", signUpEmailController, "Email",
-              emailErrorStatus,true),
+          child: textBox("Enter Your Email", signUpEmailController, "Email",
+              emailErrorStatus, true),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -701,8 +701,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Enter your phone number", phoneNumberController,
-              "Phone Number", phoneNumberErrorStatus,true),
+          child: textBox("Enter Your Phone Number", phoneNumberController,
+              "Phone Number", phoneNumberErrorStatus, true),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -721,8 +721,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Min. 8 characters", signUpPasswordController,
-              "Password", passwordErrorStatus,true),
+          child: textBox("Minimum 8 characters", signUpPasswordController,
+              "Password", passwordErrorStatus, true),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
@@ -824,7 +824,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
           ),
         ),
 
-        const SizedBox(height: 20,)
+        const SizedBox(
+          height: 20,
+        )
         // Padding(
         //   padding: const EdgeInsets.only(bottom: 16.0, top: 24),
         //   child: Container(
@@ -904,7 +906,10 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                 widget.widgetIndex = 0;
               });
             },
-            child: Icon(Icons.close)),
+            child: const Icon(
+              Icons.close,
+              color: AppColors.primaryColors,
+            )),
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: Colors.black,
@@ -930,7 +935,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 8.0),
                       child: Text(
-                        "We just send you a confirmation email",
+                        "We just sent you a confirmation email",
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -975,7 +980,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                              color: Color(0xff333333)),
+                              color: AppColors.primaryColors),
                         ),
                       ),
                     ),
@@ -1032,19 +1037,18 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         nameErrorMsg = "First name can't be empty";
         nameErrorStaus = true;
       });
-    } else{
-      if(firstName.length<3){
+    } else {
+      if (firstName.length < 3) {
         setState(() {
-          nameErrorMsg="Please enter a valid first name";
+          nameErrorMsg = "Please enter a valid first name";
         });
-      }else{
-         setState(() {
-        nameErrorStaus=false;
-      });
-
+      } else {
+        setState(() {
+          nameErrorStaus = false;
+        });
       }
-     
-    }if (lastName.isEmpty) {
+    }
+    if (lastName.isEmpty) {
       {
         setState(() {
           lastNameErrorMsg = "Last name can't be empty";
@@ -1052,20 +1056,16 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         });
       }
     } else {
-
-      if(lastName.length<2){
+      if (lastName.length < 2) {
         setState(() {
-          lastNameErrorMsg="Please enter a valid last name";
-          lastNameErrorStatus=true;
+          lastNameErrorMsg = "Please enter a valid last name";
+          lastNameErrorStatus = true;
         });
-      }else{
-
+      } else {
         setState(() {
-        lastNameErrorStatus = false;
-      });
-
+          lastNameErrorStatus = false;
+        });
       }
-      
     }
 
     if (email.isEmpty) {

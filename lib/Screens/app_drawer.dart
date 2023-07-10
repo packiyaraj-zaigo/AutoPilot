@@ -1,6 +1,7 @@
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
+import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/Screens/time_card_screen.dart';
@@ -55,18 +56,33 @@ showDrawer(BuildContext context) {
             context, BottomBarScreen()),
         drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees",
             context, EmployeeListScreen()),
-        drawerTileWidget("assets/images/customer_drawer_icon.svg", "Customers",
-            context, CustomersScreen()),
+        drawerTileWidget(
+            "assets/images/customer_drawer_icon.svg",
+            "Customers",
+            context,
+            DummyScreen(
+              name: "Customer Screen",
+            )),
         drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles",
             context, BottomBarScreen()),
         drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
             context, BottomBarScreen()),
-        drawerTileWidget("assets/images/service_drawer_icon.svg", "Services",
-            context, ServicesListScreen()),
+        drawerTileWidget(
+            "assets/images/service_drawer_icon.svg",
+            "Services",
+            context,
+            DummyScreen(
+              name: "Service Screen",
+            )),
         drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
             context, BottomBarScreen()),
-        drawerTileWidget("assets/images/time_card_drawer_icon.svg",
-            "Time Cards", context, TimeCardsScreen()),
+        drawerTileWidget(
+            "assets/images/time_card_drawer_icon.svg",
+            "Time Cards",
+            context,
+            DummyScreen(
+              name: "Time Card Screen",
+            )),
         const SizedBox(
           height: 52,
         ),

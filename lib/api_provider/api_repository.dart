@@ -202,6 +202,10 @@ class ApiRepository {
     return apiProvider.sendCustomerMessage(
         token, clientId, customerId, messageBody);
   }
+
+  Future createNewEstimate(int customerId, int vehicleId, dynamic token) {
+    return apiProvider.createNewEstimate(customerId, vehicleId, token);
+  }
 }
 
 class NetworkError extends Error {}
