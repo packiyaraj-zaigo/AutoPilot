@@ -35,18 +35,3 @@ class ServiceCreateErrorState extends ServiceState {
 }
 
 class ServiceCreateSuccessState extends ServiceState {}
-
-class GetServiceSucessState extends ServiceState {
-  ServiceModel serviceModel;
-  GetServiceSucessState({required this.serviceModel});
-
-  @override
-  List<Object> get props => [serviceModel];
-}
-
-class GetServiceLoadingState extends ServiceState {}
-
-class GetServiceErrorState extends ServiceState {
-  final String errorMessage;
-  GetServiceErrorState({required this.errorMessage});
-}

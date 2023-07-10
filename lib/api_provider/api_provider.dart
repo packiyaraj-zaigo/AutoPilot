@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
-import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -349,6 +348,7 @@ class ApiProvider {
     state,
     city,
     pinCode,
+    stateId,
   ) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -365,14 +365,47 @@ class ApiProvider {
         ..fields['phone'] = mobileNo
         ..fields['notes'] = customerNotes
         ..fields['address_line_1'] = address
-        ..fields['state'] = state
+        ..fields['province_name'] = state
+        ..fields['province_id'] = stateId
         ..fields['town_city'] = city
         ..fields['zipcode'] = pinCode;
 
       var response = await request.send();
-      print('object===============================');
+      print('object========id: ${stateId}=name:=${state}=====================');
       if (response.statusCode == 200 || response.statusCode == 201) {}
       print(response.statusCode.toString());
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
+  Future<dynamic> calendarload(String token, DateTime selectedDate) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      var url = Uri.parse(
+          '${BASE_URL}api/calendar_events_mobile?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1)}');
+      var request = http.MultipartRequest("GET", url);
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      print('callllllllllllllllll${response.statusCode.toString()}');
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
+  Future<dynamic> calendarWeekLoad(String token, DateTime selectedDate) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      var url = Uri.parse(
+          '${BASE_URL}api/calendar_events_weekly?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 6)}');
+      var request = http.MultipartRequest("GET", url);
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      print('callllllllllllllllll${response.statusCode.toString()}');
       return http.Response.fromStream(response);
     } catch (e) {
       print("errroor draft found ${e.toString()}");

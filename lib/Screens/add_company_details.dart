@@ -714,6 +714,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 child: ButtonTheme(
                   alignedDropdown: true,
                   child: DropdownButtonFormField<tz.Location>(
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_sharp,
+                      color: AppColors.primaryColors,
+                    ),
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       focusedBorder: InputBorder.none,

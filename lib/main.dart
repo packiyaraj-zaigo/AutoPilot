@@ -9,7 +9,6 @@ import 'package:auto_pilot/bloc/scanner/scanner_bloc.dart';
 import 'package:auto_pilot/bloc/parts_model/parts_bloc.dart';
 import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
-import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -58,9 +57,6 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => TimeCardBloc(),
-        ),
-        BlocProvider(
-          create: (context) => WorkflowBloc(),
         ),
       ],
       child: MaterialApp(

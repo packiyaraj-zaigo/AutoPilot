@@ -39,39 +39,45 @@ class AddCustomerError extends CustomerState {
   List<Object> get props => [message];
 }
 
-
-class GetCustomerMessageState extends CustomerState{
+class GetCustomerMessageState extends CustomerState {
   final cm.CustomerMessageModel messageModel;
   const GetCustomerMessageState({required this.messageModel});
 
-     @override
+  @override
   List<Object> get props => [messageModel];
 }
 
-class GetCustomerMessageLoadingState extends CustomerState{}
-class GetCustomerMessageErrorState extends CustomerState{
+class GetCustomerMessageLoadingState extends CustomerState {}
+
+class GetCustomerMessageErrorState extends CustomerState {
   final String errorMsg;
- const GetCustomerMessageErrorState({required this.errorMsg});
+  const GetCustomerMessageErrorState({required this.errorMsg});
 }
 
+class SendCustomerMessageState extends CustomerState {}
 
-class SendCustomerMessageState extends CustomerState{}
-class SendCustomerMessageLoadingState extends CustomerState{}
-class SendCustomerMessageErrorState extends CustomerState{
+class SendCustomerMessageLoadingState extends CustomerState {}
+
+class SendCustomerMessageErrorState extends CustomerState {
   final String errorMsg;
   SendCustomerMessageErrorState({required this.errorMsg});
 }
 
+class GetProvinceState extends CustomerState {
+  final data.ProvinceModel provinceList;
+  const GetProvinceState({required this.provinceList});
 
-
-class GetCustomerMessagePaginationState extends CustomerState{
-   final cm.CustomerMessageModel messageModel;
-   const GetCustomerMessagePaginationState({required this.messageModel});
-
-     @override
-  List<Object> get props => [messageModel];
-
-
+  @override
+  @override
+  List<Object> get props => [provinceList];
 }
 
-class GetCustomerMessagePaginationLoadingState extends CustomerState{}
+class GetCustomerMessagePaginationState extends CustomerState {
+  final cm.CustomerMessageModel messageModel;
+  const GetCustomerMessagePaginationState({required this.messageModel});
+
+  @override
+  List<Object> get props => [messageModel];
+}
+
+class GetCustomerMessagePaginationLoadingState extends CustomerState {}

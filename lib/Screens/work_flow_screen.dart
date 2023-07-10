@@ -1,21 +1,14 @@
-import 'dart:developer';
-
-import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
-import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
-import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:boardview/board_item.dart';
 import 'package:boardview/board_list.dart';
 import 'package:boardview/boardview_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:boardview/boardview.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 class WorkFlowScreen extends StatefulWidget {
-  const WorkFlowScreen({super.key, required this.tabController});
+  const WorkFlowScreen({super.key,required this.tabController});
   final TabController tabController;
 
   @override
@@ -28,250 +21,508 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   // late final controller = TabController(length: 2, vsync: this);
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  List<BoardList> workflowOrderList = [];
-  List<String> workflowOrderHeadings = [];
-  List<List<WorkflowBucketModel>> workflowOrderModelsList = [];
   List<BoardList> lists = [];
 
-  late final WorkflowBloc bloc;
+  final list3 = BoardList(
+    backgroundColor: Colors.transparent,
+    header: const [
+      SizedBox(
+        height: 35,
+        width: 200,
+        // width: double.infinity,
+        // color: Colors.black,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Estimate',
+              style: TextStyle(
+                color: AppColors.primaryColors,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Icon(
+              Icons.more_horiz,
+              color: AppColors.primaryColors,
+            ),
+          ],
+        ),
+      )
+    ],
+    items: List.generate(
+        10,
+        (index) => BoardItem(
+              item: Column(
+                children: [
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(7, 7), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Text(
+                            '3/7/23 9:00 AM - 3/10/23 12:00 PM',
+                            style: TextStyle(
+                              color: Color(0xFF9A9A9A),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            'Estimate #1847 - Satin Black Wrap',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            '$index',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            '2022 Tesla Model Y',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Container(
+                            height: 24,
+                            decoration: BoxDecoration(
+                                color: Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: const Padding(
+                              padding: EdgeInsets.only(
+                                  left: 14.0, right: 14, top: 5),
+                              child: Text(
+                                'Tag',
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 24,
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: const Center(
+                              child: Text(
+                                'In Progress',
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.primaryColors),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16)
+                ],
+              ),
+            )),
+  );
+  final list = BoardList(
+    backgroundColor: Colors.transparent,
+    header: const [
+      SizedBox(
+        height: 35,
+        width: 200,
+        // width: double.infinity,
+        // color: Colors.black,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Inquiry',
+              style: TextStyle(
+                color: AppColors.primaryColors,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Icon(
+              Icons.more_horiz,
+              color: AppColors.primaryColors,
+            ),
+          ],
+        ),
+      )
+    ],
+    items: List.generate(
+        10,
+        (index) => BoardItem(
+              item: Column(
+                children: [
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(7, 7), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Text(
+                            '3/7/23 9:00 AM - 3/10/23 12:00 PM',
+                            style: TextStyle(
+                              color: Color(0xFF9A9A9A),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            'Estimate #1847 - Satin Black Wrap',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            '$index',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            '2022 Tesla Model Y',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Container(
+                            height: 24,
+                            decoration: BoxDecoration(
+                                color: Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: const Padding(
+                              padding: EdgeInsets.only(
+                                  left: 14.0, right: 14, top: 5),
+                              child: Text(
+                                'Tag',
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 24,
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: const Center(
+                              child: Text(
+                                'In Progress',
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.primaryColors),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16)
+                ],
+              ),
+            )),
+  );
+  final list2 = BoardList(
+    backgroundColor: Colors.transparent,
+    header: const [
+      SizedBox(
+        height: 35,
+        width: 200,
+        // width: double.infinity,
+        // color: Colors.black,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Estimate',
+              style: TextStyle(
+                color: AppColors.primaryColors,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Icon(
+              Icons.more_horiz,
+              color: AppColors.primaryColors,
+            ),
+          ],
+        ),
+      )
+    ],
+    items: List.generate(
+        10,
+        (index) => BoardItem(
+              item: Column(
+                children: [
+                  Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(7, 7), // changes position of shadow
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Text(
+                            '3/7/23 9:00 AM - 3/10/23 12:00 PM',
+                            style: TextStyle(
+                              color: Color(0xFF9A9A9A),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            'Estimate #1847 - Satin Black Wrap',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            '$index',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const Text(
+                            '2022 Tesla Model Y',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF333333),
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Container(
+                            height: 24,
+                            decoration: BoxDecoration(
+                                color: Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left: 14.0, right: 14, top: 5),
+                              child: Text(
+                                'Tag',
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            height: 24,
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: const Center(
+                              child: Text(
+                                'In Progress',
+                                maxLines: 1,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.primaryColors),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16)
+                ],
+              ),
+            )),
+  );
 
   @override
   void initState() {
     super.initState();
-    bloc = BlocProvider.of<WorkflowBloc>(context);
-    bloc.add(GetAllWorkflows());
-  }
-
-  filterWorkflowOrders(String title, List<WorkflowBucketModel> workflows) {
-    if (!workflowOrderHeadings.contains(title)) {
-      workflowOrderHeadings.add(title);
-      final tasks =
-          workflows.where((element) => element.title == title).toList();
-      tasks.sort(
-        (a, b) {
-          final aPos = a.position;
-          final bPos = b.position;
-          return bPos!.compareTo(aPos!);
-        },
-      );
-      workflowOrderList.add(boardWidget(tasks));
-      workflowOrderModelsList.add(tasks);
-    }
+    lists = [list];
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+     // drawer: showDrawer(context),
       key: scaffoldKey,
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //     icon: const Icon(
+      //       Icons.menu,
+      //       color: AppColors.primaryColors,
+      //     ),
+      //     onPressed: () {
+      //       scaffoldKey.currentState!.openDrawer();
+      //     },
+      //   ),
+      //   backgroundColor: Colors.transparent,
+      //   elevation: 0,
+      //   title: const Text(
+      //     'Autopilot',
+      //     style: TextStyle(color: Colors.black87),
+      //   ),
+      //   centerTitle: true,
+      //   actions: [
+      //     IconButton(
+      //       onPressed: () {},
+      //       icon: Icon(
+      //         Icons.search,
+      //         color: AppColors.primaryColors,
+      //       ),
+      //     ),
+      //   ],
+      //   bottom: PreferredSize(
+      //     preferredSize: Size(double.infinity, 90),
+      //     child: Column(
+      //       crossAxisAlignment: CrossAxisAlignment.start,
+      //       children: [
+      //         Padding(
+      //           padding: const EdgeInsets.only(left: 16.0),
+      //           child: const Text(
+      //             'Workflow',
+      //             style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+      //           ),
+      //         ),
+      //         PreferredSize(
+      //           preferredSize: const Size(double.infinity, 60),
+      //           child: TabBar(
+      //             controller: controller,
+      //             enableFeedback: false,
+      //             indicatorColor: AppColors.primaryColors,
+      //             unselectedLabelColor: const Color(0xFF9A9A9A),
+      //             labelColor: AppColors.primaryColors,
+      //             tabs: const [
+      //               SizedBox(
+      //                 height: 50,
+      //                 child: Center(
+      //                   child: Text(
+      //                     'Orders',
+      //                     style: TextStyle(fontWeight: FontWeight.w500),
+      //                   ),
+      //                 ),
+      //               ),
+      //               SizedBox(
+      //                 height: 50,
+      //                 child: Center(
+      //                   child: Text(
+      //                     'Vehicle',
+      //                     style: TextStyle(fontWeight: FontWeight.w500),
+      //                   ),
+      //                 ),
+      //               ),
+      //             ],
+      //           ),
+      //         ),
+      //       ],
+      //     ),
+      //   ),
+      // ),
       body: SafeArea(
+        // child: Column(
+        //   children: [Text("Workflow screen")],
+        // ),
+        // child: Kanban,
+
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
-          child: BlocListener<WorkflowBloc, WorkflowState>(
-            listener: (context, state) {
-              if (state is GetAllWorkflowSuccessState) {
-                for (int i = 0; i < state.workflows.length; i++) {
-                  filterWorkflowOrders(
-                      state.workflows[i].title ?? '', state.workflows);
-                }
-              }
-            },
-            child: BlocBuilder<WorkflowBloc, WorkflowState>(
-              builder: (context, state) {
-                if (state is GetAllWorkflowLoadingState && !bloc.isLoading) {
-                  return const Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                } else if (state is GetAllWorkflowErrorState) {
-                  return Center(
-                    child: Text(state.message,
-                        style: const TextStyle(color: AppColors.greyText)),
-                  );
-                }
-                return TabBarView(
-                  controller: widget.tabController,
-                  children: [
-                    BoardView(
-                      width: 240,
-                      lists: workflowOrderList,
-                      boardViewController: boardViewController,
-                    ),
-                    BoardView(
-                      width: 240,
-                      lists: lists,
-                      boardViewController: boardViewController,
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  BoardList boardWidget(List<WorkflowBucketModel> workflows) {
-    return BoardList(
-      backgroundColor: Colors.transparent,
-      header: [
-        SizedBox(
-          height: 35,
-          width: 200,
-          // width: double.infinity,
-          // color: Colors.black,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: TabBarView(
+            controller: widget.tabController,
             children: [
-              Text(
-                workflows[0].title ?? '',
-                style: const TextStyle(
-                  color: AppColors.primaryColors,
-                  fontWeight: FontWeight.w500,
-                ),
+              BoardView(
+                width: 240,
+                lists: [list, list3],
+                boardViewController: boardViewController,
               ),
-              Icon(
-                Icons.more_horiz,
-                color: AppColors.primaryColors,
+              BoardView(
+                width: 240,
+                lists: [list2],
+                boardViewController: boardViewController,
               ),
             ],
           ),
-        )
-      ],
-      items: List.generate(
-        workflows.length,
-        (index) => BoardItem(
-          onDropItem:
-              (listIndex, itemIndex, oldListIndex, oldItemIndex, state) {
-            //if (listIndex != oldListIndex && itemIndex != oldItemIndex) {
-            final workflow =
-                workflowOrderModelsList[oldListIndex!][oldItemIndex!];
-            workflowOrderModelsList[listIndex!].insert(itemIndex!, workflow);
-            workflowOrderModelsList[oldListIndex].removeAt(oldItemIndex);
-            final newWorkFlow = WorkflowBucketModel(
-              clientId: workflow.clientId,
-              color: workflow.color,
-              createdAt: workflow.createdAt,
-              createdBy: workflow.createdBy,
-              defaultBuceket: workflow.defaultBuceket,
-              description: workflow.description,
-              id: workflow.id,
-              notificationId: workflow.notificationId,
-              parentId: workflow.parentId,
-              parentTitle: workflow.parentTitle,
-              position: itemIndex + 1,
-              title: workflowOrderHeadings[listIndex],
-              updatedAt: workflow.updatedAt,
-              workflowType: workflow.workflowType,
-            );
-            log(newWorkFlow.toJson().toString());
-            bloc.add(EditWorkflowPosition(workflow: newWorkFlow));
-          },
-          item: Column(
-            children: [
-              workflowCard(workflows[index]),
-              const SizedBox(height: 16)
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container workflowCard(WorkflowBucketModel workflow) {
-    String str = workflow.color ?? '';
-    str = str.replaceAll('#', '0xFF');
-    final color = int.parse(str);
-
-    return Container(
-      width: 200,
-      height: 200,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(7, 7), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              '${AppUtils.getTimeFormatted(workflow.createdAt ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.createdAt ?? DateTime.now())}',
-              style: const TextStyle(
-                color: Color(0xFF9A9A9A),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const Text(
-              'Estimate #1847 - Satin Black Wrap',
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryColors,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              'John Smith',
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF333333),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const Text(
-              '2022 Tesla Model Y',
-              style: TextStyle(
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF333333),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Container(
-              height: 24,
-              decoration: BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12)),
-              child: const Padding(
-                padding: EdgeInsets.only(left: 14.0, right: 14, top: 5),
-                child: Text(
-                  'Tag',
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ),
-            ),
-            Container(
-                height: 24,
-                decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(12)),
-                child: Center(
-                  child: Text(
-                    workflow.parentTitle ?? '',
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: str == '' ? AppColors.primaryColors : Color(color),
-                    ),
-                  ),
-                ))
-          ],
         ),
       ),
     );

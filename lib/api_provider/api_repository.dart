@@ -1,10 +1,5 @@
 import 'package:auto_pilot/Models/time_card_create_model.dart';
-import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:flutter/material.dart';
-
-import 'package:flutter/material.dart';
-
-import '../Models/vechile_dropdown_model.dart';
 import '../Models/employee_creation_model.dart';
 import 'api_provider.dart';
 
@@ -71,9 +66,10 @@ class ApiRepository {
     state,
     city,
     pinCode,
+    stateId,
   ) {
     return apiProvider.addCustomerload(token, context, firstName, lastName,
-        email, mobileNo, customerNotes, address, state, city, pinCode);
+        email, mobileNo, customerNotes, address, state, city, pinCode, stateId);
   }
 
   Future createEmployee(String token, EmployeeCreationModel model) {
@@ -82,6 +78,20 @@ class ApiRepository {
 
   Future getAllRoles(String token) {
     return apiProvider.getAllRoles(token);
+  }
+
+  Future calendarload(
+    String token,
+    DateTime selectedDate,
+  ) {
+    return apiProvider.calendarload(token, selectedDate);
+  }
+
+  Future calendarWeekLoad(
+    String token,
+    DateTime selectedDate,
+  ) {
+    return apiProvider.calendarWeekLoad(token, selectedDate);
   }
 
   Future getVechile(String token, int currentPage, String query) {
