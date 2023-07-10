@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
 part 'service_event.dart';
 part 'service_state.dart';
@@ -18,6 +20,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
   int totalPages = 1;
   ServiceBloc() : super(ServiceInitial()) {
     on<GetAllServicess>(getAllServices);
+    on<GetTechnicianEvent>(getAllTechnicianBloc);
     // on<CreateEmployee>(createEmployee);
   }
 
@@ -89,6 +92,28 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       emit(ServiceDetailsErrorState(message: e.toString()));
       isEmployeesLoading = false;
       isPagenationLoading = false;
+    }
+  }
+
+  getAllTechnicianBloc(
+    GetTechnicianEvent event,
+    Emitter<ServiceState> emit,
+  ) async {
+    try {
+      emit(GetTechnicianLoadingState());
+      TechnicianOnlyModel technicianModel;
+
+      final token = await AppUtils.getToken();
+      Response getTechnicianResponse = await apiRepo.getTechniciansOnly(token);
+      if (getTechnicianResponse.statusCode == 200) {
+        technicianModel =
+            technicianOnlyModelFromJson(getTechnicianResponse.body);
+        emit(GetTechnicianState(technicianModel: technicianModel));
+      } else {
+        emit(GetTechnicianErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(GetTechnicianErrorState(errorMsg: e.toString()));
     }
   }
 }

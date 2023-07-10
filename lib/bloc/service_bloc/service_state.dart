@@ -35,3 +35,15 @@ class ServiceCreateErrorState extends ServiceState {
 }
 
 class ServiceCreateSuccessState extends ServiceState {}
+
+class GetTechnicianState extends ServiceState {
+  final TechnicianOnlyModel technicianModel;
+  GetTechnicianState({required this.technicianModel});
+}
+
+class GetTechnicianLoadingState extends ServiceState {}
+
+class GetTechnicianErrorState extends ServiceState {
+  final String errorMsg;
+  GetTechnicianErrorState({required this.errorMsg});
+}

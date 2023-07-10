@@ -16,3 +16,5 @@ class CreateServices extends ServiceEvent {
   // final ServicesCreationModel model;
   // CreateServices({required this.model});
 }
+
+class GetTechnicianEvent extends ServiceEvent {}

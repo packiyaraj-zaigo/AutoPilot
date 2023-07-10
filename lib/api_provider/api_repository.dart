@@ -215,6 +215,10 @@ class ApiRepository {
   Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
     return apiProvider.editWorkflowPosition(token, workflow);
   }
+
+  Future getTechniciansOnly(String token) {
+    return apiProvider.getTechniciansOnly(token);
+  }
 }
 
 class NetworkError extends Error {}
