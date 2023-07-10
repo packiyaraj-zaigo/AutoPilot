@@ -729,6 +729,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         } else if (state is SendCustomerMessageState) {
         } else if (state is GetCustomerMessagePaginationState) {
           customerMessageList.insertAll(0, state.messageModel.data.data);
+          Future.delayed(Duration(milliseconds: 300)).then((value) {
+            chatScrollController.animateTo(50 * 15,
+                duration: Duration(milliseconds: 300), curve: Curves.linear);
+          });
 
           print("pagniation state emited");
           print(customerMessageList.length);

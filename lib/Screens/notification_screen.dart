@@ -96,6 +96,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     return const Center(
                       child: CupertinoActivityIndicator(),
                     );
+                  } else if (notifications.isEmpty) {
+                    return const Center(
+                      child: Text('No Notifications found'),
+                    );
                   }
                   return ListView.separated(
                     itemBuilder: (context, index) {
