@@ -91,7 +91,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
       }
     } catch (e) {
       log(e.toString() + "::::::::::::::::::::::::::");
-      emit(VinSearchErrorState(message: e.toString()));
+      emit(VinSearchErrorState(message: 'Something went wrong'));
     }
   }
 
