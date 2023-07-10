@@ -800,4 +800,29 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+  Future<dynamic> getAllWorkflows(String token, int page) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/workflowbuckets?page=$page&updated_by=$clientId');
+      final response = await http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Get workflows error");
+    }
+  }
+
+  Future<dynamic> editWorkflowPosition(
+      String token, WorkflowBucketModel workflow) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');
+      final response = await http.put(url,
+          headers: getHeader(token), body: jsonEncode(workflow.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + "put workflows error");
+    }
+  }
 }

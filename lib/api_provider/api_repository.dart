@@ -206,6 +206,14 @@ class ApiRepository {
   Future createNewEstimate(int customerId, int vehicleId, dynamic token) {
     return apiProvider.createNewEstimate(customerId, vehicleId, token);
   }
+
+  Future getAllWorkflows(String token, int page) {
+    return apiProvider.getAllWorkflows(token, page);
+  }
+
+  Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
+    return apiProvider.editWorkflowPosition(token, workflow);
+  }
 }
 
 class NetworkError extends Error {}
