@@ -695,10 +695,17 @@ class _ScannerScreenState extends State<ScannerScreen>
                     ),
                     const SizedBox(height: 24),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
+                      onTap: () async {
+                        await Navigator.of(context)
+                            .push(MaterialPageRoute(
                           builder: (context) => CreateVehicleScreen(),
-                        ));
+                        ))
+                            .then((value) {
+                          if (value != null) {
+                            searchController.text = value;
+                            bloc.add(GetVehiclesFromVin(vin: value));
+                          }
+                        });
                       },
                       child: Container(
                         height: 56,
