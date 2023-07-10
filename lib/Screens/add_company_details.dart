@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/province_model.dart';
+import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/create_employee_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
@@ -12,6 +15,7 @@ import 'package:csc_picker/csc_picker.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -92,9 +96,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   bool taxPartSwitchValue = false;
   bool taxMaterialSwitchValue = false;
 
-  Map<String, dynamic> basicDetailsmap = {};
-  Map<String, dynamic> operationDetailsMap = {};
-  Map<String, dynamic> employeeDetailsMap = {};
+  // Map<String, dynamic> basicDetailsmap = {};
+  // Map<String, dynamic> operationDetailsMap = {};
+  // Map<String, dynamic> employeeDetailsMap = {};
   List<ProvinceData> proviceList = [];
   ScrollController provinceScrollController = ScrollController();
   final provinceController = TextEditingController();
@@ -121,12 +125,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     // TODO: implement initState
 
     if (widget.widgetIndex == 0) {
-      if (widget.basicDetailsMap != null && widget.basicDetailsMap != {}) {
+      if (basicDetailsMap != null && basicDetailsMap != {}) {
         populateBasicDetails();
       }
     } else if (widget.widgetIndex == 1) {
-      if (widget.operationDetailsMap != null &&
-          widget.operationDetailsMap != {}) {
+      if (operationDetailsMap != null && operationDetailsMap != {}) {
         populateOperationDetails();
       }
     }
@@ -184,7 +187,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               validateOperationDetails();
             } else if (widget.widgetIndex == 2) {
               employeeList.forEach((element) {
-                employeeDetailsMap.addAll({
+                employeeDetailsMap!.addAll({
                   element.id.toString():
                       "${element.firstName} ${element.lastName}"
                 });
@@ -394,20 +397,27 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   : MediaQuery.of(context).size.width,
               child: TextField(
                 controller: controller,
-                inputFormatters:
-                    label == "Business Phone" ? [PhoneInputFormatter()] : [],
-                keyboardType: label == 'Phone Number' ||
+                inputFormatters: label == "Business Phone"
+                    ? [PhoneInputFormatter()]
+                    : label == "Number of Employees" || label == 'Zip'
+                        ? [FilteringTextInputFormatter.digitsOnly]
+                        : [],
+                keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
                         label == "Shop Hourly Labor Rate" ||
-                        label == "Tax Rate"
+                        label == "Tax Rate" ||
+                        label == 'Zip'
                     ? TextInputType.number
                     : null,
                 maxLength: label == 'Business Phone'
                     ? 19
                     : label == 'Password'
                         ? 12
-                        : 50,
+                        : label == 'Zip'
+                            ? 5
+                            : 50,
                 decoration: InputDecoration(
+                    prefixText: label == 'Shop Hourly Labor Rate' ? '\$' : null,
                     hintText: placeHolder,
                     counterText: "",
                     suffixIcon: label == "Shop Hourly Labor Rate"
@@ -830,13 +840,18 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 52.0),
             child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+              onTap: () async {
+                await Navigator.of(context).push(MaterialPageRoute(
                   builder: (context) {
                     return const CreateEmployeeScreen(
                         navigation: "add_company");
                   },
-                ));
+                )).then((value) {
+                  if (value != null && value) {
+                    bloc.currentPage = 1;
+                    bloc.add(GetAllEmployees());
+                  }
+                });
               },
               child: Container(
                 height: 56,
@@ -972,7 +987,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         !cityErrorStatus &&
         !stateErrorStatus &&
         !zipErrorStatus) {
-      basicDetailsmap.addAll({
+      basicDetailsMap!.addAll({
         "company_name": busineesNameController.text,
         "phone": businessPhoneController.text,
         "address_1": addressController.text,
@@ -983,7 +998,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "website": businessWebsiteController.text
       });
 
-      Navigator.pop(context, basicDetailsmap);
+      Navigator.pop(context, basicDetailsMap);
     }
   }
 
@@ -1169,10 +1184,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         !timeZoneErrorStatus &&
         !labourRateErrorStatus &&
         !taxRateErrorStatus) {
-      operationDetailsMap.addAll({
+      operationDetailsMap!.addAll({
         "employee_count": numberOfEmployeeController.text,
         "time_zone": timeZoneString,
-        "base_labor_cost": labourRateController.text,
+        "base_labor_cost": labourRateController.text.replaceAll('\$', ''),
         "sales_tax_rate": taxRateController.text
       });
 
@@ -1201,6 +1216,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           child: BlocListener<EmployeeBloc, EmployeeState>(
             listener: (context, state) {
               if (state is EmployeeDetailsSuccessState) {
+                log('Adding');
                 employeeList.addAll(state.employees.employeeList ?? []);
 
                 // if (employeeList.isNotEmpty) {
@@ -1336,29 +1352,27 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   }
 
   populateBasicDetails() {
-    busineesNameController.text = widget.basicDetailsMap?['company_name'] ?? "";
-    businessPhoneController.text = widget.basicDetailsMap?['phone'] ?? "";
-    addressController.text = widget.basicDetailsMap?['address_1'] ?? "";
-    cityController.text = widget.basicDetailsMap?['town_city'] ?? "";
-    provinceController.text = widget.basicDetailsMap?['province_name'] ?? "";
-    zipController.text = widget.basicDetailsMap?['zipcode'] ?? "";
-    provinceId = widget.basicDetailsMap?['province_id'] ?? 0;
-    businessWebsiteController.text = widget.basicDetailsMap?['website'] ?? "";
+    busineesNameController.text = basicDetailsMap?['company_name'] ?? "";
+    businessPhoneController.text = basicDetailsMap?['phone'] ?? "";
+    addressController.text = basicDetailsMap?['address_1'] ?? "";
+    cityController.text = basicDetailsMap?['town_city'] ?? "";
+    provinceController.text = basicDetailsMap?['province_name'] ?? "";
+    zipController.text = basicDetailsMap?['zipcode'] ?? "";
+    provinceId = basicDetailsMap?['province_id'] ?? 0;
+    businessWebsiteController.text = basicDetailsMap?['website'] ?? "";
 
-    print(widget.basicDetailsMap);
+    print(basicDetailsMap);
   }
 
   populateOperationDetails() {
-    labourRateController.text =
-        widget.operationDetailsMap?['base_labor_cost'] ?? "";
-    taxRateController.text =
-        widget.operationDetailsMap?['sales_tax_rate'] ?? "";
+    labourRateController.text = operationDetailsMap?['base_labor_cost'] ?? "";
+    taxRateController.text = operationDetailsMap?['sales_tax_rate'] ?? "";
     numberOfEmployeeController.text =
-        widget.operationDetailsMap?['employee_count'] ?? "";
+        operationDetailsMap?['employee_count'] ?? "";
 
     timeZones.forEach((element) {
       print(element.name);
-      if (element.name == widget.operationDetailsMap?['time_zone']) {
+      if (element.name == operationDetailsMap?['time_zone']) {
         print("in condition");
         setState(() {
           _currentSelectedTimezoneValue = element;
@@ -1381,6 +1395,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
+              if (widget.widgetIndex == 1) {
+                operationDetailsMap.clear();
+              } else if (widget.widgetIndex == 0) {
+                basicDetailsMap.clear();
+              }
             },
           ),
           CupertinoDialogAction(
@@ -1396,7 +1415,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
   validateEmployeeDetails() {
     employeeList.forEach((element) {
-      employeeDetailsMap.addAll(
+      employeeDetailsMap!.addAll(
           {element.id.toString(): "${element.firstName} ${element.lastName}"});
     });
 

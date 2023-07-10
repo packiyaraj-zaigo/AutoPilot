@@ -63,9 +63,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                   builder: (context) => EmployeeListScreen(),
                 ));
               } else {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => AddCompanyDetailsScreen(widgetIndex: 2),
-                ));
+                Navigator.of(context).pop(false);
               }
             },
             child: const Icon(
@@ -92,10 +90,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                     builder: (context) => EmployeeListScreen(),
                   ));
                 } else {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) =>
-                        AddCompanyDetailsScreen(widgetIndex: 2),
-                  ));
+                  Navigator.of(context).pop(false);
                 }
               } else if (state is EmployeeCreateErrorState) {
                 CommonWidgets().showDialog(context, state.message);
@@ -110,10 +105,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                     builder: (context) => EmployeeListScreen(),
                   ));
                 } else {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) =>
-                        AddCompanyDetailsScreen(widgetIndex: 2),
-                  ));
+                  Navigator.of(context).pop(true);
                 }
               }
             },

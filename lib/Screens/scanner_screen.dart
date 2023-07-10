@@ -510,14 +510,14 @@ class _ScannerScreenState extends State<ScannerScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      '${vehicle.vehicleYear}${vehicle.vehicleModel}',
+                      '${vehicle.vehicleYear} ${vehicle.vehicleModel}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w600,
-                        color: Color(0xFF333333),
+                        color: AppColors.primaryColors,
                       ),
                     ),
                     Text(
-                      '${vehicle.vehicleColor == null ? '' : '${vehicle.vehicleColor!}, '}${vehicle.vehicleType}',
+                      '${vehicle.vehicleColor == null ? '' : vehicle.vehicleColor == '' ? '' : '${vehicle.vehicleColor!}, '} ${vehicle.vehicleType}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF333333),

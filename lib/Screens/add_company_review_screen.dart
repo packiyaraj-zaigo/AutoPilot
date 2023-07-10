@@ -74,57 +74,60 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
               ),
               body: Padding(
                 padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Review Details",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 28,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        "Something wrong? Tap on the row to edit it.\nOtherwise tap confirm and continue.",
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        "Review Details",
                         style: TextStyle(
-                            color: AppColors.greyText,
-                            fontSize: 14,
-                            height: 1.5,
-                            fontWeight: FontWeight.w400),
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40.0),
-                      child: detailsWidget("Name",
-                          widget.basicDetailsMap['company_name'], "basic"),
-                    ),
-                    dividerLine(),
-                    detailsWidget("Address",
-                        widget.basicDetailsMap['address_1'], "basic"),
-                    dividerLine(),
-                    detailsWidget(
-                        "Phone", widget.basicDetailsMap['phone'], "basic"),
-                    dividerLine(),
-                    detailsWidget(
-                        "Website", widget.basicDetailsMap['website'], "basic"),
-                    dividerLine(),
-                    detailsWidget("Timezone",
-                        widget.operationDetailsMap['time_zone'], "operation"),
-                    dividerLine(),
-                    detailsWidget(
-                        "Tax Rate",
-                        "${widget.operationDetailsMap['sales_tax_rate']} %",
-                        "operation"),
-                    dividerLine(),
-                    detailsWidget(
-                        "Base Labor Cost",
-                        "${widget.operationDetailsMap['base_labor_cost']} \$ per hour",
-                        "operation"),
-                    dividerLine(),
-                    detailsWidget("Employees", "", "employee"),
-                  ],
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          "Something wrong? Tap on the row to edit it.\nOtherwise tap confirm and continue.",
+                          style: TextStyle(
+                              color: AppColors.greyText,
+                              fontSize: 15,
+                              height: 1.6,
+                              letterSpacing: 0.2,
+                              fontWeight: FontWeight.w400),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 40.0),
+                        child: detailsWidget("Name",
+                            widget.basicDetailsMap['company_name'], "basic"),
+                      ),
+                      dividerLine(),
+                      detailsWidget("Address",
+                          widget.basicDetailsMap['address_1'], "basic"),
+                      dividerLine(),
+                      detailsWidget(
+                          "Phone", widget.basicDetailsMap['phone'], "basic"),
+                      dividerLine(),
+                      detailsWidget("Website",
+                          widget.basicDetailsMap['website'], "basic"),
+                      dividerLine(),
+                      detailsWidget("Timezone",
+                          widget.operationDetailsMap['time_zone'], "operation"),
+                      dividerLine(),
+                      detailsWidget(
+                          "Tax Rate",
+                          "${widget.operationDetailsMap['sales_tax_rate']} %",
+                          "operation"),
+                      dividerLine(),
+                      detailsWidget(
+                          "Base Labor Cost",
+                          "\$ ${widget.operationDetailsMap['base_labor_cost']} / hour",
+                          "operation"),
+                      dividerLine(),
+                      detailsWidget("Employees", "", "employee"),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -136,7 +139,7 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
 
   Widget dividerLine() {
     return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Container(
         width: MediaQuery.of(context).size.width,
         height: 0.5,
@@ -146,6 +149,12 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
   }
 
   Widget detailsWidget(String label, String value, String navigation) {
+    if (label == 'Employees') {
+      widget.employeeDetailsMap.values.forEach((element) {
+        value += element;
+        value += '\n';
+      });
+    }
     return GestureDetector(
       onTap: () {
         if (navigation == "basic") {
@@ -174,29 +183,40 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
           ));
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.only(top: 12.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                  color: Color(
-                    0xff6A7187,
-                  ),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400),
-            ),
-            Text(
-              value,
-              style: const TextStyle(
-                  color: AppColors.primaryTitleColor,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400),
-            )
-          ],
-        ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+                color: Color(
+                  0xff6A7187,
+                ),
+                fontSize: 16,
+                fontWeight: FontWeight.w400),
+          ),
+          label == 'Address'
+              ? Text(
+                  // ignore: prefer_interpolation_to_compose_strings
+                  '${value + ',\n' + widget.basicDetailsMap['town_city'] + ',\n' + widget.basicDetailsMap['province_name']} ' +
+                      widget.basicDetailsMap['zipcode'],
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                      color: AppColors.primaryTitleColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400),
+                )
+              : Text(
+                  textAlign: TextAlign.end,
+                  value,
+                  style: TextStyle(
+                      height: label == 'Employees' ? 2 : null,
+                      color: AppColors.primaryTitleColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400),
+                )
+        ],
       ),
     );
   }

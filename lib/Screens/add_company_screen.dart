@@ -9,6 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+Map<String, dynamic> basicDetailsMap = {};
+Map<String, dynamic> operationDetailsMap = {};
+Map<String, dynamic> employeeDetailsMap = {};
+
 class AddCompanyScreen extends StatefulWidget {
   const AddCompanyScreen({
     super.key,
@@ -20,9 +24,6 @@ class AddCompanyScreen extends StatefulWidget {
 
 class _AddCompanyScreenState extends State<AddCompanyScreen> {
   List<dynamic> navigationData = [];
-  Map<String, dynamic>? basicDetailsMap = {};
-  Map<String, dynamic>? operationDetailsMap = {};
-  Map<String, dynamic>? employeeDetailsMap = {};
   // bool? isEmployee = false;
   @override
   Widget build(BuildContext context) {
@@ -72,18 +73,15 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
             //   return BottomBarScreen();
             // },), (route) => false);
 
-            if (basicDetailsMap != null &&
-                basicDetailsMap!.isNotEmpty &&
-                operationDetailsMap != null &&
-                operationDetailsMap!.isNotEmpty &&
-                employeeDetailsMap != null &&
-                employeeDetailsMap!.isNotEmpty) {
+            if (basicDetailsMap.isNotEmpty &&
+                operationDetailsMap.isNotEmpty &&
+                employeeDetailsMap.isNotEmpty) {
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
                   return AddCompanyReviewScreen(
-                    basicDetailsMap: basicDetailsMap!,
-                    operationDetailsMap: operationDetailsMap!,
-                    employeeDetailsMap: employeeDetailsMap!,
+                    basicDetailsMap: basicDetailsMap,
+                    operationDetailsMap: operationDetailsMap,
+                    employeeDetailsMap: employeeDetailsMap,
                   );
                 },
               ));
@@ -95,12 +93,9 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: basicDetailsMap != null &&
-                      basicDetailsMap!.isNotEmpty &&
-                      operationDetailsMap != null &&
-                      operationDetailsMap!.isNotEmpty &&
-                      employeeDetailsMap != null &&
-                      employeeDetailsMap!.isNotEmpty
+              color: basicDetailsMap.isNotEmpty &&
+                      operationDetailsMap.isNotEmpty &&
+                      employeeDetailsMap.isNotEmpty
                   ? AppColors.primaryColors
                   : Color.fromARGB(255, 136, 169, 250),
             ),
@@ -154,16 +149,13 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                       setState(() {
                         // isBasicDetails=value;
                         // navigationData=value;
-                        basicDetailsMap = value;
-                        print(value);
+                        // basicDetailsMap = value;
+                        // print(value);
                       });
                     });
                   },
-                  child: stepTile(
-                      "Step 1. Basic Details",
-                      basicDetailsMap != null && basicDetailsMap!.isNotEmpty
-                          ? true
-                          : false)),
+                  child: stepTile("Step 1. Basic Details",
+                      basicDetailsMap.isNotEmpty ? true : false)),
             ),
             GestureDetector(
                 behavior: HitTestBehavior.translucent,
@@ -177,16 +169,12 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                     },
                   )).then((value) {
                     setState(() {
-                      operationDetailsMap = value;
+                      // operationDetailsMap = value;
                     });
                   });
                 },
-                child: stepTile(
-                    "Step 2. Operating Details",
-                    operationDetailsMap != null &&
-                            operationDetailsMap!.isNotEmpty
-                        ? true
-                        : false)),
+                child: stepTile("Step 2. Operating Details",
+                    operationDetailsMap.isNotEmpty ? true : false)),
             GestureDetector(
                 behavior: HitTestBehavior.translucent,
                 onTap: () async {
@@ -198,16 +186,13 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
                     },
                   )).then((value) {
                     setState(() {
-                      employeeDetailsMap = value;
-                      log(employeeDetailsMap.toString());
+                      // employeeDetailsMap = value;
+                      // log(employeeDetailsMap.toString());
                     });
                   });
                 },
-                child: stepTile(
-                    "Step 3. Employees",
-                    employeeDetailsMap != null && employeeDetailsMap!.isNotEmpty
-                        ? true
-                        : false))
+                child: stepTile("Step 3. Employees",
+                    employeeDetailsMap.isNotEmpty ? true : false))
           ],
         ),
       ),
