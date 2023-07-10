@@ -517,7 +517,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       ),
                     ),
                     Text(
-                      '${vehicle.vehicleColor == null ? '' : vehicle.vehicleColor == '' ? '' : '${vehicle.vehicleColor!}, '} ${vehicle.vehicleType}',
+                      '${vehicle.vehicleColor == null ? '' : vehicle.vehicleColor == '' ? '' : '${vehicle.vehicleColor!}, '}${vehicle.vehicleType}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF333333),
@@ -695,10 +695,17 @@ class _ScannerScreenState extends State<ScannerScreen>
                     ),
                     const SizedBox(height: 24),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
+                      onTap: () async {
+                        await Navigator.of(context)
+                            .push(MaterialPageRoute(
                           builder: (context) => CreateVehicleScreen(),
-                        ));
+                        ))
+                            .then((value) {
+                          if (value != null) {
+                            searchController.text = value;
+                            bloc.add(GetVehiclesFromVin(vin: value));
+                          }
+                        });
                       },
                       child: Container(
                         height: 56,

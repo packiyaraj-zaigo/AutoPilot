@@ -309,7 +309,13 @@ class ApiProvider {
         ..fields['vehicle_year'] = year
         ..fields['vehicle_make'] = make
         ..fields['vehicle_model'] = model
-        ..fields['vehicle_color'] = color;
+        ..fields['vehicle_color'] = color
+        ..fields['vin'] = vinNumber
+        ..fields['sub_model'] = submodel
+        ..fields['engine_size'] = engine
+        ..fields['licence_plate'] = licNumber;
+
+      // final map = {};
       var response = await request.send();
       inspect(response);
       print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");

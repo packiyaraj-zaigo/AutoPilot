@@ -555,8 +555,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     } else {
       if (VechileYear.length < 4) {
         setState(() {
-          modelErrorStatus = true;
-          modelErrorMsg = 'The vehicle model must be at least 2 characters.';
+          yearErrorStaus = true;
+          yearErrorMsg = 'The vehicle year must be at least 4 characters.';
         });
       } else {
         setState(() {
@@ -584,9 +584,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
             vinNumber: vinController.text,
             licNumber: licController.text,
             make: makeController.text,
-            type: typeController.text != ''
-                ? typeController.text
-                : _currentSelectedTypeValue.toString(),
+            type: typeController.text,
           ));
     }
   }
@@ -689,6 +687,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                           ),
                           onChanged: (DropdownDatum? value) {
                             setState(() {
+                              typeController.text =
+                                  value?.vehicleTypeName ?? '';
                               _currentSelectedTypeValue = value;
                             });
                           },

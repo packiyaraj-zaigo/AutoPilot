@@ -197,15 +197,20 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                 fontWeight: FontWeight.w400),
           ),
           label == 'Address'
-              ? Text(
-                  // ignore: prefer_interpolation_to_compose_strings
-                  '${value + ',\n' + widget.basicDetailsMap['town_city'] + ',\n' + widget.basicDetailsMap['province_name']} ' +
-                      widget.basicDetailsMap['zipcode'],
-                  textAlign: TextAlign.end,
-                  style: const TextStyle(
-                      color: AppColors.primaryTitleColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400),
+              ? Flexible(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.6,
+                    child: Text(
+                      // ignore: prefer_interpolation_to_compose_strings
+                      '${value + ', ' + widget.basicDetailsMap['town_city'] + ', ' + widget.basicDetailsMap['province_name']} ' +
+                          widget.basicDetailsMap['zipcode'],
+                      textAlign: TextAlign.end,
+                      style: const TextStyle(
+                          color: AppColors.primaryTitleColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400),
+                    ),
+                  ),
                 )
               : Text(
                   textAlign: TextAlign.end,

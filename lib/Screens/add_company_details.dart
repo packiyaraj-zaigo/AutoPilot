@@ -226,6 +226,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
   Widget basicDetailsWidget() {
     return SingleChildScrollView(
+      // physics: CustomScrollPhysics(),
       child: Padding(
         padding:
             const EdgeInsets.only(left: 24.0, right: 24, bottom: 24, top: 8),
@@ -1217,6 +1218,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             listener: (context, state) {
               if (state is EmployeeDetailsSuccessState) {
                 log('Adding');
+                employeeList.clear();
                 employeeList.addAll(state.employees.employeeList ?? []);
 
                 // if (employeeList.isNotEmpty) {
@@ -1424,3 +1426,22 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     Navigator.pop(context, employeeDetailsMap);
   }
 }
+
+// class CustomScrollPhysics extends ScrollPhysics {
+//   const CustomScrollPhysics({ScrollPhysics? parent}) : super(parent: parent);
+
+//   @override
+//   CustomScrollPhysics applyTo(ScrollPhysics? ancestor) {
+//     return CustomScrollPhysics(parent: buildParent(ancestor));
+//   }
+
+//   @override
+//   bool shouldAcceptUserOffset(ScrollMetrics position) {
+//     return true;
+//   }
+
+//   @override
+//   double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+//     return offset;
+//   }
+// }
