@@ -31,6 +31,26 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   String taxError = '';
   final TextEditingController taxRateController = TextEditingController();
 
+  //Add material popup controllers
+  final addMaterialNameController = TextEditingController();
+  final addMaterialDescriptionController = TextEditingController();
+  final addMaterialPriceController = TextEditingController();
+  final addMaterialCostController = TextEditingController();
+  final addMaterialDiscountController = TextEditingController();
+  final addMaterialBatchController = TextEditingController();
+
+  //Add material errorstatus and error message variables
+  bool addMaterailNameErrorStatus = false;
+  bool addMaterialDescriptionErrorStatus = false;
+  bool addMaterialPriceErrorStatus = false;
+  bool addMaterialCostErrorStatus = false;
+  bool addMaterialDiscountErrorStatus = false;
+  bool addMaterailBatchErrorStatus = false;
+  bool addMaterialPricingErrorStatus = false;
+
+  dynamic _currentPricingModelSelectedValue;
+  List<String> pricingModelList = ['per Sqrt', 'per feet'];
+
   String taxRateError = '';
   var dropdownValue;
   String categoryError = '';
@@ -353,7 +373,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
             height: 56,
-            width: MediaQuery.of(context).size.width,
+            width: label == "Price" || label == "Cost"
+                ? MediaQuery.of(context).size.width / 2.6
+                : MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
               maxLength: 50,
@@ -517,21 +539,37 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const Row(
-            children: [
-              Icon(
-                Icons.add,
-                color: AppColors.primaryColors,
-              ),
-              Text(
-                "  Add New",
-                style: TextStyle(
+          GestureDetector(
+            onTap: () {
+              if (label == "Material") {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      contentPadding: EdgeInsets.all(20),
+                      insetPadding: EdgeInsets.all(20),
+                      content: addMaterialPopup(),
+                    );
+                  },
+                );
+              }
+            },
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.add,
                   color: AppColors.primaryColors,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
                 ),
-              )
-            ],
+                Text(
+                  "  Add New",
+                  style: TextStyle(
+                    color: AppColors.primaryColors,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                )
+              ],
+            ),
           )
         ],
       ),
@@ -541,6 +579,139 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   addMaterialPopup() {
     return Container(
       width: MediaQuery.of(context).size.width,
+      child: Column(
+        children: [
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Add Material",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTitleColor),
+              ),
+              Icon(Icons.close)
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 17.0),
+            child: textBox("Enter Material Name", addMaterialNameController,
+                "Name", addMaterailNameErrorStatus, context),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 17.0),
+            child: textBox(
+                "Enter Material Description",
+                addMaterialDescriptionController,
+                "Description",
+                addMaterialDescriptionErrorStatus,
+                context),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 17.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                textBox("Amount", addMaterialDescriptionController, "Price",
+                    addMaterialDescriptionErrorStatus, context),
+                pricingModelDropDown()
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 17.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                textBox("Amount", addMaterialDescriptionController, "Cost",
+                    addMaterialDescriptionErrorStatus, context),
+                pricingModelDropDown()
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 17),
+            child: textBox("Enter Amount", addMaterialDiscountController,
+                "Discoount", addMaterialDiscountErrorStatus, context),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget pricingModelDropDown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Pricing Model",
+          style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(0xff6A7187)),
+        ),
+        const SizedBox(height: 3),
+        Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width / 2.6,
+            height: 56,
+            // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
+            // padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                border: Border.all(
+                    color: addMaterialPricingErrorStatus
+                        ? const Color(0xffD80027)
+                        : const Color(0xffC1C4CD)),
+                borderRadius: BorderRadius.circular(12)),
+            child: DropdownButtonHideUnderline(
+              child: ButtonTheme(
+                alignedDropdown: true,
+                child: DropdownButtonFormField<String>(
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_sharp,
+                    color: AppColors.primaryColors,
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                  ),
+                  menuMaxHeight: 380,
+                  isExpanded: true,
+                  value: _currentPricingModelSelectedValue,
+                  style: const TextStyle(color: Color(0xff6A7187)),
+                  items: pricingModelList
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      alignment: AlignmentDirectional.centerStart,
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  hint: const Text(
+                    "Select Pricing Model",
+                    style: TextStyle(
+                        color: Color(0xff6A7187),
+                        fontSize: 16,
+                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  onChanged: (String? value) {
+                    setState(() {
+                      _currentPricingModelSelectedValue = value;
+                    });
+                  },
+                  //isExpanded: true,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

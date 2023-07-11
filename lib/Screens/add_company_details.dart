@@ -153,7 +153,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     cityController.text.isNotEmpty ||
                     zipController.text.isNotEmpty) {
                   showBackDialog(context,
-                      "The enterd data will be lost until you confim it.");
+                      "The entered data will be lost until you confirm it.");
                 } else {
                   Navigator.pop(context);
                 }
