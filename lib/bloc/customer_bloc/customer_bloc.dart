@@ -77,7 +77,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           currentPage++;
         }
         // emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
-        print('=======-------------------------${loadedResponse.body}');
+        log(loadedResponse.body.toString() + "preivew api call");
       } else {
         final body = jsonDecode(loadedResponse.body);
         emit(CustomerError(message: body['message']));
@@ -347,7 +347,13 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
       emit(DeleteCustomerLoading());
       Response loadedResponse =
           await _apiRepository.deleteCustomer(token, event.customerId);
+      var unloadData = _decoder.convert(loadedResponse.body);
       if (loadedResponse.statusCode == 200) {
+        Navigator.of(event.context).pushReplacement(MaterialPageRoute(
+          builder: (context) {
+            return CustomersScreen();
+          },
+        ));
         print('lllllllllll');
         final responseBody = jsonDecode(loadedResponse.body);
         emit(

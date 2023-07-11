@@ -742,51 +742,44 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                         height: 10,
                       ),
                       SizedBox(
-                        height: 57,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppColors.buttonColors,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.delete,
-                                color: AppColors.primaryColors,
-                                size: 16,
+                          height: 57,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: AppColors.buttonColors,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
                               ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                'Delete Customer',
-                                style: TextStyle(
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.delete,
                                     color: AppColors.primaryColors,
-                                    fontFamily: '.SF Pro Text',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16),
+                                    size: 16,
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(
+                                    'Delete Customer',
+                                    style: TextStyle(
+                                        color: AppColors.primaryColors,
+                                        fontFamily: '.SF Pro Text',
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 16),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          onPressed: () {
-                            BlocProvider.of<CustomerBloc>(context).add(
-                                DeleteCustomerEvent(
-                                    customerId:
-                                        widget.customerData.id.toString()));
-                            Navigator.of(context)
-                                .pushReplacement(MaterialPageRoute(
-                              builder: (context) {
-                                return const cs.CustomersScreen();
-                              },
-                            ));
-                          },
-                        ),
-                      ),
+                              onPressed: () async {
+                                BlocProvider.of<CustomerBloc>(context).add(
+                                    DeleteCustomerEvent(
+                                        customerId:
+                                            widget.customerData.id.toString(),
+                                        context: context));
+                              })),
                     ],
                   ),
                 ),

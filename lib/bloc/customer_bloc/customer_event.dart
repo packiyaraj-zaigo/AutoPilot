@@ -102,7 +102,11 @@ class GetCustomerMessagePaginationEvent extends CustomerEvent {
 
 class DeleteCustomerEvent extends CustomerEvent {
   final String customerId;
-  const DeleteCustomerEvent({required this.customerId});
+  final BuildContext context;
+  const DeleteCustomerEvent({
+    required this.customerId,
+    required this.context,
+  });
   @override
   List<Object?> get props => [customerId];
 }
