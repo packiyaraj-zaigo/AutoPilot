@@ -56,6 +56,13 @@ class ApiRepository {
     return apiProvider.customerLoad(token, currentPage, query);
   }
 
+  Future deleteCustomer(
+    String token,
+    String customerId,
+  ) {
+    return apiProvider.deleteCustomer(token, customerId);
+  }
+
   Future addCustomerload(
     token,
     BuildContext context,

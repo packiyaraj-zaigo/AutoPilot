@@ -151,7 +151,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                 ),
                               ],
                             ),
-                            placeholder: 'Search Employee...',
+                            placeholder: 'Search Employee',
                             maxLines: 1,
                             placeholderStyle: const TextStyle(
                               color: Color(0xFF7F808C),

@@ -2,6 +2,8 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
+import 'package:auto_pilot/Screens/customers_screen.dart' as cs;
+import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -645,7 +647,12 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               ),
                             ],
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => NewCustomerScreen()));
+                          },
                         ),
                       ),
                       const SizedBox(
@@ -683,7 +690,18 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               ),
                             ],
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            BlocProvider.of<CustomerBloc>(context).add(
+                                DeleteCustomerEvent(
+                                    customerId:
+                                        widget.customerData.id.toString()));
+                            Navigator.of(context)
+                                .pushReplacement(MaterialPageRoute(
+                              builder: (context) {
+                                return const cs.CustomersScreen();
+                              },
+                            ));
+                          },
                         ),
                       ),
                     ],

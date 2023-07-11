@@ -59,7 +59,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const NewCustomerScreen()));
+                        builder: (context) => NewCustomerScreen()));
               },
               icon: Icon(
                 Icons.add,
@@ -130,7 +130,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                           ),
                         ],
                       ),
-                      placeholder: 'Search Customer...',
+                      placeholder: 'Search Customer',
                       maxLines: 1,
                       placeholderStyle: const TextStyle(
                         color: Color(0xFF7F808C),

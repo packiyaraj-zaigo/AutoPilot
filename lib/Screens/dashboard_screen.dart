@@ -202,7 +202,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                               ""),
                                       dashBoardTile(
                                           'assets/images/current_vehicle_dash_icon.svg',
-                                          'Current Vehicles',
+                                          'Current vehicles',
                                           revenueChartData?.currentVehicles
                                                   .toString() ??
                                               ""),

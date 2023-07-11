@@ -62,8 +62,15 @@ class SendCustomerMessageEvent extends CustomerEvent {
 }
 
 class GetCustomerMessagePaginationEvent extends CustomerEvent {
-  GetCustomerMessagePaginationEvent();
+  const GetCustomerMessagePaginationEvent();
 
   @override
   List<Object?> get props => [];
+}
+
+class DeleteCustomerEvent extends CustomerEvent {
+  final String customerId;
+  const DeleteCustomerEvent({required this.customerId});
+  @override
+  List<Object?> get props => [customerId];
 }

@@ -105,19 +105,19 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    textBoxFullCard(employeeController, employeeError, 'Select',
-                        'Employee'),
+                    textBoxFullCard(employeeController, employeeError,
+                        'Select Employee', 'Employee'),
                     textBoxFullCard(
-                        taskController, taskError, 'Enter Task...', 'Task'),
+                        taskController, taskError, 'Enter Task', 'Task'),
                     textBoxFullCard(
-                        dateController, dateError, 'Select', 'Date'),
+                        dateController, dateError, 'Select Date', 'Date'),
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        halfTextBox('Select time...', clockInController,
+                        halfTextBox('Select Time', clockInController,
                             'Clocked in', clockError.isNotEmpty, context),
-                        halfTextBox('Select time...', clockOutController,
+                        halfTextBox('Select Time', clockOutController,
                             'Clocked out', clockError.isNotEmpty, context),
                       ],
                     ),
@@ -139,7 +139,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                     ),
                     textBoxFullCard(totalTimeController, '', '-', 'Time'),
                     textBoxFullCard(
-                        notesController, notesError, 'Enter notes...', 'Notes'),
+                        notesController, notesError, 'Enter Notes', 'Notes'),
                     Padding(
                       padding: const EdgeInsets.only(top: 32.0),
                       child: GestureDetector(
@@ -257,13 +257,29 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: AppColors.greyText,
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.greyText,
+              ),
+            ),
+            label == 'Employee' || label == 'Task' || label == 'Date'
+                ? Text(
+                    " *",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )
+                : Text('')
+          ],
         ),
         const SizedBox(height: 3),
         Padding(
@@ -469,12 +485,28 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff6A7187)),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+            label == 'Clocked in' || label == 'Clocked out'
+                ? Text(
+                    " *",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )
+                : Text('')
+          ],
         ),
         Padding(
           padding: const EdgeInsets.only(top: 6.0),

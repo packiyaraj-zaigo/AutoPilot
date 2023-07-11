@@ -280,23 +280,23 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   "Business Name", businessNameErrorStatus),
             ),
             errorMessageWidget(businessNameErrorMsg, businessNameErrorStatus),
-            textBox("Enter Business phone", businessPhoneController,
+            textBox("Enter business phone", businessPhoneController,
                 "Business Phone", businessPhoneErrorStatus),
             errorMessageWidget(phoneErrorMsg, businessPhoneErrorStatus),
-            textBox("Enter Business Website", businessWebsiteController,
+            textBox("Enter business Website", businessWebsiteController,
                 "Business Website", businessWebsiteErrorStatus),
-            textBox("Enter Address", addressController, "Address",
+            textBox("Enter address", addressController, "Address",
                 addressErrorStatus),
             errorMessageWidget(addressErrorMsg, addressErrorStatus),
             // countrydropDown(),
             // errorMessageWidget(countryErrorMsg, countryErrorStatus),
-            textBox("Enter City", cityController, "City", cityErrorStatus),
+            textBox("Enter city", cityController, "City", cityErrorStatus),
             errorMessageWidget(cityErrorMsg, cityErrorStatus),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 stateDropDown(),
-                textBox("Enter Zip", zipController, "Zip", zipErrorStatus),
+                textBox("Enter zipcode", zipController, "Zip", zipErrorStatus),
               ],
             ),
             Row(
@@ -748,7 +748,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                       );
                     }).toList(),
                     hint: const Text(
-                      "Select Timezone",
+                      "Select timezone",
                       style: TextStyle(
                           color: Color(0xff6A7187),
                           fontSize: 16,
