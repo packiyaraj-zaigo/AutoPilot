@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:auto_pilot/Models/customer_model.dart';
+import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -23,20 +27,31 @@ class _NewAppointmentState extends State<NewAppointment> {
   final TextEditingController endTimeController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
+  final TextEditingController customerController = TextEditingController();
+  final TextEditingController vehicleController = TextEditingController();
+  Datum? customer;
   Duration initialTimer = const Duration();
   Duration initialTimer1 = const Duration();
-  bool startDateErrorMsg = false;
-  bool completionDateErrorMsg = false;
   bool startTimeErrorMsg = false;
   bool endTimeErrorMsg = false;
   bool nameErrorMsg = false;
   bool notesErrorMsg = false;
+  bool customerErrorMsg = false;
+  bool vehicleErrorMsg = false;
+
+  bool isChecked = false;
 
   @override
   void initState() {
     _dateCount = '';
     _range = '';
     super.initState();
+    startDateController.text = _range = DateFormat('dd/MM/yyyy')
+        .format(DateTime.now().subtract(const Duration(days: 4)))
+        .toString();
+    completionDateController.text = _range1 = DateFormat('dd/MM/yyyy')
+        .format(DateTime.now().add(const Duration(days: 3)))
+        .toString();
   }
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
@@ -47,6 +62,10 @@ class _NewAppointmentState extends State<NewAppointment> {
         _range1 = DateFormat('dd/MM/yyyy')
             .format(args.value.endDate ?? args.value.startDate)
             .toString();
+        startDateController.text = _range.toString();
+        completionDateController.text =
+            _range1 == null ? '' : _range1.toString();
+
         print("${args.value.startDate}");
       } else if (args.value is DateTime) {
       } else if (args.value is List<DateTime>) {
@@ -57,77 +76,219 @@ class _NewAppointmentState extends State<NewAppointment> {
 
   @override
   Widget build(BuildContext context) {
-    startDateController.text = _range.toString();
-    completionDateController.text = _range1 == null ? '' : _range1.toString();
-    startTimeController.text =
-        "${initialTimer.inHours}: ${initialTimer.inMinutes % 60}";
-    endTimeController.text =
-        "${initialTimer1.inHours}: ${initialTimer1.inMinutes % 60}";
-
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         title: const Text(
           'New Appointment',
           style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primaryBlackColors),
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: AppColors.primaryTitleColor,
+          ),
         ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              CupertinoIcons.clear,
+              color: AppColors.primaryColors,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Padding(
-              padding:  EdgeInsets.only(left: 10),
-              child: Text(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 16),
+              const Text(
                 "Basic Details",
                 style: TextStyle(
-                  fontSize: 25,
+                  fontSize: 18,
                   color: AppColors.primaryTitleColor,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            SfDateRangePicker(
-              headerStyle: DateRangePickerHeaderStyle(
-                  textStyle: TextStyle(
-                      fontSize: 22, color: AppColors.primaryBlackColors)),
-              rangeSelectionColor: AppColors.primaryColors,
-              startRangeSelectionColor: AppColors.primaryColors,
-              endRangeSelectionColor: AppColors.primaryColors,
-              onSelectionChanged: _onSelectionChanged,
-              selectionMode: DateRangePickerSelectionMode.range,
-              initialSelectedRange: PickerDateRange(
+              const SizedBox(height: 15),
+              SfDateRangePicker(
+                monthViewSettings:
+                    const DateRangePickerMonthViewSettings(dayFormat: 'EEE'),
+                monthCellStyle: DateRangePickerMonthCellStyle(
+                    cellDecoration: BoxDecoration(
+                  border: Border.all(color: const Color(0xFFEDEEFF)),
+                  shape: BoxShape.circle,
+                )),
+
+                headerStyle: const DateRangePickerHeaderStyle(
+                    textStyle: TextStyle(
+                        fontSize: 16,
+                        color: AppColors.primaryTitleColor,
+                        fontWeight: FontWeight.w600)),
+                // selectionTextStyle: TextStyle(color: Colors.white),
+                rangeTextStyle: const TextStyle(color: Colors.white),
+                rangeSelectionColor: AppColors.primaryColors,
+                startRangeSelectionColor: AppColors.primaryColors,
+                endRangeSelectionColor: AppColors.primaryColors,
+                onSelectionChanged: _onSelectionChanged,
+                selectionMode: DateRangePickerSelectionMode.range,
+                initialSelectedRange: PickerDateRange(
                   DateTime.now().subtract(const Duration(days: 4)),
-                  DateTime.now().add(const Duration(days: 3))),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                halfTextBox("Enter date...", startDateController, "Start date",
-                    startDateErrorMsg),
-                halfTextBox("Enter date...", completionDateController,
-                    "Completion date", startDateErrorMsg),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                halfTextTime("Select", startTimeController, "Start time",
-                    startTimeErrorMsg),
-                halfTextTime(
-                    "Select", endTimeController, "End Time", endTimeErrorMsg),
-              ],
-            ),
-            textBox("Enter name...", nameController, "Name", nameErrorMsg),
-            textBox("Enter notes...", notesController, "Appointment notes",
-                notesErrorMsg),
-          ],
+                  DateTime.now().add(
+                    const Duration(days: 3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  halfTextBox(
+                      "Enter Date", startDateController, "Start date", false),
+                  halfTextBox("Enter Date", completionDateController,
+                      "Completion date", false),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  halfTextTime("Select Time", startTimeController, "Start time",
+                      startTimeErrorMsg),
+                  halfTextTime("Select Time", endTimeController, "End Time",
+                      endTimeErrorMsg),
+                ],
+              ),
+              const SizedBox(height: 16),
+              textBox("Select Customer", customerController, "Customer",
+                  customerErrorMsg),
+              const SizedBox(height: 16),
+              textBox("Select Customer", vehicleController, "Vehicle",
+                  vehicleErrorMsg),
+              const SizedBox(height: 16),
+              textBox("Enter Name", nameController, "Name", nameErrorMsg),
+              const SizedBox(height: 16),
+              textBox("Enter Notes", notesController, "Appointment notes",
+                  notesErrorMsg),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Checkbox(
+                    checkColor: Colors.white,
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isChecked = value!;
+                      });
+                    },
+                  ),
+                  const Text(
+                    "Create new estimate for this appointment.",
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                      color: AppColors.greyText,
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 10),
+              GestureDetector(
+                onTap: () {
+                  final status = validate();
+                  if (status) {}
+                },
+                child: Container(
+                  height: 56,
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Confirm",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  errorWidget(bool isError, String label) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Visibility(
+          visible: isError,
+          child: Text(
+            ' $label cannot be empty.',
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(
+                0xffD80027,
+              ),
+            ),
+          )),
+    );
+  }
+
+  validate() {
+    bool status = true;
+
+    if (startTimeController.text.isEmpty) {
+      startTimeErrorMsg = true;
+      status = false;
+    } else {
+      startTimeErrorMsg = false;
+    }
+    if (nameController.text.isEmpty) {
+      nameErrorMsg = true;
+      status = false;
+    } else {
+      nameErrorMsg = false;
+    }
+    if (endTimeController.text.isEmpty) {
+      endTimeErrorMsg = true;
+      status = false;
+    } else {
+      endTimeErrorMsg = false;
+    }
+    if (customerController.text.isEmpty || customer == null) {
+      customerErrorMsg = true;
+      status = false;
+    } else {
+      customerErrorMsg = false;
+    }
+    if (vehicleController.text.isEmpty) {
+      vehicleErrorMsg = true;
+      status = false;
+    } else {
+      vehicleErrorMsg = false;
+    }
+    if (notesController.text.isEmpty) {
+      notesErrorMsg = true;
+      status = false;
+    } else {
+      notesErrorMsg = false;
+    }
+    setState(() {});
+    return status;
   }
 
   Widget timerPicker(TextEditingController controller) {
@@ -158,8 +319,12 @@ class _NewAppointmentState extends State<NewAppointment> {
                   setState(() {
                     if (controller == startTimeController) {
                       initialTimer = changeTimer;
+                      startTimeController.text =
+                          "${initialTimer.inHours}: ${initialTimer.inMinutes % 60}";
                     } else {
                       initialTimer1 = changeTimer;
+                      endTimeController.text =
+                          "${initialTimer1.inHours}: ${initialTimer1.inMinutes % 60}";
                     }
                     print(
                         '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
@@ -175,140 +340,132 @@ class _NewAppointmentState extends State<NewAppointment> {
 
   Widget halfTextBox(String placeHolder, TextEditingController controller,
       String label, bool errorStatus) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff6A7187)),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 6.0),
-            child: SizedBox(
-              height: 56,
-              width: 180,
-              child: TextField(
-                controller: controller,
-                maxLength: 50,
-                readOnly: true,
-                onTap: () {
-                  // showCupertinoModalPopup(
-                  //   context: context,
-                  //   builder: (context) {
-                  //     return timerPicker(controller);
-                  //   },
-                  // );
-                },
-                decoration: InputDecoration(
-                    hintText: placeHolder,
-                    counterText: "",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                            color: errorStatus == true
-                                ? Color(0xffD80027)
-                                : Color(0xffC1C4CD))),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                            color: errorStatus == true
-                                ? Color(0xffD80027)
-                                : Color(0xffC1C4CD))),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                            color: errorStatus == true
-                                ? Color(0xffD80027)
-                                : Color(0xffC1C4CD)))),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: SizedBox(
+            height: 56,
+            width: MediaQuery.of(context).size.width / 2 - 40,
+            child: TextField(
+              controller: controller,
+              maxLength: 50,
+              readOnly: true,
+              onTap: () {
+                // showCupertinoModalPopup(
+                //   context: context,
+                //   builder: (context) {
+                //     return timerPicker(controller);
+                //   },
+                // );
+              },
+              decoration: InputDecoration(
+                  hintText: placeHolder,
+                  counterText: "",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget halfTextTime(String placeHolder, TextEditingController controller,
       String label, bool errorStatus) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xff6A7187)),
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 6.0),
-            child: SizedBox(
-              height: 56,
-              width: 180,
-              child: TextField(
-                controller: controller,
-                maxLength: 50,
-                readOnly: true,
-                onTap: () {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) {
-                      return timerPicker(controller);
-                    },
-                  );
-                },
-                decoration: InputDecoration(
-                    hintText: placeHolder,
-                    counterText: "",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                            color: errorStatus == true
-                                ? Color(0xffD80027)
-                                : Color(0xffC1C4CD))),
-                    enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                            color: errorStatus == true
-                                ? Color(0xffD80027)
-                                : Color(0xffC1C4CD))),
-                    focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                            color: errorStatus == true
-                                ? Color(0xffD80027)
-                                : Color(0xffC1C4CD)))),
-              ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: SizedBox(
+            height: 56,
+            width: MediaQuery.of(context).size.width / 2 - 40,
+            child: TextField(
+              controller: controller,
+              maxLength: 50,
+              readOnly: true,
+              onTap: () {
+                showCupertinoModalPopup(
+                  context: context,
+                  builder: (context) {
+                    return timerPicker(controller);
+                  },
+                );
+              },
+              decoration: InputDecoration(
+                  hintText: placeHolder,
+                  counterText: "",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
-        ],
-      ),
+        ),
+        errorWidget(errorStatus, label)
+      ],
     );
   }
-}
 
-Widget textBox(String placeHolder, TextEditingController controller,
-    String label, bool errorStatus) {
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Column(
+  Widget textBox(String placeHolder, TextEditingController controller,
+      String label, bool errorStatus) {
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
@@ -319,11 +476,31 @@ Widget textBox(String placeHolder, TextEditingController controller,
               color: Color(0xff6A7187)),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 6.0, bottom: 15),
+          padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: 56,
+            // height: label == "Appointment notes" ? 150 : 56,
             width: double.infinity,
             child: TextField(
+              onTap: label == "Customer"
+                  ? () async {
+                      final data =
+                          await Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => SelectCustomerScreen(),
+                      ));
+                      if (data != null) {
+                        setState(() {
+                          customerController.text =
+                              data.firstName + ' ' + data.lastName;
+                          customer = customer;
+                        });
+                      }
+                    }
+                  : label == 'Vehicle'
+                      ? () {}
+                      : null,
+              readOnly: placeHolder.contains('Select'),
+              minLines: label == "Appointment notes" ? 5 : 1,
+              maxLines: label == "Appointment notes" ? 5 : 1,
               controller: controller,
               decoration: InputDecoration(
                   hintText: placeHolder,
@@ -331,24 +508,25 @@ Widget textBox(String placeHolder, TextEditingController controller,
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD)))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
         ),
+        errorWidget(errorStatus, label)
       ],
-    ),
-  );
+    );
+  }
 }
