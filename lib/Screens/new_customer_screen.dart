@@ -13,9 +13,8 @@ import '../utils/app_colors.dart';
 import '../utils/app_strings.dart';
 
 class NewCustomerScreen extends StatefulWidget {
-  const NewCustomerScreen({
-    Key? key,
-  }) : super(key: key);
+  Datum? customerEdit;
+  NewCustomerScreen({Key? key, this.customerEdit}) : super(key: key);
 
   @override
   State<NewCustomerScreen> createState() => _NewCustomerScreenState();
@@ -35,7 +34,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
   CountryCode? selectedCountry;
   List<ProvinceData> proviceList = [];
   ScrollController provinceScrollController = ScrollController();
-  final provinceController = TextEditingController();
+  final TextEditingController provinceController = TextEditingController();
   int? provinceId;
   bool firstNameErrorStatus = false;
   bool lastNameErrorStatus = false;
@@ -60,6 +59,23 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
   String zipCodeErrorMsg = '';
   String? selectedValue;
   List? dropdownList;
+  @override
+  void initState() {
+    if (widget.customerEdit != null) {
+      firstNameController.text = widget.customerEdit?.firstName ?? "";
+      lastNameController.text = widget.customerEdit?.lastName ?? '';
+      emailController.text = widget.customerEdit?.email ?? '';
+      phoneNumberController.text = widget.customerEdit?.phone ?? '';
+      customerNotesController.text = widget.customerEdit?.notes ?? '';
+      addressController.text = widget.customerEdit?.addressLine1 ?? '';
+      cityController.text = widget.customerEdit?.townCity ?? '';
+      zipCodeController.text = widget.customerEdit?.zipcode ?? '';
+      provinceController.text = widget.customerEdit?.provinceName == null
+          ? ''
+          : widget.customerEdit?.provinceName['province_name'] ?? '';
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +85,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         backgroundColor: Colors.transparent,
         automaticallyImplyLeading: false,
         title: Text(
-          'New Customer',
+          widget.customerEdit != null ? 'Edit Customer' : 'New Customer',
           style: TextStyle(
               color: AppColors.primaryBlackColors,
               fontSize: AppStrings.fontSize16,
@@ -86,7 +102,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                 size: AppStrings.fontSize20,
                 color: AppColors.primaryBlackColors,
               )),
-          SizedBox(
+          const SizedBox(
             width: 20,
           )
         ],
@@ -107,7 +123,12 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
 
               '==========================errrrrrrrrorrrrrrrrr';
             } else if (state is AddCustomerLoading) {
-              Center(
+              const Center(
+                child: CupertinoActivityIndicator(),
+              );
+              // Navigator.pop(context, true);
+            } else if (state is EditCustomerLoading) {
+              const Center(
                 child: CupertinoActivityIndicator(),
               );
               // Navigator.pop(context, true);
@@ -221,22 +242,49 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           )),
                       // textBox("Enter Zipcode...", zipCodeController, "Zip",
                       //     zipCodeErrorStatus),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
                         children: [
-                          stateDropDown(),
-                          SizedBox(
-                            width: 10,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              stateDropDown(),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                children: [
+                                  halfTextBox(
+                                      "Enter Zipcode",
+                                      zipCodeController,
+                                      "Zip",
+                                      zipCodeErrorStatus),
+                                ],
+                              ),
+                            ],
                           ),
-                          halfTextBox("Enter Zipcode", zipCodeController, "Zip",
-                              zipCodeErrorStatus),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Visibility(
+                              visible: stateErrorStatus,
+                              child: Text(
+                                stateErrorMsg,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(
+                                    0xffD80027,
+                                  ),
+                                ),
+                              )),
                         ],
                       ),
                       CheckboxListTile(
-                        fillColor: MaterialStatePropertyAll(
+                        fillColor: const MaterialStatePropertyAll(
                             AppColors.primaryGrayColors),
                         controlAffinity: ListTileControlAffinity.leading,
-                        title: Text("Create new estimate using this customer"),
+                        title: const Text(
+                            "Create new estimate using this customer"),
                         value: check,
                         onChanged: (bool? value) {
                           setState(() {
@@ -252,6 +300,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                                 lastNameController.text,
                                 emailController.text,
                                 phoneNumberController.text,
+                                provinceController.text,
                                 // customerNotesController.text,
                                 // cityController.text,
                                 // addressController.text,
@@ -267,9 +316,9 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                             borderRadius: BorderRadius.circular(12),
                             color: AppColors.primaryBlackColors,
                           ),
-                          child: const Text(
-                            "Confirm",
-                            style: TextStyle(
+                          child: Text(
+                            widget.customerEdit != null ? "Update" : "Confirm",
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white),
@@ -318,7 +367,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
@@ -327,7 +376,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                     label == 'Last Name' ||
                     label == 'Email' ||
                     label == 'Phone'
-                ? Text(
+                ? const Text(
                     " *",
                     style: TextStyle(
                       fontSize: 14,
@@ -337,7 +386,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                       ),
                     ),
                   )
-                : Text(''),
+                : const Text(''),
           ],
         ),
         Padding(
@@ -355,20 +404,20 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD)))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
         ),
@@ -386,7 +435,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
@@ -411,20 +460,20 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD)))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
         ),
@@ -647,28 +696,42 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               height: 56,
               // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
               // padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xffC1C4CD)),
-                  borderRadius: BorderRadius.circular(12)),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: TextField(
-                  readOnly: true,
-                  controller: provinceController,
-                  onTap: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return provinceBottomSheet();
-                        },
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent);
-                  },
-                  decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Select State",
-                      suffixIcon: Icon(Icons.arrow_drop_down)),
-                ),
+              // decoration: BoxDecoration(
+              //     border: Border.all(color: const Color(0xffC1C4CD)),
+              //     borderRadius: BorderRadius.circular(12)),
+              child: TextField(
+                readOnly: true,
+                controller: provinceController,
+                onTap: () {
+                  showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return provinceBottomSheet();
+                      },
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent);
+                },
+                decoration: InputDecoration(
+                    hintText: "Select State",
+                    suffixIcon: const Icon(Icons.arrow_drop_down),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: stateErrorStatus == true
+                                ? const Color(0xffD80027)
+                                : const Color(0xffC1C4CD))),
+                    enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: stateErrorStatus == true
+                                ? const Color(0xffD80027)
+                                : const Color(0xffC1C4CD))),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(
+                            color: stateErrorStatus == true
+                                ? const Color(0xffD80027)
+                                : const Color(0xffC1C4CD)))),
               )),
         ),
       ],
@@ -683,7 +746,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       // String customerNotes,
       // String city,
       // String address,
-      // String state,
+      String state,
       // String zipCode,
       BuildContext context) {
     if (firstName.isEmpty) {
@@ -723,11 +786,15 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     } else {
       phoneNumberErrorStatus = false;
     }
-    if (!firstNameErrorStatus &&
-        !lastNameErrorStatus &&
-        !emailErrorStatus &&
-        !phoneNumberErrorStatus) {
-      context.read<CustomerBloc>().add(AddCustomerDetails(
+    if (state.isEmpty) {
+      stateErrorMsg = 'State cant be empty';
+      stateErrorStatus = true;
+    } else {
+      stateErrorStatus = false;
+    }
+
+    if (widget.customerEdit != null) {
+      context.read<CustomerBloc>().add(EditCustomerDetails(
           context: context,
           firstName: firstNameController.text,
           lastName: lastNameController.text,
@@ -737,11 +804,30 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           address: addressController.text,
           city: cityController.text,
           state: provinceController.text,
-          stateId: provinceId.toString(),
-          pinCode: zipCodeController.text));
-      print('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+          stateId: provinceId == null
+              ? widget.customerEdit!.provinceId.toString()
+              : provinceId.toString(),
+          pinCode: zipCodeController.text,
+          id: widget.customerEdit!.id.toString()));
     } else {
-      print('eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
+      if (!firstNameErrorStatus &&
+          !lastNameErrorStatus &&
+          !emailErrorStatus &&
+          !phoneNumberErrorStatus) {
+        context.read<CustomerBloc>().add(AddCustomerDetails(
+            context: context,
+            firstName: firstNameController.text,
+            lastName: lastNameController.text,
+            email: emailController.text,
+            mobileNo: phoneNumberController.text,
+            customerNotes: customerNotesController.text,
+            address: addressController.text,
+            city: cityController.text,
+            state: provinceController.text,
+            stateId: provinceId.toString(),
+            pinCode: zipCodeController.text));
+        print('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+      }
     }
   }
 }

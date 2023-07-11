@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../bloc/customer_bloc/customer_bloc.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_strings.dart';
@@ -207,12 +208,56 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                           ),
                                           Row(
                                             children: [
-                                              SvgPicture.asset(
-                                                  "assets/images/sms.svg"),
-                                              const SizedBox(
-                                                width: 20,
+                                              IconButton(
+                                                onPressed: () {
+                                                  final Uri smsLaunchUri = Uri(
+                                                    scheme: 'sms',
+                                                    path: widget
+                                                        .customerData.phone,
+                                                    queryParameters: <String,
+                                                        String>{
+                                                      'body':
+                                                          Uri.encodeComponent(
+                                                              ' '),
+                                                    },
+                                                  );
+                                                  launchUrl(smsLaunchUri);
+                                                },
+                                                icon: SizedBox(
+                                                  height: 27,
+                                                  width: 18,
+                                                  child: SvgPicture.asset(
+                                                    'assets/images/sms_icons.svg',
+                                                    height: 27,
+                                                    color:
+                                                        AppColors.primaryColors,
+                                                  ),
+                                                ),
                                               ),
-                                              const Icon(CupertinoIcons.phone),
+                                              SizedBox(width: 15),
+                                              IconButton(
+                                                onPressed: () {
+                                                  final Uri emailLaunchUri =
+                                                      Uri(
+                                                    scheme: 'tel',
+                                                    path: widget.customerData
+                                                            .phone ??
+                                                        '',
+                                                  );
+
+                                                  launchUrl(emailLaunchUri);
+                                                },
+                                                icon: SizedBox(
+                                                  height: 27,
+                                                  width: 18,
+                                                  child: SvgPicture.asset(
+                                                    'assets/images/phone_icon.svg',
+                                                    height: 27,
+                                                    color:
+                                                        AppColors.primaryColors,
+                                                  ),
+                                                ),
+                                              ),
                                             ],
                                           )
                                         ],
@@ -252,7 +297,42 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               ),
                                             ],
                                           ),
-                                          const Icon(CupertinoIcons.mail)
+                                          IconButton(
+                                            onPressed: () {
+                                              String? encodeQueryParameters(
+                                                  Map<String, String> params) {
+                                                return params.entries
+                                                    .map((MapEntry<String,
+                                                                String>
+                                                            e) =>
+                                                        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                                                    .join('&');
+                                              }
+
+                                              final Uri emailLaunchUri = Uri(
+                                                scheme: 'mailto',
+                                                path:
+                                                    widget.customerData.email ??
+                                                        '',
+                                                query:
+                                                    encodeQueryParameters(<String,
+                                                        String>{
+                                                  'subject': ' ',
+                                                }),
+                                              );
+
+                                              launchUrl(emailLaunchUri);
+                                            },
+                                            icon: SizedBox(
+                                              height: 27,
+                                              width: 18,
+                                              child: SvgPicture.asset(
+                                                'assets/images/mail_icons.svg',
+                                                height: 23,
+                                                color: AppColors.primaryColors,
+                                              ),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       AppUtils.verticalDivider(),
@@ -648,10 +728,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             ],
                           ),
                           onPressed: () {
+                            Navigator.pop(context);
+
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => NewCustomerScreen()));
+                                    builder: (context) => NewCustomerScreen(
+                                        customerEdit: widget.customerData)));
                           },
                         ),
                       ),
