@@ -317,15 +317,15 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                       "assets/images/bottom_dashboard.svg",
                                       color: currentIndex == 0
                                           ? AppColors.primaryColors
-                                          : Color(0xff9A9A9A)),
+                                          : const Color(0xff9A9A9A)),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 5.0),
+                                  padding: const EdgeInsets.only(top: 5.0),
                                   child: Text("Dashboard",
                                       style: TextStyle(
                                           color: currentIndex == 0
                                               ? AppColors.primaryColors
-                                              : Color(0xff9A9A9A),
+                                              : const Color(0xff9A9A9A),
                                           fontWeight: currentIndex == 0
                                               ? FontWeight.w600
                                               : FontWeight.w400)),
@@ -350,15 +350,15 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                       "assets/images/workflow_icon.svg",
                                       color: currentIndex == 1
                                           ? AppColors.primaryColors
-                                          : Color(0xff9A9A9A)),
+                                          : const Color(0xff9A9A9A)),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 5.0),
+                                  padding: const EdgeInsets.only(top: 5.0),
                                   child: Text("Workflow",
                                       style: TextStyle(
                                           color: currentIndex == 1
                                               ? AppColors.primaryColors
-                                              : Color(0xff9A9A9A),
+                                              : const Color(0xff9A9A9A),
                                           fontWeight: currentIndex == 1
                                               ? FontWeight.w600
                                               : FontWeight.w400)),
@@ -383,15 +383,16 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                       "assets/images/calender_icon.svg",
                                       color: currentIndex == 2
                                           ? AppColors.primaryColors
-                                          : Color(0xff9A9A9A)),
+                                          : const Color.fromARGB(
+                                              255, 81, 51, 51)),
                                 ),
                                 Padding(
-                                  padding: EdgeInsets.only(top: 5.0),
+                                  padding: const EdgeInsets.only(top: 5.0),
                                   child: Text("Calendar",
                                       style: TextStyle(
                                           color: currentIndex == 2
                                               ? AppColors.primaryColors
-                                              : Color(0xff9A9A9A),
+                                              : const Color(0xff9A9A9A),
                                           fontWeight: currentIndex == 2
                                               ? FontWeight.w600
                                               : FontWeight.w400)),

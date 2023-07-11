@@ -436,6 +436,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                             : 50,
                 decoration: InputDecoration(
                     prefixText: label == 'Shop Hourly Labor Rate' ? '\$' : null,
+                    contentPadding:
+                        label == "Shop Hourly Labor Rate" || label == "Tax Rate"
+                            ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
+                            : null,
                     hintText: placeHolder,
                     counterText: "",
                     suffixStyle: const TextStyle(
