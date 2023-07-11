@@ -355,33 +355,58 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 32.0),
-          child: GestureDetector(
-            onTap: () {
+          // child: GestureDetector(
+          //   onTap: () {
+          //     validateData(loginEmailController.text,
+          //         loginPasswordController.text, context);
+
+          //     print("second tap");
+          //   },
+          //   child: Container(
+          //     height: 56,
+          //     alignment: Alignment.center,
+          //     width: MediaQuery.of(context).size.width,
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(12),
+          //       color: AppColors.primaryColors,
+          //     ),
+          //     child: state is UserLoginLoadingState
+          //         ? const CupertinoActivityIndicator(
+          //             color: Colors.white,
+          //           )
+          //         : const Text(
+          //             "Sign in",
+          //             style: TextStyle(
+          //                 fontSize: 16,
+          //                 fontWeight: FontWeight.w500,
+          //                 color: Colors.white),
+          //           ),
+          //   ),
+          // ),
+
+          child: ElevatedButton(
+            onPressed: () {
               validateData(loginEmailController.text,
                   loginPasswordController.text, context);
-
-              print("second tap");
             },
-            child: Container(
-              height: 56,
-              alignment: Alignment.center,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: AppColors.primaryColors,
-              ),
-              child: state is UserLoginLoadingState
-                  ? const CupertinoActivityIndicator(
-                      color: Colors.white,
-                    )
-                  : const Text(
-                      "Sign in",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
-                    ),
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              fixedSize: Size(MediaQuery.of(context).size.width, 56),
+              primary: AppColors.primaryColors,
             ),
+            child: state is UserLoginLoadingState
+                ? const CupertinoActivityIndicator(
+                    color: Colors.white,
+                  )
+                : const Text(
+                    "Sign in",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
           ),
         ),
 
@@ -495,7 +520,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               keyboardType:
                   label == 'Phone Number' ? TextInputType.number : null,
               maxLength: label == 'Phone Number'
-                  ? 16
+                  ? 14
                   : label == 'Password'
                       ? 12
                       : 50,
@@ -745,7 +770,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             text: const TextSpan(
               children: [
                 TextSpan(
-                  text: "By registering, i agree to the Autopilot",
+                  text: "By registering, I agree to the Autopilot",
                   style: TextStyle(
                       color: Color(0xff6A7187),
                       fontSize: 14,
@@ -783,44 +808,68 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 32.0),
-          child: GestureDetector(
-            onTap: () {
-              //   Navigator.push(context, MaterialPageRoute(builder: (context) {
-              //   return LoginAndSignupScreen(widgetIndex: 1,);
-              // },));
+          // child: GestureDetector(
+          //   onTap: () {
+          //     //  context.read<LoginBloc>().add(CreateAccountEvent(firstName: firstNameController.text, lastName: lastNameController.text, email: signUpEmailController.text, password: signUpPasswordController.text, phoneNumber: phoneNumberController.text));
+          //     validateSignup(
+          //         firstNameController.text,
+          //         lastNameController.text,
+          //         signUpEmailController.text,
+          //         phoneNumberController.text,
+          //         signUpPasswordController.text,
+          //         context);
+          //   },
+          //   child: Container(
+          //     height: 56,
+          //     alignment: Alignment.center,
+          //     width: MediaQuery.of(context).size.width,
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(12),
+          //       color: AppColors.primaryColors,
+          //     ),
+          //     child: state is CreateAccountLoadingState
+          //         ? const CupertinoActivityIndicator(
+          //             color: Colors.white,
+          //           )
+          //         : const Text(
+          //             "Next",
+          //             style: TextStyle(
+          //                 fontSize: 16,
+          //                 fontWeight: FontWeight.w500,
+          //                 color: Colors.white),
+          //           ),
+          //   ),
+          // ),
+
+          child: ElevatedButton(
+            onPressed: () {
+              //  context.read<LoginBloc>().add(CreateAccountEvent(firstName: firstNameController.text, lastName: lastNameController.text, email: signUpEmailController.text, password: signUpPasswordController.text, phoneNumber: phoneNumberController.text));
+              validateSignup(
+                  firstNameController.text,
+                  lastNameController.text,
+                  signUpEmailController.text,
+                  phoneNumberController.text,
+                  signUpPasswordController.text,
+                  context);
             },
-            child: GestureDetector(
-              onTap: () {
-                //  context.read<LoginBloc>().add(CreateAccountEvent(firstName: firstNameController.text, lastName: lastNameController.text, email: signUpEmailController.text, password: signUpPasswordController.text, phoneNumber: phoneNumberController.text));
-                validateSignup(
-                    firstNameController.text,
-                    lastNameController.text,
-                    signUpEmailController.text,
-                    phoneNumberController.text,
-                    signUpPasswordController.text,
-                    context);
-              },
-              child: Container(
-                height: 56,
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: AppColors.primaryColors,
-                ),
-                child: state is CreateAccountLoadingState
-                    ? const CupertinoActivityIndicator(
-                        color: Colors.white,
-                      )
-                    : const Text(
-                        "Next",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.white),
-                      ),
-              ),
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+              fixedSize: Size(MediaQuery.of(context).size.width, 56),
+              primary: AppColors.primaryColors,
             ),
+            child: state is CreateAccountLoadingState
+                ? const CupertinoActivityIndicator(
+                    color: Colors.white,
+                  )
+                : const Text(
+                    "Next",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
           ),
         ),
 
@@ -1019,7 +1068,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
   validateData(String email, String password, BuildContext context) {
     if (email.isNotEmpty && password.isNotEmpty) {
       context.read<LoginBloc>().add(UserLoginEvent(
-          email: loginEmailController.text,
+          email: loginEmailController.text.trim(),
           password: loginPasswordController.text,
           context: context));
     } else {
@@ -1128,7 +1177,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
       context.read<LoginBloc>().add(CreateAccountEvent(
           firstName: firstName,
           lastName: lastName,
-          email: email,
+          email: email.trim(),
           password: password,
           phoneNumber: phoneNumber));
     }

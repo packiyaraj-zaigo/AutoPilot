@@ -60,22 +60,29 @@ showDrawer(BuildContext context) {
             "assets/images/customer_drawer_icon.svg",
             "Customers",
             context,
-            // DummyScreen(
-            //   name: "Customer Screen",
-            // )
-            CustomersScreen()),
-        drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles",
-            context, VehiclesScreen()),
+            DummyScreen(
+              name: "Customer Screen",
+            )),
+        //  CustomersScreen()),
+        drawerTileWidget(
+            "assets/images/vehicle_drawer_icon.svg",
+            "Vehicles",
+            context,
+            DummyScreen(
+              name: "Vehicle Screen",
+            )
+            // VehiclesScreen()),
+            ),
         drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
             context, BottomBarScreen()),
         drawerTileWidget(
             "assets/images/service_drawer_icon.svg",
             "Services",
             context,
-            // DummyScreen(
-            //   name: "Service Screen",
-            // )
-            ServicesListScreen()),
+            DummyScreen(
+              name: "Service Screen",
+            )),
+        //  ServicesListScreen()),
         drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
             context, BottomBarScreen()),
         drawerTileWidget(
@@ -103,6 +110,7 @@ showDrawer(BuildContext context) {
 Widget drawerTileWidget(
     String iconUrl, String label, BuildContext context, constructor) {
   return GestureDetector(
+    behavior: HitTestBehavior.translucent,
     onTap: () {
       if (label == "Dashboard") {
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(

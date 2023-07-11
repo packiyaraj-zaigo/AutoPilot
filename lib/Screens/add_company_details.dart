@@ -52,6 +52,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   String selectedCountryString = '';
   String selectedStateString = '';
   Iterable<tz.Location> timeZones = [];
+  List<tz.Location> timeZoneList = [];
   final busineesNameController = TextEditingController();
   final businessPhoneController = TextEditingController();
   final businessWebsiteController = TextEditingController();
@@ -61,6 +62,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   final labourRateController = TextEditingController();
   final taxRateController = TextEditingController();
   final numberOfEmployeeController = TextEditingController();
+  final timeZoneController = TextEditingController();
   bool businessNameErrorStatus = false;
   bool businessPhoneErrorStatus = false;
   bool businessWebsiteErrorStatus = false;
@@ -118,6 +120,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     timeZones = tz.timeZoneDatabase.locations.values.where((element) {
       return element.name.contains("America/");
     });
+    timeZoneList = timeZones.toList();
     print(timeZones);
     bloc = BlocProvider.of<EmployeeBloc>(context);
     bloc.currentPage = 1;
@@ -277,26 +280,28 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
               child: textBox("Enter Business Name", busineesNameController,
-                  "Business Name", businessNameErrorStatus),
+                  "Business Name", businessNameErrorStatus, true),
             ),
             errorMessageWidget(businessNameErrorMsg, businessNameErrorStatus),
             textBox("Enter business phone", businessPhoneController,
-                "Business Phone", businessPhoneErrorStatus),
+                "Business Phone", businessPhoneErrorStatus, true),
             errorMessageWidget(phoneErrorMsg, businessPhoneErrorStatus),
             textBox("Enter business Website", businessWebsiteController,
-                "Business Website", businessWebsiteErrorStatus),
+                "Business Website", businessWebsiteErrorStatus, false),
             textBox("Enter address", addressController, "Address",
-                addressErrorStatus),
+                addressErrorStatus, true),
             errorMessageWidget(addressErrorMsg, addressErrorStatus),
             // countrydropDown(),
             // errorMessageWidget(countryErrorMsg, countryErrorStatus),
-            textBox("Enter city", cityController, "City", cityErrorStatus),
+            textBox(
+                "Enter city", cityController, "City", cityErrorStatus, true),
             errorMessageWidget(cityErrorMsg, cityErrorStatus),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 stateDropDown(),
-                textBox("Enter zipcode", zipController, "Zip", zipErrorStatus),
+                textBox("Enter zipcode", zipController, "Zip", zipErrorStatus,
+                    true),
               ],
             ),
             Row(
@@ -335,13 +340,14 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             ),
             errorMessageWidget(
                 numberOfEmployeeErrorMsg, numberOfEmployeeErrorStatus),
-            timeZoneDropdown(),
+            //  timeZoneDropdown(),
+            newTimeZoneDropDown(),
             errorMessageWidget(timeZoneErrorMsg, timeZoneErrorStatus),
             textBox("Ex. \$45", labourRateController, "Shop Hourly Labor Rate",
-                labourRateErrorStatus),
+                labourRateErrorStatus, true),
             errorMessageWidget(laborRateErrorMsg, labourRateErrorStatus),
             textBox("Enter Percentage Rate", taxRateController, "Tax Rate",
-                taxRateErrorStatus),
+                taxRateErrorStatus, true),
             errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),
             taxSwitchWidget("Tax Labor", taxLabourSwitchValue),
             taxSwitchWidget("Tax Parts", taxPartSwitchValue),
@@ -364,21 +370,20 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         //       color: Color(0xff6A7187)),
         // ),
         textBox("Enter Number of Employees", numberOfEmployeeController,
-            "Number of Employees", numberOfEmployeeErrorStatus)
+            "Number of Employees", numberOfEmployeeErrorStatus, true)
       ],
     );
   }
 
   //Common Text field widget
   Widget textBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus) {
+      String label, bool errorStatus, bool required) {
     return Padding(
       padding: const EdgeInsets.only(top: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 label,
@@ -387,6 +392,15 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     fontWeight: FontWeight.w500,
                     color: Color(0xff6A7187)),
               ),
+              required
+                  ? const Text(
+                      "*",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xffD80027)),
+                    )
+                  : const SizedBox(),
             ],
           ),
           Padding(
@@ -400,7 +414,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 controller: controller,
                 inputFormatters: label == "Business Phone"
                     ? [PhoneInputFormatter()]
-                    : label == "Number of Employees" || label == 'Zip'
+                    : label == "Number of Employees" ||
+                            label == 'Zip' ||
+                            label == "Shop Hourly Labor Rate" ||
+                            label == "Tax Rate"
                         ? [FilteringTextInputFormatter.digitsOnly]
                         : [],
                 keyboardType: label == 'Business Phone' ||
@@ -411,7 +428,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     ? TextInputType.number
                     : null,
                 maxLength: label == 'Business Phone'
-                    ? 19
+                    ? 14
                     : label == 'Password'
                         ? 12
                         : label == 'Zip'
@@ -421,20 +438,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     prefixText: label == 'Shop Hourly Labor Rate' ? '\$' : null,
                     hintText: placeHolder,
                     counterText: "",
-                    suffixIcon: label == "Shop Hourly Labor Rate"
-                        ? const Padding(
-                            padding: EdgeInsets.only(right: 10.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "per hour",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: AppColors.primaryTitleColor),
-                                ),
-                              ],
-                            ),
+                    suffixStyle: const TextStyle(
+                        fontSize: 16, color: AppColors.primaryTitleColor),
+                    suffix: label == "Shop Hourly Labor Rate"
+                        ? Text(
+                            "per hour",
                           )
                         : label == "Tax Rate"
                             ? const Padding(
@@ -693,6 +701,71 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     );
   }
 
+  Widget newTimeZoneDropDown() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Text(
+                "Time Zone",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff6A7187)),
+              ),
+              Text(
+                "*",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFFD80027)),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                height: 56,
+                // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
+                // padding: const EdgeInsets.all(5),
+                decoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xffC1C4CD)),
+                    borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: TextField(
+                    readOnly: true,
+                    controller: timeZoneController,
+                    onTap: () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return timeZoneBottomSheet();
+                          },
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent);
+                    },
+                    decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Select Time Zone",
+                        contentPadding: EdgeInsets.symmetric(vertical: 14),
+                        suffixIcon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: AppColors.primaryColors,
+                        )),
+                  ),
+                )),
+          ),
+        ],
+      ),
+    );
+  }
+
   //Timezone dropdown
 
   Widget timeZoneDropdown() {
@@ -721,47 +794,45 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                           ? const Color(0xffD80027)
                           : const Color(0xffC1C4CD)),
                   borderRadius: BorderRadius.circular(12)),
-              child: DropdownButtonHideUnderline(
-                child: ButtonTheme(
-                  alignedDropdown: true,
-                  child: DropdownButtonFormField<tz.Location>(
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down_sharp,
-                      color: AppColors.primaryColors,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
-                      enabledBorder: InputBorder.none,
-                      errorBorder: InputBorder.none,
-                      disabledBorder: InputBorder.none,
-                    ),
-                    menuMaxHeight: 380,
-                    value: _currentSelectedTimezoneValue,
-                    style: const TextStyle(color: Color(0xff6A7187)),
-                    items: timeZones.map<DropdownMenuItem<tz.Location>>(
-                        (tz.Location value) {
-                      return DropdownMenuItem<tz.Location>(
-                        alignment: AlignmentDirectional.centerStart,
-                        value: value,
-                        child: Text(value.name),
-                      );
-                    }).toList(),
-                    hint: const Text(
-                      "Select timezone",
-                      style: TextStyle(
-                          color: Color(0xff6A7187),
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    onChanged: (tz.Location? value) {
-                      setState(() {
-                        _currentSelectedTimezoneValue = value;
-                        timeZoneString = value!.name.toString();
-                      });
-                    },
-                    //isExpanded: true,
+              child: ButtonTheme(
+                alignedDropdown: true,
+                child: DropdownButtonFormField<tz.Location>(
+                  icon: const Icon(
+                    Icons.keyboard_arrow_down_sharp,
+                    color: AppColors.primaryColors,
                   ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    errorBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                  ),
+                  menuMaxHeight: 380,
+                  value: _currentSelectedTimezoneValue,
+                  style: const TextStyle(color: Color(0xff6A7187)),
+                  items: timeZones
+                      .map<DropdownMenuItem<tz.Location>>((tz.Location value) {
+                    return DropdownMenuItem<tz.Location>(
+                      alignment: AlignmentDirectional.centerStart,
+                      value: value,
+                      child: Text(value.name),
+                    );
+                  }).toList(),
+                  hint: const Text(
+                    "Select timezone",
+                    style: TextStyle(
+                        color: Color(0xff6A7187),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400),
+                  ),
+                  onChanged: (tz.Location? value) {
+                    setState(() {
+                      _currentSelectedTimezoneValue = value;
+                      timeZoneString = value!.name.toString();
+                    });
+                  },
+                  //isExpanded: true,
                 ),
               ),
             ),
@@ -1139,6 +1210,68 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     );
   }
 
+  Widget timeZoneBottomSheet() {
+    return Container(
+      height: MediaQuery.of(context).size.height / 2,
+      width: MediaQuery.of(context).size.width,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12), color: Colors.white),
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Time Zone",
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryTitleColor),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: LimitedBox(
+                maxHeight: MediaQuery.of(context).size.height / 2 - 90,
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          print("heyy");
+                          timeZoneString = timeZoneList[index].name;
+                          timeZoneController.text = timeZoneList[index].name;
+
+                          Navigator.pop(context);
+                        },
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(8)),
+                          width: MediaQuery.of(context).size.width,
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Text(
+                              timeZoneList[index].name,
+                              style: const TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                  itemCount: timeZoneList.length,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   validateOperationDetails() {
     if (numberOfEmployeeController.text.isEmpty) {
       setState(() {
@@ -1379,6 +1512,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         setState(() {
           _currentSelectedTimezoneValue = element;
           timeZoneString = element.name;
+          timeZoneController.text = element.name;
           print(timeZoneString + "tiiimme zoneee");
         });
       }

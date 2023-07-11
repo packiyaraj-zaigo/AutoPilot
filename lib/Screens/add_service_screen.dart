@@ -11,6 +11,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/svg.dart';
 
 class AddServiceScreen extends StatefulWidget {
   const AddServiceScreen({super.key});
@@ -61,7 +62,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
   CountryCode? selectedCountry;
   final countryPicker = const FlCountryCodePicker();
-  late final EmployeeBloc bloc;
+  List<String> tagDataList = [];
 
   @override
   void initState() {
@@ -577,67 +578,161 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   addMaterialPopup() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      child: Column(
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      return SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
             children: [
-              Text(
-                "Add Material",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryTitleColor),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Add Material",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                  Icon(Icons.close)
+                ],
               ),
-              Icon(Icons.close)
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Enter Material Name", addMaterialNameController,
+                    "Name", addMaterailNameErrorStatus, context),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Enter Material Description",
+                    addMaterialDescriptionController,
+                    "Description",
+                    addMaterialDescriptionErrorStatus,
+                    context),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    textBox("Amount", addMaterialDescriptionController, "Price",
+                        addMaterialDescriptionErrorStatus, context),
+                    pricingModelDropDown()
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    textBox("Amount", addMaterialDescriptionController, "Cost",
+                        addMaterialDescriptionErrorStatus, context),
+                    pricingModelDropDown()
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: textBox("Enter Amount", addMaterialDiscountController,
+                    "Discount", addMaterialDiscountErrorStatus, context),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Label",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff6A7187),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        newSetState(() {
+                          tagDataList.add("Tag");
+                        });
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.add,
+                            color: AppColors.primaryColors,
+                          ),
+                          Text(
+                            "Add New",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    //  maxCrossAxisExtent: 150,
+                    mainAxisSpacing: 20,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 3),
+                itemBuilder: (context, index) {
+                  return tagWidget(tagDataList[index], index, newSetState);
+                },
+                itemCount: tagDataList.length,
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: textBox("Enter Batch Number", addMaterialBatchController,
+                    "Part/Batch Number", addMaterailBatchErrorStatus, context),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Sub Total :",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Text(
+                      "\$0.00",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 31),
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primaryColors),
+                ),
+              )
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 17.0),
-            child: textBox("Enter Material Name", addMaterialNameController,
-                "Name", addMaterailNameErrorStatus, context),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 17.0),
-            child: textBox(
-                "Enter Material Description",
-                addMaterialDescriptionController,
-                "Description",
-                addMaterialDescriptionErrorStatus,
-                context),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 17.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                textBox("Amount", addMaterialDescriptionController, "Price",
-                    addMaterialDescriptionErrorStatus, context),
-                pricingModelDropDown()
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 17.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                textBox("Amount", addMaterialDescriptionController, "Cost",
-                    addMaterialDescriptionErrorStatus, context),
-                pricingModelDropDown()
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 17),
-            child: textBox("Enter Amount", addMaterialDiscountController,
-                "Discoount", addMaterialDiscountErrorStatus, context),
-          )
-        ],
-      ),
-    );
+        ),
+      );
+    });
   }
 
   Widget pricingModelDropDown() {
@@ -712,6 +807,44 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget tagWidget(String tagName, index, StateSetter newSetState) {
+    return Container(
+      height: 35,
+      width: 40,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          color: const Color(0xffF4F4F4)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 15),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                tagName,
+                style: const TextStyle(
+                    fontSize: 16,
+                    overflow: TextOverflow.ellipsis,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.primaryTitleColor),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: GestureDetector(
+                  onTap: () {
+                    newSetState(() {
+                      tagDataList.removeAt(index);
+                    });
+                  },
+                  child: SvgPicture.asset("assets/images/close_tag_icon.svg")),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

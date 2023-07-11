@@ -144,11 +144,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   actions: [
                     IconButton(
                         onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(
-                            builder: (context) {
-                              return AddCompanyScreen();
-                            },
-                          ));
+                          // Navigator.push(context, MaterialPageRoute(
+                          //   builder: (context) {
+                          //     return AddCompanyScreen();
+                          //   },
+                          // ));
                         },
                         icon: SvgPicture.asset(
                           "assets/images/message.svg",
@@ -519,10 +519,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Estimate",
                   "assets/images/estimate_icon.svg",
-                  // DummyScreen(
-                  //   name: "Create estimate screen",
-                  // )),
-                  CreateEstimateScreen()),
+                  DummyScreen(
+                    name: "Create estimate screen",
+                  )),
+              //   CreateEstimateScreen()),
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
@@ -542,7 +542,12 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                     name: "New Appointment Screen",
                   )),
               bottomSheetTile(
-                  "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
+                  "Scanner",
+                  "assets/images/scanner_icon.svg",
+                  DummyScreen(
+                    name: "Scanner Screen",
+                  )),
+              // ScannerScreen()),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: GestureDetector(
