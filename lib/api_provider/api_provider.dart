@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -598,6 +599,18 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print("errroor draft found ${e.toString()}");
+    }
+  }
+
+  Future<dynamic> editPart(PartsDatum part, String token) async {
+    try {
+      final response = await http.put(
+          Uri.parse('${BASE_URL}api/inventory_parts/${part.id}'),
+          headers: getHeader(token),
+          body: json.encode(part.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Edit part provider error');
     }
   }
 

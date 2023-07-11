@@ -22,7 +22,10 @@ class PartsDetailsLoadingState extends PartsState {
 
 class AddPartsDetailsLoadingState extends PartsState {}
 
-class AddPartDetailsErrorState extends PartsState {}
+class AddPartDetailsErrorState extends PartsState {
+  final String message;
+  AddPartDetailsErrorState({required this.message});
+}
 
 class PartsDetailsPageNationLoading extends PartsState {}
 
@@ -30,6 +33,8 @@ class PartsDetailsErrorState extends PartsState {
   final String message;
   PartsDetailsErrorState({required this.message});
 }
+
+class AddPardDetailsSuccessState extends PartsState {}
 
 class PartsDetailsSuccessStates extends PartsState {
   final Parts part;
