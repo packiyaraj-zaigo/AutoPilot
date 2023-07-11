@@ -309,7 +309,7 @@ class _PartsScreenState extends State<PartsScreen> {
                                                             width: 10,
                                                           ),
                                                           Text(
-                                                            'Qty: ${item.quantityInHand.toString().padLeft(3, '0')}',
+                                                            'QTY: ${item.quantityInHand.toString().padLeft(3, '0')}',
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,

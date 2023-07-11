@@ -11,6 +11,7 @@ import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -214,90 +215,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                             final item = employeeList[index];
                                             return Column(
                                               children: [
-                                                GestureDetector(
-                                                  behavior:
-                                                      HitTestBehavior.opaque,
-                                                  onTap: () {
-                                                    Navigator.of(context).push(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            EmployeeDetailsScreen(
-                                                          employee: item,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    height: 77,
-                                                    width: double.infinity,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withOpacity(
-                                                                  0.07),
-                                                          offset: const Offset(
-                                                              0, 4),
-                                                          blurRadius: 10,
-                                                        ),
-                                                      ],
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          horizontal: 16.0),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            '${item.firstName ?? ""} ${item.lastName ?? ""} ',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 1,
-                                                            style:
-                                                                const TextStyle(
-                                                              color: Color(
-                                                                  0xFF061237),
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                              height: 3),
-                                                          Text(
-                                                            item.roles?[0].name
-                                                                    ?.toUpperCase() ??
-                                                                '',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            maxLines: 1,
-                                                            style:
-                                                                const TextStyle(
-                                                              color: Color(
-                                                                  0xFF6A7187),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
+                                                CommonWidgets()
+                                                    .employeeCard(item: item),
                                                 bloc.currentPage <=
                                                             bloc.totalPages &&
                                                         index ==
