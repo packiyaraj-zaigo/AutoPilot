@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:flutter/material.dart';
 import '../Models/employee_creation_model.dart';
@@ -214,6 +215,10 @@ class ApiRepository {
 
   Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
     return apiProvider.editWorkflowPosition(token, workflow);
+  }
+
+  Future editPart(String token, PartsDatum part) {
+    return apiProvider.editPart(part, token);
   }
 
   Future getTechniciansOnly(String token) {

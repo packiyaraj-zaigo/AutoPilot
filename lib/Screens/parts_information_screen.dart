@@ -1,6 +1,9 @@
+import 'package:auto_pilot/bloc/parts_model/parts_bloc.dart';
+import 'package:auto_pilot/bloc/parts_model/parts_event.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../Models/parts_model.dart';
@@ -24,12 +27,19 @@ class _PartsInformationState extends State<PartsInformation> {
     setState(() {
       _counter++;
     });
+    changeQuantity();
   }
 
   void _decrementCounter() {
     setState(() {
       _counter--;
     });
+    changeQuantity();
+  }
+
+  changeQuantity() {
+    widget.parts.quantityInHand = _counter;
+    BlocProvider.of<PartsBloc>(context).add(ChangeQuantity(part: widget.parts));
   }
 
   final List _segmentTitles = [
@@ -49,6 +59,12 @@ class _PartsInformationState extends State<PartsInformation> {
   int selectedIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    _counter = widget.parts.quantityInHand;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
@@ -60,291 +76,303 @@ class _PartsInformationState extends State<PartsInformation> {
             Navigator.pop(context);
           },
           color: AppColors.primaryColors,
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
         ),
-        title: Center(
-          child: Text(
-            "Parts Information",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primaryBlackColors),
-          ),
+        centerTitle: true,
+        title: const Text(
+          "Parts Information",
+          style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primaryBlackColors),
         ),
         actions: [
-          Icon(
-            Icons.more_horiz,
-            color: AppColors.primaryColors,
-          )
+          IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.more_horiz,
+                color: AppColors.primaryColors,
+              ))
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 24, right: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${widget.parts.itemName}",
-              style: TextStyle(
+              widget.parts.itemName,
+              style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 18,
                   color: AppColors.primaryTitleColor),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 8, bottom: 0, left: 10, right: 10),
-              child: Center(
-                child: CupertinoSlidingSegmentedControl(
-                  onValueChanged: (value) {
-                    setState(() {
-                      selectedIndex = value ?? 0;
-                    });
-                  },
-                  groupValue: selectedIndex,
-                  children: {
-                    for (int i = 0; i < _segmentTitles.length; i++)
-                      i: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 65),
-                        child: _segmentTitles[i],
-                      )
-                  },
-                ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: CupertinoSlidingSegmentedControl(
+                onValueChanged: (value) {
+                  setState(() {
+                    selectedIndex = value ?? 0;
+                  });
+                },
+                backgroundColor: AppColors.primarySegmentColors,
+                groupValue: selectedIndex,
+                children: {
+                  for (int i = 0; i < _segmentTitles.length; i++)
+                    i: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 65),
+                      child: _segmentTitles[i],
+                    )
+                },
               ),
             ),
+            const SizedBox(height: 20),
             Expanded(
-              child: selectedIndex == 1
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 24),
-                      child: Container(
-                          color: CupertinoColors.white,
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    print("object");
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: AppColors.buttonColors,
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius:
-                                          new BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.add_circle_outline,
-                                        color: AppColors.primaryColors,
-                                      ),
-                                      const Text(
-                                        'Add New Note',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: AppColors.primaryColors,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                child: selectedIndex == 1
+                    ? Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                print("object");
+                              },
+                              style: ElevatedButton.styleFrom(
+                                primary: AppColors.buttonColors,
+                                shape: new RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(10.0),
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 32),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        spreadRadius: 1,
-                                        blurRadius: 5,
-                                        offset: Offset(
-                                            0, 7), // changes position of shadow
-                                      ),
-                                    ],
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add_circle_outline,
+                                    color: AppColors.primaryColors,
                                   ),
-                                  child: ListTile(
-                                    title: Text(
-                                      '${widget.parts.createdAt}',
-                                      style: TextStyle(
-                                          color: AppColors.greyText,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                                  Text(
+                                    'Add New Note',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryColors,
                                     ),
-                                    subtitle: Text(
-                                      '${widget.parts.itemServiceNote}',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    // trailing: Icon(Icons.add),),
                                   ),
-                                ),
-                              )
-                            ],
-                          )),
-                    )
-                  : selectedIndex == 0
-                      ? Container(
-                          height: MediaQuery.of(context).size.height,
-                          color: const Color(0xffF9F9F9),
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 24, top: 20),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Serial Number",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.primaryGrayColors),
-                                ),
-                                Text(
-                                  "${widget.parts.partName}",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.primaryTitleColor),
-                                ),
-                                AppUtils.verticalDivider(),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                Text(
-                                  "Type",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.primaryGrayColors),
-                                ),
-                                Text(
-                                  "${widget.parts.itemName ?? ""}",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.primaryTitleColor),
-                                ),
-                                AppUtils.verticalDivider(),
-                                SizedBox(
-                                  height: 14,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(
-                                          "Quantity",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400,
-                                              color:
-                                                  AppColors.primaryGrayColors),
-                                        ),
-                                        Text(
-                                          '$_counter',
-                                          style: TextStyle(fontSize: 24.0),
-                                        ),
-                                      ],
-                                    ),
-                                    Container(
-                                        alignment: Alignment.topCenter,
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            InkWell(
-                                              onTap: _decrementCounter,
-                                              child: SvgPicture.asset(
-                                                "assets/images/parts_minns.svg",
-                                                color: AppColors.primaryColors,
-                                                height: 20,
-                                                width: 20,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 15,
-                                            ),
-                                            InkWell(
-                                              onTap: _incrementCounter,
-                                              child: SvgPicture.asset(
-                                                "assets/images/parts_add.svg",
-                                                color: AppColors.primaryColors,
-                                                height: 20,
-                                                width: 20,
-                                              ),
-                                            ),
-                                          ],
-                                        )),
-                                  ],
-                                ),
-                                AppUtils.verticalDivider(),
-                                SizedBox(
-                                  height: 14,
-                                ),
-                                Text(
-                                  "Fee",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.primaryGrayColors),
-                                ),
-                                Text(
-                                  "${widget.parts.subTotal ?? ""}",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.primaryTitleColor),
-                                ),
-                                AppUtils.verticalDivider(),
-                                SizedBox(
-                                  height: 14,
-                                ),
-                                Text(
-                                  "Cost",
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w400,
-                                      color: AppColors.primaryGrayColors),
-                                ),
-                                Text(
-                                  "${widget.parts.taxRate ?? ""}",
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.primaryTitleColor),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ))
-                      : SingleChildScrollView(
-                          child: Column(
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 32),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 5,
+                                    offset: const Offset(
+                                        0, 7), // changes position of shadow
+                                  ),
+                                ],
+                              ),
+                              child: ListTile(
+                                title: Text(
+                                  '${widget.parts.createdAt}',
+                                  style: const TextStyle(
+                                      color: AppColors.greyText,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                subtitle: Text(
+                                  widget.parts.itemServiceNote,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16,
+                                      color: AppColors.primaryTitleColor),
+                                ),
+                                // trailing: Icon(Icons.add),),
+                              ),
+                            ),
+                          )
+                        ],
+                      )
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Serial Number",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.greyText),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.parts.partName,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          AppUtils.verticalDivider(),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          const Text(
+                            "Type",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.greyText),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.parts.itemName,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          AppUtils.verticalDivider(),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return Column(
-                                    children: [Text("data")],
-                                  );
-                                },
-                                // itemCount: equipmentFormList.length,
-                                shrinkWrap: true,
-                                padding: const EdgeInsets.all(0),
-                                physics: const ClampingScrollPhysics(),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Quantity",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.greyText),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    '$_counter'.padLeft(2, '0'),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                ],
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  GestureDetector(
+                                    onTap: () {
+                                      _decrementCounter();
+                                    },
+                                    child: const CircleAvatar(
+                                      radius: 11,
+                                      child: Center(
+                                          child: Icon(
+                                        CupertinoIcons.minus,
+                                        size: 15,
+                                      )),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 35,
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      _incrementCounter();
+                                    },
+                                    child: const CircleAvatar(
+                                      radius: 11,
+                                      child: Center(
+                                          child: Icon(
+                                        CupertinoIcons.add,
+                                        size: 15,
+                                      )),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 12,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
-            ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          AppUtils.verticalDivider(),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          const Text(
+                            "Fee",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.primaryGrayColors),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.parts.subTotal,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          AppUtils.verticalDivider(),
+                          const SizedBox(
+                            height: 14,
+                          ),
+                          const Text(
+                            "Cost",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.greyText),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            widget.parts.taxRate,
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
+                      )
+                // : SingleChildScrollView(
+                //     child: Column(
+                //       children: [
+                //         ListView.builder(
+                //           itemBuilder: (context, index) {
+                //             return Column(
+                //               children: [Text("data")],
+                //             );
+                //           },
+                //           // itemCount: equipmentFormList.length,
+                //           shrinkWrap: true,
+                //           padding: const EdgeInsets.all(0),
+                //           physics: const ClampingScrollPhysics(),
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                ),
           ],
         ),
       ),

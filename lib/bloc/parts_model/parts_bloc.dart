@@ -21,6 +21,20 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
   PartsBloc() : super(PartsInitial()) {
     on<GetAllParts>(getAllParts);
     on<AddParts>(addAllParts);
+    on<ChangeQuantity>(changeQuantity);
+  }
+
+  changeQuantity(
+    ChangeQuantity event,
+    Emitter<PartsState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final response = await apiRepo.editPart(token, event.part);
+      log(response.body.toString() + " Edit reponse");
+    } catch (e) {
+      log(e.toString() + "Update quantity error");
+    }
   }
 
   getAllParts(
@@ -95,26 +109,21 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
           event.quantity,
           event.type);
       var partsAdd = _decoder.convert(response.body);
-      print("33333333333333333333######3${response.body}");
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("${response.statusCode}");
         isPartsLoading = false;
-        Navigator.pop(
-          event.context,
-        );
-        ScaffoldMessenger.of((event.context)).showSnackBar(
-          SnackBar(
-            content: Text('${partsAdd['message']}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        emit(PartsDetailsPageNationLoading());
-      } else if (response.statusCode == 422) {
-        emit(AddPartDetailsErrorState());
+
+        emit(AddPardDetailsSuccessState());
+      } else {
+        if (partsAdd['message'] != null) {
+          emit(AddPartDetailsErrorState(message: partsAdd['message']));
+        } else {
+          emit(
+              AddPartDetailsErrorState(message: partsAdd[partsAdd.keys.first]));
+        }
         errorRes = partsAdd;
       }
     } catch (e) {
-      emit(PartsDetailsErrorState(message: e.toString()));
+      emit(PartsDetailsErrorState(message: 'Something went wrong'));
       isPartsLoading = false;
     }
   }

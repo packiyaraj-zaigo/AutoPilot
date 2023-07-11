@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -27,6 +28,11 @@ class AddParts extends PartsEvent {
     required this.epa,
     required this.cost,
   });
+}
+
+class ChangeQuantity extends PartsEvent {
+  final PartsDatum part;
+  const ChangeQuantity({required this.part});
 }
 
 // class AddPart extends PartsEvent {
