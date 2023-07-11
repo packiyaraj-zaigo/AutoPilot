@@ -295,8 +295,53 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 77),
-                    GestureDetector(
-                      onTap: () async {
+                    // GestureDetector(
+                    //   onTap: () async {
+                    //     final validate = validation();
+                    //     if (validate) {
+                    //       final clientId = await AppUtils.getUserID();
+                    //       print(phoneController.text
+                    //           .trim()
+                    //           .replaceAll(RegExp(r'[^\w\s]+'), '')
+                    //           .replaceAll(" ", ""));
+                    //       bloc.add(
+                    //         CreateEmployee(
+                    //           model: EmployeeCreationModel(
+                    //             clientId: int.parse(clientId),
+                    //             email: emailController.text.trim(),
+                    //             firstName: firstNameController.text.trim(),
+                    //             lastName: lastNameController.text.trim(),
+                    //             phone: phoneController.text
+                    //                 .trim()
+                    //                 .replaceAll(RegExp(r'[^\w\s]+'), ''),
+                    //             role: dropdownValue,
+                    //           ),
+                    //         ),
+                    //       );
+                    //       log(clientId.toString() +
+                    //           ":::::::::::::::Client id:::::::::::");
+                    //     }
+                    //   },
+                    //   child: Container(
+                    //     height: 56,
+                    //     alignment: Alignment.center,
+                    //     width: MediaQuery.of(context).size.width,
+                    //     decoration: BoxDecoration(
+                    //       borderRadius: BorderRadius.circular(12),
+                    //       color: AppColors.primaryColors,
+                    //     ),
+                    //     child: const Text(
+                    //       "Confirm",
+                    //       style: TextStyle(
+                    //           fontSize: 16,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Colors.white),
+                    //     ),
+                    //   ),
+                    // ),
+
+                    ElevatedButton(
+                      onPressed: () async {
                         final validate = validation();
                         if (validate) {
                           final clientId = await AppUtils.getUserID();
@@ -322,21 +367,19 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                               ":::::::::::::::Client id:::::::::::");
                         }
                       },
-                      child: Container(
-                        height: 56,
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: AppColors.primaryColors,
-                        ),
-                        child: const Text(
-                          "Confirm",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
-                        ),
+                      style: ElevatedButton.styleFrom(
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                        primary: AppColors.primaryColors,
+                      ),
+                      child: const Text(
+                        "Confirm",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white),
                       ),
                     ),
                     const SizedBox(height: 34),
@@ -389,7 +432,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
               inputFormatters:
                   label == "Phone" ? [PhoneInputFormatter()] : null,
               maxLength: label == 'Phone'
-                  ? 19
+                  ? 14
                   : label.contains('Name')
                       ? 100
                       : 50,
