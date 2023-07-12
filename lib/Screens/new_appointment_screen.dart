@@ -1,25 +1,36 @@
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/customer_model.dart';
+import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
+import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
+import 'package:auto_pilot/bloc/appointment/appointment_bloc.dart';
+import '../Models/vechile_model.dart' as vm;
+
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import '../utils/app_colors.dart';
 
-class NewAppointment extends StatefulWidget {
-  const NewAppointment({Key? key}) : super(key: key);
+class CreateAppointmentScreen extends StatefulWidget {
+  const CreateAppointmentScreen({Key? key}) : super(key: key);
 
   @override
-  State<NewAppointment> createState() => _NewAppointmentState();
+  State<CreateAppointmentScreen> createState() =>
+      _CreateAppointmentScreenState();
 }
 
-class _NewAppointmentState extends State<NewAppointment> {
-  String? _dateCount;
-  String? _range;
-  String? _range1;
+class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
+  // String? _dateCount;
+  DateTime? startDateToServer;
+  DateTime? endDateToServer;
+  String? startDate;
+  String? endDate;
   final TextEditingController startDateController = TextEditingController();
   final TextEditingController completionDateController =
       TextEditingController();
@@ -30,46 +41,47 @@ class _NewAppointmentState extends State<NewAppointment> {
   final TextEditingController customerController = TextEditingController();
   final TextEditingController vehicleController = TextEditingController();
   Datum? customer;
-  Duration initialTimer = const Duration();
-  Duration initialTimer1 = const Duration();
+  vm.Datum? vehicle;
+  Duration startTime = const Duration();
+  Duration endTime = const Duration();
   bool startTimeErrorMsg = false;
   bool endTimeErrorMsg = false;
   bool nameErrorMsg = false;
   bool notesErrorMsg = false;
   bool customerErrorMsg = false;
   bool vehicleErrorMsg = false;
-
+  bool isValidated = false;
   bool isChecked = false;
 
   @override
   void initState() {
-    _dateCount = '';
-    _range = '';
+    startDate = '';
     super.initState();
-    startDateController.text = _range = DateFormat('dd/MM/yyyy')
+    startDateController.text = startDate = DateFormat('dd/MM/yyyy')
         .format(DateTime.now().subtract(const Duration(days: 4)))
         .toString();
-    completionDateController.text = _range1 = DateFormat('dd/MM/yyyy')
+    startDateToServer = DateTime.now().subtract(const Duration(days: 4));
+    completionDateController.text = endDate = DateFormat('dd/MM/yyyy')
         .format(DateTime.now().add(const Duration(days: 3)))
         .toString();
+    endDateToServer = DateTime.now().subtract(const Duration(days: 3));
   }
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     setState(() {
       if (args.value is PickerDateRange) {
-        _range =
+        startDate =
             DateFormat('dd/MM/yyyy').format(args.value.startDate).toString();
-        _range1 = DateFormat('dd/MM/yyyy')
+        startDateToServer = args.value.startDate;
+        endDate = DateFormat('dd/MM/yyyy')
             .format(args.value.endDate ?? args.value.startDate)
             .toString();
-        startDateController.text = _range.toString();
+        endDateToServer = args.value.endDate ?? args.value.startDate;
+        startDateController.text = startDate.toString();
         completionDateController.text =
-            _range1 == null ? '' : _range1.toString();
+            endDate == null ? '' : endDate.toString();
 
         print("${args.value.startDate}");
-      } else if (args.value is DateTime) {
-      } else if (args.value is List<DateTime>) {
-        _dateCount = args.value.length.toString();
       }
     });
   }
@@ -102,128 +114,181 @@ class _NewAppointmentState extends State<NewAppointment> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              const Text(
-                "Basic Details",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: AppColors.primaryTitleColor,
-                  fontWeight: FontWeight.w600,
+      body: BlocListener<AppointmentBloc, AppointmentState>(
+        listener: (context, state) {
+          if (state is CreateAppointmentErrorState) {
+            CommonWidgets().showDialog(context, state.message);
+          }
+          if (state is CreateAppointmentSuccessState) {
+            log(isChecked.toString());
+            if (isChecked == true) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => CreateEstimateScreen(
+                  customer: customer,
+                  vehicle: vehicle,
                 ),
-              ),
-              const SizedBox(height: 15),
-              SfDateRangePicker(
-                monthViewSettings:
-                    const DateRangePickerMonthViewSettings(dayFormat: 'EEE'),
-                monthCellStyle: DateRangePickerMonthCellStyle(
-                    cellDecoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFEDEEFF)),
-                  shape: BoxShape.circle,
-                )),
+              ));
+            } else {
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //   const SnackBar(
+              //     content: Text('Appointment created succesfully'),
+              //     backgroundColor: Colors.green,
+              //   ),
+              // );
+              Navigator.of(context).pop();
+            }
+          }
+        },
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                const Text(
+                  "Basic Details",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: AppColors.primaryTitleColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                SfDateRangePicker(
+                  monthViewSettings:
+                      const DateRangePickerMonthViewSettings(dayFormat: 'EEE'),
+                  monthCellStyle: DateRangePickerMonthCellStyle(
+                      cellDecoration: BoxDecoration(
+                    border: Border.all(color: const Color(0xFFEDEEFF)),
+                    shape: BoxShape.circle,
+                  )),
 
-                headerStyle: const DateRangePickerHeaderStyle(
-                    textStyle: TextStyle(
-                        fontSize: 16,
-                        color: AppColors.primaryTitleColor,
-                        fontWeight: FontWeight.w600)),
-                // selectionTextStyle: TextStyle(color: Colors.white),
-                rangeTextStyle: const TextStyle(color: Colors.white),
-                rangeSelectionColor: AppColors.primaryColors,
-                startRangeSelectionColor: AppColors.primaryColors,
-                endRangeSelectionColor: AppColors.primaryColors,
-                onSelectionChanged: _onSelectionChanged,
-                selectionMode: DateRangePickerSelectionMode.range,
-                initialSelectedRange: PickerDateRange(
-                  DateTime.now().subtract(const Duration(days: 4)),
-                  DateTime.now().add(
-                    const Duration(days: 3),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  halfTextBox(
-                      "Enter Date", startDateController, "Start date", false),
-                  halfTextBox("Enter Date", completionDateController,
-                      "Completion date", false),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  halfTextTime("Select Time", startTimeController, "Start time",
-                      startTimeErrorMsg),
-                  halfTextTime("Select Time", endTimeController, "End Time",
-                      endTimeErrorMsg),
-                ],
-              ),
-              const SizedBox(height: 16),
-              textBox("Select Customer", customerController, "Customer",
-                  customerErrorMsg),
-              const SizedBox(height: 16),
-              textBox("Select Customer", vehicleController, "Vehicle",
-                  vehicleErrorMsg),
-              const SizedBox(height: 16),
-              textBox("Enter Name", nameController, "Name", nameErrorMsg),
-              const SizedBox(height: 16),
-              textBox("Enter Notes", notesController, "Appointment notes",
-                  notesErrorMsg),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Checkbox(
-                    checkColor: Colors.white,
-                    value: isChecked,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked = value!;
-                      });
-                    },
-                  ),
-                  const Text(
-                    "Create new estimate for this appointment.",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                      color: AppColors.greyText,
+                  headerStyle: const DateRangePickerHeaderStyle(
+                      textStyle: TextStyle(
+                          fontSize: 16,
+                          color: AppColors.primaryTitleColor,
+                          fontWeight: FontWeight.w600)),
+                  // selectionTextStyle: TextStyle(color: Colors.white),
+                  rangeTextStyle: const TextStyle(color: Colors.white),
+                  rangeSelectionColor: AppColors.primaryColors,
+                  startRangeSelectionColor: AppColors.primaryColors,
+                  endRangeSelectionColor: AppColors.primaryColors,
+                  onSelectionChanged: _onSelectionChanged,
+                  selectionMode: DateRangePickerSelectionMode.range,
+                  initialSelectedRange: PickerDateRange(
+                    DateTime.now().subtract(const Duration(days: 4)),
+                    DateTime.now().add(
+                      const Duration(days: 3),
                     ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () {
-                  final status = validate();
-                  if (status) {}
-                },
-                child: Container(
-                  height: 56,
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    color: AppColors.primaryColors,
-                  ),
-                  child: const Text(
-                    "Confirm",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
                   ),
                 ),
-              ),
-              const SizedBox(height: 30),
-            ],
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    halfTextBox(
+                        "Enter Date", startDateController, "Start date", false),
+                    halfTextBox("Enter Date", completionDateController,
+                        "Completion date", false),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    halfTextTime("Select Time", startTimeController,
+                        "Start time", startTimeErrorMsg),
+                    halfTextTime("Select Time", endTimeController, "End Time",
+                        endTimeErrorMsg),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                textBox("Select Customer", customerController, "Customer",
+                    customerErrorMsg),
+                const SizedBox(height: 16),
+                textBox("Select Customer", vehicleController, "Vehicle",
+                    vehicleErrorMsg),
+                const SizedBox(height: 16),
+                textBox("Enter Name", nameController, "Name", nameErrorMsg),
+                const SizedBox(height: 16),
+                textBox("Enter Notes", notesController, "Appointment notes",
+                    notesErrorMsg),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Checkbox(
+                      checkColor: Colors.white,
+                      value: isChecked,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          isChecked = value!;
+                        });
+                      },
+                    ),
+                    const Text(
+                      "Create new estimate for this appointment.",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: AppColors.greyText,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 10),
+                GestureDetector(
+                  onTap: () {
+                    isValidated = true;
+                    final status = validate();
+
+                    if (status) {
+                      BlocProvider.of<AppointmentBloc>(context).add(
+                        CreateAppointmentEvent(
+                          appointment: AppointmentCreateModel(
+                            appointmentTitle: nameController.text,
+                            createdBy: 0,
+                            customerId: customer!.id,
+                            vehicleId: vehicle!.id,
+                            startOn: startDateToServer!.add(startTime),
+                            endOn: endDateToServer!.add(endTime),
+                            notes: notesController.text,
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                  child: Container(
+                    height: 56,
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primaryColors,
+                    ),
+                    child: BlocBuilder<AppointmentBloc, AppointmentState>(
+                      builder: (context, state) {
+                        if (state is CreateAppointmentLoadingState) {
+                          return const Center(
+                            child: CupertinoActivityIndicator(
+                              color: AppColors.greyText,
+                            ),
+                          );
+                        }
+                        return const Text(
+                          "Confirm",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 30),
+              ],
+            ),
           ),
         ),
       ),
@@ -257,7 +322,7 @@ class _NewAppointmentState extends State<NewAppointment> {
     } else {
       startTimeErrorMsg = false;
     }
-    if (nameController.text.isEmpty) {
+    if (nameController.text.trim().isEmpty) {
       nameErrorMsg = true;
       status = false;
     } else {
@@ -275,13 +340,13 @@ class _NewAppointmentState extends State<NewAppointment> {
     } else {
       customerErrorMsg = false;
     }
-    if (vehicleController.text.isEmpty) {
+    if (vehicleController.text.isEmpty || vehicle == null) {
       vehicleErrorMsg = true;
       status = false;
     } else {
       vehicleErrorMsg = false;
     }
-    if (notesController.text.isEmpty) {
+    if (notesController.text.trim().isEmpty) {
       notesErrorMsg = true;
       status = false;
     } else {
@@ -305,6 +370,19 @@ class _NewAppointmentState extends State<NewAppointment> {
                 CupertinoButton(
                     child: const Text("Done"),
                     onPressed: () {
+                      if (startTimeController.text.isEmpty &&
+                          controller == startTimeController) {
+                        startTime = Duration.zero;
+                        startTimeController.text = '0.0';
+                      }
+                      if (endTimeController.text.isEmpty &&
+                          controller == endTimeController) {
+                        endTime = Duration.zero;
+                        endTimeController.text = '0.0';
+                      }
+                      if (isValidated) {
+                        validate();
+                      }
                       Navigator.pop(context);
                     })
               ],
@@ -314,21 +392,28 @@ class _NewAppointmentState extends State<NewAppointment> {
                 mode: CupertinoTimerPickerMode.hm,
                 minuteInterval: 1,
                 secondInterval: 1,
-                initialTimerDuration: const Duration(),
+                initialTimerDuration: startTimeController.text != '' &&
+                        controller == startTimeController
+                    ? startTime
+                    : endTimeController.text != '' &&
+                            controller == endTimeController
+                        ? endTime
+                        : const Duration(),
                 onTimerDurationChanged: (Duration changeTimer) {
-                  setState(() {
-                    if (controller == startTimeController) {
-                      initialTimer = changeTimer;
-                      startTimeController.text =
-                          "${initialTimer.inHours}: ${initialTimer.inMinutes % 60}";
-                    } else {
-                      initialTimer1 = changeTimer;
-                      endTimeController.text =
-                          "${initialTimer1.inHours}: ${initialTimer1.inMinutes % 60}";
-                    }
-                    print(
-                        '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
-                  });
+                  // setState(() {
+                  if (controller == startTimeController) {
+                    startTime = changeTimer;
+                    startTimeController.text =
+                        "${startTime.inHours}: ${startTime.inMinutes % 60}";
+                  } else {
+                    endTime = changeTimer;
+                    endTimeController.text =
+                        "${endTime.inHours}: ${endTime.inMinutes % 60}";
+                  }
+                  // });
+                  if (isValidated) {
+                    validate();
+                  }
                 },
               ),
             ),
@@ -485,18 +570,34 @@ class _NewAppointmentState extends State<NewAppointment> {
                   ? () async {
                       final data =
                           await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => SelectCustomerScreen(),
+                        builder: (context) => const SelectCustomerScreen(),
                       ));
                       if (data != null) {
-                        setState(() {
-                          customerController.text =
-                              data.firstName + ' ' + data.lastName;
-                          customer = customer;
-                        });
+                        customerController.text = (data.firstName ?? '') +
+                            ' ' +
+                            (data.lastName ?? '');
+                        customer = data;
+                        if (isValidated) {
+                          validate();
+                        }
                       }
                     }
                   : label == 'Vehicle'
-                      ? () {}
+                      ? () async {
+                          final data = await Navigator.of(context)
+                              .push(MaterialPageRoute(
+                            builder: (context) => const SelectVehiclesScreen(),
+                          ));
+                          if (data != null) {
+                            vehicleController.text = (data.vehicleYear ?? '') +
+                                ' ' +
+                                (data.vehicleModel ?? '');
+                            vehicle = data;
+                            if (isValidated) {
+                              validate();
+                            }
+                          }
+                        }
                       : null,
               readOnly: placeHolder.contains('Select'),
               minLines: label == "Appointment notes" ? 5 : 1,

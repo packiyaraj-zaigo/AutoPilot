@@ -45,7 +45,7 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
         }
         emit(GetAllTimeCardsSucessState(timeCards: timeCards));
       } else {
-        throw body[body.keys.first];
+        throw body[body.keys.first][0];
       }
     } catch (e) {
       emit(const GetAllTimeCardsErrorState(message: 'Something went wrong'));

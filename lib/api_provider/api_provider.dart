@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -932,6 +933,21 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createAppointment(
+      String token, AppointmentCreateModel appointment) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/appointments');
+      final response = await http.post(
+        url,
+        headers: getHeader(token),
+        body: appointmentCreateModelToJson(appointment),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + " create appointment api error");
     }
   }
 }

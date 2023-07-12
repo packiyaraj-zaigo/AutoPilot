@@ -47,7 +47,7 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
         }
         emit(GetAllWorkflowSuccessState(workflows: workflows));
       } else {
-        emit(GetAllWorkflowErrorState(message: body[body.keys.first]));
+        emit(GetAllWorkflowErrorState(message: body[body.keys.first][0]));
       }
     } catch (e) {
       log("${e}Workflow get bloc error");

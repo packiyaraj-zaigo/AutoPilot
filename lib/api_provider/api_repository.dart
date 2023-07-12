@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:flutter/material.dart';
@@ -265,6 +266,10 @@ class ApiRepository {
 
   Future deleteVechile(String token, String deleteId) {
     return apiProvider.deleteVechile(token, deleteId);
+  }
+
+  Future createAppointment(String token, AppointmentCreateModel appointment) {
+    return apiProvider.createAppointment(token, appointment);
   }
 }
 

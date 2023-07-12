@@ -54,9 +54,11 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
           IconButton(
             onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const NewCustomerScreen()));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => NewCustomerScreen(),
+                ),
+              );
             },
             icon: Icon(
               Icons.add,

@@ -1,5 +1,6 @@
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/appointment/appointment_bloc.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/login_bloc/login_bloc.dart';
 
@@ -61,6 +62,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider(
           create: (context) => WorkflowBloc(),
+        ),
+        BlocProvider(
+          create: (context) => AppointmentBloc(),
         ),
       ],
       child: MaterialApp(
