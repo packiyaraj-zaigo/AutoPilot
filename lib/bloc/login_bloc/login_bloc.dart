@@ -3,7 +3,6 @@
 import 'dart:convert';
 import 'dart:developer';
 
-
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -20,255 +19,194 @@ part 'login_event.dart';
 part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-
-   final ApiRepository _apiRepository;
+  final ApiRepository _apiRepository;
   final JsonDecoder _decoder = const JsonDecoder();
 
-  Map errorRes={};
- LoginBloc({
+  Map errorRes = {};
+  LoginBloc({
     required ApiRepository apiRepository,
   })  : _apiRepository = apiRepository,
         super(LoginInitial()) {
-          on<CreateAccountEvent>(createAccountBloc);
-          on<UserLoginEvent>(loginBloc);
-          on<ResetPasswordGetPasswordEvent>(resetPasswordGetOtpBloc);
-          on<ResetPasswordSendOtpEvent>(resetPasswordSendOtpBloc);
-          on<CreateNewPasswordEvent>(createNewPasswordBloc);
-   
+    on<CreateAccountEvent>(createAccountBloc);
+    on<UserLoginEvent>(loginBloc);
+    on<ResetPasswordGetPasswordEvent>(resetPasswordGetOtpBloc);
+    on<ResetPasswordSendOtpEvent>(resetPasswordSendOtpBloc);
+    on<CreateNewPasswordEvent>(createNewPasswordBloc);
   }
 
-
-
-   Future<void> createAccountBloc(
+  Future<void> createAccountBloc(
     CreateAccountEvent event,
     Emitter<LoginState> emit,
   ) async {
-
-    
     try {
-      
       emit(CreateAccountLoadingState());
 
       Response createAccRes = await _apiRepository.createAccount(
-          event.firstName,event.lastName,event.email,event.phoneNumber,event.password);
+          event.firstName,
+          event.lastName,
+          event.email,
+          event.phoneNumber,
+          event.password);
       var createAccData = _decoder.convert(createAccRes.body);
       log("res${createAccRes.body}");
 
-      
-      if (createAccRes.statusCode==201) {
+      if (createAccRes.statusCode == 201) {
         emit(CreateAccountSuccessState());
         AppUtils.setTempVar("user_created");
-      }else if(createAccRes.statusCode==422){
+      } else if (createAccRes.statusCode == 422) {
         emit(CreateAccountErrorState());
-        errorRes=createAccData;
+        errorRes = createAccData;
       }
-       
-       
     } catch (e) {
       emit(CreateAccountErrorState());
-      
+
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }
 
-
-   Future<void> loginBloc(
+  Future<void> loginBloc(
     UserLoginEvent event,
     Emitter<LoginState> emit,
   ) async {
-
-    
     try {
-       SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? tempVar = prefs.getString(AppConstants.TEMP_VAR);
-      
       emit(UserLoginLoadingState());
 
-      Response userLoginRes = await _apiRepository.login(
-        event.email,event.password);
+      Response userLoginRes =
+          await _apiRepository.login(event.email, event.password);
       var userLoginData = _decoder.convert(userLoginRes.body);
       log("res${userLoginRes.body}");
 
-      
-      if (userLoginRes.statusCode==200) {
+      if (userLoginRes.statusCode == 200) {
         emit(UserLoginSuccessState());
         AppUtils.setToken(userLoginData['access_token']);
         AppUtils.setUserID(userLoginData['client_id'].toString());
 
-        if(tempVar!=null &&tempVar!=""){
-          
-        Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
-          builder: (context) {
-            return const AddCompanyScreen();
-      },), (route) => false);
-
-        }else{
-          
-        Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
-          builder: (context) {
-            return BottomBarScreen();
-      },), (route) => false);
+        if (userLoginData['isCompanySetup'] == 1) {
+          Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
+            builder: (context) {
+              return const AddCompanyScreen();
+            },
+          ), (route) => false);
+        } else {
+          Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
+            builder: (context) {
+              return BottomBarScreen();
+            },
+          ), (route) => false);
         }
-
-
-      }else{
-        if(userLoginRes.body.contains("email")){
-           emit(UserLoginErrorState(
-          errorMessage: userLoginData['email'][0]));
+      } else {
+        if (userLoginRes.body.contains("email")) {
+          emit(UserLoginErrorState(errorMessage: userLoginData['email'][0]));
         }
-        emit(UserLoginErrorState(
-          errorMessage: userLoginData['message']
-        ));
+        emit(UserLoginErrorState(errorMessage: userLoginData['message']));
       }
-       
-       
     } catch (e) {
       emit(CreateAccountErrorState());
 
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }
 
-
-
-   Future<void> resetPasswordGetOtpBloc(
+  Future<void> resetPasswordGetOtpBloc(
     ResetPasswordGetPasswordEvent event,
     Emitter<LoginState> emit,
   ) async {
-
-
     try {
-
       emit(ResetPasswordGetOtpLoadingState());
 
-      Response resetPasswordRes = await _apiRepository.resetPasswordGetOtp(
-        event.emailId);
+      Response resetPasswordRes =
+          await _apiRepository.resetPasswordGetOtp(event.emailId);
       var resetPasswordData = _decoder.convert(resetPasswordRes.body);
       log("res${resetPasswordRes.body}");
 
-
-      if (resetPasswordRes.statusCode==200) {
+      if (resetPasswordRes.statusCode == 200) {
         emit(ResetPasswordGetOtpState());
-
-      }else{
-         if(resetPasswordRes.body.contains("email")){
+      } else {
+        if (resetPasswordRes.body.contains("email")) {
           print("correct");
-           emit(ResetPasswordGetOtpErrorState(
-          errorMsg: resetPasswordData['email'][0]));
-        }else if(resetPasswordRes.body.contains("message")){
-
-            emit(ResetPasswordGetOtpErrorState(
-          errorMsg: resetPasswordData['message']
-        ));
-
-        }else{
-               emit(const ResetPasswordGetOtpErrorState(
-          errorMsg: "Something went wrong"
-        ));
-
+          emit(ResetPasswordGetOtpErrorState(
+              errorMsg: resetPasswordData['email'][0]));
+        } else if (resetPasswordRes.body.contains("message")) {
+          emit(ResetPasswordGetOtpErrorState(
+              errorMsg: resetPasswordData['message']));
+        } else {
+          emit(const ResetPasswordGetOtpErrorState(
+              errorMsg: "Something went wrong"));
         }
-      
+
         // emit(ResetPasswordGetOtpErrorState(
         //   errorMsg: resetPasswordData['message']
         // ));
       }
-
-
     } catch (e) {
       emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
 
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }
 
-
-   Future<void> resetPasswordSendOtpBloc(
+  Future<void> resetPasswordSendOtpBloc(
     ResetPasswordSendOtpEvent event,
     Emitter<LoginState> emit,
   ) async {
-
-
     try {
-
       emit(ResetPasswordSendOtpLoadingState());
 
-      Response resetPasswordRes = await _apiRepository.resetPasswordSendOtp(
-        event.email,event.otp);
+      Response resetPasswordRes =
+          await _apiRepository.resetPasswordSendOtp(event.email, event.otp);
       var resetPasswordData = _decoder.convert(resetPasswordRes.body);
       log("res${resetPasswordRes.body}");
 
-
-      if (resetPasswordRes.statusCode==200) {
-        emit(ResetPasswordSendOtpState(
-          newToken: resetPasswordData['token']
-
-        ));
+      if (resetPasswordRes.statusCode == 200) {
+        emit(ResetPasswordSendOtpState(newToken: resetPasswordData['token']));
 
         print(resetPasswordRes.body);
-
-      }else{
+      } else {
         emit(ResetPasswordSendOtpErrorState(
-          errorMsg: resetPasswordData['message']
-        ));
+            errorMsg: resetPasswordData['message']));
       }
-
-
     } catch (e) {
       emit(ResetPasswordGetOtpErrorState(errorMsg: "Something went wrong"));
 
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }
 
-
-
-   Future<void> createNewPasswordBloc(
+  Future<void> createNewPasswordBloc(
     CreateNewPasswordEvent event,
     Emitter<LoginState> emit,
   ) async {
-
-
     try {
-
       emit(CreateNewPasswordLoadingState());
 
       Response createNewPasswordRes = await _apiRepository.createNewPassword(
-        event.email,event.password,event.confirmPassword,event.newToken);
+          event.email, event.password, event.confirmPassword, event.newToken);
       var resetPasswordData = _decoder.convert(createNewPasswordRes.body);
       log("res${createNewPasswordRes.body}");
 
-
-      if (createNewPasswordRes.statusCode==200) {
+      if (createNewPasswordRes.statusCode == 200) {
         emit(CreateNewPasswordState());
-
-
-       
-
-      }else{
-        if(createNewPasswordRes.body.contains("password")){
-           emit(CreateNewPasswordErrorState(errorMsg: resetPasswordData['password'][0]));
-        }else{
+      } else {
+        if (createNewPasswordRes.body.contains("password")) {
+          emit(CreateNewPasswordErrorState(
+              errorMsg: resetPasswordData['password'][0]));
+        } else {
           emit(CreateNewPasswordErrorState(errorMsg: "Something went wrong"));
         }
-
-
-       
       }
-
-
     } catch (e) {
       emit(CreateNewPasswordErrorState(errorMsg: "Something went wrong"));
 
       print(e.toString());
-     // emit(LoginInvalidCredentialsState(message: e.toString()));
+      // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
     }
   }
