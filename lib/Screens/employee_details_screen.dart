@@ -571,7 +571,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             children: [
               bottomSheetTile(
                 'Edit',
-                CupertinoIcons.pencil,
+                Icons.edit,
                 CreateEmployeeScreen(
                   navigation: 'edit_employee',
                   employee: widget.employee,
@@ -579,7 +579,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
               ),
               bottomSheetTile(
                 'Delete',
-                CupertinoIcons.delete,
+                Icons.delete,
                 null,
               ),
               Padding(
@@ -668,16 +668,21 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             children: [
               Icon(
                 icon,
-                color: AppColors.primaryColors,
+                color: title == 'Delete'
+                    ? CupertinoColors.destructiveRed
+                    : AppColors.primaryColors,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
                   title,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryColors),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: title == 'Delete'
+                        ? CupertinoColors.destructiveRed
+                        : AppColors.primaryColors,
+                  ),
                 ),
               ),
             ],

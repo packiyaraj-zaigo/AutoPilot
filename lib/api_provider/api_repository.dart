@@ -252,7 +252,7 @@ class ApiRepository {
     return apiProvider.getAllWorkflows(token, page);
   }
 
-  Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
+  Future editWorkflowPosition(String token, WorkflowModel workflow) {
     return apiProvider.editWorkflowPosition(token, workflow);
   }
 

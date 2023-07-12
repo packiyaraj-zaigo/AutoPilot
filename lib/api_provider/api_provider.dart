@@ -894,8 +894,8 @@ class ApiProvider {
   Future<dynamic> getAllWorkflows(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse(
-          '${BASE_URL}api/workflowbuckets?page=$page&updated_by=$clientId');
+      final url =
+          Uri.parse('${BASE_URL}api/workfloworders?client_id=$clientId');
       final response = await http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -904,7 +904,7 @@ class ApiProvider {
   }
 
   Future<dynamic> editWorkflowPosition(
-      String token, WorkflowBucketModel workflow) async {
+      String token, WorkflowModel workflow) async {
     try {
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');

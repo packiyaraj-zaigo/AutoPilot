@@ -37,20 +37,18 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
       if (response.statusCode == 200) {
         final data = body['data'];
         log(data.toString());
-        currentPage = data['current_page'] ?? 1;
-        totalPages = data['last_page'] ?? 1;
-        List<WorkflowBucketModel> workflows = [];
-        if (data['data'] != null && data['data'].isNotEmpty) {
-          data['data'].forEach((workflow) {
-            workflows.add(WorkflowBucketModel.fromJson(workflow));
+        List<WorkflowModel> workflows = [];
+        if (data != null && data.isNotEmpty) {
+          data.forEach((workflow) {
+            workflows.add(WorkflowModel.fromJson(workflow));
           });
         }
         emit(GetAllWorkflowSuccessState(workflows: workflows));
       } else {
         emit(GetAllWorkflowErrorState(message: body[body.keys.first][0]));
       }
-    } catch (e) {
-      log("${e}Workflow get bloc error");
+    } catch (e, s) {
+      log("$e ${s}Workflow get bloc error");
       emit(const GetAllWorkflowErrorState(message: 'Something went wrong'));
     }
   }
