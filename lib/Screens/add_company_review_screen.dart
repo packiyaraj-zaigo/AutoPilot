@@ -40,36 +40,64 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
               bottomNavigationBar: Padding(
                 padding:
                     const EdgeInsets.only(left: 24.0, right: 24, bottom: 24),
-                child: GestureDetector(
-                  onTap: () {
+                // child: GestureDetector(
+                //   onTap: () {
+                //     Map<String, dynamic> finalDataMap = {}
+                //       ..addAll(widget.basicDetailsMap)
+                //       ..addAll(widget.operationDetailsMap);
+                //     context.read<DashboardBloc>().add(AddCompanyEvent(
+                //         dataMap: finalDataMap, context: context));
+                //   },
+                //   child: Container(
+                //     height: 56,
+                //     alignment: Alignment.center,
+                //     width: MediaQuery.of(context).size.width,
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(12),
+                //       color: AppColors.primaryColors,
+                //     ),
+                //     child: state is AddCompanyLoadingState
+                //         ? const Center(
+                //             child: CupertinoActivityIndicator(
+                //               color: Colors.white,
+                //             ),
+                //           )
+                //         : const Text(
+                //             "Confirm",
+                //             style: TextStyle(
+                //                 fontSize: 16,
+                //                 fontWeight: FontWeight.w500,
+                //                 color: Colors.white),
+                //           ),
+                //   ),
+                // ),
+                child: ElevatedButton(
+                  onPressed: () {
                     Map<String, dynamic> finalDataMap = {}
                       ..addAll(widget.basicDetailsMap)
                       ..addAll(widget.operationDetailsMap);
                     context.read<DashboardBloc>().add(AddCompanyEvent(
                         dataMap: finalDataMap, context: context));
                   },
-                  child: Container(
-                    height: 56,
-                    alignment: Alignment.center,
-                    width: MediaQuery.of(context).size.width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: AppColors.primaryColors,
-                    ),
-                    child: state is AddCompanyLoadingState
-                        ? const Center(
-                            child: CupertinoActivityIndicator(
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text(
-                            "Confirm",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                      primary: AppColors.primaryColors),
+                  child: state is AddCompanyLoadingState
+                      ? const Center(
+                          child: CupertinoActivityIndicator(
+                            color: Colors.white,
                           ),
-                  ),
+                        )
+                      : const Text(
+                          "Confirm",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white),
+                        ),
                 ),
               ),
               body: Padding(
