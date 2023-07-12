@@ -262,6 +262,10 @@ class ApiRepository {
   Future getTechniciansOnly(String token) {
     return apiProvider.getTechniciansOnly(token);
   }
+
+  Future deleteVechile(String token, String deleteId) {
+    return apiProvider.deleteVechile(token, deleteId);
+  }
 }
 
 class NetworkError extends Error {}

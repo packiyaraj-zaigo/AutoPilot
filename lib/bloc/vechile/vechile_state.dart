@@ -75,3 +75,16 @@ class DropdownVechileDetailsErrorState extends VechileState {
   final String message;
   DropdownVechileDetailsErrorState({required this.message});
 }
+
+class DeleteVechileDetailsSuccessState extends VechileState {
+  final VechileResponse vechile;
+  const DeleteVechileDetailsSuccessState({required this.vechile});
+
+  @override
+  List<Object> get props => [];
+}
+
+class DeleteVechileDetailsErrorState extends VechileState {
+  final String message;
+  DeleteVechileDetailsErrorState({required this.message});
+}

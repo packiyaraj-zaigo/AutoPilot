@@ -328,6 +328,28 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> deleteVechile(
+    String token,
+    String deleteId,
+  ) async {
+    print("eeeeeeeeeeeeeeeeeeeeeeeeeee$token");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/vehicles/${deleteId}");
+      var request = http.MultipartRequest("DELETE", url)
+        ..headers['Authorization'] = "Bearer $token";
+      var response = await request.send();
+      inspect(response);
+      print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");
+      print(response.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
   Future<dynamic> customerLoad(String token, int page, String query) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();

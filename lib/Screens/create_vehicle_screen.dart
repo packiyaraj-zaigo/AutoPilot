@@ -13,9 +13,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CreateVehicleScreen extends StatefulWidget {
-  const CreateVehicleScreen({super.key, this.vehicle, this.vin = ''});
+  const CreateVehicleScreen(
+      {super.key, this.vehicle, this.vin = '', this.Editvechile});
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
+  final Datum? Editvechile;
+
   @override
   State<CreateVehicleScreen> createState() => _CreateVehicleScreenState();
 }
@@ -71,7 +74,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   dynamic _currentSelectedTypeValue;
 
   addDataToFields() {
-// nameController.text = widget.vehicle!.
+    // nameController.text = widget.vehicle!.
     yearController.text = widget.vehicle!.modelYear ?? '';
     modelController.text = widget.vehicle!.model ?? '';
     engineController.text = widget.vehicle!.displacementCc ?? '';
@@ -85,6 +88,16 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     vinController.text = widget.vin;
     if (widget.vehicle != null) {
       addDataToFields();
+    }
+    if (widget.Editvechile != null) {
+      yearController.text = widget.Editvechile?.vehicleYear ?? "";
+      yearController.text = widget.Editvechile?.vehicleMake ?? "";
+      yearController.text = widget.Editvechile?.vehicleModel ?? "";
+      // yearController.text = widget.Editvechile?.subModel ?? "";
+      // yearController.text = widget.Editvechile?.engineSize ?? "";
+      yearController.text = widget.Editvechile?.vehicleColor ?? "";
+      // yearController.text = widget.Editvechile?.licencePlate ?? "";
+      // yearController.text = widget.Editvechile?.vehicleType ?? "";
     }
     _bloc = BlocProvider.of<VechileBloc>(context);
     _bloc?.currentPage = 1;
@@ -496,6 +509,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                       context,
                                       stateUpdate,
                                     );
+                                    print("${yearController.text}");
                                     // Navigator.push(
                                     //     context,
                                     //     MaterialPageRoute(
