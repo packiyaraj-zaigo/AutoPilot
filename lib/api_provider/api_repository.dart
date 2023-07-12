@@ -271,6 +271,14 @@ class ApiRepository {
   Future createAppointment(String token, AppointmentCreateModel appointment) {
     return apiProvider.createAppointment(token, appointment);
   }
+
+  Future deleteEmployee(String token, int id) {
+    return apiProvider.deleteEmployee(token, id);
+  }
+
+  Future editEmployee(String token, EmployeeCreationModel employee, int id) {
+    return apiProvider.editEmployee(token, employee, id);
+  }
 }
 
 class NetworkError extends Error {}

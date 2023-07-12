@@ -47,3 +47,18 @@ class EmployeeRolesSuccessState extends EmployeeState {
   final List<RoleModel> roles;
   const EmployeeRolesSuccessState({required this.roles});
 }
+
+class DeleteEmployeeLoadingState extends EmployeeState {}
+
+class DeleteEmployeeErrorState extends EmployeeState {}
+
+class DeleteEmployeeSuccessState extends EmployeeState {}
+
+class EditEmployeeLoadingState extends EmployeeState {}
+
+class EditEmployeeErrorState extends EmployeeState {
+  final String message;
+  const EditEmployeeErrorState({required this.message});
+}
+
+class EditEmployeeSuccessState extends EmployeeState {}

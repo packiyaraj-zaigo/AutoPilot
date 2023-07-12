@@ -950,4 +950,25 @@ class ApiProvider {
       log(e.toString() + " create appointment api error");
     }
   }
+
+  Future<dynamic> deleteEmployee(String token, int id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/users/$id');
+      final response = await http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Delete provider error");
+    }
+  }
+
+  Future<dynamic> editEmployee(
+      String token, EmployeeCreationModel model, int id) async {
+    try {
+      final response = http.put(Uri.parse('${BASE_URL}api/users/$id'),
+          headers: getHeader(token), body: json.encode(model.toJson()));
+      return response;
+    } catch (e) {
+      print(e.toString() + 'Create employee error');
+    }
+  }
 }

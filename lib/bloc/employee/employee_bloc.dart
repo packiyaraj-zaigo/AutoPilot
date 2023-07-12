@@ -7,6 +7,8 @@ import 'package:equatable/equatable.dart';
 import 'package:auto_pilot/Models/employee_creation_model.dart';
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/role_model.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
 
 part 'employee_event.dart';
@@ -22,6 +24,61 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     on<GetAllEmployees>(getAllEmployee);
     on<CreateEmployee>(createEmployee);
     on<GetAllRoles>(getAllRoles);
+    on<DeleteEmployee>(deleteEmployee);
+    on<EditEmployee>(editEmployee);
+  }
+
+  editEmployee(
+    EditEmployee event,
+    Emitter<EmployeeState> emit,
+  ) async {
+    try {
+      emit(EditEmployeeLoadingState());
+      final token = await AppUtils.getToken();
+      final Response response =
+          await apiRepo.editEmployee(token, event.employee, event.id);
+      log(response.statusCode.toString() + "Status code");
+      log(jsonDecode(response.body).toString() + "BODY");
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(EditEmployeeSuccessState());
+      } else {
+        final body = jsonDecode(response.body);
+        log(body.toString());
+        if (body.keys.isNotEmpty) {
+          if (body.containsKey('error')) {
+            emit(EditEmployeeErrorState(message: body['error']));
+          } else if (body.containsKey('message')) {
+            emit(EditEmployeeErrorState(message: body['message']));
+          } else {
+            emit(EditEmployeeErrorState(message: body[body.keys.first][0]));
+          }
+        } else {
+          throw 'Something went wrong';
+        }
+      }
+    } catch (e) {
+      log(e.toString() + 'Edit employee bloc error');
+      emit(EditEmployeeErrorState(message: "Something went wrong"));
+    }
+  }
+
+  deleteEmployee(
+    DeleteEmployee event,
+    Emitter<EmployeeState> emit,
+  ) async {
+    try {
+      emit(DeleteEmployeeLoadingState());
+      final token = await AppUtils.getToken();
+      final reponse = await apiRepo.deleteEmployee(token, event.id);
+      if (reponse.statusCode == 200) {
+        emit(DeleteEmployeeSuccessState());
+      } else {
+        emit(DeleteEmployeeErrorState());
+      }
+    } catch (e) {
+      emit(DeleteEmployeeErrorState());
+      log(e.toString() + " Delete employee bloc error");
+    }
   }
 
   getAllRoles(
