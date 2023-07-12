@@ -1,8 +1,11 @@
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/employee_creation_model.dart';
+import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/role_model.dart';
+import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Screens/add_company_details.dart';
+import 'package:auto_pilot/Screens/employee_details_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -14,8 +17,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateEmployeeScreen extends StatefulWidget {
-  const CreateEmployeeScreen({super.key, required this.navigation});
+  const CreateEmployeeScreen(
+      {super.key, required this.navigation, this.employee});
   final String navigation;
+  final Employee? employee;
 
   @override
   State<CreateEmployeeScreen> createState() => _CreateEmployeeScreenState();
@@ -36,11 +41,23 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
 
   late final EmployeeBloc bloc;
 
+  populateDataToFields() {
+    final employee = widget.employee!;
+    firstNameController.text = employee.firstName ?? '';
+    lastNameController.text = employee.lastName ?? '';
+    emailController.text = employee.email ?? '';
+    phoneController.text = employee.phone ?? '';
+    dropdownValue = employee.roles![0].name!;
+  }
+
   @override
   void initState() {
     super.initState();
     bloc = BlocProvider.of<EmployeeBloc>(context);
     bloc.add(GetAllRoles());
+    if (widget.employee != null) {
+      populateDataToFields();
+    }
   }
 
   @override
@@ -62,6 +79,13 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => EmployeeListScreen(),
                 ));
+              } else if (widget.navigation == "edit_employee") {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EmployeeDetailsScreen(employee: widget.employee!),
+                  ),
+                );
               } else {
                 Navigator.of(context).pop(false);
               }
@@ -103,6 +127,20 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 if (widget.navigation == "add_employee") {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => EmployeeListScreen(),
+                  ));
+                } else {
+                  Navigator.of(context).pop(true);
+                }
+              } else if (state is EditEmployeeSuccessState) {
+                if (widget.navigation == "edit_employee") {
+                  widget.employee!.firstName = firstNameController.text;
+                  widget.employee!.lastName = lastNameController.text;
+                  widget.employee!.email = emailController.text;
+                  widget.employee!.roles![0].name = dropdownValue;
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => EmployeeDetailsScreen(
+                      employee: widget.employee!,
+                    ),
                   ));
                 } else {
                   Navigator.of(context).pop(true);
@@ -349,20 +387,38 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                               .trim()
                               .replaceAll(RegExp(r'[^\w\s]+'), '')
                               .replaceAll(" ", ""));
-                          bloc.add(
-                            CreateEmployee(
-                              model: EmployeeCreationModel(
-                                clientId: int.parse(clientId),
-                                email: emailController.text.trim(),
-                                firstName: firstNameController.text.trim(),
-                                lastName: lastNameController.text.trim(),
-                                phone: phoneController.text
-                                    .trim()
-                                    .replaceAll(RegExp(r'[^\w\s]+'), ''),
-                                role: dropdownValue,
+                          if (widget.employee == null) {
+                            bloc.add(
+                              CreateEmployee(
+                                model: EmployeeCreationModel(
+                                  clientId: int.parse(clientId),
+                                  email: emailController.text.trim(),
+                                  firstName: firstNameController.text.trim(),
+                                  lastName: lastNameController.text.trim(),
+                                  phone: phoneController.text
+                                      .trim()
+                                      .replaceAll(RegExp(r'[^\w\s]+'), ''),
+                                  role: dropdownValue,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } else {
+                            bloc.add(
+                              EditEmployee(
+                                id: widget.employee!.id!,
+                                employee: EmployeeCreationModel(
+                                  clientId: int.parse(clientId),
+                                  email: emailController.text.trim(),
+                                  firstName: firstNameController.text.trim(),
+                                  lastName: lastNameController.text.trim(),
+                                  phone: phoneController.text
+                                      .trim()
+                                      .replaceAll(RegExp(r'[^\w\s]+'), ''),
+                                  role: dropdownValue,
+                                ),
+                              ),
+                            );
+                          }
                           log(clientId.toString() +
                               ":::::::::::::::Client id:::::::::::");
                         }

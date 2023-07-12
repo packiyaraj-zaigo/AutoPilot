@@ -117,8 +117,8 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
         if (partsAdd['message'] != null) {
           emit(AddPartDetailsErrorState(message: partsAdd['message']));
         } else {
-          emit(
-              AddPartDetailsErrorState(message: partsAdd[partsAdd.keys.first]));
+          emit(AddPartDetailsErrorState(
+              message: partsAdd[partsAdd.keys.first][0]));
         }
         errorRes = partsAdd;
       }

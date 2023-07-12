@@ -10,6 +10,6 @@ abstract class WorkflowEvent extends Equatable {
 class GetAllWorkflows extends WorkflowEvent {}
 
 class EditWorkflowPosition extends WorkflowEvent {
-  final WorkflowBucketModel workflow;
+  final WorkflowModel workflow;
   const EditWorkflowPosition({required this.workflow});
 }

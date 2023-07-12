@@ -22,7 +22,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CreateEstimateScreen extends StatefulWidget {
-  const CreateEstimateScreen({super.key});
+  const CreateEstimateScreen({super.key, this.vehicle, this.customer});
+  final vm.Datum? vehicle;
+  final Datum? customer;
 
   @override
   State<CreateEstimateScreen> createState() => _CreateEstimateScreenState();
@@ -64,6 +66,17 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   String appointmentErrorMsg = '';
 
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.customer != null && widget.vehicle != null) {
+      customerController.text =
+          '${widget.customer!.firstName} ${widget.customer!.lastName}';
+      vehicleController.text =
+          '${widget.vehicle!.vehicleYear} ${widget.vehicle!.vehicleModel}';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

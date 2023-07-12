@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -893,8 +894,8 @@ class ApiProvider {
   Future<dynamic> getAllWorkflows(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse(
-          '${BASE_URL}api/workflowbuckets?page=$page&updated_by=$clientId');
+      final url =
+          Uri.parse('${BASE_URL}api/workfloworders?client_id=$clientId');
       final response = await http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -903,7 +904,7 @@ class ApiProvider {
   }
 
   Future<dynamic> editWorkflowPosition(
-      String token, WorkflowBucketModel workflow) async {
+      String token, WorkflowModel workflow) async {
     try {
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');
@@ -932,6 +933,42 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createAppointment(
+      String token, AppointmentCreateModel appointment) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/appointments');
+      final response = await http.post(
+        url,
+        headers: getHeader(token),
+        body: appointmentCreateModelToJson(appointment),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + " create appointment api error");
+    }
+  }
+
+  Future<dynamic> deleteEmployee(String token, int id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/users/$id');
+      final response = await http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Delete provider error");
+    }
+  }
+
+  Future<dynamic> editEmployee(
+      String token, EmployeeCreationModel model, int id) async {
+    try {
+      final response = http.put(Uri.parse('${BASE_URL}api/users/$id'),
+          headers: getHeader(token), body: json.encode(model.toJson()));
+      return response;
+    } catch (e) {
+      print(e.toString() + 'Create employee error');
     }
   }
 }

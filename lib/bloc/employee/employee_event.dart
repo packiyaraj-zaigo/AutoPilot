@@ -18,3 +18,15 @@ class CreateEmployee extends EmployeeEvent {
 }
 
 class GetAllRoles extends EmployeeEvent {}
+
+class DeleteEmployee extends EmployeeEvent {
+  final int id;
+  final BuildContext context;
+  const DeleteEmployee({required this.id, required this.context});
+}
+
+class EditEmployee extends EmployeeEvent {
+  final EmployeeCreationModel employee;
+  final int id;
+  const EditEmployee({required this.employee, required this.id});
+}

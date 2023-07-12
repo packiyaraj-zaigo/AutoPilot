@@ -10,7 +10,7 @@ abstract class WorkflowState extends Equatable {
 class WorkflowInitial extends WorkflowState {}
 
 class GetAllWorkflowSuccessState extends WorkflowState {
-  final List<WorkflowBucketModel> workflows;
+  final List<WorkflowModel> workflows;
   const GetAllWorkflowSuccessState({required this.workflows});
 
   @override

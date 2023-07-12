@@ -30,7 +30,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
 
   List<BoardList> workflowOrderList = [];
   List<String> workflowOrderHeadings = [];
-  List<List<WorkflowBucketModel>> workflowOrderModelsList = [];
+  List<List<WorkflowModel>> workflowOrderModelsList = [];
   List<BoardList> lists = [];
 
   late final WorkflowBloc bloc;
@@ -42,15 +42,16 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     bloc.add(GetAllWorkflows());
   }
 
-  filterWorkflowOrders(String title, List<WorkflowBucketModel> workflows) {
+  filterWorkflowOrders(String title, List<WorkflowModel> workflows) {
     if (!workflowOrderHeadings.contains(title)) {
       workflowOrderHeadings.add(title);
-      final tasks =
-          workflows.where((element) => element.title == title).toList();
+      final tasks = workflows
+          .where((element) => element.bucketName?.title == title)
+          .toList();
       tasks.sort(
         (a, b) {
-          final aPos = a.position;
-          final bPos = b.position;
+          final aPos = a.bucketName?.position;
+          final bPos = b.bucketName?.position;
           return bPos!.compareTo(aPos!);
         },
       );
@@ -71,7 +72,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               if (state is GetAllWorkflowSuccessState) {
                 for (int i = 0; i < state.workflows.length; i++) {
                   filterWorkflowOrders(
-                      state.workflows[i].title ?? '', state.workflows);
+                      state.workflows[i].bucketName?.title ?? '',
+                      state.workflows);
                 }
               }
             },
@@ -110,7 +112,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  BoardList boardWidget(List<WorkflowBucketModel> workflows) {
+  BoardList boardWidget(List<WorkflowModel> workflows) {
     return BoardList(
       backgroundColor: Colors.transparent,
       header: [
@@ -123,7 +125,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                workflows[0].title ?? '',
+                workflows[0].bucketName?.title ?? '',
                 style: const TextStyle(
                   color: AppColors.primaryColors,
                   fontWeight: FontWeight.w500,
@@ -147,24 +149,11 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                 workflowOrderModelsList[oldListIndex!][oldItemIndex!];
             workflowOrderModelsList[listIndex!].insert(itemIndex!, workflow);
             workflowOrderModelsList[oldListIndex].removeAt(oldItemIndex);
-            final newWorkFlow = WorkflowBucketModel(
-              clientId: workflow.clientId,
-              color: workflow.color,
-              createdAt: workflow.createdAt,
-              createdBy: workflow.createdBy,
-              defaultBuceket: workflow.defaultBuceket,
-              description: workflow.description,
-              id: workflow.id,
-              notificationId: workflow.notificationId,
-              parentId: workflow.parentId,
-              parentTitle: workflow.parentTitle,
-              position: itemIndex + 1,
-              title: workflowOrderHeadings[listIndex],
-              updatedAt: workflow.updatedAt,
-              workflowType: workflow.workflowType,
-            );
-            log(newWorkFlow.toJson().toString());
-            bloc.add(EditWorkflowPosition(workflow: newWorkFlow));
+            workflow.bucketName!.position = itemIndex + 1;
+            workflow.bucketName!.title = workflowOrderHeadings[listIndex];
+
+            log(workflow.toJson().toString());
+            bloc.add(EditWorkflowPosition(workflow: workflow));
           },
           item: Column(
             children: [
@@ -177,8 +166,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  Container workflowCard(WorkflowBucketModel workflow) {
-    String str = workflow.color ?? '';
+  Container workflowCard(WorkflowModel workflow) {
+    String str = workflow.bucketName!.color ?? '';
     str = str.replaceAll('#', '0xFF');
     final color = int.parse(str);
 
@@ -204,7 +193,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              '${AppUtils.getTimeFormatted(workflow.createdAt ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.createdAt ?? DateTime.now())}',
+              '${AppUtils.getTimeFormatted(workflow.createdAt ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.promiseDate ?? DateTime.now())}',
               style: const TextStyle(
                 color: Color(0xFF9A9A9A),
                 fontSize: 12,
@@ -213,9 +202,9 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const Text(
-              'Estimate #1847 - Satin Black Wrap',
-              style: TextStyle(
+            Text(
+              '${workflow.orders?.orderStatus ?? ''} #${workflow.orderId} - ${workflow.orders?.estimationName}',
+              style: const TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.primaryColors,
               ),
@@ -223,7 +212,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              'John Smith',
+              '${workflow.orders?.customer?.firstName} ${workflow.orders?.customer?.lastName}',
               style: TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),
@@ -231,9 +220,9 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            const Text(
-              '2022 Tesla Model Y',
-              style: TextStyle(
+            Text(
+              '${workflow.orders?.vehicle?.vehicleYear ?? ''} ${workflow.orders?.vehicle?.vehicleModel}',
+              style: const TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),
               ),
@@ -262,7 +251,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     borderRadius: BorderRadius.circular(12)),
                 child: Center(
                   child: Text(
-                    workflow.parentTitle ?? '',
+                    workflow.bucketName?.color ?? '',
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     style: TextStyle(
