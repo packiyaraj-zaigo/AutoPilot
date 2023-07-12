@@ -66,9 +66,52 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: GestureDetector(
-          onTap: () {
-            //  AppUtils.setTempVar("");
+        // child: GestureDetector(
+        //   onTap: () {
+        //     //  AppUtils.setTempVar("");
+        //     // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+        //     //   return BottomBarScreen();
+        //     // },), (route) => false);
+
+        //     if (basicDetailsMap.isNotEmpty &&
+        //         operationDetailsMap.isNotEmpty &&
+        //         employeeDetailsMap.isNotEmpty) {
+        //       Navigator.push(context, MaterialPageRoute(
+        //         builder: (context) {
+        //           return AddCompanyReviewScreen(
+        //             basicDetailsMap: basicDetailsMap,
+        //             operationDetailsMap: operationDetailsMap,
+        //             employeeDetailsMap: employeeDetailsMap,
+        //           );
+        //         },
+        //       ));
+        //     }
+        //   },
+        //   child: Container(
+        //     height: 56,
+        //     alignment: Alignment.center,
+        //     width: MediaQuery.of(context).size.width,
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.circular(12),
+        //       color: basicDetailsMap.isNotEmpty &&
+        //               operationDetailsMap.isNotEmpty &&
+        //               employeeDetailsMap.isNotEmpty
+        //           ? AppColors.primaryColors
+        //           : Color.fromARGB(255, 136, 169, 250),
+        //     ),
+        //     child: const Text(
+        //       "Confirm",
+        //       style: TextStyle(
+        //           fontSize: 16,
+        //           fontWeight: FontWeight.w500,
+        //           color: Colors.white),
+        //     ),
+        //   ),
+        // ),
+
+        child: ElevatedButton(
+          onPressed: () {
+            //   AppUtils.setTempVar("");
             // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
             //   return BottomBarScreen();
             // },), (route) => false);
@@ -87,25 +130,21 @@ class _AddCompanyScreenState extends State<AddCompanyScreen> {
               ));
             }
           },
-          child: Container(
-            height: 56,
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: basicDetailsMap.isNotEmpty &&
-                      operationDetailsMap.isNotEmpty &&
-                      employeeDetailsMap.isNotEmpty
-                  ? AppColors.primaryColors
-                  : Color.fromARGB(255, 136, 169, 250),
-            ),
-            child: const Text(
-              "Confirm",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white),
-            ),
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            fixedSize: Size(MediaQuery.of(context).size.width, 56),
+            primary: basicDetailsMap.isNotEmpty &&
+                    operationDetailsMap.isNotEmpty &&
+                    employeeDetailsMap.isNotEmpty
+                ? AppColors.primaryColors
+                : Color.fromARGB(255, 136, 169, 250),
+          ),
+          child: const Text(
+            "Confirm",
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
           ),
         ),
       ),

@@ -156,7 +156,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     cityController.text.isNotEmpty ||
                     zipController.text.isNotEmpty) {
                   showBackDialog(context,
-                      "The entered data will be lost until you confirm it.");
+                      "The entered data will be lost if you click on Yes.");
                 } else {
                   Navigator.pop(context);
                 }
@@ -165,7 +165,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     taxRateController.text.isNotEmpty ||
                     numberOfEmployeeString.isNotEmpty) {
                   showBackDialog(context,
-                      "The enterd data will be lost until you confim it.");
+                      "The entered data will be lost if you click on Yes.");
                 } else {
                   Navigator.pop(context);
                 }
@@ -181,8 +181,46 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       bottomNavigationBar: Padding(
         padding:
             const EdgeInsets.only(bottom: 24.0, left: 24, right: 24, top: 0),
-        child: GestureDetector(
-          onTap: () {
+        // child: GestureDetector(
+        //   onTap: () {
+        //     if (widget.widgetIndex == 0) {
+        //       validateBasicDetails();
+        //       print("hellooo");
+        //     } else if (widget.widgetIndex == 1) {
+        //       validateOperationDetails();
+        //     } else if (widget.widgetIndex == 2) {
+        //       employeeList.forEach((element) {
+        //         employeeDetailsMap!.addAll({
+        //           element.id.toString():
+        //               "${element.firstName} ${element.lastName}"
+        //         });
+        //       });
+
+        //       print(employeeDetailsMap);
+
+        //       Navigator.pop(context, employeeDetailsMap);
+        //     }
+        //   },
+        //   child: Container(
+        //     height: 56,
+        //     alignment: Alignment.center,
+        //     width: MediaQuery.of(context).size.width,
+        //     decoration: BoxDecoration(
+        //       borderRadius: BorderRadius.circular(12),
+        //       color: AppColors.primaryColors,
+        //     ),
+        //     child: const Text(
+        //       "Confirm",
+        //       style: TextStyle(
+        //           fontSize: 16,
+        //           fontWeight: FontWeight.w500,
+        //           color: Colors.white),
+        //     ),
+        //   ),
+        // ),
+
+        child: ElevatedButton(
+          onPressed: () {
             if (widget.widgetIndex == 0) {
               validateBasicDetails();
               print("hellooo");
@@ -201,21 +239,17 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               Navigator.pop(context, employeeDetailsMap);
             }
           },
-          child: Container(
-            height: 56,
-            alignment: Alignment.center,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: AppColors.primaryColors,
-            ),
-            child: const Text(
-              "Confirm",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.white),
-            ),
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            fixedSize: Size(MediaQuery.of(context).size.width, 56),
+            primary: AppColors.primaryColors,
+          ),
+          child: const Text(
+            "Confirm",
+            style: TextStyle(
+                fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
           ),
         ),
       ),
@@ -436,6 +470,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                             : 50,
                 decoration: InputDecoration(
                     prefixText: label == 'Shop Hourly Labor Rate' ? '\$' : null,
+                    contentPadding:
+                        label == "Shop Hourly Labor Rate" || label == "Tax Rate"
+                            ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
+                            : null,
                     hintText: placeHolder,
                     counterText: "",
                     suffixStyle: const TextStyle(
@@ -964,7 +1002,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   }
 
   void validateBasicDetails() {
-    if (busineesNameController.text.isEmpty) {
+    if (busineesNameController.text.trim().isEmpty) {
       setState(() {
         businessNameErrorStatus = true;
         businessNameErrorMsg = "Business name can't be empty";
@@ -991,7 +1029,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         });
       }
     }
-    if (addressController.text.isEmpty) {
+    if (addressController.text.trim().isEmpty) {
       setState(() {
         addressErrorStatus = true;
         addressErrorMsg = "Address can't be empty";
@@ -1014,7 +1052,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     //   });
 
     // }
-    if (cityController.text.isEmpty) {
+    if (cityController.text.trim().isEmpty) {
       setState(() {
         cityErrorStatus = true;
         cityErrorMsg = "City cant't be empty";
