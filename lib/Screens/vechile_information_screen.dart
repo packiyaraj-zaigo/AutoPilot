@@ -5,6 +5,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../Models/vechile_model.dart';
 import '../utils/app_utils.dart';
+import 'create_vehicle_screen.dart';
 
 class VechileInformation extends StatefulWidget {
   VechileInformation({
@@ -478,7 +479,12 @@ class _VechileInformationState extends State<VechileInformation> {
                               ),
                             ],
                           ),
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CreateVehicleScreen(
+                                        Editvechile: widget.vechile,
+                                      ))),
                         ),
                       ),
                       SizedBox(

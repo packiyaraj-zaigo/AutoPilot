@@ -48,3 +48,8 @@ class AddVechile extends VechileEvent {
 }
 
 class DropDownVechile extends VechileEvent {}
+
+class DeleteVechile extends VechileEvent {
+  final String deleteId;
+  DeleteVechile({required this.deleteId});
+}
