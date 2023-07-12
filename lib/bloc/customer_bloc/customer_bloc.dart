@@ -45,6 +45,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<GetProvinceEvent>(getProvinceBloc);
     on<GetCustomerMessagePaginationEvent>(getCustomerMessagePaginationBloc);
     on<DeleteCustomerEvent>(deleteCustomer);
+    on<EditCustomerDetails>(editCustomerEvent);
   }
   Future<void> CustomerEvent(
     customerDetails event,
@@ -76,7 +77,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           currentPage++;
         }
         // emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
-        print('=======-------------------------${loadedResponse.body}');
+        log(loadedResponse.body.toString() + "preivew api call");
       } else {
         final body = jsonDecode(loadedResponse.body);
         emit(CustomerError(message: body['message']));
@@ -119,9 +120,48 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           loadedResponse.statusCode == 201) {
         print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
 
-        ScaffoldMessenger.of((event.context)).showSnackBar(SnackBar(
-            content: Text('${unloadData['message']}'),
-            backgroundColor: Colors.green));
+        Navigator.of(event.context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => CustomersScreen(),
+          ),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      showLoading = 0;
+      emit(AddCustomerError(message: e.toString()));
+    }
+  }
+
+  Future<void> editCustomerEvent(
+    EditCustomerDetails event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      emit(EditCustomerLoading());
+      Response loadedResponse = await _apiRepository.editCustomerload(
+          token,
+          (event.context),
+          event.firstName,
+          event.lastName,
+          event.email,
+          event.mobileNo,
+          event.customerNotes,
+          event.address,
+          event.state,
+          event.city,
+          event.pinCode,
+          event.stateId,
+          event.id);
+      var unloadData = _decoder.convert(loadedResponse.body);
+      print('nnnnnnnnnnnnnnnnnnnnnnnnnn');
+
+      print(unloadData.toString());
+      if (loadedResponse.statusCode == 200 ||
+          loadedResponse.statusCode == 201) {
+        print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
+
         Navigator.of(event.context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => CustomersScreen(),
@@ -129,11 +169,11 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           (route) => false,
         );
       } else {
-        emit(AddCustomerError(message: unloadData));
+        emit(EditCustomerError(message: unloadData));
       }
     } catch (e) {
       showLoading = 0;
-      emit(AddCustomerError(message: e.toString()));
+      emit(EditCustomerError(message: e.toString()));
     }
   }
 
@@ -304,8 +344,16 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
   ) async {
     try {
       final token = await AppUtils.getToken();
-      Response loadedResponse = await _apiRepository.deleteCustomer(token, event.customerId);
+      emit(DeleteCustomerLoading());
+      Response loadedResponse =
+          await _apiRepository.deleteCustomer(token, event.customerId);
+      var unloadData = _decoder.convert(loadedResponse.body);
       if (loadedResponse.statusCode == 200) {
+        Navigator.of(event.context).pushReplacement(MaterialPageRoute(
+          builder: (context) {
+            return CustomersScreen();
+          },
+        ));
         print('lllllllllll');
         final responseBody = jsonDecode(loadedResponse.body);
         emit(

@@ -81,6 +81,37 @@ class ApiRepository {
         email, mobileNo, customerNotes, address, state, city, pinCode, stateId);
   }
 
+  Future editCustomerload(
+    token,
+    BuildContext context,
+    firstName,
+    lastName,
+    email,
+    mobileNo,
+    customerNotes,
+    address,
+    state,
+    city,
+    pinCode,
+    stateId,
+    id,
+  ) {
+    return apiProvider.editCustomerload(
+        token,
+        context,
+        firstName,
+        lastName,
+        email,
+        mobileNo,
+        customerNotes,
+        address,
+        state,
+        city,
+        pinCode,
+        stateId,
+        id);
+  }
+
   Future createEmployee(String token, EmployeeCreationModel model) {
     return apiProvider.createEmployee(token, model);
   }

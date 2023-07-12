@@ -388,6 +388,40 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> editCustomerload(
+    token,
+    BuildContext context,
+    firstName,
+    lastName,
+    email,
+    mobileNo,
+    customerNotes,
+    address,
+    state,
+    city,
+    pinCode,
+    stateId,
+    id,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var url = Uri.parse(
+          '${BASE_URL}api/customers/$id?email=$email&first_name=$firstName&last_name=$lastName&phone=$mobileNo&notes=$customerNotes&address_line_1=$address&province_name=$state&province_id=$stateId&town_city=$city&zipcode=$pinCode&client_id=${prefs.getString(AppConstants.USER_ID)}');
+      print('hjjjjjjjjjjjjjjjj${token}');
+
+      var request = http.MultipartRequest("PUT", url)
+        ..headers['Authorization'] = "Bearer $token";
+
+      var response = await request.send();
+      print('object========id: ${stateId}=name:=${state}=====================');
+      if (response.statusCode == 200 || response.statusCode == 201) {}
+      print(response.statusCode.toString());
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
   Future<dynamic> deleteCustomer(token, customerId) async {
     try {
       var url = Uri.parse('${BASE_URL}api/customers/$customerId');
