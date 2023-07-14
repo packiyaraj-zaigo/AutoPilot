@@ -169,7 +169,8 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   ],
                   bottom: currentIndex == 3
                       ? PreferredSize(
-                          preferredSize: const Size(double.infinity, 80),
+                          preferredSize:
+                              Size(MediaQuery.of(context).size.width, 80),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -186,6 +187,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                               TabBar(
                                 controller: estimateTabController,
                                 enableFeedback: false,
+                                labelPadding: EdgeInsets.all(0),
                                 indicatorColor: AppColors.primaryColors,
                                 unselectedLabelColor: const Color(0xFF9A9A9A),
                                 labelColor: AppColors.primaryColors,

@@ -2,6 +2,7 @@ import 'package:auto_pilot/Screens/add_company_details.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,6 +29,10 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
       child: BlocListener<DashboardBloc, DashboardState>(
         listener: (context, state) {
           // TODO: implement listener
+
+          if (state is AddCompanyErrorState) {
+            CommonWidgets().showDialog(context, state.errorMessage);
+          }
         },
         child: BlocBuilder<DashboardBloc, DashboardState>(
           builder: (context, state) {
@@ -150,7 +155,7 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                       dividerLine(),
                       detailsWidget(
                           "Base Labor Cost",
-                          "\$ ${widget.operationDetailsMap['base_labor_cost']} / hour",
+                          "${widget.operationDetailsMap['base_labor_cost']} / hour",
                           "operation"),
                       dividerLine(),
                       detailsWidget("Employees", "", "employee"),

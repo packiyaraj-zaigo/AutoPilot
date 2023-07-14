@@ -210,7 +210,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                               child: const Wrap(
                                 children: [
                                   Text(
-                                    "Don't have an account? ",
+                                    "Don't Have An Account? ",
                                     style: TextStyle(
                                       color: Color(0xff061237),
                                       fontWeight: FontWeight.w400,
@@ -237,7 +237,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                               child: const Wrap(
                                 children: [
                                   Text(
-                                    "Already have an account?",
+                                    "Already Have An Account?",
                                     style: TextStyle(
                                       color: Color(0xff061237),
                                       fontWeight: FontWeight.w400,
@@ -293,7 +293,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         const Padding(
           padding: EdgeInsets.only(top: 8.0),
           child: Text(
-            "Enter using your account credentials",
+            "Enter Using Your Account Credentials",
             style: TextStyle(
                 fontSize: 14,
                 letterSpacing: 1.1,
@@ -746,7 +746,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         ),
         Padding(
           padding: const EdgeInsets.only(top: 12.0),
-          child: textBox("Minimum 8 characters", signUpPasswordController,
+          child: textBox("Minimum 8 Characters", signUpPasswordController,
               "Password", passwordErrorStatus, true),
         ),
         Padding(
@@ -778,7 +778,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       letterSpacing: 1.1),
                 ),
                 TextSpan(
-                    text: " Terms of service",
+                    text: " Terms of Service",
                     style: TextStyle(
                         color: AppColors.primaryColors,
                         fontSize: 15,
@@ -848,7 +848,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                   firstNameController.text,
                   lastNameController.text,
                   signUpEmailController.text,
-                  phoneNumberController.text,
+                  phoneNumberController.text
+                      .trim()
+                      .replaceAll(RegExp(r'[^\w\s]+'), ''),
                   signUpPasswordController.text,
                   context);
             },
@@ -984,7 +986,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 8.0),
                       child: Text(
-                        "We just sent you a confirmation email",
+                        "We Just Sent You a Confirmation Email",
                         style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -994,7 +996,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                     Padding(
                       padding: EdgeInsets.only(top: 24.0),
                       child: Text(
-                        "Please open it and click the link to\ncomplete the registration.",
+                        "Please click the link to\ncomplete the registration.",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             fontSize: 14,
@@ -1049,7 +1051,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                           color: AppColors.primaryColors,
                         ),
                         child: const Text(
-                          "Continue to login",
+                          "Continue to Login",
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -1143,7 +1145,11 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
         phoneNumberErrorStatus = true;
       });
     } else {
-      if (phoneNumber.length < 6) {
+      if (phoneNumber
+              .replaceAll(RegExp(r'[^\w\s]+'), '')
+              .replaceAll(" ", "")
+              .length <
+          6) {
         setState(() {
           phoneNumberErrorStatus = true;
           phoneErrorMsg = 'Please enter a valid phone number';

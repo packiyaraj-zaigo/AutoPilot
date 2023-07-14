@@ -152,7 +152,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                 ),
                               ],
                             ),
-                            placeholder: 'Search Employee',
+                            placeholder: 'Type First Name To Search',
                             maxLines: 1,
                             placeholderStyle: const TextStyle(
                               color: Color(0xFF7F808C),
@@ -186,7 +186,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                               return employeeList.isEmpty
                                   ? const Center(
                                       child: Text(
-                                      'No user found',
+                                      'No User Found',
                                       style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
