@@ -317,34 +317,46 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   "Business Name", businessNameErrorStatus, true),
             ),
             errorMessageWidget(businessNameErrorMsg, businessNameErrorStatus),
-            textBox("Enter business phone", businessPhoneController,
+            textBox("Enter Business Phone", businessPhoneController,
                 "Business Phone", businessPhoneErrorStatus, true),
             errorMessageWidget(phoneErrorMsg, businessPhoneErrorStatus),
-            textBox("Enter business Website", businessWebsiteController,
+            textBox("Enter Business Website", businessWebsiteController,
                 "Business Website", businessWebsiteErrorStatus, false),
-            textBox("Enter address", addressController, "Address",
+            textBox("Enter Address", addressController, "Address",
                 addressErrorStatus, true),
             errorMessageWidget(addressErrorMsg, addressErrorStatus),
             // countrydropDown(),
             // errorMessageWidget(countryErrorMsg, countryErrorStatus),
             textBox(
-                "Enter city", cityController, "City", cityErrorStatus, true),
+                "Enter City", cityController, "City", cityErrorStatus, true),
             errorMessageWidget(cityErrorMsg, cityErrorStatus),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                stateDropDown(),
-                textBox("Enter zipcode", zipController, "Zip", zipErrorStatus,
-                    true),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    stateDropDown(),
+                    errorMessageWidget(stateErrorMsg, stateErrorStatus),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    textBox("Enter Zipcode", zipController, "Zip",
+                        zipErrorStatus, true),
+                    errorMessageWidget(zipErrorMsg, zipErrorStatus)
+                  ],
+                ),
               ],
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                errorMessageWidget(stateErrorMsg, stateErrorStatus),
-                errorMessageWidget(zipErrorMsg, zipErrorStatus)
-              ],
-            )
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     errorMessageWidget(stateErrorMsg, stateErrorStatus),
+            //     errorMessageWidget(zipErrorMsg, zipErrorStatus)
+            //   ],
+            // )
           ],
         ),
       ),
@@ -450,10 +462,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     ? [PhoneInputFormatter()]
                     : label == "Number of Employees" ||
                             label == 'Zip' ||
-                            label == "Shop Hourly Labor Rate" ||
                             label == "Tax Rate"
-                        ? [FilteringTextInputFormatter.digitsOnly]
-                        : [],
+                        ? [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ]
+                        : label == "Shop Hourly Labor Rate"
+                            ? [
+                                FilteringTextInputFormatter.digitsOnly,
+                                DollarInputFormatter()
+                              ]
+                            : [],
                 keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
                         label == "Shop Hourly Labor Rate" ||
@@ -469,7 +487,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                             ? 5
                             : 50,
                 decoration: InputDecoration(
-                    prefixText: label == 'Shop Hourly Labor Rate' ? '\$' : null,
+                    // prefixText: label == 'Shop Hourly Labor Rate' &&
+                    //         labourRateController.text.isNotEmpty
+                    //     ? '\$'
+                    //     : null,
                     contentPadding:
                         label == "Shop Hourly Labor Rate" || label == "Tax Rate"
                             ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
@@ -480,7 +501,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         fontSize: 16, color: AppColors.primaryTitleColor),
                     suffix: label == "Shop Hourly Labor Rate"
                         ? Text(
-                            "per hour",
+                            "Per Hour",
                           )
                         : label == "Tax Rate"
                             ? const Padding(
@@ -695,12 +716,23 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "State",
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff6A7187)),
+          const Row(
+            children: [
+              Text(
+                "State",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff6A7187)),
+              ),
+              Text(
+                "*",
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFFD80027)),
+              ),
+            ],
           ),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
@@ -711,7 +743,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
                 // padding: const EdgeInsets.all(5),
                 decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xffC1C4CD)),
+                    border: Border.all(
+                        color: stateErrorStatus
+                            ? const Color(0xFFD80027)
+                            : const Color(0xffC1C4CD)),
                     borderRadius: BorderRadius.circular(12)),
                 child: Padding(
                   padding: const EdgeInsets.only(left: 10.0),
@@ -1018,7 +1053,12 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         phoneErrorMsg = "Business phone can't be empty";
       });
     } else {
-      if (businessPhoneController.text.length < 6) {
+      if (businessPhoneController.text
+              .toString()
+              .replaceAll(RegExp(r'[^\w\s]+'), '')
+              .replaceAll(" ", "")
+              .length <
+          6) {
         setState(() {
           businessPhoneErrorStatus = true;
           phoneErrorMsg = "Please enter a valid business phone";
@@ -1314,7 +1354,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     if (numberOfEmployeeController.text.isEmpty) {
       setState(() {
         numberOfEmployeeErrorStatus = true;
-        numberOfEmployeeErrorMsg = "Please select number of employees";
+        numberOfEmployeeErrorMsg = "Please enter number of employees";
       });
     } else {
       setState(() {
@@ -1359,7 +1399,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       operationDetailsMap!.addAll({
         "employee_count": numberOfEmployeeController.text,
         "time_zone": timeZoneString,
-        "base_labor_cost": labourRateController.text.replaceAll('\$', ''),
+        "base_labor_cost": labourRateController.text,
         "sales_tax_rate": taxRateController.text
       });
 
@@ -1617,3 +1657,32 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 //     return offset;
 //   }
 // }
+
+class DollarInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // If the new value is empty, allow it
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Check if the new value starts with a dollar sign ($)
+    if (!newValue.text.startsWith('\$')) {
+      // Add a dollar sign ($) at the beginning
+      final updatedText = '\$${newValue.text}';
+
+      // Compute the new selection position
+      final selectionIndex = newValue.selection.baseOffset + 1;
+
+      return TextEditingValue(
+        text: updatedText,
+        selection: TextSelection.collapsed(offset: selectionIndex),
+      );
+    }
+
+    return newValue;
+  }
+}

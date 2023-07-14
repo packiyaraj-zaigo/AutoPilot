@@ -746,7 +746,8 @@ class ApiProvider {
         "service_type": "Full service",
         "time_zone": dataMap['time_zone'],
         "sales_tax_rate": dataMap['sales_tax_rate'],
-        "base_labor_cost": dataMap['base_labor_cost']
+        "base_labor_cost":
+            dataMap['base_labor_cost'].toString().replaceAll("\$", "")
       };
       var encodedBody = json.encode(bodyMap);
 

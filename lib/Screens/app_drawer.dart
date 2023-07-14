@@ -22,7 +22,7 @@ showDrawer(BuildContext context) {
         DrawerHeader(
           // padding: EdgeInsets.zero,
           decoration: const BoxDecoration(
-            color: Colors.white,
+            color: Colors.transparent,
           ), //BoxDecoration
           child: UserAccountsDrawerHeader(
             decoration: const BoxDecoration(color: Colors.white),

@@ -197,17 +197,17 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'Email',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
                                 ),
                               ),
-                              SizedBox(height: 5),
+                              const SizedBox(height: 5),
                               Text(
                                 '${widget.employee.email}',
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                 ),
@@ -383,7 +383,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 22, vertical: 18),
-                    hintText: "Enter your messsage..",
+                    hintText: "Enter Your Messsage",
                     prefixIcon: Padding(
                       padding: const EdgeInsets.all(12.0),
                       child: SizedBox(

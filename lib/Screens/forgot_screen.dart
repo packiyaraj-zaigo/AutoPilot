@@ -26,14 +26,14 @@ class _ResetPasswordState extends State<ResetPassword> {
   final TextEditingController otpController = TextEditingController();
   String otp = '';
   final TextEditingController emailController = TextEditingController();
-  final newPasswordController=TextEditingController();
-  final newConfirmPasswordController=TextEditingController();
+  final newPasswordController = TextEditingController();
+  final newConfirmPasswordController = TextEditingController();
   int widgetIndex = 0;
   bool otpErrorStatus = false;
   String otpErrorMsg = '';
-  bool emailErrorStatus=false;
-  String emailErrorMsg="";
-  String newToken="";
+  bool emailErrorStatus = false;
+  String emailErrorMsg = "";
+  String newToken = "";
 
   @override
   Widget build(BuildContext context) {
@@ -46,27 +46,28 @@ class _ResetPasswordState extends State<ResetPassword> {
             displayBottomSheet(context, state);
           } else if (state is ResetPasswordSendOtpErrorState) {
             otpErrorMsg = state.errorMsg;
-          }else if(state is ResetPasswordGetOtpErrorState){
-            emailErrorMsg=state.errorMsg;
-            emailErrorStatus=true;
+          } else if (state is ResetPasswordGetOtpErrorState) {
+            emailErrorMsg = state.errorMsg;
+            emailErrorStatus = true;
           }
           // else if(state is ResetPasswordSendOtpState){
           //   // print("state emitted");
           //   // Navigator.pop(context);
           //   // widgetIndex++;
           //   // newToken=state.newToken;
-            
+
           // }
-          else if(state is CreateNewPasswordState){
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-              return LoginAndSignupScreen(widgetIndex: 0);
-            },), (route) => false);
+          else if (state is CreateNewPasswordState) {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+              builder: (context) {
+                return LoginAndSignupScreen(widgetIndex: 0);
+              },
+            ), (route) => false);
 
-            CommonWidgets().showDialog(context, "Password changed successfully");
-
-          }else if(state is CreateNewPasswordErrorState){
-             CommonWidgets().showDialog(context, state.errorMsg);
-
+            CommonWidgets()
+                .showDialog(context, "Password changed successfully");
+          } else if (state is CreateNewPasswordErrorState) {
+            CommonWidgets().showDialog(context, state.errorMsg);
           }
 
           // TODO: implement listener
@@ -93,7 +94,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                   widgetIndex == 0
                       ? resetpasswordscreen(context, state)
                       : widgetIndex == 2
-                          ? newpassword(context,state)
+                          ? newpassword(context, state)
                           : resetpasswordscreen(context, state)
                   // widget.widgetIndex == 0
                   //     ? resetpasswordscreen()
@@ -133,7 +134,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           const SizedBox(
             height: 40,
           ),
-         const Text(
+          const Text(
             "Email",
             style: TextStyle(
                 fontSize: 15,
@@ -146,24 +147,26 @@ class _ResetPasswordState extends State<ResetPassword> {
           SizedBox(
             height: 50,
             child: CupertinoTextField(
-              placeholder: 'Enter your email',
+              placeholder: 'Enter Your Email',
               controller: emailController,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                 border: Border.all(
-                  color: emailErrorStatus?Color(0xffD80027):Color(0xffC1C4CD)
-                ),
+                    color: emailErrorStatus
+                        ? Color(0xffD80027)
+                        : Color(0xffC1C4CD)),
               ),
             ),
           ),
-             const SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Visibility(
-            visible: emailErrorStatus,
-            child: Text(emailErrorMsg,style: const TextStyle(
-            color: Color(0xffD80027)
-          ),)),
+              visible: emailErrorStatus,
+              child: Text(
+                emailErrorMsg,
+                style: const TextStyle(color: Color(0xffD80027)),
+              )),
           const SizedBox(
             height: 40,
           ),
@@ -289,201 +292,202 @@ class _ResetPasswordState extends State<ResetPassword> {
         enableDrag: false,
         isDismissible: false,
         backgroundColor: Colors.transparent,
-        builder: (ctx) => StatefulBuilder(
-          builder: (context,StateSetter newSetState) {
-            return BlocProvider(
-                  create: (context) => LoginBloc(apiRepository: ApiRepository()),
-                  child: BlocListener<LoginBloc, LoginState>(
-                    listener: (context, state) {
-                      if(state is ResetPasswordSendOtpErrorState){
-                        otpErrorStatus=true;
-                        otpErrorMsg=state.errorMsg;
-                        
-                      }else if(state is ResetPasswordSendOtpState){
-                        Navigator.pop(ctx);
-                        setState(() {
-                            widgetIndex++;
-                          
-                        });
-                      
-                        newToken=state.newToken;
-                      }
-                      // TODO: implement listener
-                    },
-                    child: BlocBuilder<LoginBloc, LoginState>(
-                      builder: (context, state) {
-                        return Container(
-                          height: MediaQuery.of(context).size.height * 0.800,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30)),
-                            color: Colors.white,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(30),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Center(
-                                  child: Container(
-                                    width: 60,
-                                    height: 8,
-                                    decoration: const BoxDecoration(
-                                      color: AppColors.dividerColors,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(10),
-                                      ),
+        builder: (ctx) =>
+            StatefulBuilder(builder: (context, StateSetter newSetState) {
+              return BlocProvider(
+                create: (context) => LoginBloc(apiRepository: ApiRepository()),
+                child: BlocListener<LoginBloc, LoginState>(
+                  listener: (context, state) {
+                    if (state is ResetPasswordSendOtpErrorState) {
+                      otpErrorStatus = true;
+                      otpErrorMsg = state.errorMsg;
+                    } else if (state is ResetPasswordSendOtpState) {
+                      Navigator.pop(ctx);
+                      setState(() {
+                        widgetIndex++;
+                      });
+
+                      newToken = state.newToken;
+                    }
+                    // TODO: implement listener
+                  },
+                  child: BlocBuilder<LoginBloc, LoginState>(
+                    builder: (context, state) {
+                      return Container(
+                        height: MediaQuery.of(context).size.height * 0.800,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(30),
+                              topRight: Radius.circular(30)),
+                          color: Colors.white,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Container(
+                                  width: 60,
+                                  height: 8,
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.dividerColors,
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(10),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(
-                                  height: 24,
+                              ),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              const Text(
+                                "4-Digit Code",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 28,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "Please enter the code we\'ve sent to ${emailController.text}.",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 15,
+                                    color: AppColors.greyText),
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              PinCodeTextField(
+                                appContext: context,
+                                pastedTextStyle: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const Text(
-                                  "4-Digit Code",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 28,
-                                      color: AppColors.primaryTitleColor),
+                                length: 4,
+                                validator: (v) {
+                                  // if (v!.length < 4) {
+                                  //   return "Enter a valid OTP";
+                                  // } else {
+                                  //   return null;
+                                  // }
+                                },
+                                pinTheme: PinTheme(
+                                  selectedColor: Colors.black,
+                                  inactiveColor: AppColors.greyText,
+                                  activeColor: otpErrorStatus
+                                      ? Color(0xffD80027)
+                                      : const Color(0xff808B9E),
+                                  errorBorderColor: otpErrorStatus
+                                      ? Color(0xffD80027)
+                                      : const Color(0xff808B9E),
+                                  shape: PinCodeFieldShape.box,
+                                  borderRadius: BorderRadius.circular(15),
+                                  fieldHeight: 57,
+                                  fieldWidth: 55,
+                                  //activeColor: Colors.black
                                 ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  "Please enter the code we\'ve sent to ${emailController.text}.",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 15,
-                                      color: AppColors.greyText),
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                PinCodeTextField(
-                                  appContext: context,
-                                  pastedTextStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
+                                cursorColor: Colors.black,
+                                keyboardType: TextInputType.number,
+                                boxShadows: const [
+                                  BoxShadow(
+                                    offset: Offset.zero,
+                                    color: Color(0xffFFFFFF),
+                                    blurRadius: 0,
                                   ),
-                                  length: 4,
-                                  validator: (v) {
-                                    // if (v!.length < 4) {
-                                    //   return "Enter a valid OTP";
-                                    // } else {
-                                    //   return null;
-                                    // }
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    otp = value;
+                                  });
+                                },
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Visibility(
+                                  visible: otpErrorStatus,
+                                  child: Text(
+                                    otpErrorMsg,
+                                    style: const TextStyle(
+                                        color: Color(0xffD80027)),
+                                  )),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    context.read<LoginBloc>().add(
+                                        ResetPasswordSendOtpEvent(
+                                            email: emailController.text,
+                                            otp: otp));
                                   },
-                                  pinTheme: PinTheme(
-                                    selectedColor: Colors.black,
-                                    inactiveColor: AppColors.greyText,
-                                    activeColor:otpErrorStatus?Color(0xffD80027): const Color(0xff808B9E),
-                                    errorBorderColor: otpErrorStatus?Color(0xffD80027): const Color(0xff808B9E),
-                                    shape: PinCodeFieldShape.box,
-                                    borderRadius: BorderRadius.circular(15),
-                                    fieldHeight: 57,
-                                    fieldWidth: 55,
-                                    //activeColor: Colors.black
-                                  ),
-                                  cursorColor: Colors.black,
-                                  keyboardType: TextInputType.number,
-                                  boxShadows: const [
-                                    BoxShadow(
-                                      offset: Offset.zero,
-                                      color: Color(0xffFFFFFF),
-                                      blurRadius: 0,
+                                  style: ElevatedButton.styleFrom(
+                                    primary: AppColors.primaryColors,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
                                     ),
-                                  ],
-                                  onChanged: (value) {
-                                    setState(() {
-                                      otp = value;
-                                    });
-                                  },
+                                  ),
+                                  child:
+                                      state is ResetPasswordSendOtpLoadingState
+                                          ? const Center(
+                                              child: CupertinoActivityIndicator(
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Text(
+                                              'Continue',
+                                              style: TextStyle(fontSize: 15),
+                                            ),
                                 ),
-                                  const SizedBox(
-                                  height: 5,
-                                ),
-                                 Visibility(
-                                    visible: otpErrorStatus,
-                                    child: Text(
-                                      otpErrorMsg,
-                                      style:
-                                          const TextStyle(color: Color(0xffD80027)),
-                                    )),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                               
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 50,
-                                  child: ElevatedButton(
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text('Don\'t receive a code?'),
+                                  TextButton(
+                                    child: const Text(
+                                      'Resend',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.primaryColors),
+                                    ),
                                     onPressed: () {
                                       context.read<LoginBloc>().add(
-                                          ResetPasswordSendOtpEvent(
-                                              email: emailController.text,
-                                              otp: otp));
+                                          ResetPasswordGetPasswordEvent(
+                                              emailId: emailController.text));
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      primary: AppColors.primaryColors,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.0),
-                                      ),
-                                    ),
-                                    child: state is ResetPasswordSendOtpLoadingState
-                                        ? const Center(
-                                            child: CupertinoActivityIndicator(
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const Text(
-                                            'Continue',
-                                            style: TextStyle(fontSize: 15),
-                                          ),
-                                  ),
-                                ),
-                               const SizedBox(
-                                  height: 10,
-                                ),
-                                 Row(
-                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Text('Don\'t receive a code?'),
-                                    TextButton(
-                                      child: const Text(
-                                        'Resend',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: AppColors.primaryColors),
-                                      ),
-                                      onPressed: () {
-                                       context.read<LoginBloc>().add(ResetPasswordGetPasswordEvent(emailId: emailController.text));
-
-                                      },
-                                    )
-                                  ],
-                                 
-                                ),
-                              ],
-                            ),
+                                  )
+                                ],
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
-                );
-          }
-        ));
+                ),
+              );
+            }));
   }
 
-  Widget newpassword(BuildContext context,state) {
+  Widget newpassword(BuildContext context, state) {
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Create a new password",
+            "Create a New Password",
             style: TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 28,
@@ -493,7 +497,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             height: 26,
           ),
           const Text(
-            "New password",
+            "New Password",
             style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -506,7 +510,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           SizedBox(
             height: 55,
             child: CupertinoTextField(
-              placeholder: 'Enter new password',
+              placeholder: 'Enter New Password',
               controller: newPasswordController,
               obscureText: true,
               decoration: BoxDecoration(
@@ -519,7 +523,7 @@ class _ResetPasswordState extends State<ResetPassword> {
             height: 20,
           ),
           const Text(
-            "Confirm New password",
+            "Confirm New Password",
             style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
@@ -532,7 +536,7 @@ class _ResetPasswordState extends State<ResetPassword> {
           SizedBox(
             height: 55,
             child: CupertinoTextField(
-              placeholder: 'Confirm new password',
+              placeholder: 'Confirm New Password',
               controller: newConfirmPasswordController,
               obscureText: true,
               decoration: BoxDecoration(
@@ -541,7 +545,7 @@ class _ResetPasswordState extends State<ResetPassword> {
               ),
             ),
           ),
-         const  SizedBox(
+          const SizedBox(
             height: 40,
           ),
           SizedBox(
@@ -549,20 +553,26 @@ class _ResetPasswordState extends State<ResetPassword> {
             height: 50,
             child: ElevatedButton(
               onPressed: () {
-                context.read<LoginBloc>().add(CreateNewPasswordEvent(email: emailController.text, password: newPasswordController.text, confirmPassword: newConfirmPasswordController.text, newToken: newToken));
+                context.read<LoginBloc>().add(CreateNewPasswordEvent(
+                    email: emailController.text,
+                    password: newPasswordController.text,
+                    confirmPassword: newConfirmPasswordController.text,
+                    newToken: newToken));
               },
               style: ElevatedButton.styleFrom(
                 primary: AppColors.primaryColors,
-                shape:  RoundedRectangleBorder(
-                  borderRadius:  BorderRadius.circular(10.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
-              child:state is CreateNewPasswordLoadingState?const Center(
-                child: CupertinoActivityIndicator(),
-              ):  const Text(
-                'Confirm',
-                style: TextStyle(fontSize: 15),
-              ),
+              child: state is CreateNewPasswordLoadingState
+                  ? const Center(
+                      child: CupertinoActivityIndicator(),
+                    )
+                  : const Text(
+                      'Confirm',
+                      style: TextStyle(fontSize: 15),
+                    ),
             ),
           ),
         ],
