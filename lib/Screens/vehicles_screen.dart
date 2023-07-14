@@ -122,7 +122,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                         });
                       },
                       backgroundColor: Colors.white,
-                      placeholder: 'Search Vehicles...',
+                      placeholder: 'Search Vehicles',
                       prefixIcon: const Padding(
                         padding: EdgeInsets.only(left: 24, right: 16),
                         child: Icon(
@@ -240,8 +240,9 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                         ),
                                                       ),
                                                       Text(
-                                                        'haiii',
-                                                        // item.firstName ?? "",
+                                                        (item.firstName ?? "") +
+                                                            (item.lastName ??
+                                                                ''),
                                                         overflow: TextOverflow
                                                             .ellipsis,
                                                         style: const TextStyle(
