@@ -227,13 +227,17 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                                       MainAxisSize.min,
                                                   children: [
                                                     SvgPicture.asset(
-                                                        "assets/images/sms.svg"),
+                                                      "assets/images/sms.svg",
+                                                      color: AppColors
+                                                          .primaryColors,
+                                                    ),
                                                     SizedBox(
                                                       width: 28,
                                                     ),
                                                     Icon(
                                                       CupertinoIcons.phone,
-                                                      color: Colors.black,
+                                                      color: AppColors
+                                                          .primaryColors,
                                                     )
                                                   ],
                                                 ),
