@@ -238,8 +238,10 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                                                             ),
                                                           ),
                                                           Text(
-                                                            'haiii',
-                                                            // item.firstName ?? "",
+                                                            (item.firstName ??
+                                                                    "") +
+                                                                (item.lastName ??
+                                                                    ''),
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
