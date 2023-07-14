@@ -161,6 +161,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       log("res${addCompanyResponse.body}");
 
       if (addCompanyResponse.statusCode == 200) {
+        prefs.setBool('add_company', true);
         emit(AddCompanySucessState());
         AppUtils.setTempVar("");
         Navigator.pushReplacement(event.context, MaterialPageRoute(
@@ -176,6 +177,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       //   emit(CreateAccountErrorState());
       //   errorRes=createAccData;
       // }
+       
+       
     } catch (e) {
       // emit(CreateAccountErrorState());
       emit(AddCompanyErrorState(

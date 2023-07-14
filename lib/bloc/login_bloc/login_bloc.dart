@@ -90,6 +90,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
             },
           ), (route) => false);
         } else {
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setBool('add_company', true);
           Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
             builder: (context) {
               return BottomBarScreen();
