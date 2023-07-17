@@ -64,7 +64,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
               icon: Icon(
                 Icons.add,
                 size: AppStrings.fontSize20,
-                color: AppColors.primaryBlackColors,
+                color: AppColors.primaryColors,
               )),
           SizedBox(
             width: 20,
