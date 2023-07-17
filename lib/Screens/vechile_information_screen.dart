@@ -54,7 +54,7 @@ class _VechileInformationState extends State<VechileInformation> {
           color: AppColors.primaryColors,
           icon: Icon(Icons.arrow_back),
         ),
-        title: Center(
+        title: const Center(
           child: Text(
             "Vehicle's Information",
             style: TextStyle(
@@ -66,7 +66,7 @@ class _VechileInformationState extends State<VechileInformation> {
         actions: [
           IconButton(
             onPressed: () {
-              ShowBottomSheet();
+              //  ShowBottomSheet();
             },
             icon: Icon(Icons.more_horiz),
             color: AppColors.primaryColors,
@@ -80,13 +80,13 @@ class _VechileInformationState extends State<VechileInformation> {
           children: [
             Text(
               "${widget.vechile.vehicleYear} ${widget.vechile.vehicleMake} ${widget.vechile.vehicleModel}",
-              style: TextStyle(
+              style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 18,
                   color: AppColors.primaryTitleColor),
             ),
-            SizedBox(height: 16),
-            Container(
+            const SizedBox(height: 16),
+            SizedBox(
               width: double.infinity,
               child: CupertinoSlidingSegmentedControl(
                 onValueChanged: (value) {

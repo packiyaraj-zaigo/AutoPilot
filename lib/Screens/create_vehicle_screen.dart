@@ -368,6 +368,22 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                   makeErrorStatus,
                                   widget.vehicle != null &&
                                       widget.vehicle!.make!.isNotEmpty),
+
+                              Visibility(
+                                  visible: makeErrorStatus,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 6.0),
+                                    child: Text(
+                                      makeErrorMsg,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(
+                                          0xffD80027,
+                                        ),
+                                      ),
+                                    ),
+                                  )),
                               SizedBox(
                                 height: 15,
                               ),
@@ -575,23 +591,32 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     StateSetter stateUpdate,
   ) {
     if (VechileYear.isEmpty) {
-      stateUpdate(() {
+      setState(() {
         yearErrorMsg = "Year can't be empty.";
         yearErrorStaus = true;
       });
     } else {
-      yearErrorStaus = false;
+      if (VechileYear.length < 4) {
+        setState(() {
+          yearErrorMsg = "Please enter a valid year";
+          yearErrorStaus = true;
+        });
+      } else {
+        setState(() {
+          yearErrorStaus = false;
+        });
+      }
     }
     if (VechileModel.isEmpty) {
-      stateUpdate(() {
+      setState(() {
         modelErrorMsg = "Model can't be empty.";
         modelErrorStatus = true;
       });
     } else {
-      if (VechileYear.length < 4) {
+      if (VechileModel.length < 2) {
         setState(() {
-          yearErrorStaus = true;
-          yearErrorMsg = 'The vehicle year must be at least 4 characters.';
+          modelErrorMsg = "Please enter a valid model";
+          modelErrorStatus = true;
         });
       } else {
         setState(() {
@@ -607,7 +632,24 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     } else {
       typeErrorStatus = false;
     }
-    if (!yearErrorStaus && !modelErrorStatus) {
+    if (makeController.text.isEmpty) {
+      setState(() {
+        makeErrorStatus = true;
+        makeErrorMsg = "Make can't be empty";
+      });
+    } else {
+      if (makeController.text.length < 2) {
+        setState(() {
+          makeErrorStatus = true;
+          makeErrorMsg = "Please enter a valid make";
+        });
+      } else {
+        setState(() {
+          makeErrorStatus = false;
+        });
+      }
+    }
+    if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
       context.read<VechileBloc>().add(AddVechile(
             context: context,
             email: nameController.text,
@@ -634,13 +676,13 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
-            label == 'Year' || label == 'Model'
-                ? Text(
+            label == 'Year' || label == 'Model' || label == "Make"
+                ? const Text(
                     " *",
                     style: TextStyle(
                       fontSize: 14,
@@ -650,7 +692,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                       ),
                     ),
                   )
-                : Text('')
+                : const Text('')
           ],
         ),
         Padding(
@@ -665,7 +707,15 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : null,
               keyboardType: label == 'Year' ? TextInputType.number : null,
-              maxLength: label == 'Year' ? 4 : null,
+              maxLength: label == 'Year'
+                  ? 4
+                  : label == "Make" || label == "Model" || label == "Sub-Model"
+                      ? 100
+                      : label == "VIN"
+                          ? 30
+                          : label == "LIC"
+                              ? 20
+                              : 100,
               decoration: InputDecoration(
                   counterText: '',
                   hintText: placeHolder,
