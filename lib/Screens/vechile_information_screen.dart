@@ -56,7 +56,7 @@ class _VechileInformationState extends State<VechileInformation> {
         ),
         title: Center(
           child: Text(
-            "Vehicles Information",
+            "Vehicle's Information",
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
@@ -79,34 +79,34 @@ class _VechileInformationState extends State<VechileInformation> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "2020 Tesla Model 3",
+              "${widget.vechile.vehicleYear} ${widget.vechile.vehicleMake} ${widget.vechile.vehicleModel}",
               style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 18,
                   color: AppColors.primaryTitleColor),
             ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 8, bottom: 0, left: 10, right: 10),
-              child: Center(
-                child: CupertinoSlidingSegmentedControl(
-                  onValueChanged: (value) {
-                    setState(() {
-                      selectedIndex = value ?? 0;
-                    });
-                  },
-                  groupValue: selectedIndex,
-                  children: {
-                    for (int i = 0; i < _segmentTitles.length; i++)
-                      i: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 12, horizontal: 42),
-                        child: _segmentTitles[i],
-                      )
-                  },
-                ),
+            SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              child: CupertinoSlidingSegmentedControl(
+                onValueChanged: (value) {
+                  setState(() {
+                    selectedIndex = value ?? 0;
+                  });
+                },
+                groupValue: selectedIndex,
+                backgroundColor: AppColors.primarySegmentColors,
+                children: {
+                  for (int i = 0; i < _segmentTitles.length; i++)
+                    i: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 42),
+                      child: _segmentTitles[i],
+                    )
+                },
               ),
             ),
+            SizedBox(height: 16),
             Expanded(
               child: selectedIndex == 2
                   ? Column(
@@ -195,138 +195,134 @@ class _VechileInformationState extends State<VechileInformation> {
                       : selectedIndex == 0
                           ? Container(
                               height: MediaQuery.of(context).size.height,
-                              color: const Color(0xffF9F9F9),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 24, top: 20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Owner",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.firstName}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    Text(
-                                      "Sub-Model",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.subModel ?? ""}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                    SizedBox(
-                                      height: 14,
-                                    ),
-                                    Text(
-                                      "Engine",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.engineSize ?? ""}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                    SizedBox(
-                                      height: 14,
-                                    ),
-                                    Text(
-                                      "Color",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.vehicleColor ?? ""}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                    SizedBox(
-                                      height: 14,
-                                    ),
-                                    Text(
-                                      "VIN",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.vin ?? ""}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                    SizedBox(
-                                      height: 14,
-                                    ),
-                                    Text(
-                                      "LIC",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.licencePlate ?? ""}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                    SizedBox(
-                                      height: 14,
-                                    ),
-                                    Text(
-                                      "Type",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w400,
-                                          color: AppColors.primaryGrayColors),
-                                    ),
-                                    Text(
-                                      "${widget.vechile.vehicleType}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    AppUtils.verticalDivider(),
-                                  ],
-                                ),
+                              // color: const Color(0xffF9F9F9),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Owner",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.firstName ?? '-'}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                  SizedBox(
+                                    height: 20,
+                                  ),
+                                  Text(
+                                    "Sub-Model",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.subModel ?? ""}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                  SizedBox(
+                                    height: 14,
+                                  ),
+                                  Text(
+                                    "Engine",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.engineSize ?? ""}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                  SizedBox(
+                                    height: 14,
+                                  ),
+                                  Text(
+                                    "Color",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.vehicleColor ?? ""}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                  SizedBox(
+                                    height: 14,
+                                  ),
+                                  Text(
+                                    "VIN",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.vin ?? ""}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                  SizedBox(
+                                    height: 14,
+                                  ),
+                                  Text(
+                                    "LIC",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.licencePlate ?? ""}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                  SizedBox(
+                                    height: 14,
+                                  ),
+                                  Text(
+                                    "Type",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w400,
+                                        color: AppColors.primaryGrayColors),
+                                  ),
+                                  Text(
+                                    "${widget.vechile.vehicleType}",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  AppUtils.verticalDivider(),
+                                ],
                               ))
                           : SingleChildScrollView(
                               child: Column(
