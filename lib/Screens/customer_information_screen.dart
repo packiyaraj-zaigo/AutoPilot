@@ -814,12 +814,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
       listener: (context, state) async {
         if (state is GetCustomerMessageState) {
           customerMessageList.addAll(state.messageModel.data.data);
-          Future.delayed(Duration(milliseconds: 300)).then((value) {
-            chatScrollController.animateTo(
-                chatScrollController.position.maxScrollExtent,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.linear);
-          });
+          if (state.messageModel.data.currentPage == 1) {
+            Future.delayed(Duration(milliseconds: 300)).then((value) {
+              chatScrollController.animateTo(
+                  chatScrollController.position.maxScrollExtent,
+                  duration: Duration(milliseconds: 300),
+                  curve: Curves.linear);
+            });
+          }
         } else if (state is SendCustomerMessageState) {
         } else if (state is GetCustomerMessagePaginationState) {
           customerMessageList.insertAll(0, state.messageModel.data.data);
@@ -846,7 +848,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                chatBoxWidget(customerMessageList),
+                chatBoxWidget(customerMessageList, context),
                 const SizedBox(
                   height: 20,
                 ),
@@ -932,7 +934,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                       createdAt: DateTime.now(),
                                       id: widget.customerData.id,
                                       messageBody: messageController.text,
-                                      messageType: "SMS",
+                                      messageType: "",
                                       receiverCustomerId: null,
                                       status: "Open",
                                       updatedAt: DateTime.now(),
@@ -996,13 +998,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
     );
   }
 
-  Widget chatBoxWidget(List<cm.Datum> messsageModelList) {
+  Widget chatBoxWidget(List<cm.Datum> messsageModelList, BuildContext context) {
     log("re build");
     return BlocBuilder<CustomerBloc, CustomerState>(
       builder: (context, state) {
         log(messsageModelList.length.toString());
         return Expanded(
           child: ListView.builder(
+              reverse: true,
               itemBuilder: (context2, index) {
                 newIndex = index;
 
@@ -1018,18 +1021,20 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
               physics: const ClampingScrollPhysics(),
               controller: chatScrollController
                 ..addListener(() {
-                  if (chatScrollController.position.pixels == 0 &&
+                  if ((BlocProvider.of<CustomerBloc>(context)
+                              .messageCurrentPage <=
+                          BlocProvider.of<CustomerBloc>(context)
+                              .messageTotalPage) &&
+                      chatScrollController.offset ==
+                          chatScrollController.position.maxScrollExtent &&
                       BlocProvider.of<CustomerBloc>(context)
                               .messageCurrentPage !=
-                          0) {
-                    print("pagination called");
-                    _debouncer.run(() {
-                      log(BlocProvider.of<CustomerBloc>(context)
-                          .messageCurrentPage
-                          .toString());
-                      BlocProvider.of<CustomerBloc>(context)
-                          .add(GetCustomerMessagePaginationEvent());
-                    });
+                          0 &&
+                      !BlocProvider.of<CustomerBloc>(context).isFetching) {
+                    print("here");
+                    context.read<CustomerBloc>()
+                      ..isFetching = true
+                      ..add(GetCustomerMessageEvent());
                   }
                 })),
         );

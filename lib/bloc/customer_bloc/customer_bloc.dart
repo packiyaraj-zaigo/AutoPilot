@@ -220,53 +220,94 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     }
   }
 
+  // Future<void> getCustomerMessageBloc(
+  //   GetCustomerMessageEvent event,
+  //   Emitter<CustomerState> emit,
+  // ) async {
+  //   try {
+  //     emit(GetCustomerMessageLoadingState());
+  //     // if (messageCurrentPage == 1) {
+  //     //   isMessageLoading = true;
+  //     // } else {
+  //     //   isMessageLoading = false;
+  //     // }
+  //     final token = await AppUtils.getToken();
+  //     final clientId = await AppUtils.getUserID();
+  //     cm.CustomerMessageModel messageModel;
+
+  //     Response messageResponse = await _apiRepository.getCustomerMessages(
+  //         token, clientId, messageCurrentPage);
+  //     if (messageResponse.statusCode == 200) {
+  //       messageModel = cm.customerMessageModelFromJson(messageResponse.body);
+  //       messageCurrentPage = messageModel.data.lastPage;
+
+  //       print(messageCurrentPage.toString() + "firstt curreent");
+  //       Response newMessageRes = await _apiRepository.getCustomerMessages(
+  //           token, clientId, messageCurrentPage);
+  //       messageModel = cm.customerMessageModelFromJson(newMessageRes.body);
+
+  //       emit(GetCustomerMessageState(messageModel: messageModel));
+
+  //       log('=======-------------------------${messageResponse.body}');
+  //       messageCurrentPage--;
+  //     } else {
+  //       emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
+  //     }
+
+  //     isEmployeesLoading = false;
+  //     isPaginationLoading = false;
+  //   } catch (e) {
+  //     showLoading = 0;
+  //     emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
+  //     isEmployeesLoading = false;
+  //     isPaginationLoading = false;
+  //   }
+  // }
+
   Future<void> getCustomerMessageBloc(
     GetCustomerMessageEvent event,
     Emitter<CustomerState> emit,
   ) async {
     try {
-      emit(GetCustomerMessageLoadingState());
-      // if (messageCurrentPage == 1) {
-      //   isMessageLoading = true;
-      // } else {
-      //   isMessageLoading = false;
-      // }
-      final token = await AppUtils.getToken();
-      final clientId = await AppUtils.getUserID();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      String clientId = await AppUtils.getUserID();
+
       cm.CustomerMessageModel messageModel;
 
-      Response messageResponse = await _apiRepository.getCustomerMessages(
-          token, clientId, messageCurrentPage);
-      if (messageResponse.statusCode == 200) {
-        messageModel = cm.customerMessageModelFromJson(messageResponse.body);
-        messageCurrentPage = messageModel.data.lastPage;
-
-        print(messageCurrentPage.toString() + "firstt curreent");
-        Response newMessageRes = await _apiRepository.getCustomerMessages(
-            token, clientId, messageCurrentPage);
-        messageModel = cm.customerMessageModelFromJson(newMessageRes.body);
-
-        emit(GetCustomerMessageState(messageModel: messageModel));
-
-        // messageCurrentPage = messageModel.data.currentPage;
-        // messageTotalPage = messageModel.data.lastPage;
-        // if (messageCurrentPage <= messageTotalPage) {
-        //   messageCurrentPage--;
-        // }
-        // emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
-        log('=======-------------------------${messageResponse.body}');
-        messageCurrentPage--;
-      } else {
-        emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
+      if (messageCurrentPage == 1) {
+        emit(GetCustomerMessageLoadingState());
       }
 
-      isEmployeesLoading = false;
-      isPaginationLoading = false;
-    } catch (e) {
-      showLoading = 0;
-      emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
-      isEmployeesLoading = false;
-      isPaginationLoading = false;
+      Response getMessageRes = await _apiRepository.getCustomerMessages(
+          token!, clientId, messageCurrentPage);
+
+      log("res${getMessageRes.body}");
+
+      if (getMessageRes.statusCode == 200) {
+        messageModel = cm.customerMessageModelFromJson(getMessageRes.body);
+        messageTotalPage = messageModel.data.lastPage ?? 1;
+        isFetching = false;
+        emit(GetCustomerMessageState(messageModel: messageModel));
+
+        if (messageTotalPage > messageCurrentPage && messageCurrentPage != 0) {
+          messageCurrentPage += 1;
+        } else {
+          messageCurrentPage = 0;
+          print("this works");
+        }
+      } else {
+        emit(const GetCustomerMessageErrorState(
+            errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(
+          const GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s.toString());
+
+      print("thisss");
     }
   }
 
