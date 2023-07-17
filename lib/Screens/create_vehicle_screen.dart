@@ -9,6 +9,7 @@ import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -575,7 +576,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   ) {
     if (VechileYear.isEmpty) {
       stateUpdate(() {
-        yearErrorMsg = 'Year cant be empty.';
+        yearErrorMsg = "Year can't be empty.";
         yearErrorStaus = true;
       });
     } else {
@@ -583,7 +584,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     }
     if (VechileModel.isEmpty) {
       stateUpdate(() {
-        modelErrorMsg = 'Type cant be empty.';
+        modelErrorMsg = "Model can't be empty.";
         modelErrorStatus = true;
       });
     } else {
@@ -600,7 +601,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     }
     if (VechileType.isEmpty) {
       stateUpdate(() {
-        typeErrorMsg = 'Type cant be empty.';
+        typeErrorMsg = "Type can't be empty.";
         typeErrorStatus = true;
       });
     } else {
@@ -660,7 +661,13 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
             child: TextField(
               readOnly: readOnly,
               controller: controller,
+              inputFormatters: label == "Year"
+                  ? [FilteringTextInputFormatter.digitsOnly]
+                  : null,
+              keyboardType: label == 'Year' ? TextInputType.number : null,
+              maxLength: label == 'Year' ? 4 : null,
               decoration: InputDecoration(
+                  counterText: '',
                   hintText: placeHolder,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),

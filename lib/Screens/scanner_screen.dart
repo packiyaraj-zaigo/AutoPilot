@@ -610,7 +610,7 @@ class _ScannerScreenState extends State<ScannerScreen>
               Color color = Colors.red;
               Icon icon = const Icon(Icons.check);
               if (state is VinCodeNotInShopState) {
-                vehicleStatus = "Vehicle found but not in shop history";
+                vehicleStatus = "Vehicle Found But Not In Shop History";
                 color = Colors.red;
                 icon = Icon(Icons.info, size: 20, color: color);
                 return Column(
@@ -643,15 +643,20 @@ class _ScannerScreenState extends State<ScannerScreen>
                     vehicleCard(context, vehicle),
                     const SizedBox(height: 24),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => CreateVehicleScreen(
-                              vehicle: state.vehicle,
-                              vin: searchController.text,
-                            ),
+                      onTap: () async {
+                        await Navigator.of(context)
+                            .push(MaterialPageRoute(
+                          builder: (context) => CreateVehicleScreen(
+                            vehicle: state.vehicle,
+                            vin: searchController.text,
                           ),
-                        );
+                        ))
+                            .then((value) {
+                          if (value != null) {
+                            searchController.text = value;
+                            bloc.add(GetVehiclesFromVin(vin: value));
+                          }
+                        });
                       },
                       child: Container(
                         height: 56,
@@ -673,7 +678,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                   ],
                 );
               } else if (state is VehicleNotFoundState) {
-                vehicleStatus = "No vehicle found";
+                vehicleStatus = "No Vehicle Found";
                 color = Colors.red;
                 icon = Icon(Icons.info, size: 20, color: color);
                 return Column(
@@ -735,9 +740,9 @@ class _ScannerScreenState extends State<ScannerScreen>
                 return const Center(child: CupertinoActivityIndicator());
               } else if (searchController.text.isEmpty) {
                 return const Center(
-                    child: Text('Please enter a VIN number to check'));
+                    child: Text('Please Enter A VIN Number To Check'));
               } else {
-                vehicleStatus = "Vehicle found in shop history";
+                vehicleStatus = "Vehicle Found In Shop History";
 
                 color = Colors.green;
                 icon = Icon(Icons.check, size: 20, color: color);
