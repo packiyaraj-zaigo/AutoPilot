@@ -279,7 +279,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                         color: AppColors.primaryGrayColors),
                                   ),
                                   Text(
-                                    "${widget.vechile.vin ?? ""}",
+                                    "${widget.vechile.vin?.toUpperCase() ?? ""}",
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,

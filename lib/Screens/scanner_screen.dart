@@ -12,6 +12,7 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -26,6 +27,7 @@ class _ScannerScreenState extends State<ScannerScreen>
     with SingleTickerProviderStateMixin {
   late final controller = TabController(length: 3, vsync: this);
   final TextEditingController searchController = TextEditingController();
+  final licSeachController = TextEditingController();
   String vinNumber = '';
   final _debouncer = Debouncer();
   late ScannerBloc bloc;
@@ -262,7 +264,17 @@ class _ScannerScreenState extends State<ScannerScreen>
             height: 50,
             width: double.infinity,
             child: CupertinoTextField(
-              placeholder: "Enter the lic number to check",
+              controller: licSeachController,
+              placeholder: "Enter LIC Number",
+              suffix: IconButton(
+                  onPressed: () {
+                    licSeachController.clear();
+                    setState(() {});
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.primaryColors,
+                  )),
               onChanged: (value) {
                 networkCheck().then((val) => setState(() {
                       if (network) {
@@ -305,6 +317,9 @@ class _ScannerScreenState extends State<ScannerScreen>
               },
               child: BlocBuilder<ScannerBloc, ScannerState>(
                 builder: (context, state) {
+                  if (licSeachController.text.isEmpty) {
+                    return const SizedBox();
+                  }
                   if (state is LicSearchLoadingState) {
                     return const Center(child: CupertinoActivityIndicator());
                   } else if (state is LicSearchErrorState) {
@@ -524,7 +539,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       ),
                     ),
                     Text(
-                      searchController.text,
+                      vehicle.vin?.toUpperCase() ?? "",
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF333333),
@@ -549,15 +564,29 @@ class _ScannerScreenState extends State<ScannerScreen>
             child: CupertinoTextField(
               placeholder: "Search VIN Number",
               controller: searchController,
+              suffix: IconButton(
+                  onPressed: () {
+                    searchController.clear();
+                    setState(() {});
+                  },
+                  icon: Icon(
+                    Icons.close,
+                    color: AppColors.primaryColors,
+                  )),
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+              ],
               onChanged: (value) {
                 networkCheck().then((val) => setState(() {
                       if (network) {
                         _debouncer.run(() {
-                          if (value.isNotEmpty) {
-                            estimates.clear();
-                            bloc.currentEstimatePage = 1;
-                            bloc.add(GetVehiclesFromVin(vin: value));
-                          }
+                          // if (value.isNotEmpty) {
+                          estimates.clear();
+                          bloc.currentEstimatePage = 1;
+                          bloc.add(GetVehiclesFromVin(vin: value));
+                          // } else {
+                          //   setState(() {});
+                          // }
                         });
                       }
                     }));
@@ -594,6 +623,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                     vehicleYear: state.vehicle.modelYear ?? '',
                     vehicleMake: state.vehicle.make ?? '',
                     vehicleModel: state.vehicle.model ?? '',
+                    vin: state.vehicle.vinGlobal ?? "",
                     kilometers: '',
                     createdBy: CreatedBy(
                         id: 0,
@@ -610,7 +640,10 @@ class _ScannerScreenState extends State<ScannerScreen>
               String vehicleStatus = '';
               Color color = Colors.red;
               Icon icon = const Icon(Icons.check);
-              if (state is VinCodeNotInShopState) {
+              if (searchController.text.isEmpty) {
+                return const Center(
+                    child: Text('Please Enter a VIN Number To Check'));
+              } else if (state is VinCodeNotInShopState) {
                 vehicleStatus = "Vehicle Found But Not In Shop History";
                 color = Colors.red;
                 icon = Icon(Icons.info, size: 20, color: color);
@@ -740,9 +773,6 @@ class _ScannerScreenState extends State<ScannerScreen>
               } else if (state is VinSearchLoadingState &&
                   !bloc.isEstimatePagenationLoading) {
                 return const Center(child: CupertinoActivityIndicator());
-              } else if (searchController.text.isEmpty) {
-                return const Center(
-                    child: Text('Please Enter A VIN Number To Check'));
               } else {
                 vehicleStatus = "Vehicle Found In Shop History";
 
