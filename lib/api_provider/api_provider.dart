@@ -827,7 +827,7 @@ class ApiProvider {
 
     try {
       var url = Uri.parse(
-          "${BASE_URL}api/sentmessages?client_id=$clientId&page=$currentPage");
+          "${BASE_URL}api/sentmessages?client_id=$clientId&page=$currentPage&orderby=created_at&sort=DESC");
       var request = http.MultipartRequest("GET", url);
 
       request.headers.addAll(getHeader(token));
