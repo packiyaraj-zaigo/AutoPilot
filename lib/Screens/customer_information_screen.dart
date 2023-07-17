@@ -146,6 +146,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                         });
                         if (value == 2) {
                           BlocProvider.of<CustomerBloc>(context)
+                              .messageCurrentPage = 1;
+                          BlocProvider.of<CustomerBloc>(context)
+                              .messageTotalPage = 1;
+                          BlocProvider.of<CustomerBloc>(context)
                               .add(GetCustomerMessageEvent());
                         }
                       },

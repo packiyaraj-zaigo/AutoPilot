@@ -62,13 +62,19 @@ showDrawer(BuildContext context) {
             context,
             // DummyScreen(
             //   name: "Customer Screen",
-            // )
+            // )),
             CustomersScreen()),
         //  CustomersScreen()),
-        drawerTileWidget("assets/images/vehicle_drawer_icon.svg", "Vehicles",
-            context, VehiclesScreen()
-            // VehiclesScreen()),
-            ),
+        drawerTileWidget(
+            "assets/images/vehicle_drawer_icon.svg",
+            "Vehicles",
+            context,
+            // DummyScreen(
+            //   name: "Vehicle Screen",
+            // )),
+            VehiclesScreen()),
+        // VehiclesScreen()),
+
         drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
             context, BottomBarScreen()),
         drawerTileWidget(

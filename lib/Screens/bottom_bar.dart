@@ -47,8 +47,8 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
     pages = [
       DashBoardScreen(),
-      WorkFlowScreen(tabController: workFlowTabController),
-      // DummyScreen(name: "Work flow Screen"),
+      // WorkFlowScreen(tabController: workFlowTabController),
+      DummyScreen(name: "Work flow Screen"),
       DummyScreen(name: "Calendar Screen"),
       //  CalendarScreen(),
       // EstimateScreen(
@@ -547,10 +547,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "Scanner",
                   "assets/images/scanner_icon.svg",
-                  DummyScreen(
-                    name: "Scanner Screen",
-                  )),
-              // ScannerScreen()),
+                  // DummyScreen(
+                  //   name: "Scanner Screen",
+                  // )),
+                  ScannerScreen()),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: GestureDetector(

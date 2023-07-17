@@ -547,6 +547,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             height: 50,
             width: double.infinity,
             child: CupertinoTextField(
+              placeholder: "Search VIN Number",
               controller: searchController,
               onChanged: (value) {
                 networkCheck().then((val) => setState(() {
@@ -561,7 +562,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       }
                     }));
               },
-              padding: const EdgeInsets.only(top: 14, left: 14),
+              padding: const EdgeInsets.only(top: 0, left: 14),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -703,7 +704,8 @@ class _ScannerScreenState extends State<ScannerScreen>
                       onTap: () async {
                         await Navigator.of(context)
                             .push(MaterialPageRoute(
-                          builder: (context) => CreateVehicleScreen(),
+                          builder: (context) =>
+                              CreateVehicleScreen(vin: searchController.text),
                         ))
                             .then((value) {
                           if (value != null) {
