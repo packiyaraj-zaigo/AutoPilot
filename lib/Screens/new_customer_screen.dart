@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/customer_model.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +185,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
-                      textBox("ex. 555-555-5555", phoneNumberController,
+                      textBox("Ex. (555) 555-5555", phoneNumberController,
                           "Phone", phoneNumberErrorStatus),
                       Visibility(
                           visible: phoneNumberErrorStatus,
@@ -243,14 +244,35 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                       // textBox("Enter Zipcode...", zipCodeController, "Zip",
                       //     zipCodeErrorStatus),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              stateDropDown(),
-                              const SizedBox(
-                                width: 10,
+                              Column(
+                                children: [
+                                  stateDropDown(),
+                                  Visibility(
+                                      visible: stateErrorStatus,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          stateErrorMsg,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(
+                                              0xffD80027,
+                                            ),
+                                          ),
+                                        ),
+                                      )),
+                                ],
                               ),
+                              // const SizedBox(
+                              //   width: 10,
+                              // ),
                               Column(
                                 children: [
                                   halfTextBox(
@@ -258,6 +280,25 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                                       zipCodeController,
                                       "Zip",
                                       zipCodeErrorStatus),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Visibility(
+                                      visible: zipCodeErrorStatus,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 8.0),
+                                        child: Text(
+                                          zipCodeErrorMsg,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(
+                                              0xffD80027,
+                                            ),
+                                          ),
+                                        ),
+                                      ))
                                 ],
                               ),
                             ],
@@ -265,18 +306,6 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           const SizedBox(
                             height: 10,
                           ),
-                          Visibility(
-                              visible: stateErrorStatus,
-                              child: Text(
-                                stateErrorMsg,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Color(
-                                    0xffD80027,
-                                  ),
-                                ),
-                              )),
                         ],
                       ),
                       CheckboxListTile(
@@ -301,10 +330,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                                 emailController.text,
                                 phoneNumberController.text,
                                 provinceController.text,
-                                // customerNotesController.text,
-                                // cityController.text,
-                                // addressController.text,
-                                // zipCodeController.text,
+                                customerNotesController.text,
+                                cityController.text,
+                                addressController.text,
+                                zipCodeController.text,
                                 context);
                           });
                         },
@@ -314,7 +343,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12),
-                            color: AppColors.primaryBlackColors,
+                            color: AppColors.primaryColors,
                           ),
                           child: Text(
                             widget.customerEdit != null ? "Update" : "Confirm",
@@ -396,10 +425,12 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              maxLength: label == "Phone" ? 14 : 25,
+              inputFormatters: label == "Phone" ? [PhoneInputFormatter()] : [],
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
-                  prefixIcon: label == 'Phone' ? countryPickerWidget() : null,
+                  // prefixIcon: label == 'Phone' ? countryPickerWidget() : null,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
@@ -585,7 +616,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Provinces",
+                      "State",
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
@@ -681,12 +712,23 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "State",
-          style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff6A7187)),
+        const Row(
+          children: [
+            Text(
+              "State",
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+            Text(
+              "*",
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xffD80027)),
+            ),
+          ],
         ),
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
@@ -743,11 +785,11 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       String lastName,
       String email,
       String phoneNumber,
-      // String customerNotes,
-      // String city,
-      // String address,
+      String customerNotes,
+      String city,
+      String address,
       String state,
-      // String zipCode,
+      String zipCode,
       BuildContext context) {
     if (firstName.isEmpty) {
       setState(() {
@@ -755,13 +797,19 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         firstNameErrorStatus = true;
       });
     } else {
-      firstNameErrorStatus = false;
+      setState(() {
+        firstNameErrorStatus = false;
+      });
     }
     if (lastName.isEmpty) {
-      lastNameErrorMsg = 'Last name cant be empty';
-      lastNameErrorStatus = true;
+      setState(() {
+        lastNameErrorMsg = 'Last name cant be empty';
+        lastNameErrorStatus = true;
+      });
     } else {
-      lastNameErrorStatus = false;
+      setState(() {
+        lastNameErrorStatus = false;
+      });
     }
     if (email.isEmpty) {
       setState(() {
@@ -776,7 +824,9 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         emailErrorStatus = true;
       });
     } else {
-      emailErrorStatus = false;
+      setState(() {
+        emailErrorStatus = false;
+      });
     }
     if (phoneNumber.isEmpty) {
       setState(() {
@@ -784,13 +834,54 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         phoneNumberErrorStatus = true;
       });
     } else {
-      phoneNumberErrorStatus = false;
+      setState(() {
+        phoneNumberErrorStatus = false;
+      });
     }
     if (state.isEmpty) {
       stateErrorMsg = 'State cant be empty';
       stateErrorStatus = true;
     } else {
-      stateErrorStatus = false;
+      setState(() {
+        stateErrorStatus = false;
+      });
+    }
+    if (zipCode.isEmpty) {
+      setState(() {
+        zipCodeErrorStatus = true;
+        zipCodeErrorMsg = "Zipcode can't be empty";
+      });
+    } else {
+      if (zipCode.length < 2) {
+        setState(() {
+          zipCodeErrorStatus = true;
+          zipCodeErrorMsg = "Please enter a valid zipcode";
+        });
+      } else {
+        setState(() {
+          zipCodeErrorStatus = false;
+        });
+      }
+    }
+    if (address.isEmpty) {
+      setState(() {
+        addressErrorStatus = true;
+        addressErrorMsg = "Address can't be empty";
+      });
+    } else {
+      setState(() {
+        addressErrorStatus = false;
+      });
+    }
+    if (city.isEmpty) {
+      setState(() {
+        cityErrorStatus = true;
+        cityErrorMsg = "City can't be empty";
+      });
+    } else {
+      setState(() {
+        cityErrorStatus = false;
+      });
     }
 
     if (widget.customerEdit != null) {
@@ -813,7 +904,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       if (!firstNameErrorStatus &&
           !lastNameErrorStatus &&
           !emailErrorStatus &&
-          !phoneNumberErrorStatus) {
+          !phoneNumberErrorStatus &&
+          !addressErrorStatus &&
+          !cityErrorStatus &&
+          !zipCodeErrorStatus) {
         context.read<CustomerBloc>().add(AddCustomerDetails(
             context: context,
             firstName: firstNameController.text,
