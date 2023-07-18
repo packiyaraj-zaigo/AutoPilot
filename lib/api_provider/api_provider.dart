@@ -245,8 +245,8 @@ class ApiProvider {
 
   Future<dynamic> getVechile(String token, int page, String query) async {
     try {
-      final clientId = AppUtils.getUserID();
-      String url = '${BASE_URL}api/vehicles?$clientId';
+      final clientId = await AppUtils.getUserID();
+      String url = '${BASE_URL}api/vehicles?client_id=$clientId';
       if (page != 1) {
         url = '$url&page=$page';
       }
@@ -260,8 +260,9 @@ class ApiProvider {
         // }
       }
       // : '${BASE_URL}api/vehicles?page=${page + 1}';
-      var response = http.get(Uri.parse(url), headers: getHeader(token));
+      var response = await http.get(Uri.parse(url), headers: getHeader(token));
       print(response);
+      inspect(response);
       return response;
     } catch (e) {
       print(e.toString() + 'get employee error');
