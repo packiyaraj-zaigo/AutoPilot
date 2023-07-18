@@ -48,6 +48,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: false,
         key: scaffoldKey,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -151,14 +152,24 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                       return const Center(child: CupertinoActivityIndicator());
                     } else {
                       return vechile.isEmpty
-                          ? const Center(
-                              child: Text(
-                              'No Vechile found',
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryTextColors),
-                            ))
+                          ? SingleChildScrollView(
+                              child: SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height - 280,
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'No Vehicle Found',
+                                      style: TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.primaryTextColors),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
                           : Expanded(
                               child: ScrollConfiguration(
                                 behavior: const ScrollBehavior(),

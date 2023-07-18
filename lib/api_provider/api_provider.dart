@@ -245,16 +245,19 @@ class ApiProvider {
 
   Future<dynamic> getVechile(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}api/vehicles';
+      final clientId = AppUtils.getUserID();
+      String url = '${BASE_URL}api/vehicles?$clientId';
       if (page != 1) {
-        url = '$url?page=$page';
+        url = '$url&page=$page';
       }
       if (query != '') {
-        if (url.contains('?')) {
-          url = '$url&vehicle_model=$query';
-        } else {
-          url = '$url?vehicle_model=$query';
-        }
+        url = '$url&vehicle_model=$query';
+        // if (url.contains('?')) {
+
+        // }
+        //  else {
+        //   url = '$url?vehicle_model=$query';
+        // }
       }
       // : '${BASE_URL}api/vehicles?page=${page + 1}';
       var response = http.get(Uri.parse(url), headers: getHeader(token));
@@ -304,7 +307,8 @@ class ApiProvider {
 
     //  LoadingFormModel? loadingFormModel;
     try {
-      var url = Uri.parse("${BASE_URL}api/vehicles?customer_id=4&client_id=64");
+      final clientId = AppUtils.getUserID();
+      var url = Uri.parse("${BASE_URL}api/vehicles?client_id=$clientId");
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token"
         ..fields['vehicle_type'] = type
