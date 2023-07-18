@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vin_global_response.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
@@ -14,11 +17,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CreateVehicleScreen extends StatefulWidget {
-  const CreateVehicleScreen(
-      {super.key, this.vehicle, this.vin = '', this.Editvechile});
+  CreateVehicleScreen(
+      {super.key,
+      this.vehicle,
+      this.vin = '',
+      this.Editvechile,
+      this.navigation});
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
   final Datum? Editvechile;
+  String? navigation;
 
   @override
   State<CreateVehicleScreen> createState() => _CreateVehicleScreenState();
@@ -107,480 +115,515 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-      child: BlocProvider(
-        create: (context) => VechileBloc()..add(DropDownVechile()),
-        child: BlocListener<VechileBloc, VechileState>(
-          listener: (context, state) {
-            if (state is AddVechileDetailsLoadingState) {
-              CommonWidgets().showDialog(
-                  context, 'Something went wrong please try again later');
-              Navigator.pop(context);
-              // vechileList.addAll(state.vechile.data.data ?? []);
-            } else if (state is VechileDetailsErrorState) {
-              CommonWidgets().showDialog(context, state.message);
-            } else if (state is AddVechileDetailsSuccessState) {
-              // roles.clear();
-              // roles.addAll(state.roles);
-            } else if (state is DropdownVechileDetailsSuccessState) {
-              dropdownData.addAll(state.dropdownData.data.data);
-            } else if (state is AddVechileDetailsErrorState) {
-              if (BlocProvider.of<VechileBloc>(context).errorRes.isNotEmpty) {
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vehicle_year")) {
-                  print("vehicle_year");
-
-                  yearErrorStaus = true;
-
-                  print(yearErrorStaus);
-                  yearErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['vehicle_year'][0];
-                  print(yearErrorMsg);
-                  // }
+    return WillPopScope(
+      onWillPop: () async {
+        if (widget.navigation != null) {
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) => VehiclesScreen()));
+          return false;
+        } else {
+          Navigator.pop(context);
+          return false;
+        }
+      },
+      child: Scaffold(
+          body: SafeArea(
+        child: BlocProvider(
+          create: (ctx) => VechileBloc()..add(DropDownVechile()),
+          child: BlocListener<VechileBloc, VechileState>(
+            listener: (ctx, state) {
+              if (state is AddVechileDetailsLoadingState) {
+                CommonWidgets().showDialog(
+                    context, 'Something went wrong please try again later');
+                if (widget.navigation != null) {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => VehiclesScreen()));
                 } else {
-                  yearErrorStaus = false;
+                  Navigator.pop(context);
                 }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vehicle_model")) {
-                  modelErrorStatus = true;
-                  modelErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['vehicle_model'][0];
+                // vechileList.addAll(state.vechile.data.data ?? []);
+              } else if (state is VechileDetailsErrorState) {
+                CommonWidgets().showDialog(context, state.message);
+              } else if (state is AddVechileDetailsPageNationLoading) {
+                if (widget.navigation != null) {
+                  log('here');
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => VehiclesScreen()));
                 } else {
-                  modelErrorStatus = false;
+                  Navigator.pop(context);
                 }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vehicle_type")) {
-                  print("vehicle_type");
+                // roles.clear();
+                // roles.addAll(state.roles);
+              } else if (state is DropdownVechileDetailsSuccessState) {
+                dropdownData.addAll(state.dropdownData.data.data);
+              } else if (state is AddVechileDetailsErrorState) {
+                if (BlocProvider.of<VechileBloc>(context).errorRes.isNotEmpty) {
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vehicle_year")) {
+                    print("vehicle_year");
 
-                  typeErrorStatus = true;
+                    yearErrorStaus = true;
 
-                  print(typeErrorStatus);
-                  typeErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['vehicle_type'][0];
-                  print(typeErrorMsg);
-                  // }
-                } else {
-                  typeErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vehicle_make")) {
-                  print("vehicle_make");
+                    print(yearErrorStaus);
+                    yearErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vehicle_year'][0];
+                    print(yearErrorMsg);
+                    // }
+                  } else {
+                    yearErrorStaus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vehicle_model")) {
+                    modelErrorStatus = true;
+                    modelErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vehicle_model'][0];
+                  } else {
+                    modelErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vehicle_type")) {
+                    print("vehicle_type");
 
-                  makeErrorStatus = true;
+                    typeErrorStatus = true;
 
-                  print(makeErrorStatus);
-                  makeErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['vehicle_make'][0];
-                  print(makeErrorMsg);
-                  // }
-                } else {
-                  makeErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vehicle_color")) {
-                  print("vehicle_color");
+                    print(typeErrorStatus);
+                    typeErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vehicle_type'][0];
+                    print(typeErrorMsg);
+                    // }
+                  } else {
+                    typeErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vehicle_make")) {
+                    print("vehicle_make");
 
-                  colorErrorStatus = true;
+                    makeErrorStatus = true;
 
-                  print(colorErrorStatus);
-                  colorErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['vehicle_color'][0];
-                  print(colorErrorMsg);
-                  // }
-                } else {
-                  colorErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vehicle_color")) {
-                  print("vehicle_color");
+                    print(makeErrorStatus);
+                    makeErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vehicle_make'][0];
+                    print(makeErrorMsg);
+                    // }
+                  } else {
+                    makeErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vehicle_color")) {
+                    print("vehicle_color");
 
-                  colorErrorStatus = true;
+                    colorErrorStatus = true;
 
-                  print(colorErrorStatus);
-                  colorErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['vehicle_color'][0];
-                  print(colorErrorMsg);
-                  // }
-                } else {
-                  colorErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vin")) {
-                  print("vin");
+                    print(colorErrorStatus);
+                    colorErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vehicle_color'][0];
+                    print(colorErrorMsg);
+                    // }
+                  } else {
+                    colorErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vehicle_color")) {
+                    print("vehicle_color");
 
-                  vinErrorStatus = true;
+                    colorErrorStatus = true;
 
-                  print(vinErrorStatus);
-                  vinErrorMsg =
-                      BlocProvider.of<VechileBloc>(context).errorRes['vin'][0];
-                  print(vinErrorMsg);
-                  // }
-                } else {
-                  vinErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("vin")) {
-                  print("vin");
+                    print(colorErrorStatus);
+                    colorErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vehicle_color'][0];
+                    print(colorErrorMsg);
+                    // }
+                  } else {
+                    colorErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vin")) {
+                    print("vin");
 
-                  vinErrorStatus = true;
+                    vinErrorStatus = true;
 
-                  print(vinErrorStatus);
-                  vinErrorMsg =
-                      BlocProvider.of<VechileBloc>(context).errorRes['vin'][0];
-                  print(vinErrorMsg);
-                  // }
-                } else {
-                  vinErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("sub_model")) {
-                  print("sub_model");
+                    print(vinErrorStatus);
+                    vinErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vin'][0];
+                    print(vinErrorMsg);
+                    // }
+                  } else {
+                    vinErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("vin")) {
+                    print("vin");
 
-                  subModelErrorStatus = true;
+                    vinErrorStatus = true;
 
-                  print(subModelErrorStatus);
-                  submodelErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['sub_model'][0];
-                  print(submodelErrorMsg);
-                  // }
-                } else {
-                  subModelErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("licence_plate")) {
-                  print("licence_plate");
+                    print(vinErrorStatus);
+                    vinErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['vin'][0];
+                    print(vinErrorMsg);
+                    // }
+                  } else {
+                    vinErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("sub_model")) {
+                    print("sub_model");
 
-                  licErrorStatus = true;
+                    subModelErrorStatus = true;
 
-                  print(subModelErrorStatus);
-                  licErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['licence_plate'][0];
-                  print(licErrorMsg);
-                  // }
-                } else {
-                  licErrorStatus = false;
-                }
-                if (BlocProvider.of<VechileBloc>(context)
-                    .errorRes
-                    .containsKey("engine_size")) {
-                  print("engine_size");
+                    print(subModelErrorStatus);
+                    submodelErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['sub_model'][0];
+                    print(submodelErrorMsg);
+                    // }
+                  } else {
+                    subModelErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("licence_plate")) {
+                    print("licence_plate");
 
-                  engineErrorStatus = true;
+                    licErrorStatus = true;
 
-                  print(engineErrorStatus);
-                  engineErrorMsg = BlocProvider.of<VechileBloc>(context)
-                      .errorRes['engine_size'][0];
-                  print(engineErrorMsg);
-                  // }
-                } else {
-                  engineErrorStatus = false;
+                    print(subModelErrorStatus);
+                    licErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['licence_plate'][0];
+                    print(licErrorMsg);
+                    // }
+                  } else {
+                    licErrorStatus = false;
+                  }
+                  if (BlocProvider.of<VechileBloc>(context)
+                      .errorRes
+                      .containsKey("engine_size")) {
+                    print("engine_size");
+
+                    engineErrorStatus = true;
+
+                    print(engineErrorStatus);
+                    engineErrorMsg = BlocProvider.of<VechileBloc>(context)
+                        .errorRes['engine_size'][0];
+                    print(engineErrorMsg);
+                    // }
+                  } else {
+                    engineErrorStatus = false;
+                  }
                 }
               }
-            }
-          },
-          child:
-              BlocBuilder<VechileBloc, VechileState>(builder: (context, state) {
-            return StatefulBuilder(
-                builder: (BuildContext context, StateSetter stateUpdate) {
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    AppBar(
-                      centerTitle: true,
-                      backgroundColor: Colors.transparent,
-                      automaticallyImplyLeading: false,
-                      elevation: 0,
-                      title: Text(
-                        "New Vehicle",
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: AppColors.primaryBlackColors,
-                            fontWeight: FontWeight.w500),
+            },
+            child: BlocBuilder<VechileBloc, VechileState>(
+                builder: (context, state) {
+              return StatefulBuilder(
+                  builder: (BuildContext context, StateSetter stateUpdate) {
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppBar(
+                        centerTitle: true,
+                        backgroundColor: Colors.transparent,
+                        automaticallyImplyLeading: false,
+                        elevation: 0,
+                        title: Text(
+                          "New Vehicle",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: AppColors.primaryBlackColors,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        actions: [
+                          IconButton(
+                              onPressed: () {
+                                if (widget.navigation != null) {
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              VehiclesScreen()));
+                                } else {
+                                  Navigator.pop(context);
+                                }
+                              },
+                              icon: const Icon(
+                                CupertinoIcons.clear,
+                                color: AppColors.primaryColors,
+                              ))
+                        ],
                       ),
-                      actions: [
-                        IconButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            icon: const Icon(
-                              CupertinoIcons.clear,
-                              color: AppColors.primaryColors,
-                            ))
-                      ],
-                    ),
-                    Expanded(
-                        child: SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 24.0, right: 24),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Basic Details",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryTitleColor),
-                              ),
-                              SizedBox(height: 16),
-                              // textBox("Enter name...", nameController,
-                              //     "Owner", nameErrorStatus),
-                              textBox(
-                                  "Enter Year",
-                                  yearController,
-                                  "Year",
-                                  yearErrorStaus,
-                                  widget.vehicle != null &&
-                                      widget.vehicle!.modelYear!.isNotEmpty),
-                              Visibility(
-                                  visible: yearErrorStaus,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 6.0),
-                                    child: Text(
-                                      yearErrorMsg,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(
-                                          0xffD80027,
-                                        ),
-                                      ),
-                                    ),
-                                  )),
-
-                              textBox(
-                                  "Enter Make",
-                                  makeController,
-                                  "Make",
-                                  makeErrorStatus,
-                                  widget.vehicle != null &&
-                                      widget.vehicle!.make!.isNotEmpty),
-
-                              Visibility(
-                                  visible: makeErrorStatus,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 6.0),
-                                    child: Text(
-                                      makeErrorMsg,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(
-                                          0xffD80027,
-                                        ),
-                                      ),
-                                    ),
-                                  )),
-                              SizedBox(
-                                height: 15,
-                              ),
-                              textBox(
-                                  "Enter Model",
-                                  modelController,
-                                  "Model",
-                                  modelErrorStatus,
-                                  widget.vehicle != null &&
-                                      widget.vehicle!.model!.isNotEmpty),
-                              Visibility(
-                                  visible: modelErrorStatus,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Text(
-                                      modelErrorMsg,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Color(
-                                          0xffD80027,
-                                        ),
-                                      ),
-                                    ),
-                                  )),
-                              textBox(
-                                  "Enter Number",
-                                  vinController,
-                                  "VIN",
-                                  vinErrorStatus,
-                                  widget.vehicle != null &&
-                                      widget.vin.isNotEmpty),
-                              Theme(
-                                data: Theme.of(context)
-                                    .copyWith(dividerColor: Colors.transparent),
-                                child: ExpansionTile(
-                                  tilePadding: EdgeInsets.all(0),
-                                  childrenPadding: EdgeInsets.all(0),
-                                  title: const Text(
-                                    'Additional Fields',
-                                    style: TextStyle(
-                                        fontSize: 20,
-                                        color: AppColors.primaryTitleColor,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  children: <Widget>[
-                                    ListTile(
-                                        contentPadding: EdgeInsets.all(0),
-                                        title: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            textBox(
-                                                "Enter Sub-Model",
-                                                subModelController,
-                                                "Sub-Model",
-                                                subModelErrorStatus),
-                                            textBox(
-                                                "Enter Engine",
-                                                engineController,
-                                                "Engine",
-                                                engineErrorStatus,
-                                                widget.vehicle != null &&
-                                                    widget
-                                                        .vehicle!
-                                                        .displacementCc!
-                                                        .isNotEmpty),
-                                            // textBox(
-                                            //     "Enter make...",
-                                            //     makeController,
-                                            //     "Make",
-                                            //     makeErrorStatus),
-                                            textBox(
-                                              "Enter Color",
-                                              colorController,
-                                              "Color",
-                                              colorErrorStatus,
-                                            ),
-                                            textBox(
-                                                "Enter Number",
-                                                licController,
-                                                "LIC",
-                                                licErrorStatus),
-                                            typeController.text.isNotEmpty
-                                                ? SizedBox()
-                                                : Text(
-                                                    "Type",
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color:
-                                                            AppColors.greyText),
-                                                  ),
-                                            vechiledropDown(),
-                                            // SizedBox(
-                                            //   height: 50,
-                                            //   child: CupertinoTextField(
-                                            //     controller: typeController,
-                                            //     readOnly: false,
-                                            //     placeholder: 'Select',
-                                            //     style: TextStyle(
-                                            //         fontSize: 15,
-                                            //         fontWeight:
-                                            //             FontWeight.w400,
-                                            //         color: AppColors
-                                            //             .primaryBlackColors),
-                                            //     suffix: Icon(Icons
-                                            //         .arrow_drop_down_outlined),
-                                            //     decoration: BoxDecoration(
-                                            //       borderRadius:
-                                            //           BorderRadius.all(
-                                            //               Radius.circular(
-                                            //                   10)),
-                                            //       border: Border.all(
-                                            //           color: AppColors
-                                            //               .greyText),
-                                            //     ),
-                                            //   ),
-                                            // ),
-                                          ],
-                                        )),
-                                  ],
+                      Expanded(
+                          child: SingleChildScrollView(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 24.0, right: 24),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Basic Details",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryTitleColor),
                                 ),
-                              ),
-                              Center(
-                                child: Row(
-                                  children: <Widget>[
-                                    const SizedBox(
-                                      height: 30,
-                                    ),
-                                    Checkbox(
-                                      checkColor: Colors.white,
-                                      value: isChecked,
-                                      onChanged: (bool? value) {
-                                        stateUpdate(() {
-                                          isChecked = value!;
-                                        });
-                                      },
-                                    ),
-                                    Text(
-                                      "Create new estimate using this vehicle",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
+                                SizedBox(height: 16),
+                                // textBox("Enter name...", nameController,
+                                //     "Owner", nameErrorStatus),
+                                textBox(
+                                    "Enter Year",
+                                    yearController,
+                                    "Year",
+                                    yearErrorStaus,
+                                    widget.vehicle != null &&
+                                        widget.vehicle!.modelYear!.isNotEmpty),
+                                Visibility(
+                                    visible: yearErrorStaus,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 6.0),
+                                      child: Text(
+                                        yearErrorMsg,
+                                        style: const TextStyle(
                                           fontSize: 14,
-                                          color: AppColors.primaryTitleColor),
-                                    )
-                                  ],
-                                ),
-                              ),
-                              SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    validateVechile(
-                                      yearController.text,
-                                      modelController.text,
-                                      typeController.text,
-                                      context,
-                                      stateUpdate,
-                                    );
-                                    print("${yearController.text}");
-                                    // Navigator.push(
-                                    //     context,
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             VechileInformation()));
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    primary: AppColors.primaryColors,
-                                    shape: new RoundedRectangleBorder(
-                                      borderRadius:
-                                          new BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  child: state is AddVechileDetailsLoadingState
-                                      ? const CupertinoActivityIndicator(
-                                          color: Colors.white,
-                                        )
-                                      : Text(
-                                          'Confirm',
-                                          style: TextStyle(fontSize: 15),
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(
+                                            0xffD80027,
+                                          ),
                                         ),
+                                      ),
+                                    )),
+
+                                textBox(
+                                    "Enter Make",
+                                    makeController,
+                                    "Make",
+                                    makeErrorStatus,
+                                    widget.vehicle != null &&
+                                        widget.vehicle!.make!.isNotEmpty),
+
+                                Visibility(
+                                    visible: makeErrorStatus,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 6.0),
+                                      child: Text(
+                                        makeErrorMsg,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(
+                                            0xffD80027,
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                                SizedBox(
+                                  height: 15,
                                 ),
-                              ),
-                            ]),
-                      ),
-                    ))
-                  ],
-                ),
-              );
-            });
-          }),
+                                textBox(
+                                    "Enter Model",
+                                    modelController,
+                                    "Model",
+                                    modelErrorStatus,
+                                    widget.vehicle != null &&
+                                        widget.vehicle!.model!.isNotEmpty),
+                                Visibility(
+                                    visible: modelErrorStatus,
+                                    child: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 8.0),
+                                      child: Text(
+                                        modelErrorMsg,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(
+                                            0xffD80027,
+                                          ),
+                                        ),
+                                      ),
+                                    )),
+                                textBox(
+                                    "Enter Number",
+                                    vinController,
+                                    "VIN",
+                                    vinErrorStatus,
+                                    widget.vehicle != null &&
+                                        widget.vin.isNotEmpty),
+                                Theme(
+                                  data: Theme.of(context).copyWith(
+                                      dividerColor: Colors.transparent),
+                                  child: ExpansionTile(
+                                    tilePadding: EdgeInsets.all(0),
+                                    childrenPadding: EdgeInsets.all(0),
+                                    title: const Text(
+                                      'Additional Fields',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          color: AppColors.primaryTitleColor,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    children: <Widget>[
+                                      ListTile(
+                                          contentPadding: EdgeInsets.all(0),
+                                          title: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              textBox(
+                                                  "Enter Sub-Model",
+                                                  subModelController,
+                                                  "Sub-Model",
+                                                  subModelErrorStatus),
+                                              textBox(
+                                                  "Enter Engine",
+                                                  engineController,
+                                                  "Engine",
+                                                  engineErrorStatus,
+                                                  widget.vehicle != null &&
+                                                      widget
+                                                          .vehicle!
+                                                          .displacementCc!
+                                                          .isNotEmpty),
+                                              // textBox(
+                                              //     "Enter make...",
+                                              //     makeController,
+                                              //     "Make",
+                                              //     makeErrorStatus),
+                                              textBox(
+                                                "Enter Color",
+                                                colorController,
+                                                "Color",
+                                                colorErrorStatus,
+                                              ),
+                                              textBox(
+                                                  "Enter Number",
+                                                  licController,
+                                                  "LIC",
+                                                  licErrorStatus),
+                                              typeController.text.isNotEmpty
+                                                  ? SizedBox()
+                                                  : Text(
+                                                      "Type",
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          color: AppColors
+                                                              .greyText),
+                                                    ),
+                                              vechiledropDown(),
+                                              // SizedBox(
+                                              //   height: 50,
+                                              //   child: CupertinoTextField(
+                                              //     controller: typeController,
+                                              //     readOnly: false,
+                                              //     placeholder: 'Select',
+                                              //     style: TextStyle(
+                                              //         fontSize: 15,
+                                              //         fontWeight:
+                                              //             FontWeight.w400,
+                                              //         color: AppColors
+                                              //             .primaryBlackColors),
+                                              //     suffix: Icon(Icons
+                                              //         .arrow_drop_down_outlined),
+                                              //     decoration: BoxDecoration(
+                                              //       borderRadius:
+                                              //           BorderRadius.all(
+                                              //               Radius.circular(
+                                              //                   10)),
+                                              //       border: Border.all(
+                                              //           color: AppColors
+                                              //               .greyText),
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                            ],
+                                          )),
+                                    ],
+                                  ),
+                                ),
+                                Center(
+                                  child: Row(
+                                    children: <Widget>[
+                                      const SizedBox(
+                                        height: 30,
+                                      ),
+                                      Checkbox(
+                                        checkColor: Colors.white,
+                                        value: isChecked,
+                                        onChanged: (bool? value) {
+                                          stateUpdate(() {
+                                            isChecked = value!;
+                                          });
+                                        },
+                                      ),
+                                      Text(
+                                        "Create new estimate using this vehicle",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 14,
+                                            color: AppColors.primaryTitleColor),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      validateVechile(
+                                        yearController.text,
+                                        modelController.text,
+                                        typeController.text,
+                                        context,
+                                        stateUpdate,
+                                      );
+                                      print("${yearController.text}");
+                                      // Navigator.push(
+                                      //     context,
+                                      //     MaterialPageRoute(
+                                      //         builder: (context) =>
+                                      //             VechileInformation()));
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      primary: AppColors.primaryColors,
+                                      shape: new RoundedRectangleBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(10.0),
+                                      ),
+                                    ),
+                                    child:
+                                        state is AddVechileDetailsLoadingState
+                                            ? const CupertinoActivityIndicator(
+                                                color: Colors.white,
+                                              )
+                                            : Text(
+                                                'Confirm',
+                                                style: TextStyle(fontSize: 15),
+                                              ),
+                                  ),
+                                ),
+                              ]),
+                        ),
+                      ))
+                    ],
+                  ),
+                );
+              });
+            }),
+          ),
         ),
-      ),
-    ));
+      )),
+    );
   }
 
   validateVechile(
@@ -662,6 +705,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
             licNumber: licController.text,
             make: makeController.text,
             type: typeController.text,
+            navigation: widget.navigation,
           ));
     }
   }

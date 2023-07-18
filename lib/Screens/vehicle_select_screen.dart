@@ -305,7 +305,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
     await Navigator.of(context)
         .push(
       MaterialPageRoute(
-        builder: (context) => const CreateVehicleScreen(),
+        builder: (context) => CreateVehicleScreen(),
       ),
     )
         .then((value) {

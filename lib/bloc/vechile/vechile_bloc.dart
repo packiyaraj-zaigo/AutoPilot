@@ -148,7 +148,12 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         print("${response.body}");
         isVechileLoading = false;
-        Navigator.pop(event.context, event.vinNumber);
+        // if (event.navigation != null) {
+        //   Navigator.of(event.context).pushReplacement(
+        //       MaterialPageRoute(builder: (context) => VehiclesScreen()));
+        // } else {
+        //   Navigator.pop(event.context, event.vinNumber);
+        // }
         ScaffoldMessenger.of((event.context)).showSnackBar(
           SnackBar(
             content: Text('${vechileAdd['message']}'),
