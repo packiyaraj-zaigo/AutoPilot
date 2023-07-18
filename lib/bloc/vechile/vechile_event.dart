@@ -53,3 +53,35 @@ class DeleteVechile extends VechileEvent {
   final String deleteId;
   DeleteVechile({required this.deleteId});
 }
+
+class EditVechileDetails extends VechileEvent {
+  final BuildContext context;
+  final String vehicletype,
+      vehicleyear,
+      vehiclemake,
+      vehiclemodel,
+      kilometers,
+      vehiclecolor,
+      licenceplate,
+      unit,
+      vin,
+      notes,
+      submodel,
+      enginesize;
+
+  const EditVechileDetails({
+    required this.context,
+    required this.vehicletype,
+    required this.vehicleyear,
+    required this.vehiclemake,
+    required this.vehiclemodel,
+    required this.kilometers,
+    required this.vehiclecolor,
+    required this.licenceplate,
+    required this.unit,
+    required this.vin,
+    required this.notes,
+    required this.submodel,
+    required this.enginesize,
+  });
+}

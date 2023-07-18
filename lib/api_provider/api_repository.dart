@@ -169,6 +169,41 @@ class ApiRepository {
     );
   }
 
+  Future editVechile(
+    token,
+    BuildContext context,
+    vehicletype,
+    vehicleyear,
+    vehiclemake,
+    vehiclemodel,
+    kilometers,
+    vehiclecolor,
+    licenceplate,
+    unit,
+    vin,
+    notes,
+    submodel,
+    enginesize,
+    id,
+  ) {
+    return apiProvider.editVechile(
+        token,
+        context,
+        vehicletype,
+        vehicleyear,
+        vehiclemake,
+        vehiclemodel,
+        kilometers,
+        vehiclecolor,
+        licenceplate,
+        unit,
+        vin,
+        notes,
+        submodel,
+        enginesize,
+        id);
+  }
+
   Future dropdownVechile(String token) {
     return apiProvider.dropdownVechile(token);
   }

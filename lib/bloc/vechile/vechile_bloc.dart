@@ -15,8 +15,9 @@ import '../../Screens/vehicles_screen.dart';
 class VechileBloc extends Bloc<VechileEvent, VechileState> {
   bool isVechileLoading = false;
   final apiRepo = ApiRepository();
-  bool isPagenationLoading = false;
 
+  bool isPagenationLoading = false;
+  int showLoading = 0;
   int currentPage = 1;
   int totalPages = 1;
   final JsonDecoder _decoder = const JsonDecoder();
@@ -26,6 +27,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     on<AddVechile>(addAlllVechile);
     on<DropDownVechile>(dropdownVechile);
     on<DeleteVechile>(deleteVechile);
+    on<EditVechileDetails>(editVechile);
   }
   getAllVechile(
     GetAllVechile event,
@@ -211,6 +213,52 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     } catch (e) {
       emit(VechileDetailsErrorState(message: e.toString()));
       isVechileLoading = false;
+    }
+  }
+
+  Future<void> editVechile(
+    EditVechileDetails event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      emit(EditVechileLoading());
+      Response loadedResponse = await apiRepo.editVechile(
+          token,
+          (event.context),
+          event.vehicletype,
+          event.vehicleyear,
+          event.vin,
+          event.vehiclemodel,
+          event.submodel,
+          event.enginesize,
+          event.kilometers,
+          event.licenceplate,
+          event.notes,
+          event.unit,
+          event.vehiclecolor,
+          event.vehiclemake,
+          event.context);
+      var unloadData = _decoder.convert(loadedResponse.body);
+      print('nnnnnnnnnnnnnnnnnnnnnnnnnn');
+
+      print(unloadData.toString());
+      if (loadedResponse.statusCode == 200 ||
+          loadedResponse.statusCode == 201) {
+        print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
+
+        Navigator.of(event.context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => VehiclesScreen(),
+          ),
+          (route) => false,
+        );
+      } else {
+        emit(EditVechileError(message: unloadData));
+      }
+    } catch (e) {
+      showLoading = 0;
+      emit(EditVechileError(message: e.toString()));
     }
   }
 }

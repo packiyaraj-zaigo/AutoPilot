@@ -88,3 +88,14 @@ class DeleteVechileDetailsErrorState extends VechileState {
   final String message;
   DeleteVechileDetailsErrorState({required this.message});
 }
+
+class EditVechileError extends VechileState {
+  var message;
+  EditVechileError({required this.message});
+  @override
+  List<Object> get props => [message];
+}
+
+class EditVechileLoading extends VechileState {
+  EditVechileLoading();
+}

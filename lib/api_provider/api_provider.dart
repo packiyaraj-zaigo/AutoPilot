@@ -351,6 +351,43 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> editVechile(
+    token,
+    BuildContext context,
+    vehicletype,
+    vehicleyear,
+    vehiclemake,
+    vehiclemodel,
+    kilometers,
+    vehiclecolor,
+    licenceplate,
+    unit,
+    vin,
+    notes,
+    submodel,
+    enginesize,
+    id,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var url = Uri.parse(
+          '${BASE_URL}api/vehicles/$id?vehicle_type=$vehicletype&vehicle_year=$vehicleyear&vehicle_make=$vehiclemake&vehicle_model=$vehiclemodel&kilometers=$kilometers&vehicle_color=$vehiclecolor&licence_plate=$licenceplate&unit=$unit&vin=$vin&client_id=${prefs.getString(AppConstants.USER_ID)}');
+      print('hjjjjjjjjjjjjjjjj${token}');
+
+      var request = http.MultipartRequest("PUT", url)
+        ..headers['Authorization'] = "Bearer $token";
+
+      var response = await request.send();
+      print(
+          'object========id: ${vehiclemodel}=name:=${vin}=====================');
+      if (response.statusCode == 200 || response.statusCode == 201) {}
+      print(response.statusCode.toString());
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print("errroor draft found ${e.toString()}");
+    }
+  }
+
   Future<dynamic> customerLoad(String token, int page, String query) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
