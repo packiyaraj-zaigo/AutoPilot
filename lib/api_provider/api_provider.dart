@@ -246,7 +246,7 @@ class ApiProvider {
   Future<dynamic> getVechile(String token, int page, String query) async {
     try {
       final clientId = await AppUtils.getUserID();
-      String url = '${BASE_URL}api/vehicles?client_id=$clientId';
+      String url = '${BASE_URL}api/vehicles?client_id=$clientId&orderby=id&sort=DESC';
       if (page != 1) {
         url = '$url&page=$page';
       }
