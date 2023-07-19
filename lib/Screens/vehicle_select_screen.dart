@@ -132,168 +132,174 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                 ],
               ),
               const SizedBox(height: 16),
-              BlocListener<VechileBloc, VechileState>(
-                listener: (context, state) {
-                  if (state is VechileDetailsSuccessStates) {
-                    print(
-                        "-----------=============111111111111111111111111111=================");
-                    vechile.addAll(state.vechile.data.data);
-                  }
-                },
-                child: BlocBuilder<VechileBloc, VechileState>(
-                  builder: (context, state) {
-                    if (state is VechileDetailsLoadingState &&
-                        !_bloc!.isPagenationLoading) {
-                      print("-----------==============================");
-                      return const Center(child: CupertinoActivityIndicator());
-                    } else {
-                      return vechile.isEmpty
-                          ? const Center(
-                              child: Text(
-                              'No Vechile found',
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryTextColors),
-                            ))
-                          : Expanded(
-                              child: ScrollConfiguration(
-                                behavior: const ScrollBehavior(),
-                                child: ListView.separated(
-                                    shrinkWrap: true,
-                                    controller: Listcontroller
-                                      ..addListener(() {
-                                        print('object');
-                                        if (Listcontroller.offset ==
-                                                Listcontroller
-                                                    .position.maxScrollExtent &&
-                                            !_bloc!.isPagenationLoading &&
-                                            _bloc!.currentPage <=
-                                                _bloc!.totalPages) {
-                                          _debouncer.run(() {
-                                            _bloc?.isPagenationLoading = true;
-                                            _bloc?.add(GetAllVechile());
-                                          });
-                                        }
-                                      }),
-                                    itemBuilder: (context, index) {
-                                      final item = vechile[index];
-                                      return Column(
-                                        children: [
-                                          GestureDetector(
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () {
-                                              Navigator.of(context).pop(item);
-                                            },
-                                            child: Container(
-                                              height: 77,
-                                              width: double.infinity,
-                                              decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color: Colors.black
-                                                        .withOpacity(0.07),
-                                                    offset: const Offset(0, 4),
-                                                    blurRadius: 10,
-                                                  ),
-                                                ],
-                                                borderRadius:
-                                                    BorderRadius.circular(12),
-                                              ),
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 16.0),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          vertical: 16.0),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceEvenly,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            '${item.vehicleYear} ${item.vehicleModel}',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style:
-                                                                const TextStyle(
-                                                              color: AppColors
-                                                                  .primaryTitleColor,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w500,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            (item.firstName ??
-                                                                    "") +
-                                                                (item.lastName ??
-                                                                    ''),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style:
-                                                                const TextStyle(
-                                                              color: AppColors
-                                                                  .greyText,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
+              BlocProvider(
+                create: (context) => VechileBloc(),
+                child: BlocListener<VechileBloc, VechileState>(
+                  listener: (context, state) {
+                    if (state is VechileDetailsSuccessStates) {
+                      print(
+                          "-----------=============111111111111111111111111111=================");
+                      vechile.addAll(state.vechile.data.data);
+                    }
+                  },
+                  child: BlocBuilder<VechileBloc, VechileState>(
+                    builder: (context, state) {
+                      if (state is VechileDetailsLoadingState &&
+                          !_bloc!.isPagenationLoading) {
+                        print("-----------==============================");
+                        return const Center(
+                            child: CupertinoActivityIndicator());
+                      } else {
+                        return vechile.isEmpty
+                            ? const Center(
+                                child: Text(
+                                'No Vechile found',
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryTextColors),
+                              ))
+                            : Expanded(
+                                child: ScrollConfiguration(
+                                  behavior: const ScrollBehavior(),
+                                  child: ListView.separated(
+                                      shrinkWrap: true,
+                                      controller: Listcontroller
+                                        ..addListener(() {
+                                          print('object');
+                                          if (Listcontroller.offset ==
+                                                  Listcontroller.position
+                                                      .maxScrollExtent &&
+                                              !_bloc!.isPagenationLoading &&
+                                              _bloc!.currentPage <=
+                                                  _bloc!.totalPages) {
+                                            _debouncer.run(() {
+                                              _bloc?.isPagenationLoading = true;
+                                              _bloc?.add(GetAllVechile());
+                                            });
+                                          }
+                                        }),
+                                      itemBuilder: (context, index) {
+                                        final item = vechile[index];
+                                        return Column(
+                                          children: [
+                                            GestureDetector(
+                                              behavior: HitTestBehavior.opaque,
+                                              onTap: () {
+                                                Navigator.of(context).pop(item);
+                                              },
+                                              child: Container(
+                                                height: 77,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.black
+                                                          .withOpacity(0.07),
+                                                      offset:
+                                                          const Offset(0, 4),
+                                                      blurRadius: 10,
                                                     ),
-                                                    const Icon(
-                                                      CupertinoIcons.add,
-                                                      color: AppColors
-                                                          .primaryColors,
-                                                    )
                                                   ],
+                                                  borderRadius:
+                                                      BorderRadius.circular(12),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 16.0),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .symmetric(
+                                                                vertical: 16.0),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .spaceEvenly,
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              '${item.vehicleYear} ${item.vehicleModel}',
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: AppColors
+                                                                    .primaryTitleColor,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              (item.firstName ??
+                                                                      "") +
+                                                                  (item.lastName ??
+                                                                      ''),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              style:
+                                                                  const TextStyle(
+                                                                color: AppColors
+                                                                    .greyText,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      const Icon(
+                                                        CupertinoIcons.add,
+                                                        color: AppColors
+                                                            .primaryColors,
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          _bloc!.currentPage <=
-                                                      _bloc!.totalPages &&
-                                                  index == vechile.length - 1
-                                              ? const Column(
-                                                  children: [
-                                                    SizedBox(height: 24),
-                                                    Center(
-                                                      child:
-                                                          CupertinoActivityIndicator(),
-                                                    ),
-                                                    SizedBox(height: 24),
-                                                  ],
-                                                )
-                                              : const SizedBox(),
-                                          index == vechile.length - 1
-                                              ? const SizedBox(height: 24)
-                                              : const SizedBox(),
-                                        ],
-                                      );
-                                    },
-                                    separatorBuilder: (context, index) =>
-                                        const SizedBox(height: 16),
-                                    itemCount: vechile.length),
-                              ),
-                            );
-                    }
-                  },
+                                            _bloc!.currentPage <=
+                                                        _bloc!.totalPages &&
+                                                    index == vechile.length - 1
+                                                ? const Column(
+                                                    children: [
+                                                      SizedBox(height: 24),
+                                                      Center(
+                                                        child:
+                                                            CupertinoActivityIndicator(),
+                                                      ),
+                                                      SizedBox(height: 24),
+                                                    ],
+                                                  )
+                                                : const SizedBox(),
+                                            index == vechile.length - 1
+                                                ? const SizedBox(height: 24)
+                                                : const SizedBox(),
+                                          ],
+                                        );
+                                      },
+                                      separatorBuilder: (context, index) =>
+                                          const SizedBox(height: 16),
+                                      itemCount: vechile.length),
+                                ),
+                              );
+                      }
+                    },
+                  ),
                 ),
               ),
             ],

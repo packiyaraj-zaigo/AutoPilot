@@ -12,6 +12,7 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 showDrawer(BuildContext context) {
   return Drawer(
@@ -155,10 +156,12 @@ Widget drawerTileWidget(
 
 Widget drawerBottomTile(String label, BuildContext context, constructor) {
   return GestureDetector(
-    onTap: () {
+    onTap: () async {
       if (label == "Sign Out") {
         AppUtils.setToken("");
         AppUtils.setUserName("");
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setBool('add_company', false);
 
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
           builder: (context) {

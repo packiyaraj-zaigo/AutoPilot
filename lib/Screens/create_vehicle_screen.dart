@@ -34,7 +34,7 @@ class CreateVehicleScreen extends StatefulWidget {
 
 class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  VechileBloc? _bloc;
+  // VechileBloc? _bloc;
 
   final _debouncer = Debouncer();
 
@@ -108,9 +108,9 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
       // yearController.text = widget.Editvechile?.licencePlate ?? "";
       // yearController.text = widget.Editvechile?.vehicleType ?? "";
     }
-    _bloc = BlocProvider.of<VechileBloc>(context);
-    _bloc?.currentPage = 1;
-    _bloc?.add(GetAllVechile());
+    // _bloc = BlocProvider.of<VechileBloc>(context);
+    // _bloc?.currentPage = 1;
+    // _bloc?.add(GetAllVechile());
   }
 
   @override
@@ -129,9 +129,9 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
       child: Scaffold(
           body: SafeArea(
         child: BlocProvider(
-          create: (ctx) => VechileBloc()..add(DropDownVechile()),
+          create: (context) => VechileBloc()..add(DropDownVechile()),
           child: BlocListener<VechileBloc, VechileState>(
-            listener: (ctx, state) {
+            listener: (context, state) {
               if (state is AddVechileDetailsLoadingState) {
                 CommonWidgets().showDialog(
                     context, 'Something went wrong please try again later');

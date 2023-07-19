@@ -45,9 +45,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => EmployeeBloc(),
         ),
-        BlocProvider(
-          create: (context) => VechileBloc(),
-        ),
+        // BlocProvider(
+        //   create: (context) => VechileBloc(),
+        // ),
         BlocProvider(
           create: (context) => CustomerBloc(),
         ),
