@@ -151,7 +151,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => VehiclesScreen()));
                 } else {
-                  Navigator.pop(context);
+                  Navigator.pop(context, vinController.text);
                 }
                 // roles.clear();
                 // roles.addAll(state.roles);

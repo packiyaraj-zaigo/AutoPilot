@@ -142,123 +142,205 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Colors.black,
-        leading: GestureDetector(
-            onTap: () {
-              if (widget.widgetIndex == 0) {
-                if (busineesNameController.text.isNotEmpty ||
-                    businessPhoneController.text.isNotEmpty ||
-                    businessWebsiteController.text.isNotEmpty ||
-                    addressController.text.isNotEmpty ||
-                    cityController.text.isNotEmpty ||
-                    zipController.text.isNotEmpty) {
-                  showBackDialog(context,
-                      "The entered data will be lost if you click on Yes.");
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Colors.black,
+          leading: GestureDetector(
+              onTap: () {
+                if (widget.widgetIndex == 0) {
+                  if (busineesNameController.text.isNotEmpty ||
+                      businessPhoneController.text.isNotEmpty ||
+                      businessWebsiteController.text.isNotEmpty ||
+                      addressController.text.isNotEmpty ||
+                      cityController.text.isNotEmpty ||
+                      zipController.text.isNotEmpty) {
+                    showBackDialog(context,
+                        "The entered data will be lost if you click on Yes.");
+                  } else {
+                    Navigator.pop(context);
+                  }
+                } else if (widget.widgetIndex == 1) {
+                  if (labourRateController.text.isNotEmpty ||
+                      taxRateController.text.isNotEmpty ||
+                      numberOfEmployeeString.isNotEmpty) {
+                    showBackDialog(context,
+                        "The entered data will be lost if you click on Yes.");
+                  } else {
+                    Navigator.pop(context);
+                  }
                 } else {
                   Navigator.pop(context);
                 }
-              } else if (widget.widgetIndex == 1) {
-                if (labourRateController.text.isNotEmpty ||
-                    taxRateController.text.isNotEmpty ||
-                    numberOfEmployeeString.isNotEmpty) {
-                  showBackDialog(context,
-                      "The entered data will be lost if you click on Yes.");
-                } else {
-                  Navigator.pop(context);
-                }
-              } else {
-                Navigator.pop(context);
-              }
-            },
-            child: const Icon(
-              Icons.arrow_back,
-              color: AppColors.primaryColors,
-            )),
-      ),
-      bottomNavigationBar: Padding(
-        padding:
-            const EdgeInsets.only(bottom: 24.0, left: 24, right: 24, top: 0),
-        // child: GestureDetector(
-        //   onTap: () {
-        //     if (widget.widgetIndex == 0) {
-        //       validateBasicDetails();
-        //       print("hellooo");
-        //     } else if (widget.widgetIndex == 1) {
-        //       validateOperationDetails();
-        //     } else if (widget.widgetIndex == 2) {
-        //       employeeList.forEach((element) {
-        //         employeeDetailsMap!.addAll({
-        //           element.id.toString():
-        //               "${element.firstName} ${element.lastName}"
+              },
+              child: const Icon(
+                Icons.arrow_back,
+                color: AppColors.primaryColors,
+              )),
+        ),
+        // bottomNavigationBar: Padding(
+        //   padding:
+        //       const EdgeInsets.only(bottom: 24.0, left: 24, right: 24, top: 0),
+        //   // child: GestureDetector(
+        //   //   onTap: () {
+        //   //     if (widget.widgetIndex == 0) {
+        //   //       validateBasicDetails();
+        //   //       print("hellooo");
+        //   //     } else if (widget.widgetIndex == 1) {
+        //   //       validateOperationDetails();
+        //   //     } else if (widget.widgetIndex == 2) {
+        //   //       employeeList.forEach((element) {
+        //   //         employeeDetailsMap!.addAll({
+        //   //           element.id.toString():
+        //   //               "${element.firstName} ${element.lastName}"
+        //   //         });
+        //   //       });
+
+        //   //       print(employeeDetailsMap);
+
+        //   //       Navigator.pop(context, employeeDetailsMap);
+        //   //     }
+        //   //   },
+        //   //   child: Container(
+        //   //     height: 56,
+        //   //     alignment: Alignment.center,
+        //   //     width: MediaQuery.of(context).size.width,
+        //   //     decoration: BoxDecoration(
+        //   //       borderRadius: BorderRadius.circular(12),
+        //   //       color: AppColors.primaryColors,
+        //   //     ),
+        //   //     child: const Text(
+        //   //       "Confirm",
+        //   //       style: TextStyle(
+        //   //           fontSize: 16,
+        //   //           fontWeight: FontWeight.w500,
+        //   //           color: Colors.white),
+        //   //     ),
+        //   //   ),
+        //   // ),
+
+        //   child: ElevatedButton(
+        //     onPressed: () {
+        //       if (widget.widgetIndex == 0) {
+        //         validateBasicDetails();
+        //         print("hellooo");
+        //       } else if (widget.widgetIndex == 1) {
+        //         validateOperationDetails();
+        //       } else if (widget.widgetIndex == 2) {
+        //         employeeList.forEach((element) {
+        //           employeeDetailsMap!.addAll({
+        //             element.id.toString():
+        //                 "${element.firstName} ${element.lastName}"
+        //           });
         //         });
-        //       });
 
-        //       print(employeeDetailsMap);
+        //         print(employeeDetailsMap);
 
-        //       Navigator.pop(context, employeeDetailsMap);
-        //     }
-        //   },
-        //   child: Container(
-        //     height: 56,
-        //     alignment: Alignment.center,
-        //     width: MediaQuery.of(context).size.width,
-        //     decoration: BoxDecoration(
-        //       borderRadius: BorderRadius.circular(12),
-        //       color: AppColors.primaryColors,
+        //         Navigator.pop(context, employeeDetailsMap);
+        //       }
+        //     },
+        //     style: ElevatedButton.styleFrom(
+        //       elevation: 0,
+        //       shape:
+        //           RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        //       fixedSize: Size(MediaQuery.of(context).size.width, 56),
+        //       primary: AppColors.primaryColors,
         //     ),
         //     child: const Text(
         //       "Confirm",
         //       style: TextStyle(
-        //           fontSize: 16,
-        //           fontWeight: FontWeight.w500,
-        //           color: Colors.white),
+        //           fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
         //     ),
         //   ),
         // ),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              widget.widgetIndex == 0
+                  ? basicDetailsWidget()
+                  : widget.widgetIndex == 1
+                      ? operationDetailsWidget()
+                      : addEmployeeWidget(),
+              Padding(
+                padding: const EdgeInsets.only(
+                    bottom: 24.0, left: 24, right: 24, top: 16),
+                // child: GestureDetector(
+                //   onTap: () {
+                //     if (widget.widgetIndex == 0) {
+                //       validateBasicDetails();
+                //       print("hellooo");
+                //     } else if (widget.widgetIndex == 1) {
+                //       validateOperationDetails();
+                //     } else if (widget.widgetIndex == 2) {
+                //       employeeList.forEach((element) {
+                //         employeeDetailsMap!.addAll({
+                //           element.id.toString():
+                //               "${element.firstName} ${element.lastName}"
+                //         });
+                //       });
 
-        child: ElevatedButton(
-          onPressed: () {
-            if (widget.widgetIndex == 0) {
-              validateBasicDetails();
-              print("hellooo");
-            } else if (widget.widgetIndex == 1) {
-              validateOperationDetails();
-            } else if (widget.widgetIndex == 2) {
-              employeeList.forEach((element) {
-                employeeDetailsMap!.addAll({
-                  element.id.toString():
-                      "${element.firstName} ${element.lastName}"
-                });
-              });
+                //       print(employeeDetailsMap);
 
-              print(employeeDetailsMap);
+                //       Navigator.pop(context, employeeDetailsMap);
+                //     }
+                //   },
+                //   child: Container(
+                //     height: 56,
+                //     alignment: Alignment.center,
+                //     width: MediaQuery.of(context).size.width,
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(12),
+                //       color: AppColors.primaryColors,
+                //     ),
+                //     child: const Text(
+                //       "Confirm",
+                //       style: TextStyle(
+                //           fontSize: 16,
+                //           fontWeight: FontWeight.w500,
+                //           color: Colors.white),
+                //     ),
+                //   ),
+                // ),
 
-              Navigator.pop(context, employeeDetailsMap);
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            elevation: 0,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            fixedSize: Size(MediaQuery.of(context).size.width, 56),
-            primary: AppColors.primaryColors,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (widget.widgetIndex == 0) {
+                      validateBasicDetails();
+                      print("hellooo");
+                    } else if (widget.widgetIndex == 1) {
+                      validateOperationDetails();
+                    } else if (widget.widgetIndex == 2) {
+                      employeeList.forEach((element) {
+                        employeeDetailsMap!.addAll({
+                          element.id.toString():
+                              "${element.firstName} ${element.lastName}"
+                        });
+                      });
+
+                      print(employeeDetailsMap);
+
+                      Navigator.pop(context, employeeDetailsMap);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                    primary: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Confirm",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              )
+            ],
           ),
-          child: const Text(
-            "Confirm",
-            style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w500, color: Colors.white),
-          ),
-        ),
-      ),
-      body: widget.widgetIndex == 0
-          ? basicDetailsWidget()
-          : widget.widgetIndex == 1
-              ? operationDetailsWidget()
-              : addEmployeeWidget(),
-    );
+        ));
   }
 
   Widget basicDetailsWidget() {

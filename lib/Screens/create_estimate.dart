@@ -19,7 +19,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
 
 class CreateEstimateScreen extends StatefulWidget {
   const CreateEstimateScreen({super.key, this.vehicle, this.customer});
@@ -43,9 +42,9 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   CustomerModel? customerModel;
   vm.VechileResponse? vehicleModel;
 
-  final ImagePicker imagePicker = ImagePicker();
-  List<XFile>? imageFileList = [];
-  XFile? selectedImage;
+  // final ImagePicker imagePicker = ImagePicker();
+  // List<XFile>? imageFileList = [];
+  // XFile? selectedImage;
 
   final vehicleScrollController = ScrollController();
   final customerScrollController = ScrollController();
@@ -1009,7 +1008,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.pop(context);
-                selectImages("camera");
+                //  selectImages("camera");
               },
               child: Row(
                 children: [
@@ -1028,7 +1027,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.pop(context);
-                selectImages("lib");
+                //   selectImages("lib");
               },
               child: Row(
                 children: [
@@ -1055,24 +1054,24 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
     );
   }
 
-  void selectImages(source) async {
-    if (source == "camera") {
-      selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
-      // if (imageFileList != null) {
-      setState(() {
-        imageFileList?.add(selectedImage!);
-      });
+  // void selectImages(source) async {
+  //   if (source == "camera") {
+  //     selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
+  //     // if (imageFileList != null) {
+  //     setState(() {
+  //       imageFileList?.add(selectedImage!);
+  //     });
 
-      // }
-    } else {
-      final List<XFile> imageFile = await imagePicker.pickMultiImage();
-      //  if (imageFile.isNotEmpty) {
-      setState(() {
-        imageFileList?.addAll(imageFile);
-      });
+  //     // }
+  //   } else {
+  //     final List<XFile> imageFile = await imagePicker.pickMultiImage();
+  //     //  if (imageFile.isNotEmpty) {
+  //     setState(() {
+  //       imageFileList?.addAll(imageFile);
+  //     });
 
-      //  }
-    }
-    setState(() {});
-  }
+  //     //  }
+  //   }
+  //   setState(() {});
+  // }
 }

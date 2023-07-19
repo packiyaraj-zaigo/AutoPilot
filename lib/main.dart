@@ -13,7 +13,7 @@ import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,7 +27,7 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   initScreen = prefs.getString(AppConstants.USER_TOKEN);
   addCompany = prefs.getBool('add_company');
-  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 

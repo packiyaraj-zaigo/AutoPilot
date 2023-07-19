@@ -682,7 +682,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                             .push(MaterialPageRoute(
                           builder: (context) => CreateVehicleScreen(
                             vehicle: state.vehicle,
-                            vin: searchController.text,
+                            vin: state.vehicle.vinGlobal ?? "",
                           ),
                         ))
                             .then((value) {
