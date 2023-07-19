@@ -517,8 +517,9 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       //  FilteringTextInputFormatter.allow(RegExp("[0-9]"))
                     ]
                   : [],
-              keyboardType:
-                  label == 'Phone Number' ? TextInputType.number : null,
+              keyboardType: label == 'Phone Number'
+                  ? TextInputType.numberWithOptions(signed: true)
+                  : null,
               maxLength: label == 'Phone Number'
                   ? 14
                   : label == 'Password'

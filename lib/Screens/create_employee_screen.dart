@@ -484,7 +484,9 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              keyboardType: label == 'Phone' ? TextInputType.phone : null,
+              keyboardType: label == 'Phone'
+                  ? TextInputType.numberWithOptions(signed: true)
+                  : null,
               inputFormatters:
                   label == "Phone" ? [PhoneInputFormatter()] : null,
               maxLength: label == 'Phone'

@@ -477,7 +477,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         label == "Shop Hourly Labor Rate" ||
                         label == "Tax Rate" ||
                         label == 'Zip'
-                    ? TextInputType.number
+                    ? TextInputType.numberWithOptions(signed: true)
                     : null,
                 maxLength: label == 'Business Phone'
                     ? 14
