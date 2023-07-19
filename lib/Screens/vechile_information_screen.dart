@@ -1,9 +1,13 @@
+import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../Models/vechile_model.dart';
+import '../bloc/customer_bloc/customer_bloc.dart';
+import '../bloc/vechile/vechile_event.dart';
 import '../utils/app_utils.dart';
 import 'create_vehicle_screen.dart';
 
@@ -490,33 +494,37 @@ class _VechileInformationState extends State<VechileInformation> {
                         height: 57,
                         width: double.infinity,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppColors.primaryButtonColors,
-                            elevation: 0,
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0),
+                            style: ElevatedButton.styleFrom(
+                              primary: AppColors.primaryButtonColors,
+                              elevation: 0,
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(10.0),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.delete,
-                                color: AppColors.primaryColors,
-                                size: 16,
-                              ),
-                              Text(
-                                'Delete Vechile',
-                                style: TextStyle(
-                                    color: AppColors.primaryColors,
-                                    fontFamily: '.SF Pro Text',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.delete,
+                                  color: AppColors.primaryColors,
+                                  size: 16,
+                                ),
+                                Text(
+                                  'Delete Vechile',
+                                  style: TextStyle(
+                                      color: AppColors.primaryColors,
+                                      fontFamily: '.SF Pro Text',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            onPressed: () async {
+                              BlocProvider.of<VechileBloc>(context).add(
+                                  DeleteVechile(
+                                      deleteId: widget.vechile.id.toString(),
+                                      context: context));
+                            }),
                       ),
                     ],
                   ),

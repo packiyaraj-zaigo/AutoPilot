@@ -191,31 +191,6 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     }
   }
 
-  Future<void> deleteVechile(
-    DeleteVechile event,
-    Emitter<VechileState> emit,
-  ) async {
-    try {
-      final token = await AppUtils.getToken();
-      Response response = await apiRepo.deleteVechile(token, event.deleteId);
-      if (response.statusCode == 200) {
-        final responseBody = jsonDecode(response.body);
-        print(
-            "qqqqqqqqqqqqqqqqqqqqqeeeeeeeeeeeeeeeeeeeeeeeeeewwwwwwwwwwwwwwwwwwwwwwwww${responseBody}");
-        emit(
-          DeleteVechileDetailsSuccessState(
-            vechile: VechileResponse.fromJson(
-              responseBody["data"],
-            ),
-          ),
-        );
-      }
-    } catch (e) {
-      emit(VechileDetailsErrorState(message: e.toString()));
-      isVechileLoading = false;
-    }
-  }
-
   Future<void> editVechile(
     EditVechileDetails event,
     Emitter<VechileState> emit,
@@ -260,5 +235,30 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       showLoading = 0;
       emit(EditVechileError(message: e.toString()));
     }
+  }
+}
+
+Future<void> deleteVechile(
+  DeleteVechile event,
+  Emitter<VechileState> emit,
+) async {
+  try {
+    final token = await AppUtils.getToken();
+    Response response = await apiRepo.deleteVechile(token, event.deleteId);
+    if (response.statusCode == 200) {
+      final responseBody = jsonDecode(response.body);
+      print(
+          "qqqqqqqqqqqqqqqqqqqqqeeeeeeeeeeeeeeeeeeeeeeeeeewwwwwwwwwwwwwwwwwwwwwwwww${responseBody}");
+      emit(
+        DeleteVechileDetailsSuccessState(
+          vechile: VechileResponse.fromJson(
+            responseBody["data"],
+          ),
+        ),
+      );
+    }
+  } catch (e) {
+    emit(VechileDetailsErrorState(message: e.toString()));
+    isVechileLoading = false;
   }
 }

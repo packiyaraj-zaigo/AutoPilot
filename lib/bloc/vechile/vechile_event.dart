@@ -51,7 +51,11 @@ class DropDownVechile extends VechileEvent {}
 
 class DeleteVechile extends VechileEvent {
   final String deleteId;
-  DeleteVechile({required this.deleteId});
+  final BuildContext context;
+  DeleteVechile({
+    required this.deleteId,
+    required this.context,
+  });
 }
 
 class EditVechileDetails extends VechileEvent {
