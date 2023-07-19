@@ -748,6 +748,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               readOnly: readOnly,
+              textCapitalization: TextCapitalization.sentences,
               controller: controller,
               inputFormatters: label == "Year"
                   ? [FilteringTextInputFormatter.digitsOnly]

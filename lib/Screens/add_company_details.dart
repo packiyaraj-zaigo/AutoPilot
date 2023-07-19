@@ -540,6 +540,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   : MediaQuery.of(context).size.width,
               child: TextField(
                 controller: controller,
+                textCapitalization: TextCapitalization.sentences,
                 inputFormatters: label == "Business Phone"
                     ? [PhoneInputFormatter()]
                     : label == "Number of Employees" ||
@@ -559,7 +560,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         label == "Shop Hourly Labor Rate" ||
                         label == "Tax Rate" ||
                         label == 'Zip'
-                    ? TextInputType.numberWithOptions(signed: true)
+                    ? TextInputType.number
                     : null,
                 maxLength: label == 'Business Phone'
                     ? 14

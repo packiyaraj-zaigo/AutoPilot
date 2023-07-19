@@ -7,6 +7,7 @@ import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
+import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
 import 'package:auto_pilot/Screens/notification_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
@@ -529,9 +530,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
-                  DummyScreen(
-                    name: "New Customer Screen",
-                  )),
+                  // DummyScreen(
+                  //   name: "New Customer Screen",
+                  // )),
+                  NewCustomerScreen()),
               bottomSheetTile(
                   "New Vehicle",
                   "assets/images/vehicle_icon.svg",

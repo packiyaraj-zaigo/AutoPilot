@@ -397,7 +397,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                   lastName: lastNameController.text.trim(),
                                   phone: phoneController.text
                                       .trim()
-                                      .replaceAll(RegExp(r'[^\w\s]+'), ''),
+                                      .replaceAll(RegExp(r'[^\w\s]+'), '')
+                                      .replaceAll(" ", ""),
                                   role: dropdownValue,
                                 ),
                               ),
@@ -413,7 +414,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                   lastName: lastNameController.text.trim(),
                                   phone: phoneController.text
                                       .trim()
-                                      .replaceAll(RegExp(r'[^\w\s]+'), ''),
+                                      .replaceAll(RegExp(r'[^\w\s]+'), '')
+                                      .replaceAll(" ", ""),
                                   role: dropdownValue,
                                 ),
                               ),
@@ -484,9 +486,10 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              keyboardType: label == 'Phone'
-                  ? TextInputType.numberWithOptions(signed: true)
-                  : null,
+              textCapitalization: label != "Email"
+                  ? TextCapitalization.sentences
+                  : TextCapitalization.none,
+              keyboardType: label == 'Phone' ? TextInputType.number : null,
               inputFormatters:
                   label == "Phone" ? [PhoneInputFormatter()] : null,
               maxLength: label == 'Phone'

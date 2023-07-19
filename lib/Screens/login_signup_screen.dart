@@ -515,9 +515,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                       //  FilteringTextInputFormatter.allow(RegExp("[0-9]"))
                     ]
                   : [],
-              keyboardType: label == 'Phone Number'
-                  ? TextInputType.numberWithOptions(signed: true)
-                  : null,
+              keyboardType:
+                  label == 'Phone Number' ? TextInputType.number : null,
               maxLength: label == 'Phone Number'
                   ? 14
                   : label == 'Password'
@@ -611,6 +610,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
             width: MediaQuery.of(context).size.width / 2.4,
             child: TextField(
               controller: controller,
+              textCapitalization: TextCapitalization.sentences,
               maxLength: 50,
               inputFormatters: label == 'First Name'
                   ? [
@@ -849,7 +849,8 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                   signUpEmailController.text,
                   phoneNumberController.text
                       .trim()
-                      .replaceAll(RegExp(r'[^\w\s]+'), ''),
+                      .replaceAll(RegExp(r'[^\w\s]+'), '')
+                      .replaceAll(" ", ""),
                   signUpPasswordController.text,
                   context);
             },

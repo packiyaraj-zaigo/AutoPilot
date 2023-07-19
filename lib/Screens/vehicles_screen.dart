@@ -138,9 +138,11 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                           onChanged: (value) {
                             _debouncer.run(() {
                               vechile.clear();
-                              BlocProvider.of<VechileBloc>(context)
+                              BlocProvider.of<VechileBloc>(
+                                      scaffoldKey.currentContext!)
                                   .currentPage = 1;
-                              BlocProvider.of<VechileBloc>(context)
+                              BlocProvider.of<VechileBloc>(
+                                      scaffoldKey.currentContext!)
                                   .add(GetAllVechile(query: value));
                             });
                           },

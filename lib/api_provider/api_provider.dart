@@ -246,7 +246,8 @@ class ApiProvider {
   Future<dynamic> getVechile(String token, int page, String query) async {
     try {
       final clientId = await AppUtils.getUserID();
-      String url = '${BASE_URL}api/vehicles?client_id=$clientId&orderby=id&sort=DESC';
+      String url =
+          '${BASE_URL}api/vehicles?client_id=$clientId&orderby=id&sort=DESC';
       if (page != 1) {
         url = '$url&page=$page';
       }
@@ -500,6 +501,8 @@ class ApiProvider {
     try {
       final response = http.post(Uri.parse('${BASE_URL}api/users'),
           headers: getHeader(token), body: json.encode(model.toJson()));
+
+      log(model.phone);
       return response;
     } catch (e) {
       print(e.toString() + 'Create employee error');
