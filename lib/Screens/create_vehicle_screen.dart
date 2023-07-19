@@ -147,9 +147,10 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
               } else if (state is AddVechileDetailsPageNationLoading) {
                 if (widget.navigation != null) {
                   log('here');
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => VehiclesScreen()));
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => VehiclesScreen()),
+                    (route) => false,
+                  );
                 } else {
                   Navigator.pop(context, vinController.text);
                 }
