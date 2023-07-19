@@ -45,19 +45,24 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   filterWorkflowOrders(String title, List<WorkflowModel> workflows) {
     if (!workflowOrderHeadings.contains(title)) {
       workflowOrderHeadings.add(title);
-      final tasks = workflows
-          .where((element) => element.bucketName?.title == title)
-          .toList();
+      final tasks =
+          workflows.where((element) => element.bucket?.title == title).toList();
       tasks.sort(
         (a, b) {
-          final aPos = a.bucketName?.position;
-          final bPos = b.bucketName?.position;
+          final aPos = a.bucket?.position;
+          final bPos = b.bucket?.position;
           return bPos!.compareTo(aPos!);
         },
       );
       workflowOrderList.add(boardWidget(tasks));
       workflowOrderModelsList.add(tasks);
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    boardViewController.state.dispose();
   }
 
   @override
@@ -72,8 +77,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               if (state is GetAllWorkflowSuccessState) {
                 for (int i = 0; i < state.workflows.length; i++) {
                   filterWorkflowOrders(
-                      state.workflows[i].bucketName?.title ?? '',
-                      state.workflows);
+                      state.workflows[i].bucket?.title ?? '', state.workflows);
                 }
               }
             },
@@ -125,7 +129,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                workflows[0].bucketName?.title ?? '',
+                workflows[0].bucket?.title ?? '',
                 style: const TextStyle(
                   color: AppColors.primaryColors,
                   fontWeight: FontWeight.w500,
@@ -149,11 +153,11 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                 workflowOrderModelsList[oldListIndex!][oldItemIndex!];
             workflowOrderModelsList[listIndex!].insert(itemIndex!, workflow);
             workflowOrderModelsList[oldListIndex].removeAt(oldItemIndex);
-            workflow.bucketName!.position = itemIndex + 1;
-            workflow.bucketName!.title = workflowOrderHeadings[listIndex];
+            workflow.bucket!.position = itemIndex + 1;
+            workflow.bucket!.title = workflowOrderHeadings[listIndex];
 
-            log(workflow.toJson().toString());
-            bloc.add(EditWorkflowPosition(workflow: workflow));
+            log(workflow.bucket!.toJson().toString());
+            bloc.add(EditWorkflowPosition(workflow: workflow.bucket!));
           },
           item: Column(
             children: [
@@ -167,7 +171,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   }
 
   Container workflowCard(WorkflowModel workflow) {
-    String str = workflow.bucketName!.color ?? '';
+    String str = workflow.bucket!.color ?? '';
     str = str.replaceAll('#', '0xFF');
     final color = int.parse(str);
 
@@ -251,13 +255,16 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     borderRadius: BorderRadius.circular(12)),
                 child: Center(
                   child: Text(
-                    workflow.bucketName?.color ?? '',
+                    workflow.bucket?.parentTitle ?? '',
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: str == '' ? AppColors.primaryColors : Color(color),
-                    ),
+                        fontWeight: FontWeight.w500,
+                        color:
+                            // str == '' ?
+                            AppColors.primaryColors
+                        // : Color(color),
+                        ),
                   ),
                 ))
           ],

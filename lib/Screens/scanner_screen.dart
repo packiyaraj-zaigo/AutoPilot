@@ -524,7 +524,7 @@ class _ScannerScreenState extends State<ScannerScreen>
                       ),
                     ),
                     Text(
-                      searchController.text,
+                      vehicle.vin ?? '',
                       style: const TextStyle(
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF333333),
@@ -609,7 +609,10 @@ class _ScannerScreenState extends State<ScannerScreen>
               String vehicleStatus = '';
               Color color = Colors.red;
               Icon icon = const Icon(Icons.check);
-              if (state is VinCodeNotInShopState) {
+              if (searchController.text.isEmpty) {
+                return const Center(
+                    child: Text('Please Enter A VIN Number To Check'));
+              } else if (state is VinCodeNotInShopState) {
                 vehicleStatus = "Vehicle Found But Not In Shop History";
                 color = Colors.red;
                 icon = Icon(Icons.info, size: 20, color: color);
@@ -703,7 +706,8 @@ class _ScannerScreenState extends State<ScannerScreen>
                       onTap: () async {
                         await Navigator.of(context)
                             .push(MaterialPageRoute(
-                          builder: (context) => CreateVehicleScreen(),
+                          builder: (context) =>
+                              CreateVehicleScreen(vin: searchController.text),
                         ))
                             .then((value) {
                           if (value != null) {
@@ -738,9 +742,6 @@ class _ScannerScreenState extends State<ScannerScreen>
               } else if (state is VinSearchLoadingState &&
                   !bloc.isEstimatePagenationLoading) {
                 return const Center(child: CupertinoActivityIndicator());
-              } else if (searchController.text.isEmpty) {
-                return const Center(
-                    child: Text('Please Enter A VIN Number To Check'));
               } else {
                 vehicleStatus = "Vehicle Found In Shop History";
 

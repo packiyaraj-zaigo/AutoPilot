@@ -4,6 +4,7 @@ import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
+import 'package:auto_pilot/Screens/create_workflow.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
@@ -144,11 +145,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   actions: [
                     IconButton(
                         onPressed: () {
-                          // Navigator.push(context, MaterialPageRoute(
-                          //   builder: (context) {
-                          //     return AddCompanyScreen();
-                          //   },
-                          // ));
+                          Navigator.push(context, MaterialPageRoute(
+                            builder: (context) {
+                              return CreateWorkflowScreen();
+                            },
+                          ));
                         },
                         icon: SvgPicture.asset(
                           "assets/images/message.svg",
@@ -545,11 +546,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                     name: "New Appointment Screen",
                   )),
               bottomSheetTile(
-                  "Scanner",
-                  "assets/images/scanner_icon.svg",
-                  DummyScreen(
-                    name: "Scanner Screen",
-                  )),
+                  "Scanner", "assets/images/scanner_icon.svg", ScannerScreen()),
               // ScannerScreen()),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),

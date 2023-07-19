@@ -11,7 +11,9 @@ class WorkflowInitial extends WorkflowState {}
 
 class GetAllWorkflowSuccessState extends WorkflowState {
   final List<WorkflowModel> workflows;
-  const GetAllWorkflowSuccessState({required this.workflows});
+  const GetAllWorkflowSuccessState({
+    required this.workflows,
+  });
 
   @override
   List<Object> get props => [workflows];
@@ -25,3 +27,12 @@ class GetAllWorkflowErrorState extends WorkflowState {
 class GetAllWorkflowLoadingState extends WorkflowState {
   const GetAllWorkflowLoadingState();
 }
+
+class CreateWorkflowLoadingState extends WorkflowState {}
+
+class CreateWorkflowErrorState extends WorkflowState {
+  final String message;
+  const CreateWorkflowErrorState({required this.message});
+}
+
+class CreateWorkflowSuccessState extends WorkflowState {}

@@ -10,6 +10,11 @@ abstract class WorkflowEvent extends Equatable {
 class GetAllWorkflows extends WorkflowEvent {}
 
 class EditWorkflowPosition extends WorkflowEvent {
-  final WorkflowModel workflow;
+  final WorkflowBucketModel workflow;
   const EditWorkflowPosition({required this.workflow});
+}
+
+class CreateWorkflow extends WorkflowEvent {
+  final Map<String, dynamic> json;
+  const CreateWorkflow({required this.json});
 }
