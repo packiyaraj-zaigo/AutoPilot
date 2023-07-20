@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
+import 'package:auto_pilot/Models/workflow_bucket_model.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -312,7 +313,7 @@ class ApiProvider {
       final clientId = AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/vehicles?client_id=$clientId");
       var request = http.MultipartRequest("POST", url)
-        ..headers['Authorization'] = "Bearer $token"
+        ..headers['Authorization'] = "Bearer $token  "
         ..fields['vehicle_type'] = type
         ..fields['vehicle_year'] = year
         ..fields['vehicle_make'] = make
@@ -968,13 +969,26 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getWorkflowBucket(String token, int page) async {
+    try {
+      // final clientId = await AppUtils.getUserID();
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets?page=$page');
+      final response = await http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Get workflow bucket error");
+    }
+  }
+
   Future<dynamic> editWorkflowPosition(
-      String token, WorkflowModel workflow) async {
+      String token, WorkflowBucketModel workflow) async {
     try {
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse('${BASE_URL}api/workflowbuckets/${workflow.id}');
       final response = await http.put(url,
           headers: getHeader(token), body: jsonEncode(workflow.toJson()));
+
+      inspect(response);
       return response;
     } catch (e) {
       log(e.toString() + "put workflows error");
@@ -1034,6 +1048,20 @@ class ApiProvider {
       return response;
     } catch (e) {
       print(e.toString() + 'Create employee error');
+    }
+  }
+
+  Future<dynamic> addWorkflowBucket(
+      String token, Map<String, dynamic> map) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets');
+      final clientId = await AppUtils.getUserID();
+      map['client_id'] = int.parse(clientId);
+      final response = await http.post(url,
+          headers: getHeader(token), body: json.encode(map));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Add workflow api error");
     }
   }
 }

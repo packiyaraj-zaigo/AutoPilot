@@ -1,6 +1,7 @@
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
+import 'package:auto_pilot/Models/workflow_bucket_model.dart';
 import 'package:flutter/material.dart';
 import '../Models/employee_creation_model.dart';
 import '../Models/workflow_model.dart';
@@ -256,7 +257,11 @@ class ApiRepository {
     return apiProvider.getAllWorkflows(token, page);
   }
 
-  Future editWorkflowPosition(String token, WorkflowModel workflow) {
+  Future getWorkflowBucket(String token, int page) {
+    return apiProvider.getWorkflowBucket(token, page);
+  }
+
+  Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
     return apiProvider.editWorkflowPosition(token, workflow);
   }
 
@@ -282,6 +287,10 @@ class ApiRepository {
 
   Future editEmployee(String token, EmployeeCreationModel employee, int id) {
     return apiProvider.editEmployee(token, employee, id);
+  }
+
+  Future addWorkflowBucket(String token, Map<String, dynamic> json) {
+    return apiProvider.addWorkflowBucket(token, json);
   }
 }
 
