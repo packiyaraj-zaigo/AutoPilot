@@ -43,9 +43,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
+        foregroundColor: AppColors.primaryColors,
+        // automaticallyImplyLeading: false,
         title: Text(
           'Autopilot',
           style: TextStyle(
@@ -64,8 +66,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
               },
               icon: Icon(
                 Icons.add,
-                size: AppStrings.fontSize20,
                 color: AppColors.primaryColors,
+                size: AppStrings.fontSize30,
               )),
           SizedBox(
             width: 20,
@@ -74,7 +76,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.menu,
-            color: Colors.black87,
+            color: AppColors.primaryColors,
           ),
           onPressed: () {
             scaffoldKey.currentState!.openDrawer();
