@@ -4,9 +4,11 @@ import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
-import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/customer_select_screen.dart';
+
 import 'package:auto_pilot/Screens/estimate_details_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
@@ -19,7 +21,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:image_picker/image_picker.dart';
 
 class CreateEstimateScreen extends StatefulWidget {
   const CreateEstimateScreen({super.key, this.vehicle, this.customer});
@@ -42,10 +43,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
 
   CustomerModel? customerModel;
   vm.VechileResponse? vehicleModel;
+  vm.Datum? selectedVehicleDetails;
 
-  final ImagePicker imagePicker = ImagePicker();
-  List<XFile>? imageFileList = [];
-  XFile? selectedImage;
+  // final ImagePicker imagePicker = ImagePicker();
+  // List<XFile>? imageFileList = [];
+  // XFile? selectedImage;
 
   final vehicleScrollController = ScrollController();
   final customerScrollController = ScrollController();
@@ -279,11 +281,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                 padding: const EdgeInsets.only(top: 32.0),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return EstimateDetailsScreen();
-                      },
-                    ));
+                    // Navigator.push(context, MaterialPageRoute(
+                    //   builder: (context) {
+                    //     return EstimateDetailsScreen();
+                    //   },
+                    // ));
                   },
                   child: Container(
                     height: 56,
@@ -467,7 +469,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   label == 'Date' || label == "Vehicle" || label == "Customer"
                       ? true
                       : false,
-              onTap: () {
+              onTap: () async {
                 if (label == 'Date') {
                   showCupertinoModalPopup(
                     context: context,
@@ -476,19 +478,43 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                     },
                   );
                 } else if (label == "Customer") {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return customerBottomSheet();
-                      },
-                      backgroundColor: Colors.transparent);
-                } else if (label == 'Vehicle') {
-                  showModalBottomSheet(
-                    context: context,
+                  // showModalBottomSheet(
+                  //     context: context,
+                  //     builder: (context) {
+                  //       return customerBottomSheet();
+                  //     },
+                  //     backgroundColor: Colors.transparent);
+
+                  Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) {
-                      return vehicleBottomSheet();
+                      return SelectCustomerScreen(
+                        navigation: "new",
+                      );
                     },
-                  );
+                  ));
+                } else if (label == 'Vehicle') {
+                  // showModalBottomSheet(
+                  //   context: context,
+                  //   isScrollControlled: true,
+                  //   useSafeArea: true,
+                  //   builder: (context) {
+                  //     return SelectVehiclesScreen();
+                  //   },
+                  // );
+                  await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return SelectVehiclesScreen(
+                        navigation: "new",
+                      );
+                    },
+                  )).then((value) {
+                    selectedVehicleDetails = value;
+                    print(selectedVehicleDetails);
+                    setState(() {
+                      vehicleController.text =
+                          "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
+                    });
+                  });
                 }
               },
               keyboardType:
@@ -1009,7 +1035,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.pop(context);
-                selectImages("camera");
+                //  selectImages("camera");
               },
               child: Row(
                 children: [
@@ -1028,7 +1054,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.pop(context);
-                selectImages("lib");
+                //   selectImages("lib");
               },
               child: Row(
                 children: [
@@ -1055,24 +1081,24 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
     );
   }
 
-  void selectImages(source) async {
-    if (source == "camera") {
-      selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
-      // if (imageFileList != null) {
-      setState(() {
-        imageFileList?.add(selectedImage!);
-      });
+  // void selectImages(source) async {
+  //   if (source == "camera") {
+  //     selectedImage = await imagePicker.pickImage(source: ImageSource.camera);
+  //     // if (imageFileList != null) {
+  //     setState(() {
+  //       imageFileList?.add(selectedImage!);
+  //     });
 
-      // }
-    } else {
-      final List<XFile> imageFile = await imagePicker.pickMultiImage();
-      //  if (imageFile.isNotEmpty) {
-      setState(() {
-        imageFileList?.addAll(imageFile);
-      });
+  //     // }
+  //   } else {
+  //     final List<XFile> imageFile = await imagePicker.pickMultiImage();
+  //     //  if (imageFile.isNotEmpty) {
+  //     setState(() {
+  //       imageFileList?.addAll(imageFile);
+  //     });
 
-      //  }
-    }
-    setState(() {});
-  }
+  //     //  }
+  //   }
+  //   setState(() {});
+  // }
 }

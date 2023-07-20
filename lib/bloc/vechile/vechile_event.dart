@@ -22,6 +22,7 @@ class CreateVechile extends VechileEvent {
 
 class AddVechile extends VechileEvent {
   final BuildContext context;
+  final String? navigation;
   final String email,
       year,
       model,
@@ -33,6 +34,7 @@ class AddVechile extends VechileEvent {
       type,
       make;
   AddVechile({
+    this.navigation,
     required this.context,
     required this.email,
     required this.year,

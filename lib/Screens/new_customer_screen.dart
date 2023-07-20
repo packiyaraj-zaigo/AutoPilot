@@ -873,7 +873,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         addressErrorStatus = false;
       });
     }
-    if (city.isEmpty) {
+    if (cityController.text.isEmpty) {
       setState(() {
         cityErrorStatus = true;
         cityErrorMsg = "City can't be empty";

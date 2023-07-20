@@ -84,7 +84,12 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
             globalVehicle.modelYear != '' ||
             globalVehicle.transmissionStyle != '' ||
             globalVehicle.vehicleType != '') {
-          emit(VinCodeNotInShopState(vehicle: globalVehicle));
+          if (event.vin.toLowerCase() ==
+              globalVehicle.vinGlobal?.toLowerCase()) {
+            emit(VinCodeNotInShopState(vehicle: globalVehicle));
+          } else {
+            emit(VehicleNotFoundState());
+          }
         } else {
           emit(VehicleNotFoundState());
         }
@@ -160,7 +165,7 @@ class ScannerBloc extends Bloc<ScannerEvent, ScannerState> {
             return;
           }
         } else {
-          throw 'No vehicles found';
+          throw 'No Vehicles Found';
         }
       }
     } catch (e) {
