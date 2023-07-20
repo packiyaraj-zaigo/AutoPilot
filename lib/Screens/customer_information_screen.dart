@@ -292,7 +292,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                                 height: 5,
                                               ),
                                               Text(
-                                                "${widget.customerData.email.toString()}",
+                                                widget.customerData.email
+                                                    .toString(),
                                                 style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w500,
@@ -354,7 +355,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         height: 5,
                                       ),
                                       Text(
-                                        "${widget.customerData.addressLine1.toString()}",
+                                        widget.customerData.addressLine1 == null
+                                            ? ''
+                                            : widget.customerData.addressLine1
+                                                .toString(),
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
@@ -396,7 +400,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         height: 5,
                                       ),
                                       Text(
-                                        "${widget.customerData.createdAt.toString()}",
+                                        widget.customerData.createdAt
+                                            .toString(),
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
@@ -417,7 +422,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         height: 5,
                                       ),
                                       Text(
-                                        "${widget.customerData.addressLine1.toString()}",
+                                        widget.customerData.addressLine1 == null
+                                            ? ''
+                                            : widget.customerData.addressLine1
+                                                .toString(),
                                         style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
@@ -499,7 +507,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                           height: 5,
                                         ),
                                         Text(
-                                          '${widget.customerData.notes}',
+                                          widget.customerData.notes == null
+                                              ? ''
+                                              : '${widget.customerData.notes}',
                                           style: AppUtils.summaryStyle(),
                                         ),
                                         const SizedBox(
@@ -542,7 +552,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                       height: 5,
                                     ),
                                     Text(
-                                      '${widget.customerData.notes}',
+                                      widget.customerData.notes == null
+                                          ? ''
+                                          : '${widget.customerData.notes}',
                                       style: AppUtils.summaryStyle(),
                                     ),
                                     const SizedBox(
