@@ -1,22 +1,39 @@
 import 'package:auto_pilot/Models/create_estimate_model.dart';
+import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
+import 'package:auto_pilot/Screens/customer_select_screen.dart';
+import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class EstimateDetailsScreen extends StatefulWidget {
-  const EstimateDetailsScreen({super.key, required this.estimateDetails});
+class EstimatePartialScreen extends StatefulWidget {
+  const EstimatePartialScreen({super.key, required this.estimateDetails});
   final CreateEstimateModel estimateDetails;
 
   @override
-  State<EstimateDetailsScreen> createState() => _EstimateDetailsScreenState();
+  State<EstimatePartialScreen> createState() => _EstimatePartialScreenState();
 }
 
-class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
+class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   bool isEstimateNotes = false;
   bool isAppointment = false;
   bool isInspectionPhotos = false;
   bool isService = false;
+
+  //Text Editing Controllers
+  final vehicleController = TextEditingController();
+  final customerController = TextEditingController();
+
+  //Text Field Error Status Variables
+  bool vehicleErrorStatus = false;
+  bool customerErrorStatus = false;
+
+  //Text Field Error Message Variables
+  String vehicleErrorMsg = "";
+  String customerErrorMsg = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +78,7 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
               const Padding(
                 padding: EdgeInsets.only(top: 8.0),
                 child: Text(
-                  'Confirm the details before submitting',
+                  'Follow the step to create an estimate.',
                   style: TextStyle(
                       color: AppColors.greyText,
                       fontSize: 14,
@@ -69,31 +86,42 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
                       fontWeight: FontWeight.w400),
                 ),
               ),
-              const Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 16.0),
                 child: Text(
-                  'Estimate #1234',
-                  style: TextStyle(
+                  'Estimate #${widget.estimateDetails.data.id}',
+                  style: const TextStyle(
                       color: AppColors.primaryTitleColor,
                       fontSize: 18,
                       fontWeight: FontWeight.w600),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    subTitleWidget("Customer Details"),
-                    const Icon(
-                      Icons.more_horiz,
-                      color: AppColors.primaryColors,
+              widget.estimateDetails.data.customer != null
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          subTitleWidget("Customer Details"),
+                          const Icon(
+                            Icons.more_horiz,
+                            color: AppColors.primaryColors,
+                          )
+                        ],
+                      ),
                     )
-                  ],
-                ),
-              ),
-              customerDetailsWidget(),
-              vehicleDetailsWidget(),
+                  : const SizedBox(),
+              widget.estimateDetails.data.customer != null
+                  ? customerDetailsWidget()
+                  : textBox("Select Existing", customerController, "Customer",
+                      customerErrorStatus),
+              widget.estimateDetails.data.vehicle != null
+                  ? vehicleDetailsWidget()
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: textBox("Select Exsisting", vehicleController,
+                          "Vehicle", vehicleErrorStatus),
+                    ),
               Padding(
                 padding: const EdgeInsets.only(top: 20.0),
                 child: Row(
@@ -277,11 +305,11 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
               )
             ],
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: Text(
-              "Anthony Miller",
-              style: TextStyle(
+              "${widget.estimateDetails.data.customer?.firstName ?? ""} ${widget.estimateDetails.data.customer?.lastName ?? ""}",
+              style: const TextStyle(
                   fontSize: 16,
                   color: AppColors.primaryTitleColor,
                   fontWeight: FontWeight.w400),
@@ -292,9 +320,9 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Anthonymiller@gmail.com",
-                  style: TextStyle(
+                Text(
+                  widget.estimateDetails.data.customer?.email ?? "",
+                  style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryTitleColor,
                       fontWeight: FontWeight.w400),
@@ -311,9 +339,9 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "(786) 000-0000",
-                  style: TextStyle(
+                Text(
+                  '(${widget.estimateDetails.data.customer?.phone?.substring(0, 3)}) ${widget.estimateDetails.data.customer?.phone?.substring(3, 6)} - ${widget.estimateDetails.data.customer?.phone?.substring(6)}',
+                  style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryTitleColor,
                       fontWeight: FontWeight.w400),
@@ -707,6 +735,194 @@ class _EstimateDetailsScreenState extends State<EstimateDetailsScreen> {
           )
         ],
       ),
+    );
+  }
+
+  //common text field
+
+  Widget textBox(String placeHolder, TextEditingController controller,
+      String label, bool errorStatus) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+            label == "Customer" || label == "Vehicle"
+                ? GestureDetector(
+                    onTap: () {
+                      if (label == "Customer") {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return NewCustomerScreen();
+                            },
+                            isScrollControlled: true,
+                            useSafeArea: true);
+                      } else if (label == "Vehicle") {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return CreateVehicleScreen();
+                            },
+                            isScrollControlled: true,
+                            useSafeArea: true);
+                      }
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: AppColors.primaryColors,
+                        ),
+                        Text(
+                          "Add new",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        )
+                      ],
+                    ),
+                  )
+                : const SizedBox()
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6.0),
+          child: SizedBox(
+            height: 56,
+            width: MediaQuery.of(context).size.width,
+            child: TextField(
+              controller: controller,
+              readOnly:
+                  label == 'Date' || label == "Vehicle" || label == "Customer"
+                      ? true
+                      : false,
+              onTap: () async {
+                if (label == 'Date') {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) {
+                      return datePicker("");
+                    },
+                  );
+                } else if (label == "Customer") {
+                  // showModalBottomSheet(
+                  //     context: context,
+                  //     builder: (context) {
+                  //       return customerBottomSheet();
+                  //     },
+                  //     backgroundColor: Colors.transparent);
+
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return SelectCustomerScreen(
+                        navigation: "partial",
+                        orderId: widget.estimateDetails.data.id.toString(),
+                      );
+                    },
+                  ));
+                } else if (label == 'Vehicle') {
+                  // showModalBottomSheet(
+                  //   context: context,
+                  //   isScrollControlled: true,
+                  //   useSafeArea: true,
+                  //   builder: (context) {
+                  //     return SelectVehiclesScreen();
+                  //   },
+                  // );
+                  await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return SelectVehiclesScreen(
+                        navigation: "partial",
+                        orderId: widget.estimateDetails.data.id.toString(),
+                      );
+                    },
+                  ));
+                }
+              },
+              keyboardType:
+                  label == 'Phone Number' ? TextInputType.number : null,
+              maxLength: label == 'Phone Number'
+                  ? 16
+                  : label == 'Password'
+                      ? 12
+                      : 50,
+              decoration: InputDecoration(
+                  hintText: placeHolder,
+                  counterText: "",
+                  suffixIcon: label == "Customer" || label == "Vehicle"
+                      ? const Icon(
+                          Icons.arrow_drop_down,
+                          color: AppColors.greyText,
+                        )
+                      : const SizedBox(),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? Color(0xffD80027)
+                              : Color(0xffC1C4CD))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? Color(0xffD80027)
+                              : Color(0xffC1C4CD))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? Color(0xffD80027)
+                              : Color(0xffC1C4CD)))),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget datePicker(String dateType) {
+    return CupertinoPopupSurface(
+      child: Container(
+          width: MediaQuery.of(context).size.width,
+          color: CupertinoColors.white,
+          height: MediaQuery.of(context).size.height * 0.3,
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  CupertinoButton(
+                      child: const Text("Done"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
+                ],
+              ),
+              //   CommonWidgets().commonDividerLine(context),
+              Flexible(
+                child: CupertinoDatePicker(
+                  initialDateTime: DateTime.now(),
+                  onDateTimeChanged: (DateTime newdate) {},
+                  use24hFormat: true,
+                  maximumDate: new DateTime(2030, 12, 30),
+                  minimumYear: 2009,
+                  maximumYear: 2030,
+                  minuteInterval: 1,
+                  mode: CupertinoDatePickerMode.date,
+                ),
+              ),
+            ],
+          )),
     );
   }
 }

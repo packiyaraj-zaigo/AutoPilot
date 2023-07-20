@@ -523,10 +523,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Estimate",
                   "assets/images/estimate_icon.svg",
-                  DummyScreen(
-                    name: "Create estimate screen",
-                  )),
-              //   CreateEstimateScreen()),
+                  // DummyScreen(
+                  //   name: "Create estimate screen",
+                  // )),
+                  CreateEstimateScreen()),
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
@@ -537,7 +537,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Vehicle",
                   "assets/images/vehicle_icon.svg",
-                  DummyScreen(
+                  const DummyScreen(
                     name: "Vehicle Screen",
                   )),
               bottomSheetTile(

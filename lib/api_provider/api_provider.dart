@@ -874,27 +874,83 @@ class ApiProvider {
     }
   }
 
+  // Future<dynamic> createNewEstimate(
+  //    String id,String which, dynamic token) async {
+  //   print("into provider");
+
+  //   Map bodymap = {
+  //     "customer_id": customerId,
+  //     "vehicle_id": vehicleId,
+  //     "estimation_name": "name",
+  //   };
+
+  //   var encodedBody = json.encode(bodymap);
+  //   log(encodedBody.toString());
+
+  //   try {
+  //     var url = Uri.parse("${BASE_URL}api/orders");
+
+  //     var response =
+  //         http.post(url, body: encodedBody, headers: getHeader(token));
+
+  //     inspect(response);
+  //     return response;
+  //   } catch (e) {
+  //     print(e.toString() + "provider error");
+  //   }
+  // }
+
   Future<dynamic> createNewEstimate(
-      int customerId, int vehicleId, dynamic token) async {
+      String id, String which, dynamic token) async {
     print("into provider");
 
-    Map bodymap = {
-      "customer_id": customerId,
-      "vehicle_id": vehicleId,
-      "estimation_name": "name",
-    };
-
-    var encodedBody = json.encode(bodymap);
-    log(encodedBody.toString());
-
+    //  LoadingFormModel? loadingFormModel;
     try {
+      final clientId = await AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/orders");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['client_id'] = clientId;
+      if (which == "vehicle") {
+        request.fields['vehicle_id'] = id;
+        request.fields['customer_id'] = "0";
+      } else {
+        request.fields['customer_id'] = id;
+      }
 
-      var response =
-          http.post(url, body: encodedBody, headers: getHeader(token));
-
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
       inspect(response);
-      return response;
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> editEstimate(
+      String id, String which, dynamic token, String orderId) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      final clientId = await AppUtils.getUserID();
+      var url = Uri.parse("${BASE_URL}api/orders/$orderId");
+      var request = http.MultipartRequest("PUT", url)
+        ..fields['client_id'] = clientId;
+      if (which == "vehicle") {
+        request.fields['vehicle_id'] = id;
+        // request.fields['customer_id'] = "0";
+      } else {
+        request.fields['customer_id'] = id;
+      }
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");
     }

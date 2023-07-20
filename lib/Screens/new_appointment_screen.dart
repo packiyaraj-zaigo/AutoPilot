@@ -570,7 +570,8 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                   ? () async {
                       final data =
                           await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const SelectCustomerScreen(),
+                        builder: (context) =>
+                            const SelectCustomerScreen(navigation: ""),
                       ));
                       if (data != null) {
                         customerController.text = (data.firstName ?? '') +
@@ -586,7 +587,8 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                       ? () async {
                           final data = await Navigator.of(context)
                               .push(MaterialPageRoute(
-                            builder: (context) => const SelectVehiclesScreen(),
+                            builder: (context) =>
+                                const SelectVehiclesScreen(navigation: ""),
                           ));
                           if (data != null) {
                             vehicleController.text = (data.vehicleYear ?? '') +

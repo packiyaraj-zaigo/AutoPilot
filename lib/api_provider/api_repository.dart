@@ -244,8 +244,12 @@ class ApiRepository {
         token, clientId, customerId, messageBody);
   }
 
-  Future createNewEstimate(int customerId, int vehicleId, dynamic token) {
-    return apiProvider.createNewEstimate(customerId, vehicleId, token);
+  Future createNewEstimate(String id, String which, dynamic token) {
+    return apiProvider.createNewEstimate(id, which, token);
+  }
+
+  Future editEstimate(String id, String which, dynamic token, String orderId) {
+    return apiProvider.editEstimate(id, which, token, orderId);
   }
 
   Future getAllWorkflows(String token, int page) {

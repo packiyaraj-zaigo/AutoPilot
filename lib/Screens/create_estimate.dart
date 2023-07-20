@@ -4,9 +4,11 @@ import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
-import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/customer_select_screen.dart';
+
 import 'package:auto_pilot/Screens/estimate_details_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
@@ -41,6 +43,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
 
   CustomerModel? customerModel;
   vm.VechileResponse? vehicleModel;
+  vm.Datum? selectedVehicleDetails;
 
   // final ImagePicker imagePicker = ImagePicker();
   // List<XFile>? imageFileList = [];
@@ -278,11 +281,11 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                 padding: const EdgeInsets.only(top: 32.0),
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return EstimateDetailsScreen();
-                      },
-                    ));
+                    // Navigator.push(context, MaterialPageRoute(
+                    //   builder: (context) {
+                    //     return EstimateDetailsScreen();
+                    //   },
+                    // ));
                   },
                   child: Container(
                     height: 56,
@@ -466,7 +469,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   label == 'Date' || label == "Vehicle" || label == "Customer"
                       ? true
                       : false,
-              onTap: () {
+              onTap: () async {
                 if (label == 'Date') {
                   showCupertinoModalPopup(
                     context: context,
@@ -475,19 +478,43 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                     },
                   );
                 } else if (label == "Customer") {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) {
-                        return customerBottomSheet();
-                      },
-                      backgroundColor: Colors.transparent);
-                } else if (label == 'Vehicle') {
-                  showModalBottomSheet(
-                    context: context,
+                  // showModalBottomSheet(
+                  //     context: context,
+                  //     builder: (context) {
+                  //       return customerBottomSheet();
+                  //     },
+                  //     backgroundColor: Colors.transparent);
+
+                  Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) {
-                      return vehicleBottomSheet();
+                      return SelectCustomerScreen(
+                        navigation: "new",
+                      );
                     },
-                  );
+                  ));
+                } else if (label == 'Vehicle') {
+                  // showModalBottomSheet(
+                  //   context: context,
+                  //   isScrollControlled: true,
+                  //   useSafeArea: true,
+                  //   builder: (context) {
+                  //     return SelectVehiclesScreen();
+                  //   },
+                  // );
+                  await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) {
+                      return SelectVehiclesScreen(
+                        navigation: "new",
+                      );
+                    },
+                  )).then((value) {
+                    selectedVehicleDetails = value;
+                    print(selectedVehicleDetails);
+                    setState(() {
+                      vehicleController.text =
+                          "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
+                    });
+                  });
                 }
               },
               keyboardType:

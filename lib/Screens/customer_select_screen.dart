@@ -1,5 +1,9 @@
 import 'dart:async';
 
+import 'package:auto_pilot/Screens/estimate_details_screen.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
+import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_strings.dart';
 import 'package:flutter/cupertino.dart';
@@ -14,7 +18,10 @@ import 'customer_information_screen.dart';
 import 'new_customer_screen.dart';
 
 class SelectCustomerScreen extends StatefulWidget {
-  const SelectCustomerScreen({super.key});
+  const SelectCustomerScreen(
+      {super.key, required this.navigation, this.orderId});
+  final String navigation;
+  final String? orderId;
 
   @override
   State<SelectCustomerScreen> createState() => _SelectCustomerScreenState();
@@ -119,7 +126,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                           ),
                         ],
                       ),
-                      placeholder: 'Search Customer...',
+                      placeholder: 'Search Customer',
                       maxLines: 1,
                       placeholderStyle: const TextStyle(
                         color: Color(0xFF7F808C),
@@ -197,7 +204,9 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                                             ),
                                             child: InkWell(
                                               onTap: () {
-                                                Navigator.of(context).pop(item);
+                                                //  Navigator.of(context).pop(item);
+                                                //open dialog
+                                                showDialog(context, "", item);
                                               },
                                               child: ListTile(
                                                 title: Text(item.firstName),
@@ -239,6 +248,60 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future showDialog(BuildContext context, message, Datum item) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is CreateEstimateState) {
+              Navigator.pop(context);
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                  );
+                },
+              ));
+            } else if (state is EditEstimateState) {
+              Navigator.pop(context, state.createEstimateModel);
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Create Estimate?"),
+                content: Text(
+                    "Do you want to create an Estimate with this Customer?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        if (widget.navigation == "new") {
+                          context.read<EstimateBloc>().add(CreateEstimateEvent(
+                              id: item.id.toString(), which: "customer"));
+                        } else {
+                          context.read<EstimateBloc>().add(EditEstimateEvent(
+                              id: item.id.toString(),
+                              orderId: widget.orderId ?? "",
+                              which: "customer"));
+                        }
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
