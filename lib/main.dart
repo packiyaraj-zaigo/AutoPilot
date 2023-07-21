@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'AutoPilot',
         initialRoute: initScreen != "" && initScreen != null
             ? addCompany == true
                 ? "/home"

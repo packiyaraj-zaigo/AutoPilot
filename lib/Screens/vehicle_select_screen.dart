@@ -18,10 +18,12 @@ import '../utils/app_utils.dart';
 import 'app_drawer.dart';
 
 class SelectVehiclesScreen extends StatefulWidget {
-  const SelectVehiclesScreen({Key? key, required this.navigation, this.orderId})
+  const SelectVehiclesScreen(
+      {Key? key, required this.navigation, this.orderId, this.customerId})
       : super(key: key);
   final String navigation;
   final String? orderId;
+  final String? customerId;
 
   @override
   State<SelectVehiclesScreen> createState() => _SelectVehiclesScreenState();
@@ -373,21 +375,29 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
               return CupertinoAlertDialog(
-                title: const Text("Create Estimate?"),
-                content: Text(
-                    "Do you want to create an Estimate with this vehicle?"),
+                title: widget.navigation == "new"
+                    ? const Text("Create Estimate?")
+                    : const Text("Update Estimate?"),
+                content: widget.navigation == "new"
+                    ? const Text(
+                        "Do you want to create an Estimate with this vehicle?")
+                    : const Text(
+                        "Do you want to Add this Vehicle to Estimate?"),
                 actions: <Widget>[
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
+                        print("create");
                         if (widget.navigation == "new") {
                           context.read<EstimateBloc>().add(CreateEstimateEvent(
                               id: item.id.toString(), which: "vehicle"));
                         } else {
+                          print('edit');
                           context.read<EstimateBloc>().add(EditEstimateEvent(
                               id: item.id.toString(),
                               which: "vehicle",
-                              orderId: widget.orderId ?? ""));
+                              orderId: widget.orderId ?? "",
+                              customerId: widget.customerId.toString()));
                         }
                       }),
                   CupertinoDialogAction(

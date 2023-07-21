@@ -7,6 +7,7 @@ import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
+import 'package:auto_pilot/Screens/new_appointment_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
 import 'package:auto_pilot/Screens/notification_screen.dart';
@@ -52,11 +53,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       DummyScreen(name: "Work flow Screen"),
       DummyScreen(name: "Calendar Screen"),
       //  CalendarScreen(),
-      // EstimateScreen(
-      //   tabController: estimateTabController,
-      // )
+      EstimateScreen(
+        tabController: estimateTabController,
+      )
 
-      DummyScreen(name: "Estimate screen")
+      //  DummyScreen(name: "Estimate screen")
     ];
     // TODO: implement initState
     super.initState();
@@ -546,6 +547,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   DummyScreen(
                     name: "New Appointment Screen",
                   )),
+              //  CreateAppointmentScreen()),
               bottomSheetTile(
                   "Scanner",
                   "assets/images/scanner_icon.svg",

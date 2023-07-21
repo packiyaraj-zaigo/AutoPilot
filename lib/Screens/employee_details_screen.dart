@@ -166,13 +166,21 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 5),
-                                Text(
-                                  '(${widget.employee.phone!.substring(0, 3)}) ${widget.employee.phone!.substring(3, 6)} - ${widget.employee.phone!.substring(6)}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
+                                widget.employee.phone!.length > 6
+                                    ? Text(
+                                        '(${widget.employee.phone!.substring(0, 3)}) ${widget.employee.phone!.substring(3, 6)} - ${widget.employee.phone!.substring(6)}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      )
+                                    : Text(
+                                        '(${widget.employee.phone!.substring(0, 3)}) ${widget.employee.phone!.substring(3, 6)}}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
                               ],
                             ),
                             Row(

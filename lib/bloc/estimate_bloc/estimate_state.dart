@@ -40,3 +40,14 @@ class EditEstimateState extends EstimateState {
   final CreateEstimateModel createEstimateModel;
   EditEstimateState({required this.createEstimateModel});
 }
+
+class AddEstimateNoteState extends EstimateState {}
+
+class AddEstimateNoteErrorState extends EstimateState {}
+
+class CreateAppointmentEstimateState extends EstimateState {}
+
+class CreateAppointmentEstimateErrorState extends EstimateState {
+  final String errorMessage;
+  CreateAppointmentEstimateErrorState({required this.errorMessage});
+}

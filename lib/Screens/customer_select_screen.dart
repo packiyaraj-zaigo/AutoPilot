@@ -292,7 +292,8 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                           context.read<EstimateBloc>().add(EditEstimateEvent(
                               id: item.id.toString(),
                               orderId: widget.orderId ?? "",
-                              which: "customer"));
+                              which: "customer",
+                              customerId: item.id.toString()));
                         }
                       }),
                   CupertinoDialogAction(
