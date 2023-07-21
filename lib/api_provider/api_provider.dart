@@ -360,10 +360,9 @@ class ApiProvider {
 
   Future<dynamic> customerLoad(String token, int page, String query) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
+      final clientId = await AppUtils.getUserID();
       var url = Uri.parse(
-          '${BASE_URL}api/customers?client_id=${prefs.getString(AppConstants.USER_ID)}&page=$page&first_name=$query');
+          '${BASE_URL}api/customers?client_id=$clientId&page=$page&first_name=$query&orderby=id&sort=DESC');
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -389,11 +388,9 @@ class ApiProvider {
     stateId,
   ) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      var url = Uri.parse(
-          '${BASE_URL}api/customers?client_id=${prefs.getString(AppConstants.USER_ID)}');
+      final clientId = await AppUtils.getUserID();
+      var url = Uri.parse('${BASE_URL}api/customers?client_id=$clientId');
       print('hjjjjjjjjjjjjjjjj${token}');
-      print('xxxxxxxxxxxxxxx${prefs.getString(AppConstants.USER_ID)}');
 
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token"
