@@ -4,6 +4,7 @@ import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
+import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
@@ -53,11 +54,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       DummyScreen(name: "Work flow Screen"),
       DummyScreen(name: "Calendar Screen"),
       //  CalendarScreen(),
-      EstimateScreen(
-        tabController: estimateTabController,
-      )
+      // EstimateScreen(
+      //   tabController: estimateTabController,
+      // )
 
-      //  DummyScreen(name: "Estimate screen")
+      DummyScreen(name: "Estimate screen")
     ];
     // TODO: implement initState
     super.initState();
@@ -524,23 +525,24 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Estimate",
                   "assets/images/estimate_icon.svg",
-                  // DummyScreen(
-                  //   name: "Create estimate screen",
-                  // )),
-                  CreateEstimateScreen()),
+                  DummyScreen(
+                    name: "Create estimate screen",
+                  )),
+              //  CreateEstimateScreen()),
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
-                  // DummyScreen(
-                  //   name: "New Customer Screen",
-                  // )),
-                  NewCustomerScreen()),
+                  DummyScreen(
+                    name: "New Customer Screen",
+                  )),
+              //  NewCustomerScreen()),
               bottomSheetTile(
                   "New Vehicle",
                   "assets/images/vehicle_icon.svg",
-                  const DummyScreen(
-                    name: "Vehicle Screen",
-                  )),
+                  // const DummyScreen(
+                  //   name: "Vehicle Screen",
+                  // )),
+                  CreateVehicleScreen()),
               bottomSheetTile(
                   "New Appointment",
                   "assets/images/appointment_icon.svg",
