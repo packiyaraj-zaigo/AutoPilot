@@ -329,10 +329,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                                 lastNameController.text,
                                 emailController.text,
                                 phoneNumberController.text,
-                                provinceController.text,
                                 customerNotesController.text,
-                                cityController.text,
                                 addressController.text,
+                                cityController.text,
+                                provinceController.text,
                                 zipCodeController.text,
                                 context);
                           });
@@ -404,7 +404,9 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             label == 'First Name' ||
                     label == 'Last Name' ||
                     label == 'Email' ||
-                    label == 'Phone'
+                    label == 'Phone' ||
+                    label == 'Address' ||
+                    label == 'City'
                 ? const Text(
                     " *",
                     style: TextStyle(
@@ -423,9 +425,19 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           child: SizedBox(
             height: 56,
             width: MediaQuery.of(context).size.width,
-            child: TextField(
+            child: TextFormField(
+              textCapitalization: TextCapitalization.sentences,
               controller: controller,
-              maxLength: label == "Phone" ? 14 : 25,
+              maxLength: label == "Phone"
+                  ? 14
+                  : label == "Customer Notes" || label == "Address"
+                      ? 50
+                      : 25,
+              keyboardType: label == "Phone"
+                  ? TextInputType.phone
+                  : label == "Email"
+                      ? TextInputType.emailAddress
+                      : TextInputType.text,
               inputFormatters: label == "Phone" ? [PhoneInputFormatter()] : [],
               decoration: InputDecoration(
                   hintText: placeHolder,
@@ -471,6 +483,13 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
+            Text(
+              "*",
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xffD80027)),
+            ),
           ],
         ),
         Padding(
@@ -480,7 +499,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             width: MediaQuery.of(context).size.width / 2.4,
             child: TextField(
               controller: controller,
-              maxLength: 50,
+              maxLength: 5,
+              keyboardType: TextInputType.phone,
               inputFormatters: [
                 FilteringTextInputFormatter.deny(RegExp(r'\s')),
               ],
@@ -786,14 +806,14 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       String email,
       String phoneNumber,
       String customerNotes,
-      String city,
       String address,
+      String city,
       String state,
       String zipCode,
       BuildContext context) {
-    if (firstName.isEmpty) {
+    if (firstName.trim().isEmpty) {
       setState(() {
-        firstNameErrorMsg = 'First name cant be empty';
+        firstNameErrorMsg = "First name can't be empty";
         firstNameErrorStatus = true;
       });
     } else {
@@ -801,9 +821,9 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         firstNameErrorStatus = false;
       });
     }
-    if (lastName.isEmpty) {
+    if (lastName.trim().isEmpty) {
       setState(() {
-        lastNameErrorMsg = 'Last name cant be empty';
+        lastNameErrorMsg = "Last name can't be empty";
         lastNameErrorStatus = true;
       });
     } else {
@@ -811,16 +831,16 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         lastNameErrorStatus = false;
       });
     }
-    if (email.isEmpty) {
+    if (email.trim().isEmpty) {
       setState(() {
-        emailErrorMsg = 'Email cant be empty';
+        emailErrorMsg = "Email can't be empty";
         emailErrorStatus = true;
       });
     } else if (!RegExp(
             r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
         .hasMatch(email)) {
       setState(() {
-        emailErrorMsg = "The email must be a valid email address.";
+        emailErrorMsg = "Enter a valid email address";
         emailErrorStatus = true;
       });
     } else {
@@ -830,7 +850,12 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     }
     if (phoneNumber.isEmpty) {
       setState(() {
-        phoneErrorMsg = 'PhoneNumber cant be empty';
+        phoneErrorMsg = "Phone number can't be empty";
+        phoneNumberErrorStatus = true;
+      });
+    } else if (phoneNumber.length < 9) {
+      setState(() {
+        phoneErrorMsg = "Enter a valid phone number";
         phoneNumberErrorStatus = true;
       });
     } else {
@@ -838,32 +863,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         phoneNumberErrorStatus = false;
       });
     }
-    if (state.isEmpty) {
-      stateErrorMsg = 'State cant be empty';
-      stateErrorStatus = true;
-    } else {
-      setState(() {
-        stateErrorStatus = false;
-      });
-    }
-    if (zipCode.isEmpty) {
-      setState(() {
-        zipCodeErrorStatus = true;
-        zipCodeErrorMsg = "Zipcode can't be empty";
-      });
-    } else {
-      if (zipCode.length < 2) {
-        setState(() {
-          zipCodeErrorStatus = true;
-          zipCodeErrorMsg = "Please enter a valid zipcode";
-        });
-      } else {
-        setState(() {
-          zipCodeErrorStatus = false;
-        });
-      }
-    }
-    if (address.isEmpty) {
+    if (address.trim().isEmpty) {
       setState(() {
         addressErrorStatus = true;
         addressErrorMsg = "Address can't be empty";
@@ -873,14 +873,42 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         addressErrorStatus = false;
       });
     }
-    if (cityController.text.isEmpty) {
+    if (city.trim().isEmpty) {
       setState(() {
         cityErrorStatus = true;
         cityErrorMsg = "City can't be empty";
       });
+    } else if (city.length < 2) {
+      setState(() {
+        cityErrorStatus = true;
+        cityErrorMsg = "City must be at least 2 characters.";
+      });
     } else {
       setState(() {
         cityErrorStatus = false;
+      });
+    }
+    if (state.trim().isEmpty) {
+      stateErrorMsg = "State can't be empty";
+      stateErrorStatus = true;
+    } else {
+      setState(() {
+        stateErrorStatus = false;
+      });
+    }
+    if (zipCode.trim().isEmpty) {
+      setState(() {
+        zipCodeErrorStatus = true;
+        zipCodeErrorMsg = "Zipcode can't be empty";
+      });
+    } else if (zipCode.length < 2) {
+      setState(() {
+        zipCodeErrorStatus = true;
+        zipCodeErrorMsg = "Please enter a valid zipcode";
+      });
+    } else {
+      setState(() {
+        zipCodeErrorStatus = false;
       });
     }
 

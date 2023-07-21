@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../Models/customer_model.dart';
 import '../api_provider/api_repository.dart';
@@ -42,9 +43,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
+        foregroundColor: AppColors.primaryColors,
+        // automaticallyImplyLeading: false,
         title: Text(
           'Autopilot',
           style: TextStyle(
@@ -63,8 +66,8 @@ class _CustomersScreenState extends State<CustomersScreen> {
               },
               icon: Icon(
                 Icons.add,
-                size: AppStrings.fontSize20,
                 color: AppColors.primaryColors,
+                size: AppStrings.fontSize30,
               )),
           SizedBox(
             width: 20,
@@ -73,7 +76,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
         leading: IconButton(
           icon: const Icon(
             Icons.menu,
-            color: Colors.black87,
+            color: AppColors.primaryColors,
           ),
           onPressed: () {
             scaffoldKey.currentState!.openDrawer();
@@ -109,8 +112,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                       ],
                     ),
                     height: 50,
-                    child: CupertinoTextField(
-                      textAlignVertical: TextAlignVertical.bottom,
+                    child: CupertinoSearchTextField(
                       padding:
                           const EdgeInsets.only(top: 14, bottom: 14, left: 16),
                       onChanged: (value) {
@@ -120,20 +122,13 @@ class _CustomersScreenState extends State<CustomersScreen> {
                           bloc.add(customerDetails(query: value));
                         });
                       },
-                      prefix: const Row(
-                        children: [
-                          SizedBox(width: 24),
-                          Icon(
-                            CupertinoIcons.search,
-                            color: Color(0xFF7F808C),
-                            size: 20,
-                          ),
-                        ],
-                      ),
                       placeholder: 'Search Customer',
-                      maxLines: 1,
-                      placeholderStyle: const TextStyle(
-                        color: Color(0xFF7F808C),
+                      prefixIcon: const Padding(
+                        padding: EdgeInsets.only(left: 24, right: 16),
+                        child: Icon(
+                          CupertinoIcons.search,
+                          color: AppColors.primaryTextColors,
+                        ),
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -143,7 +138,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
               Expanded(
                 child: BlocListener<CustomerBloc, CustomerState>(
                   listener: (context, state) {
@@ -161,7 +156,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         return customerList.isEmpty
                             ? const Center(
                                 child: Text(
-                                'No user found',
+                                'No customer found',
                                 style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -226,19 +221,59 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                                   mainAxisSize:
                                                       MainAxisSize.min,
                                                   children: [
-                                                    SvgPicture.asset(
-                                                      "assets/images/sms.svg",
-                                                      color: AppColors
-                                                          .primaryColors,
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        final Uri smsLaunchUri =
+                                                            Uri(
+                                                          scheme: 'sms',
+                                                          path: item.phone,
+                                                          queryParameters: <String,
+                                                              String>{
+                                                            'body': Uri
+                                                                .encodeComponent(
+                                                                    ' '),
+                                                          },
+                                                        );
+                                                        launchUrl(smsLaunchUri);
+                                                      },
+                                                      icon: SizedBox(
+                                                        height: 27,
+                                                        width: 18,
+                                                        child: SvgPicture.asset(
+                                                          'assets/images/sms_icons.svg',
+                                                          height: 27,
+                                                          color: AppColors
+                                                              .primaryColors,
+                                                        ),
+                                                      ),
                                                     ),
                                                     SizedBox(
-                                                      width: 28,
+                                                      width: 15,
                                                     ),
-                                                    Icon(
-                                                      CupertinoIcons.phone,
-                                                      color: AppColors
-                                                          .primaryColors,
-                                                    )
+                                                    IconButton(
+                                                      onPressed: () {
+                                                        final Uri
+                                                            emailLaunchUri =
+                                                            Uri(
+                                                          scheme: 'tel',
+                                                          path:
+                                                              item.phone ?? '',
+                                                        );
+
+                                                        launchUrl(
+                                                            emailLaunchUri);
+                                                      },
+                                                      icon: SizedBox(
+                                                        height: 27,
+                                                        width: 18,
+                                                        child: SvgPicture.asset(
+                                                          'assets/images/phone_icon.svg',
+                                                          height: 27,
+                                                          color: AppColors
+                                                              .primaryColors,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ],
                                                 ),
                                               ),
