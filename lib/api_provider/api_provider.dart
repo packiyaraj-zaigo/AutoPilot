@@ -929,22 +929,61 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> editEstimate(
-      String id, String which, dynamic token, String orderId) async {
+  Future<dynamic> editEstimate(String id, String which, dynamic token,
+      String orderId, String customerId) async {
     print("into provider");
+    print(customerId + "cusstomerrr");
 
     //  LoadingFormModel? loadingFormModel;
     try {
       final clientId = await AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/orders/$orderId");
-      var request = http.MultipartRequest("PUT", url)
-        ..fields['client_id'] = clientId;
-      if (which == "vehicle") {
-        request.fields['vehicle_id'] = id;
-        // request.fields['customer_id'] = "0";
-      } else {
-        request.fields['customer_id'] = id;
-      }
+      Object customerBody = {"client_id": clientId, "customer_id": id};
+
+      Object vehicleBody = {
+        "client_id": clientId,
+        "customer_id": customerId,
+        "vehicle_id": id
+      };
+      // var request = http.MultipartRequest("PUT", url)
+      //   ..fields['client_id'] = clientId;
+      // if (which == "vehicle") {
+      //   request.fields['vehicle_id'] = id;
+
+      //   request.fields['customer_id'] = customerId;
+      // } else {
+      //   request.fields['customer_id'] = id;
+      // }
+
+      // request.headers.addAll(getHeader(token));
+      // var response = await request.send();
+      // inspect(response);
+      // print(response.statusCode.toString() + "provider status code");
+      // print(response.toString() + "provider response");
+      // return http.Response.fromStream(response);
+
+      Response response = await http.put(url,
+          body: which == "vehicle"
+              ? json.encode(vehicleBody)
+              : json.encode(customerBody),
+          headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> addEstimateNote(
+      String orderId, String comment, dynamic token) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/work_order_notes");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['order_id'] = orderId
+        ..fields['comments'] = comment;
 
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -1024,6 +1063,37 @@ class ApiProvider {
         headers: getHeader(token),
         body: appointmentCreateModelToJson(appointment),
       );
+      return response;
+    } catch (e) {
+      log(e.toString() + " create appointment api error");
+    }
+  }
+
+  Future<dynamic> createAppointmentEstimate(
+    dynamic token,
+    String orderId,
+    String customerId,
+    String vehicleId,
+    String startTime,
+    String endTime,
+    String notes,
+  ) async {
+    try {
+      final body = {
+        "appointment_title": orderId,
+        "customer_id": customerId,
+        "vehicle_id": vehicleId,
+        "notes": notes,
+        "start_on": startTime,
+        "end_on": endTime
+      };
+      final url = Uri.parse('${BASE_URL}api/appointments');
+      final response = await http.post(
+        url,
+        headers: getHeader(token),
+        body: json.encode(body),
+      );
+      inspect(response);
       return response;
     } catch (e) {
       log(e.toString() + " create appointment api error");

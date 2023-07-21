@@ -249,8 +249,25 @@ class ApiRepository {
     return apiProvider.createNewEstimate(id, which, token);
   }
 
-  Future editEstimate(String id, String which, dynamic token, String orderId) {
-    return apiProvider.editEstimate(id, which, token, orderId);
+  Future createAppointmentEstimate(
+      dynamic token,
+      String orderId,
+      String customerId,
+      String vehicleId,
+      String startTime,
+      String endTime,
+      String note) {
+    return apiProvider.createAppointmentEstimate(
+        token, orderId, customerId, vehicleId, startTime, endTime, note);
+  }
+
+  Future editEstimate(String id, String which, dynamic token, String orderId,
+      String customerId) {
+    return apiProvider.editEstimate(id, which, token, orderId, customerId);
+  }
+
+  Future addEstimateNote(String orderId, String comment, dynamic token) {
+    return apiProvider.addEstimateNote(orderId, comment, token);
   }
 
   Future getAllWorkflows(String token, int page) {
