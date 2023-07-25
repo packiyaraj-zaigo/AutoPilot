@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/canned_service_create.dart';
+import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
@@ -9,9 +11,11 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class AddServiceScreen extends StatefulWidget {
   const AddServiceScreen({super.key});
@@ -30,7 +34,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   String rateError = '';
   final TextEditingController taxController = TextEditingController();
   String taxError = '';
-  final TextEditingController taxRateController = TextEditingController();
+  String serviceId = '';
+
+  List<CannedServiceAddModel> material = [];
+  List<CannedServiceAddModel> part = [];
+  List<CannedServiceAddModel> labor = [];
+  CannedServiceCreateModel? service;
+  String subTotal = '0.0';
 
   //Add material popup controllers
   final addMaterialNameController = TextEditingController();
@@ -41,13 +51,44 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final addMaterialBatchController = TextEditingController();
 
   //Add material errorstatus and error message variables
-  bool addMaterailNameErrorStatus = false;
-  bool addMaterialDescriptionErrorStatus = false;
-  bool addMaterialPriceErrorStatus = false;
-  bool addMaterialCostErrorStatus = false;
-  bool addMaterialDiscountErrorStatus = false;
-  bool addMaterailBatchErrorStatus = false;
-  bool addMaterialPricingErrorStatus = false;
+  String adddMaterialNameErrorStatus = '';
+  String addMaterialDescriptionErrorStatus = '';
+  String addMaterialPriceErrorStatus = '';
+  String addMaterialCostErrorStatus = '';
+  String addMaterialDiscountErrorStatus = '';
+  String adddMaterialBatchErrorStatus = '';
+  String addMaterialPricingErrorStatus = '';
+
+  //Add part popup controllers
+  final addPartNameController = TextEditingController();
+  final addPartDescriptionController = TextEditingController();
+  final addPartPriceController = TextEditingController();
+  final addPartCostController = TextEditingController();
+  final addPartDiscountController = TextEditingController();
+  final addPartPartNumberController = TextEditingController();
+
+  //Add part errorstatus and error message variables
+  String addPartNameErrorStatus = '';
+  String addPartDescriptionErrorStatus = '';
+  String addPartPriceErrorStatus = '';
+  String addPartCostErrorStatus = '';
+  String addPartDiscountErrorStatus = '';
+  String adddPartPartNumberErrorStatus = '';
+  String addPartPricingErrorStatus = '';
+
+  //Add Labor popup controllers
+  final addLaborNameController = TextEditingController();
+  final addLaborDescriptionController = TextEditingController();
+  final addLaborCostController = TextEditingController();
+  final addLaborDiscountController = TextEditingController();
+  final addLaborHoursController = TextEditingController();
+
+  //Add Labor errorstatus and error message variables
+  String addLaborNameErrorStatus = '';
+  String addLaborDescriptionErrorStatus = '';
+  String addLaborCostErrorStatus = '';
+  String addLaborDiscountErrorStatus = '';
+  String addLaborHoursErrorStatus = '';
 
   dynamic _currentPricingModelSelectedValue;
   List<String> pricingModelList = ['per Sqrt', 'per feet'];
@@ -56,9 +97,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   var dropdownValue;
   String categoryError = '';
   List<Datum> technicianData = [];
-
-  bool rateErrorStatus = false;
-  bool taxErrorStatus = false;
 
   CountryCode? selectedCountry;
   final countryPicker = const FlCountryCodePicker();
@@ -103,7 +141,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
           child: BlocProvider(
-            create: (context) => ServiceBloc()..add(GetTechnicianEvent()),
+            create: (context) => ServiceBloc(),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
                 if (state is GetTechnicianState) {
@@ -119,93 +157,66 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       const SizedBox(height: 16),
                       textBox('Enter Service Name', serviceNameController,
                           'Service Name', serviceNameError.isNotEmpty, context),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Visibility(
-                            visible: serviceNameError.isNotEmpty,
-                            child: Text(
-                              serviceNameError,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(
-                                  0xffD80027,
-                                ),
-                              ),
-                            )),
-                      ),
+                      errorWidget(error: serviceNameError),
                       const SizedBox(height: 16),
                       textBox('Enter Notes', laborDescriptionController,
                           'Notes', laborDescriptionError.isNotEmpty, context),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Visibility(
-                            visible: laborDescriptionError.isNotEmpty,
-                            child: Text(
-                              laborDescriptionError,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(
-                                  0xffD80027,
-                                ),
-                              ),
-                            )),
-                      ),
+                      errorWidget(error: laborDescriptionError),
+
                       const SizedBox(height: 16),
-                      const Text(
-                        "Technician",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xff6A7187),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Container(
-                        width: double.infinity,
-                        height: 56,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xffC1C4CD))),
-                        child: DropdownButton<Datum>(
-                          padding: const EdgeInsets.only(
-                              top: 2, left: 16, right: 16),
-                          isExpanded: true,
-                          hint: const Text(
-                            "Select",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: AppColors.greyText),
-                          ),
-                          value: dropdownValue,
-                          icon: const Icon(Icons.keyboard_arrow_down),
-                          elevation: 16,
-                          style: const TextStyle(color: Colors.deepPurple),
-                          underline: Container(color: Colors.transparent),
-                          onChanged: (Datum? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              dropdownValue = value!;
-                            });
-                          },
-                          items: technicianData
-                              .map<DropdownMenuItem<Datum>>((category) {
-                            return DropdownMenuItem<Datum>(
-                              value: category,
-                              child: Text(
-                                category.firstName,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: AppColors.greyText,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                      // const Text(
+                      //   "Technician",
+                      //   style: TextStyle(
+                      //     fontSize: 14,
+                      //     fontWeight: FontWeight.w500,
+                      //     color: Color(0xff6A7187),
+                      //   ),
+                      // ),
+                      // const SizedBox(height: 10),
+                      // Container(
+                      //   width: double.infinity,
+                      //   height: 56,
+                      //   decoration: BoxDecoration(
+                      //       borderRadius: BorderRadius.circular(12),
+                      //       border: Border.all(color: const Color(0xffC1C4CD))),
+                      //   child: DropdownButton<Datum>(
+                      //     padding: const EdgeInsets.only(
+                      //         top: 2, left: 16, right: 16),
+                      //     isExpanded: true,
+                      //     hint: const Text(
+                      //       "Select",
+                      //       style: TextStyle(
+                      //           fontSize: 16,
+                      //           fontWeight: FontWeight.w400,
+                      //           color: AppColors.greyText),
+                      //     ),
+                      //     value: dropdownValue,
+                      //     icon: const Icon(Icons.keyboard_arrow_down),
+                      //     elevation: 16,
+                      //     style: const TextStyle(color: Colors.deepPurple),
+                      //     underline: Container(color: Colors.transparent),
+                      //     onChanged: (Datum? value) {
+                      //       // This is called when the user selects an item.
+                      //       setState(() {
+                      //         dropdownValue = value!;
+                      //       });
+                      //     },
+                      //     items: technicianData
+                      //         .map<DropdownMenuItem<Datum>>((category) {
+                      //       return DropdownMenuItem<Datum>(
+                      //         value: category,
+                      //         child: Text(
+                      //           category.firstName,
+                      //           style: const TextStyle(
+                      //             fontSize: 16,
+                      //             color: AppColors.greyText,
+                      //             fontWeight: FontWeight.w400,
+                      //           ),
+                      //         ),
+                      //       );
+                      //     }).toList(),
+                      //   ),
+                      // ),
                       // Padding(
                       //   padding: const EdgeInsets.only(top: 8.0),
                       //   child: Visibility(
@@ -277,6 +288,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       //  ),
 
                       addTileWidget("Material"),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          final item = material[index];
+                          return Text(item.itemName);
+                        },
+                        itemCount: material.length,
+                      ),
+
                       addTileWidget("Part"),
                       addTileWidget("Labor"),
                       addTileWidget("Subcontract"),
@@ -288,15 +308,17 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             "Enter Labor Rate",
                             rateController,
                             "Labor Rate *For this service",
-                            rateErrorStatus,
+                            rateError.isNotEmpty,
                             context),
                       ),
+                      errorWidget(error: rateError),
 
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Enter Tax", taxRateController, "Tax",
-                            taxErrorStatus, context),
+                        child: textBox("Enter Tax", taxController, "Tax",
+                            taxError.isNotEmpty, context),
                       ),
+                      errorWidget(error: taxError),
 
                       const SizedBox(height: 16),
                       const SizedBox(height: 16),
@@ -305,21 +327,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           final validate = validation();
                           if (validate) {
                             final clientId = await AppUtils.getUserID();
-                            // bloc.add(
-                            //   CreateEmployee(
-                            //     model: EmployeeCreationModel(
-                            //       clientId: int.parse(clientId),
-                            //       email: rateController.text.trim(),
-                            //       firstName: serviceNameController.text.trim(),
-                            //       lastName:
-                            //           laborDescriptionController.text.trim(),
-                            //       phone: taxController.text.trim(),
-                            //       role: dropdownValue,
-                            //     ),
-                            //   ),
-                            // );
-                            log(clientId.toString() +
-                                ":::::::::::::::Client id:::::::::::");
+                            service = CannedServiceCreateModel(
+                              clientId: int.parse(clientId),
+                              serviceName: serviceNameController.text,
+                              servicePrice: rateController.text,
+                              discount: '0',
+                              tax: taxController.text,
+                              subTotal: (double.parse(rateController.text) +
+                                      double.parse(taxController.text))
+                                  .toString(),
+                            );
                           }
                         },
                         child: Container(
@@ -357,7 +374,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   Widget textBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus, BuildContext context) {
+      String label, bool errorStatus, BuildContext context,
+      [StateSetter? setState]) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -380,7 +398,44 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             child: TextField(
               controller: controller,
               maxLength: 50,
+              onChanged: label == 'Discount' ||
+                      label == 'Price' ||
+                      label == "Cost"
+                  ? (value) {
+                      if (addMaterialPriceController.text.isNotEmpty &&
+                          addMaterialDiscountController.text.isNotEmpty) {
+                        subTotal =
+                            (double.parse(addMaterialPriceController.text) -
+                                    double.parse(
+                                        addMaterialDiscountController.text))
+                                .toString();
+                        setState!(() {});
+                      } else if (addMaterialPriceController.text.isNotEmpty) {
+                        subTotal = addMaterialPriceController.text;
+                        setState!(() {});
+                      }
+                      if (label == 'Cost' &&
+                          setState != null &&
+                          addLaborCostController.text.isNotEmpty &&
+                          addLaborDiscountController.text.isNotEmpty) {
+                        subTotal = (double.parse(addLaborCostController.text) -
+                                double.parse(addLaborDiscountController.text))
+                            .toString();
+                        setState(() {});
+                      } else if (addLaborCostController.text.isNotEmpty &&
+                          label == "Cost") {
+                        subTotal = addLaborCostController.text;
+                        setState!(() {});
+                      }
+                    }
+                  : null,
               decoration: InputDecoration(
+                suffixIcon: label == 'Discount'
+                    ? const Icon(
+                        CupertinoIcons.money_dollar,
+                        color: AppColors.primaryColors,
+                      )
+                    : null,
                 hintText: placeHolder,
                 counterText: "",
                 border: OutlineInputBorder(
@@ -415,65 +470,79 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     );
   }
 
-  Widget halfTextBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus, BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff6A7187)),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 6.0),
-          child: SizedBox(
-            height: 56,
-            width: MediaQuery.of(context).size.width / 2.4,
-            child: TextField(
-              onSubmitted: (value) {},
-              controller: controller,
-              maxLength: 50,
-              inputFormatters: [
-                FilteringTextInputFormatter.deny(RegExp(r'\s')),
-              ],
-              decoration: InputDecoration(
-                  suffixIcon: label == "State"
-                      ? const Icon(
-                          CupertinoIcons.chevron_down,
-                          color: Colors.black,
-                        )
-                      : null,
-                  hintText: placeHolder,
-                  hintStyle: label == 'State'
-                      ? const TextStyle(color: Colors.black)
-                      : null,
-                  counterText: "",
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                          color: errorStatus == true
-                              ? const Color(0xffD80027)
-                              : const Color(0xffC1C4CD))),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                          color: errorStatus == true
-                              ? const Color(0xffD80027)
-                              : const Color(0xffC1C4CD))),
-                  focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                          color: errorStatus == true
-                              ? const Color(0xffD80027)
-                              : const Color(0xffC1C4CD)))),
-            ),
-          ),
-        ),
-      ],
-    );
+  addMaterialValidation(StateSetter setState) {
+    bool status = true;
+    if (addMaterialNameController.text.trim().isEmpty) {
+      adddMaterialNameErrorStatus = 'Service name cannot be empty';
+      status = false;
+    } else {
+      adddMaterialNameErrorStatus = '';
+    }
+    if (addMaterialPriceController.text.trim().isEmpty) {
+      addMaterialPriceErrorStatus = 'Price cannot be empty';
+      status = false;
+    } else {
+      addMaterialPriceErrorStatus = '';
+    }
+    if (addMaterialDiscountController.text.trim().isEmpty) {
+      addMaterialDiscountErrorStatus = 'Discount cannot be empty';
+      status = false;
+    } else {
+      addMaterialDiscountErrorStatus = '';
+    }
+
+    setState(() {});
+    return status;
+  }
+
+  addPartValidation(StateSetter setState) {
+    bool status = true;
+    if (addPartNameController.text.trim().isEmpty) {
+      addPartNameErrorStatus = 'Service name cannot be empty';
+      status = false;
+    } else {
+      addPartNameErrorStatus = '';
+    }
+    if (addPartPriceController.text.trim().isEmpty) {
+      addPartPriceErrorStatus = 'Price cannot be empty';
+      status = false;
+    } else {
+      addPartPriceErrorStatus = '';
+    }
+    if (addPartDiscountController.text.trim().isEmpty) {
+      addPartDiscountErrorStatus = 'Discount cannot be empty';
+      status = false;
+    } else {
+      addPartDiscountErrorStatus = '';
+    }
+
+    setState(() {});
+    return status;
+  }
+
+  addLaborValidation(StateSetter setState) {
+    bool status = true;
+    if (addLaborNameController.text.trim().isEmpty) {
+      addLaborNameErrorStatus = 'Service name cannot be empty';
+      status = false;
+    } else {
+      addLaborNameErrorStatus = '';
+    }
+    if (addLaborCostController.text.trim().isEmpty) {
+      addLaborCostErrorStatus = 'Cost cannot be empty';
+      status = false;
+    } else {
+      addLaborCostErrorStatus = '';
+    }
+    if (addLaborDiscountController.text.trim().isEmpty) {
+      addLaborDiscountErrorStatus = 'Discount cannot be empty';
+      status = false;
+    } else {
+      addLaborDiscountErrorStatus = '';
+    }
+
+    setState(() {});
+    return status;
   }
 
   validation() {
@@ -490,10 +559,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     }
 
     if (laborDescriptionController.text.trim().isEmpty) {
-      laborDescriptionError = 'Description cannot be empty';
+      laborDescriptionError = 'Notes cannot be empty';
       status = false;
     } else if (laborDescriptionController.text.trim().length < 2) {
-      laborDescriptionError = 'Enter a valid description';
+      laborDescriptionError = 'Notes should be greater than 2 characters';
       status = false;
     } else {
       laborDescriptionError = '';
@@ -506,22 +575,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       rateError = '';
     }
     if (taxController.text.trim().isEmpty) {
-      status = false;
-    } else if (taxController.text.trim().length < 2) {
-      taxError = 'Enter a valid tax';
+      taxError = 'Tax Cannot be empty';
       status = false;
     } else {
       taxError = '';
     }
-    if (dropdownValue == '') {
-      categoryError = 'Category cannot be empty';
-      status = false;
-    } else {
-      categoryError = '';
-    }
-    if (taxRateError == '') {
-      taxRateError = 'Tax Rate canot be empty';
-    }
+
     setState(() {});
     return status;
   }
@@ -543,13 +602,48 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           GestureDetector(
             onTap: () {
               if (label == "Material") {
+                subTotal = '0.0';
+                adddMaterialNameErrorStatus = '';
+                addMaterialCostErrorStatus = '';
+                addMaterialDescriptionErrorStatus = '';
+                addMaterialDiscountErrorStatus = '';
+                addMaterialPriceErrorStatus = '';
                 showDialog(
+                  barrierDismissible: false,
                   context: context,
                   builder: (context) {
                     return AlertDialog(
                       contentPadding: EdgeInsets.all(20),
                       insetPadding: EdgeInsets.all(20),
                       content: addMaterialPopup(),
+                    );
+                  },
+                );
+              } else if (label == 'Part') {
+                subTotal = '0.0';
+
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      contentPadding: EdgeInsets.all(20),
+                      insetPadding: EdgeInsets.all(20),
+                      content: addPartPopup(),
+                    );
+                  },
+                );
+              } else if (label == 'Labor') {
+                subTotal = '0.0';
+
+                showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      contentPadding: EdgeInsets.all(20),
+                      insetPadding: EdgeInsets.all(20),
+                      content: addLaborPopup(),
                     );
                   },
                 );
@@ -583,61 +677,81 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: Container(
           width: MediaQuery.of(context).size.width,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Add Material",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: AppColors.primaryTitleColor),
                   ),
-                  Icon(Icons.close)
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 17.0),
+                padding: const EdgeInsets.only(top: 16.0),
                 child: textBox("Enter Material Name", addMaterialNameController,
-                    "Name", addMaterailNameErrorStatus, context),
+                    "Name", adddMaterialNameErrorStatus.isNotEmpty, context),
               ),
+              errorWidget(error: adddMaterialNameErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
                 child: textBox(
                     "Enter Material Description",
                     addMaterialDescriptionController,
                     "Description",
-                    addMaterialDescriptionErrorStatus,
+                    addMaterialDescriptionErrorStatus.isNotEmpty,
                     context),
               ),
+              errorWidget(error: addMaterialDescriptionErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    textBox("Amount", addMaterialDescriptionController, "Price",
-                        addMaterialDescriptionErrorStatus, context),
+                    textBox(
+                        "Amount",
+                        addMaterialPriceController,
+                        "Price",
+                        addMaterialPriceErrorStatus.isNotEmpty,
+                        context,
+                        newSetState),
                     pricingModelDropDown()
                   ],
                 ),
               ),
+              errorWidget(error: addMaterialPriceErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    textBox("Amount", addMaterialDescriptionController, "Cost",
-                        addMaterialDescriptionErrorStatus, context),
+                    textBox("Amount", addMaterialCostController, "Cost",
+                        addMaterialCostErrorStatus.isNotEmpty, context),
                     pricingModelDropDown()
                   ],
                 ),
               ),
+              errorWidget(error: addMaterialCostErrorStatus),
               Padding(
                 padding: EdgeInsets.only(top: 17),
-                child: textBox("Enter Amount", addMaterialDiscountController,
-                    "Discount", addMaterialDiscountErrorStatus, context),
+                child: textBox(
+                    "Enter Amount",
+                    addMaterialDiscountController,
+                    "Discount",
+                    addMaterialDiscountErrorStatus.isNotEmpty,
+                    context,
+                    newSetState),
               ),
+              errorWidget(error: addMaterialDiscountErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17),
                 child: Row(
@@ -693,15 +807,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 17),
-                child: textBox("Enter Batch Number", addMaterialBatchController,
-                    "Part/Batch Number", addMaterailBatchErrorStatus, context),
+                child: textBox(
+                    "Enter Batch Number",
+                    addMaterialBatchController,
+                    "Part/Batch Number",
+                    adddMaterialBatchErrorStatus.isNotEmpty,
+                    context),
               ),
-              const Padding(
+              errorWidget(error: adddMaterialBatchErrorStatus),
+              Padding(
                 padding: EdgeInsets.only(top: 17),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       "Sub Total :",
                       style: TextStyle(
                           fontSize: 16,
@@ -709,8 +828,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Text(
-                      "\$0.00",
-                      style: TextStyle(
+                      "\$$subTotal",
+                      style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                           color: AppColors.primaryTitleColor),
@@ -720,12 +839,358 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               ),
               Padding(
                 padding: EdgeInsets.only(top: 31),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 56,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: AppColors.primaryColors),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final status = addMaterialValidation(newSetState);
+                    if (status) {
+                      material.add(CannedServiceAddModel(
+                        cannedServiceId: int.parse(serviceId),
+                        note: addMaterialDescriptionController.text,
+                        part: addMaterialBatchController.text,
+                        itemName: addMaterialNameController.text,
+                        unitPrice: addMaterialPriceController.text,
+                        discount: addMaterialDiscountController.text,
+                        itemType: "Material",
+                        subTotal:
+                            (double.parse(addMaterialPriceController.text) -
+                                    double.parse(
+                                        addMaterialDiscountController.text))
+                                .toString(),
+                      ));
+                      setState(() {});
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                    primary: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  addPartPopup() {
+    return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      return SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Add Part",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox("Enter Part Name", addPartNameController, "Name",
+                    addPartNameErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addPartNameErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Enter Part Description",
+                    addPartDescriptionController,
+                    "Description",
+                    addPartDescriptionErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addPartDescriptionErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    textBox(
+                        "Amount",
+                        addPartPriceController,
+                        "Price",
+                        addPartPriceErrorStatus.isNotEmpty,
+                        context,
+                        newSetState),
+                    pricingModelDropDown()
+                  ],
+                ),
+              ),
+              errorWidget(error: addPartPriceErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Amount", addPartCostController, "Cost ",
+                    addPartCostErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addPartCostErrorStatus),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: textBox(
+                    "Enter Amount",
+                    addPartDiscountController,
+                    "Discount",
+                    addPartDiscountErrorStatus.isNotEmpty,
+                    context,
+                    newSetState),
+              ),
+              errorWidget(error: addPartDiscountErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Label",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff6A7187),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        newSetState(() {
+                          tagDataList.add("Tag");
+                        });
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.add,
+                            color: AppColors.primaryColors,
+                          ),
+                          Text(
+                            "Add New",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    //  maxCrossAxisExtent: 150,
+                    mainAxisSpacing: 20,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 3),
+                itemBuilder: (context, index) {
+                  return tagWidget(tagDataList[index], index, newSetState);
+                },
+                itemCount: tagDataList.length,
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: textBox(
+                    "Enter Part Number",
+                    addPartPartNumberController,
+                    "Part Number",
+                    adddPartPartNumberErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: adddPartPartNumberErrorStatus),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Sub Total :",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Text(
+                      "\$$subTotal",
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 31),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final status = addPartValidation(newSetState);
+                    if (status) {
+                      part.add(CannedServiceAddModel(
+                        cannedServiceId: int.parse(serviceId),
+                        note: addPartDescriptionController.text,
+                        part: addPartPartNumberController.text,
+                        itemName: addPartNameController.text,
+                        unitPrice: addPartPriceController.text,
+                        discount: addPartDiscountController.text,
+                        itemType: "Part",
+                        subTotal: (double.parse(addPartPriceController.text) -
+                                double.parse(addPartDiscountController.text))
+                            .toString(),
+                      ));
+                      setState(() {});
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                    primary: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  addLaborPopup() {
+    return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      return SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Add Labor",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox("Enter Labor Name", addLaborNameController,
+                    "Name", addLaborNameErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addLaborNameErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Enter Labor Description",
+                    addLaborDescriptionController,
+                    "Description",
+                    addLaborDescriptionErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addLaborDescriptionErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Hours", addLaborHoursController, "Hours ",
+                    addLaborHoursErrorStatus.isNotEmpty, context, newSetState),
+              ),
+              errorWidget(error: addLaborHoursErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Amount", addLaborCostController, "Cost ",
+                    addLaborCostErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addLaborCostErrorStatus),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: textBox(
+                    "Enter Amount",
+                    addLaborDiscountController,
+                    "Discount",
+                    addLaborDiscountErrorStatus.isNotEmpty,
+                    context,
+                    newSetState),
+              ),
+              errorWidget(error: addLaborDiscountErrorStatus),
+              Padding(
+                padding: EdgeInsets.only(top: 31),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final status = addLaborValidation(newSetState);
+                    if (status) {
+                      labor.add(CannedServiceAddModel(
+                        cannedServiceId: int.parse(serviceId),
+                        note: addLaborDescriptionController.text,
+                        // part: addLaborLaborNumberController.text,
+                        part: '',
+                        itemName: addLaborNameController.text,
+                        unitPrice: addLaborCostController.text,
+                        discount: addLaborDiscountController.text,
+                        quanityHours: addLaborHoursController.text,
+                        itemType: "Labor",
+                        subTotal: (double.parse(addLaborCostController.text) -
+                                double.parse(addLaborDiscountController.text))
+                            .toString(),
+                      ));
+                      setState(() {});
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                    primary: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
                 ),
               )
             ],
@@ -756,7 +1221,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             // padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 border: Border.all(
-                    color: addMaterialPricingErrorStatus
+                    color: addMaterialPricingErrorStatus.isNotEmpty
                         ? const Color(0xffD80027)
                         : const Color(0xffC1C4CD)),
                 borderRadius: BorderRadius.circular(12)),
@@ -845,6 +1310,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class errorWidget extends StatelessWidget {
+  const errorWidget({
+    super.key,
+    required this.error,
+  });
+
+  final String error;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Visibility(
+          visible: error.isNotEmpty,
+          child: Text(
+            error,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(
+                0xffD80027,
+              ),
+            ),
+          )),
     );
   }
 }

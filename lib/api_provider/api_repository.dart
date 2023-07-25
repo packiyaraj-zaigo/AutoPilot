@@ -1,4 +1,6 @@
 import 'package:auto_pilot/Models/appointment_create_model.dart';
+import 'package:auto_pilot/Models/canned_service_create.dart';
+import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/Models/workflow_bucket_model.dart';
@@ -308,6 +310,16 @@ class ApiRepository {
 
   Future addWorkflowBucket(String token, Map<String, dynamic> json) {
     return apiProvider.addWorkflowBucket(token, json);
+  }
+
+  Future<dynamic> createCannedOrderService(
+      String token, CannedServiceCreateModel model) {
+    return apiProvider.createCannedOrderService(token, model);
+  }
+
+  Future<dynamic> createCannedOrderServiceItem(
+      String token, CannedServiceAddModel model) {
+    return apiProvider.createCannedOrderServiceItem(token, model);
   }
 }
 

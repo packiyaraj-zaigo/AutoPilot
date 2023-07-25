@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:auto_pilot/Models/appointment_create_model.dart';
+import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
 import 'package:auto_pilot/Models/workflow_bucket_model.dart';
@@ -13,6 +14,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Models/canned_service_create.dart';
 import '../Models/workflow_model.dart';
 import '../Screens/customer_information_screen.dart';
 import '../Models/employee_creation_model.dart';
@@ -1130,6 +1132,34 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + " Add workflow api error");
+    }
+  }
+
+  Future<dynamic> createCannedOrderService(
+      String token, CannedServiceCreateModel model) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/canned_services');
+
+      final response = await http.post(url,
+          headers: getHeader(token),
+          body: json.encode(cannedServiceItemCreateModelToJson(model)));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
+    }
+  }
+
+  Future<dynamic> createCannedOrderServiceItem(
+      String token, CannedServiceAddModel model) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/canned_service_items');
+
+      final response = await http.post(url,
+          headers: getHeader(token),
+          body: json.encode(cannedServiceAddMaterialModelToJson(model)));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
     }
   }
 }
