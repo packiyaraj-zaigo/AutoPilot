@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
-import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
+import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -26,6 +26,7 @@ class AddServiceScreen extends StatefulWidget {
 
 class _AddServiceScreenState extends State<AddServiceScreen> {
   final TextEditingController serviceNameController = TextEditingController();
+  final List<VendorResponseModel> vendors = [];
   String serviceNameError = '';
   final TextEditingController laborDescriptionController =
       TextEditingController();
@@ -34,11 +35,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   String rateError = '';
   final TextEditingController taxController = TextEditingController();
   String taxError = '';
-  String serviceId = '';
+  String serviceId = '1';
+  int? vendorId;
+  bool isTax = false;
 
   List<CannedServiceAddModel> material = [];
   List<CannedServiceAddModel> part = [];
   List<CannedServiceAddModel> labor = [];
+  List<CannedServiceAddModel> fee = [];
+  List<CannedServiceAddModel> subContract = [];
   CannedServiceCreateModel? service;
   String subTotal = '0.0';
 
@@ -89,6 +94,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   String addLaborCostErrorStatus = '';
   String addLaborDiscountErrorStatus = '';
   String addLaborHoursErrorStatus = '';
+
+  //Add Fee popup controllers
+  final addFeeNameController = TextEditingController();
+  final addFeeDescriptionController = TextEditingController();
+  final addFeeCostController = TextEditingController();
+  final addFeePriceController = TextEditingController();
+
+  //Add Fee errorstatus and error message variables
+  String addFeeNameErrorStatus = '';
+  String addFeeDescriptionErrorStatus = '';
+  String addFeePriceErrorStatus = '';
+  String addFeeCostErrorStatus = '';
+
+  //Add SubContract popup controllers
+  final addSubContractNameController = TextEditingController();
+  final addSubContractDescriptionController = TextEditingController();
+  final addSubContractCostController = TextEditingController();
+  final addSubContractPriceController = TextEditingController();
+  final addSubContractDiscountController = TextEditingController();
+  final addSubContractVendorController = TextEditingController();
+
+  //Add SubContract errorstatus and error message variables
+  String addSubContractNameErrorStatus = '';
+  String addSubContractDescriptionErrorStatus = '';
+  String addSubContractPriceErrorStatus = '';
+  String addSubContractCostErrorStatus = '';
+  String addSubContractDiscountErrorStatus = '';
+  String addSubContractVendorErrorStatus = '';
 
   dynamic _currentPricingModelSelectedValue;
   List<String> pricingModelList = ['per Sqrt', 'per feet'];
@@ -144,10 +177,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             create: (context) => ServiceBloc(),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
-                if (state is GetTechnicianState) {
-                  technicianData.addAll(state.technicianModel.data);
-                  print(technicianData);
-                }
+                // if (state is GetTechnicianState) {
+                //   technicianData.addAll(state.technicianModel.data);
+                //   print(technicianData);
+                // }
               },
               child: BlocBuilder<ServiceBloc, ServiceState>(
                 builder: (context, state) {
@@ -290,17 +323,169 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       addTileWidget("Material"),
                       ListView.builder(
                         shrinkWrap: true,
+                        itemCount: material.length,
                         itemBuilder: (context, index) {
                           final item = material[index];
-                          return Text(item.itemName);
+                          return Row(
+                            children: [
+                              Text(item.itemName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              const Expanded(child: SizedBox()),
+                              Text('\$${item.subTotal} ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              GestureDetector(
+                                onTap: () {
+                                  material.removeAt(index);
+                                  setState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.clear_thick_circled,
+                                  color: Color(0xFFFF5C5C),
+                                ),
+                              )
+                            ],
+                          );
                         },
-                        itemCount: material.length,
                       ),
 
                       addTileWidget("Part"),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: part.length,
+                        itemBuilder: (context, index) {
+                          final item = part[index];
+                          return Row(
+                            children: [
+                              Text(item.itemName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              const Expanded(child: SizedBox()),
+                              Text('\$${item.subTotal} ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              GestureDetector(
+                                onTap: () {
+                                  part.removeAt(index);
+                                  setState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.clear_thick_circled,
+                                  color: Color(0xFFFF5C5C),
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      ),
                       addTileWidget("Labor"),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: labor.length,
+                        itemBuilder: (context, index) {
+                          final item = labor[index];
+                          return Row(
+                            children: [
+                              Text(item.itemName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              const Expanded(child: SizedBox()),
+                              Text('\$${item.subTotal} ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              GestureDetector(
+                                onTap: () {
+                                  labor.removeAt(index);
+                                  setState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.clear_thick_circled,
+                                  color: Color(0xFFFF5C5C),
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      ),
                       addTileWidget("Subcontract"),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: subContract.length,
+                        itemBuilder: (context, index) {
+                          final item = subContract[index];
+                          return Row(
+                            children: [
+                              Text(item.itemName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              const Expanded(child: SizedBox()),
+                              Text('\$${item.subTotal} ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              GestureDetector(
+                                onTap: () {
+                                  subContract.removeAt(index);
+                                  setState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.clear_thick_circled,
+                                  color: Color(0xFFFF5C5C),
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      ),
                       addTileWidget("Fee"),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: fee.length,
+                        itemBuilder: (context, index) {
+                          final item = fee[index];
+                          return Row(
+                            children: [
+                              Text(item.itemName,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              const Expanded(child: SizedBox()),
+                              Text('\$${item.subTotal} ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                  )),
+                              GestureDetector(
+                                onTap: () {
+                                  fee.removeAt(index);
+                                  setState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.clear_thick_circled,
+                                  color: Color(0xFFFF5C5C),
+                                ),
+                              )
+                            ],
+                          );
+                        },
+                      ),
 
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
@@ -326,6 +511,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         onTap: () async {
                           final validate = validation();
                           if (validate) {
+                            log('Here');
                             final clientId = await AppUtils.getUserID();
                             service = CannedServiceCreateModel(
                               clientId: int.parse(clientId),
@@ -336,6 +522,17 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               subTotal: (double.parse(rateController.text) +
                                       double.parse(taxController.text))
                                   .toString(),
+                            );
+                            BlocProvider.of<ServiceBloc>(context).add(
+                              CreateCannedOrderServiceEvent(
+                                service: service!,
+                                material: material.isEmpty ? null : material[0],
+                                part: part.isEmpty ? null : part[0],
+                                labor: labor.isEmpty ? null : labor[0],
+                                subcontract:
+                                    subContract.isEmpty ? null : subContract[0],
+                                fee: fee.isEmpty ? null : fee[0],
+                              ),
                             );
                           }
                         },
@@ -396,6 +593,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
+              readOnly: label == "Vendor",
+              onTap: label == "Vendor"
+                  ? () {
+                      showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return vendorsBottomSheet();
+                          },
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent);
+                    }
+                  : null,
               controller: controller,
               maxLength: 50,
               onChanged: label == 'Discount' ||
@@ -412,7 +621,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         setState!(() {});
                       } else if (addMaterialPriceController.text.isNotEmpty) {
                         subTotal = addMaterialPriceController.text;
-                        setState!(() {});
+                        // setState!(() {});
                       }
                       if (label == 'Cost' &&
                           setState != null &&
@@ -435,7 +644,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         CupertinoIcons.money_dollar,
                         color: AppColors.primaryColors,
                       )
-                    : null,
+                    : label == "Vendor"
+                        ? const Icon(
+                            CupertinoIcons.chevron_down,
+                            color: AppColors.primaryColors,
+                          )
+                        : null,
                 hintText: placeHolder,
                 counterText: "",
                 border: OutlineInputBorder(
@@ -545,6 +759,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return status;
   }
 
+  addSubContractValidation(StateSetter setState) {
+    bool status = true;
+    if (addSubContractNameController.text.trim().isEmpty) {
+      addSubContractNameErrorStatus = 'Service name cannot be empty';
+      status = false;
+    } else {
+      addSubContractNameErrorStatus = '';
+    }
+    if (addSubContractPriceController.text.trim().isEmpty) {
+      addSubContractPriceErrorStatus = 'Price cannot be empty';
+      status = false;
+    } else {
+      addSubContractPriceErrorStatus = '';
+    }
+    if (addSubContractDescriptionController.text.trim().isEmpty) {
+      addSubContractDescriptionErrorStatus = 'Description cannot be empty';
+      status = false;
+    } else {
+      addSubContractDescriptionErrorStatus = '';
+    }
+    if (addSubContractDiscountController.text.trim().isEmpty) {
+      addSubContractDiscountErrorStatus = 'Discount cannot be empty';
+      status = false;
+    } else {
+      addSubContractDiscountErrorStatus = '';
+    }
+
+    setState(() {});
+    return status;
+  }
+
+  addFeeValidation(StateSetter setState) {
+    bool status = true;
+    if (addFeeNameController.text.trim().isEmpty) {
+      addFeeNameErrorStatus = 'Service name cannot be empty';
+      status = false;
+    } else {
+      addFeeNameErrorStatus = '';
+    }
+    if (addFeeCostController.text.trim().isEmpty) {
+      addFeeCostErrorStatus = 'Cost cannot be empty';
+      status = false;
+    } else {
+      addFeeCostErrorStatus = '';
+    }
+    if (addFeePriceController.text.trim().isEmpty) {
+      addFeePriceErrorStatus = 'Price cannot be empty';
+      status = false;
+    } else {
+      addFeePriceErrorStatus = '';
+    }
+    if (addFeeDescriptionController.text.trim().isEmpty) {
+      addFeeDescriptionErrorStatus = 'Description cannot be empty';
+      status = false;
+    } else {
+      addFeeDescriptionErrorStatus = '';
+    }
+
+    setState(() {});
+    return status;
+  }
+
   validation() {
     bool status = true;
 
@@ -644,6 +920,30 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       contentPadding: EdgeInsets.all(20),
                       insetPadding: EdgeInsets.all(20),
                       content: addLaborPopup(),
+                    );
+                  },
+                );
+              } else if (label == "Fee") {
+                subTotal = '0.0';
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      contentPadding: EdgeInsets.all(20),
+                      insetPadding: EdgeInsets.all(20),
+                      content: addFeePopup(),
+                    );
+                  },
+                );
+              } else {
+                subTotal = '0.0';
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      contentPadding: EdgeInsets.all(20),
+                      insetPadding: EdgeInsets.all(20),
+                      content: addSubContractPopup(),
                     );
                   },
                 );
@@ -1154,6 +1454,28 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               ),
               errorWidget(error: addLaborDiscountErrorStatus),
               Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Sub Total :",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Text(
+                      "\$$subTotal",
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
                 padding: EdgeInsets.only(top: 31),
                 child: ElevatedButton(
                   onPressed: () {
@@ -1173,6 +1495,399 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 double.parse(addLaborDiscountController.text))
                             .toString(),
                       ));
+                      setState(() {});
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                    primary: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  addFeePopup() {
+    return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      return SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Add Fee",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox("Enter Fee Name", addFeeNameController, "Name",
+                    addFeeNameErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addFeeNameErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Enter Fee Description",
+                    addFeeDescriptionController,
+                    "Description",
+                    addFeeDescriptionErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addFeeDescriptionErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Amount", addFeePriceController, "Price ",
+                    addFeePriceErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addFeePriceErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Amount", addFeeCostController, "Cost ",
+                    addFeeCostErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addFeeCostErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Label",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff6A7187),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        newSetState(() {
+                          tagDataList.add("Tag");
+                        });
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.add,
+                            color: AppColors.primaryColors,
+                          ),
+                          Text(
+                            "Add New",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    //  maxCrossAxisExtent: 150,
+                    mainAxisSpacing: 20,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 3),
+                itemBuilder: (context, index) {
+                  return tagWidget(tagDataList[index], index, newSetState);
+                },
+                itemCount: tagDataList.length,
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Sub Total :",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Text(
+                      "\$$subTotal",
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 31),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final status = addFeeValidation(newSetState);
+                    if (status) {
+                      fee.add(CannedServiceAddModel(
+                          cannedServiceId: int.parse(serviceId),
+                          note: addFeeDescriptionController.text,
+                          // part: addFeeFeeNumberController.text,
+                          part: '',
+                          itemName: addFeeNameController.text,
+                          discount: '0',
+                          unitPrice: addFeeCostController.text,
+                          itemType: "Fee",
+                          subTotal: addFeePriceController.text));
+                      setState(() {});
+                      Navigator.pop(context);
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                    primary: AppColors.primaryColors,
+                  ),
+                  child: const Text(
+                    "Continue",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  addSubContractPopup() {
+    return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      return SingleChildScrollView(
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Add SubContract",
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTitleColor),
+                  ),
+                  IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      })
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: textBox(
+                    "Enter SubContract Name",
+                    addSubContractNameController,
+                    "Name",
+                    addSubContractNameErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addSubContractNameErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Enter SubContract Description",
+                    addSubContractDescriptionController,
+                    "Description",
+                    addSubContractDescriptionErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addSubContractDescriptionErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Amount",
+                    addSubContractPriceController,
+                    "Price ",
+                    addSubContractPriceErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addSubContractPriceErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox("Amount", addSubContractCostController, "Cost ",
+                    addSubContractCostErrorStatus.isNotEmpty, context),
+              ),
+              errorWidget(error: addSubContractCostErrorStatus),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                      value: isTax,
+                      onChanged: (value) {
+                        newSetState(() {
+                          isTax = value!;
+                        });
+                      }),
+                  Text('Allow Tax Charges On Sub Contract',
+                      style: TextStyle(color: Color(0xFF6A7187))),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Amount",
+                    addSubContractDiscountController,
+                    "Discount",
+                    addSubContractDiscountErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addSubContractDiscountErrorStatus),
+              Padding(
+                padding: const EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Label",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xff6A7187),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        newSetState(() {
+                          tagDataList.add("Tag");
+                        });
+                      },
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.add,
+                            color: AppColors.primaryColors,
+                          ),
+                          Text(
+                            "Add New",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    //  maxCrossAxisExtent: 150,
+                    mainAxisSpacing: 20,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 3),
+                itemBuilder: (context, index) {
+                  return tagWidget(tagDataList[index], index, newSetState);
+                },
+                itemCount: tagDataList.length,
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 17.0),
+                child: textBox(
+                    "Select existing",
+                    addSubContractVendorController,
+                    "Vendor",
+                    addSubContractVendorErrorStatus.isNotEmpty,
+                    context),
+              ),
+              errorWidget(error: addSubContractVendorErrorStatus),
+              Padding(
+                padding: EdgeInsets.only(top: 17),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Sub Total :",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Text(
+                      "\$$subTotal",
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    )
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 31),
+                child: ElevatedButton(
+                  onPressed: () {
+                    final status = addSubContractValidation(newSetState);
+                    if (status) {
+                      subContract.add(
+                        CannedServiceAddModel(
+                          cannedServiceId: int.parse(serviceId),
+                          note: addSubContractDescriptionController.text,
+                          // part: addSubContractSubContractNumberController.text,
+                          part: '',
+                          itemName: addSubContractNameController.text,
+                          discount: addSubContractDiscountController.text,
+                          tax: isTax == true ? 'Y' : 'N',
+                          vendorId: vendorId,
+                          unitPrice: addSubContractPriceController.text,
+                          itemType: "SubContract",
+                          subTotal: (double.parse(
+                                      addSubContractPriceController.text) -
+                                  double.parse(
+                                      addSubContractDiscountController.text))
+                              .toString(),
+                        ),
+                      );
                       setState(() {});
                       Navigator.pop(context);
                     }
@@ -1308,6 +2023,139 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   child: SvgPicture.asset("assets/images/close_tag_icon.svg")),
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget vendorsBottomSheet() {
+    final ScrollController vendorController = ScrollController();
+
+    return BlocProvider(
+      create: (context) => ServiceBloc()..add(GetAllVendorsEvent()),
+      child: BlocListener<ServiceBloc, ServiceState>(
+        listener: (context, state) {
+          if (state is GetAllVendorsSuccessState) {
+            if (context.read<ServiceBloc>().currentPage == 2 ||
+                context.read<ServiceBloc>().currentPage == 1) {
+              vendors.clear();
+            }
+            vendors.addAll(state.vendors);
+          }
+        },
+        child: BlocBuilder<ServiceBloc, ServiceState>(
+          builder: (context, state) {
+            return Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Vendors",
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: LimitedBox(
+                        maxHeight: MediaQuery.of(context).size.height / 2 - 90,
+                        child: vendors.isEmpty
+                            ? const Center(
+                                child: Text('No Vendors Found',
+                                    style: TextStyle(
+                                      color: AppColors.greyText,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18,
+                                    )))
+                            : ListView.builder(
+                                itemBuilder: (context, index) {
+                                  if (index == vendors.length) {
+                                    return BlocProvider.of<ServiceBloc>(context)
+                                                    .currentPage <=
+                                                BlocProvider.of<ServiceBloc>(
+                                                        context)
+                                                    .totalPages &&
+                                            BlocProvider.of<ServiceBloc>(
+                                                        context)
+                                                    .currentPage !=
+                                                0
+                                        ? const SizedBox(
+                                            height: 40,
+                                            child: CupertinoActivityIndicator(
+                                              color: AppColors.primaryColors,
+                                            ))
+                                        : Container();
+                                  }
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 12.0),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        print("heyy");
+
+                                        addSubContractVendorController.text =
+                                            vendors[index].vendorName ?? '';
+                                        vendorId = vendors[index].id;
+
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                            color: Colors.grey[100],
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
+                                        width:
+                                            MediaQuery.of(context).size.width,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Text(
+                                            vendors[index].vendorName ?? '',
+                                            style: const TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                itemCount: vendors.length + 1,
+                                controller: vendorController
+                                  ..addListener(() {
+                                    if ((BlocProvider.of<ServiceBloc>(context)
+                                                .currentPage <=
+                                            BlocProvider.of<ServiceBloc>(
+                                                    context)
+                                                .totalPages) &&
+                                        vendorController.offset ==
+                                            vendorController
+                                                .position.maxScrollExtent &&
+                                        BlocProvider.of<ServiceBloc>(context)
+                                                .currentPage !=
+                                            0 &&
+                                        !BlocProvider.of<ServiceBloc>(context)
+                                            .isVendorsPagenationLoading) {
+                                      context.read<ServiceBloc>()
+                                        ..isVendorsPagenationLoading = true
+                                        ..add(GetAllVendorsEvent());
+                                    }
+                                  }),
+                              ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

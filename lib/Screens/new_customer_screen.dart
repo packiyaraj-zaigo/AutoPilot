@@ -816,6 +816,11 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         firstNameErrorMsg = "First name can't be empty";
         firstNameErrorStatus = true;
       });
+    } else if (firstName.trim().length < 2) {
+      setState(() {
+        firstNameErrorMsg = "Enter a valid first name";
+        firstNameErrorStatus = true;
+      });
     } else {
       setState(() {
         firstNameErrorStatus = false;
@@ -824,6 +829,11 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     if (lastName.trim().isEmpty) {
       setState(() {
         lastNameErrorMsg = "Last name can't be empty";
+        lastNameErrorStatus = true;
+      });
+    } else if (lastName.trim().length < 2) {
+      setState(() {
+        lastNameErrorMsg = "Enter a valid last name";
         lastNameErrorStatus = true;
       });
     } else {
@@ -867,6 +877,11 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       setState(() {
         addressErrorStatus = true;
         addressErrorMsg = "Address can't be empty";
+      });
+    } else if (address.trim().length < 2) {
+      setState(() {
+        addressErrorMsg = "Enter a valid address";
+        addressErrorStatus = true;
       });
     } else {
       setState(() {

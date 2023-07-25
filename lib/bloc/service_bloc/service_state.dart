@@ -47,3 +47,27 @@ class GetTechnicianErrorState extends ServiceState {
   final String errorMsg;
   GetTechnicianErrorState({required this.errorMsg});
 }
+
+class CreateCannedOrderServiceSuccessState extends ServiceState {}
+
+class CreateCannedOrderServiceLoadingState extends ServiceState {}
+
+class CreateCannedOrderServiceErrorState extends ServiceState {
+  final String message;
+  const CreateCannedOrderServiceErrorState({required this.message});
+}
+
+class GetAllVendorsSuccessState extends ServiceState {
+  final List<VendorResponseModel> vendors;
+  const GetAllVendorsSuccessState({required this.vendors});
+
+  @override
+  List<Object> get props => [vendors];
+}
+
+class GetAllVendorsLoadingState extends ServiceState {}
+
+class GetAllVendorsErrorState extends ServiceState {
+  final String message;
+  const GetAllVendorsErrorState({required this.message});
+}
