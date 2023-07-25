@@ -1141,8 +1141,7 @@ class ApiProvider {
       final url = Uri.parse('${BASE_URL}api/canned_services');
 
       final response = await http.post(url,
-          headers: getHeader(token),
-          body: json.encode(cannedServiceItemCreateModelToJson(model)));
+          headers: getHeader(token), body: json.encode(model.toJson()));
       return response;
     } catch (e) {
       log(e.toString() + " Create canned order service api error");
@@ -1150,16 +1149,53 @@ class ApiProvider {
   }
 
   Future<dynamic> createCannedOrderServiceItem(
-      String token, CannedServiceAddModel model) async {
+      String token, CannedServiceAddModel model, int serviceId) async {
     try {
       final url = Uri.parse('${BASE_URL}api/canned_service_items');
-
+      final map = model.toJson();
+      if (map['vendor_id'] == null) {
+        map.remove('vendor_id');
+      }
+      map['canned_service_id'] = serviceId;
       final response = await http.post(url,
-          headers: getHeader(token),
-          body: json.encode(cannedServiceAddMaterialModelToJson(model)));
+          headers: getHeader(token), body: json.encode(map));
+
+      log(map.toString());
+      inspect(response);
       return response;
     } catch (e) {
       log(e.toString() + " Create canned order service api error");
     }
   }
+
+  Future<dynamic> getAllVendors(String token, int page) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse('${BASE_URL}api/vendors?client_id=');
+
+      final response = await http.get(
+        url,
+        headers: getHeader(token),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + " Get all vendors api error");
+    }
+  }
 }
+
+final map = {
+  "canned_service_id": 34,
+  "item_type": "Material",
+  "item_name": "ldkjfg",
+  "unit_price": 23948,
+  "quanity_hours": 0,
+  "discount": 23498,
+  "discount_type": "Price",
+  "sub_total": 450.0,
+  "position": 0,
+  "item_service_note": "ldfkj",
+  "part_name": 2,
+  "is_tax": "N",
+  "vendor_id": null
+};

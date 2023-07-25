@@ -156,7 +156,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                         return customerList.isEmpty
                             ? const Center(
                                 child: Text(
-                                'No customer found',
+                                'No Customer Found',
                                 style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -231,7 +231,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                                               String>{
                                                             'body': Uri
                                                                 .encodeComponent(
-                                                                    ' '),
+                                                                    ''),
                                                           },
                                                         );
                                                         launchUrl(smsLaunchUri);

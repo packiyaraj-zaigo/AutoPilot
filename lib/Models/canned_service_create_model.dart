@@ -21,6 +21,8 @@ class CannedServiceAddModel {
   String discountType;
   String note;
   String part;
+  String tax;
+  int? vendorId;
   int position;
 
   CannedServiceAddModel({
@@ -34,7 +36,9 @@ class CannedServiceAddModel {
     this.itemType = 'Material',
     this.quanityHours = '0',
     this.discountType = 'Price',
+    this.tax = 'N',
     this.position = 0,
+    this.vendorId,
   });
 
   factory CannedServiceAddModel.fromJson(Map<String, dynamic> json) =>
@@ -50,6 +54,8 @@ class CannedServiceAddModel {
         position: json["position"],
         note: json["item_service_note"],
         part: json["part_name"],
+        tax: json["is_tax"],
+        vendorId: json["vendor_id"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,5 +70,7 @@ class CannedServiceAddModel {
         "position": position,
         "item_service_note": note,
         "part_name": part,
+        "is_tax": tax,
+        "vendor_id": vendorId,
       };
 }

@@ -318,8 +318,12 @@ class ApiRepository {
   }
 
   Future<dynamic> createCannedOrderServiceItem(
-      String token, CannedServiceAddModel model) {
-    return apiProvider.createCannedOrderServiceItem(token, model);
+      String token, CannedServiceAddModel model, int serviceId) {
+    return apiProvider.createCannedOrderServiceItem(token, model, serviceId);
+  }
+
+  Future<dynamic> getAllVendors(String token, int page) {
+    return apiProvider.getAllVendors(token, page);
   }
 }
 

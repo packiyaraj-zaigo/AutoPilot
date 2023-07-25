@@ -82,10 +82,10 @@ showDrawer(BuildContext context) {
             "assets/images/service_drawer_icon.svg",
             "Services",
             context,
-            DummyScreen(
-              name: "Service Screen",
-            )),
-        //  ServicesListScreen()),
+            // DummyScreen(
+            // name: "Service Screen",
+            // )),
+            ServicesListScreen()),
         drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
             context, BottomBarScreen()),
         drawerTileWidget(
