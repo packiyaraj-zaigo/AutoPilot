@@ -11,15 +11,15 @@ String createEstimateModelToJson(CreateEstimateModel data) =>
     json.encode(data.toJson());
 
 class CreateEstimateModel {
-  int createdId;
+  int? createdId;
   Data data;
-  Order order;
+  Order? order;
   String message;
 
   CreateEstimateModel({
-    required this.createdId,
+    this.createdId,
     required this.data,
-    required this.order,
+    this.order,
     required this.message,
   });
 
@@ -27,14 +27,14 @@ class CreateEstimateModel {
       CreateEstimateModel(
         createdId: json["created_id"],
         data: Data.fromJson(json["data"]),
-        order: Order.fromJson(json["order"]),
+        order: json["order"] != null ? Order.fromJson(json["order"]) : null,
         message: json["message"],
       );
 
   Map<String, dynamic> toJson() => {
         "created_id": createdId,
         "data": data.toJson(),
-        "order": order.toJson(),
+        "order": order!.toJson(),
         "message": message,
       };
 }

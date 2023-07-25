@@ -1168,6 +1168,68 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getSingleEstimate(String token, String orderId) async {
+    print("into provider");
+
+    try {
+      // final clientId = await AppUtils.getUserID();
+
+      var url = Uri.parse("${BASE_URL}api/orders/$orderId");
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> getEstimateNote(String token, String orderId) async {
+    print("into provider");
+
+    try {
+      // final clientId = await AppUtils.getUserID();
+
+      var url = Uri.parse("${BASE_URL}api/work_order_notes?order_id=$orderId");
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> getEstimateAppointmentDetails(
+      String token, String orderId) async {
+    print("into provider");
+
+    try {
+      // final clientId = await AppUtils.getUserID();
+
+      var url =
+          Uri.parse("${BASE_URL}api/appointments?appointment_title=$orderId");
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
   Future<dynamic> getAllVendors(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();

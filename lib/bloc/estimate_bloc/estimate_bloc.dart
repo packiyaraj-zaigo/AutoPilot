@@ -2,7 +2,9 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/create_estimate_model.dart';
+import 'package:auto_pilot/Models/estimate_appointment_model.dart';
 import 'package:auto_pilot/Models/estimate_model.dart';
+import 'package:auto_pilot/Models/estimate_note_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -28,6 +30,9 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<EditEstimateEvent>(editEstimateBloc);
     on<AddEstimateNoteEvent>(addEstimateNoteBloc);
     on<CreateAppointmentEstimateEvent>(createAppointmentEstimateBloc);
+    on<GetSingleEstimateEvent>(getSingleEstimateBloc);
+    on<GetEstimateNoteEvent>(getEstimateNoteBloc);
+    on<GetEstimateAppointmentEvent>(getEstimateAppointmentBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -197,6 +202,98 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       emit(CreateAppointmentEstimateErrorState(
           errorMessage: "Something went wrong"));
       log("$e create appointment bloc error");
+    }
+  }
+
+  Future<void> getSingleEstimateBloc(
+    GetSingleEstimateEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      CreateEstimateModel createEstimateModel;
+
+      Response singleEstimate =
+          await _apiRepository.getSingleEstimate(token!, event.orderId);
+
+      log("res${singleEstimate.body}");
+
+      if (singleEstimate.statusCode == 200) {
+        createEstimateModel = createEstimateModelFromJson(singleEstimate.body);
+        emit(GetSingleEstimateState(createEstimateModel: createEstimateModel));
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> getEstimateNoteBloc(
+    GetEstimateNoteEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      EstimateNoteModel estimateNoteModel;
+
+      Response estimateNoteRes =
+          await _apiRepository.getEstimateNote(token!, event.orderId);
+
+      log("res${estimateNoteRes.body}");
+
+      if (estimateNoteRes.statusCode == 200) {
+        estimateNoteModel = estimateNoteModelFromJson(estimateNoteRes.body);
+        emit(GetEstimateNoteState(estimateNoteModel: estimateNoteModel));
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> getEstimateAppointmentBloc(
+    GetEstimateAppointmentEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      AppointmentDetailsModel estimateAppointmentModel;
+
+      Response estimateAppointmentRes = await _apiRepository
+          .getEstimatAppointmentDetails(token!, event.orderId);
+
+      log("res${estimateAppointmentRes.body}");
+
+      if (estimateAppointmentRes.statusCode == 200) {
+        estimateAppointmentModel =
+            appointmentDetailsModelFromJson(estimateAppointmentRes.body);
+        emit(GetEstimateAppointmentState(
+            estimateAppointmentModel: estimateAppointmentModel));
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
     }
   }
 }

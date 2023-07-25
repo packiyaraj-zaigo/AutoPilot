@@ -325,6 +325,18 @@ class ApiRepository {
   Future<dynamic> getAllVendors(String token, int page) {
     return apiProvider.getAllVendors(token, page);
   }
+
+  Future getSingleEstimate(String token, String orderId) {
+    return apiProvider.getSingleEstimate(token, orderId);
+  }
+
+  Future getEstimateNote(String token, String orderId) {
+    return apiProvider.getEstimateNote(token, orderId);
+  }
+
+  Future getEstimatAppointmentDetails(String token, String orderId) {
+    return apiProvider.getEstimateAppointmentDetails(token, orderId);
+  }
 }
 
 class NetworkError extends Error {}
