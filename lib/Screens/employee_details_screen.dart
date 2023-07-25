@@ -37,7 +37,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             color: AppColors.primaryColors,
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
           },
         ),
         elevation: 0,
@@ -85,7 +85,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 backgroundColor: Colors.green));
           }
           if (state is DeleteEmployeeErrorState) {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
             CommonWidgets().showDialog(
                 context, 'Something went wrong please try again later');
           }
@@ -428,6 +428,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
 
               child: TextField(
                 controller: messageController,
+                textCapitalization: TextCapitalization.sentences,
                 decoration: InputDecoration(
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(
@@ -626,7 +627,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
       child: GestureDetector(
         onTap: () async {
           if (title == 'Delete') {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(true);
             showDialog(
               context: context,
               builder: (context) => CupertinoAlertDialog(
@@ -637,7 +638,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                   CupertinoButton(
                     child: const Text('Yes'),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(true);
                       BlocProvider.of<EmployeeBloc>(context).add(
                         DeleteEmployee(
                           id: widget.employee.id!,
@@ -649,7 +650,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                   CupertinoButton(
                     child: const Text('No'),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(context).pop(true);
                     },
                   ),
                 ],

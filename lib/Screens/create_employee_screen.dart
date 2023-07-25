@@ -46,7 +46,15 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     firstNameController.text = employee.firstName ?? '';
     lastNameController.text = employee.lastName ?? '';
     emailController.text = employee.email ?? '';
-    phoneController.text = employee.phone ?? '';
+    if (employee.phone != null) {
+      phoneController.text = '(' +
+          widget.employee!.phone!.substring(0, 3) +
+          ')' +
+          ' ' +
+          widget.employee!.phone!.substring(3, 6) +
+          "-" +
+          widget.employee!.phone!.substring(6);
+    }
     dropdownValue = employee.roles![0].name!;
   }
 
@@ -136,6 +144,10 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                   widget.employee!.firstName = firstNameController.text;
                   widget.employee!.lastName = lastNameController.text;
                   widget.employee!.email = emailController.text;
+                  widget.employee!.phone = phoneController.text
+                      .trim()
+                      .replaceAll(RegExp(r'[^\w\s]+'), '')
+                      .replaceAll(" ", "");
                   widget.employee!.roles![0].name = dropdownValue;
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => EmployeeDetailsScreen(
@@ -634,7 +646,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             .replaceAll(RegExp(r'[^\w\s]+'), '')
             .replaceAll(" ", "")
             .length <
-        6) {
+        10) {
       phoneError = 'Enter a valid phone number';
       status = false;
     } else {
