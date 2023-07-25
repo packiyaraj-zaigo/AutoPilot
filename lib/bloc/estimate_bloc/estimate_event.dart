@@ -43,3 +43,18 @@ class CreateAppointmentEstimateEvent extends EstimateEvent {
       required this.customerId,
       required this.vehicleId});
 }
+
+class GetSingleEstimateEvent extends EstimateEvent {
+  final String orderId;
+  GetSingleEstimateEvent({required this.orderId});
+}
+
+class GetEstimateNoteEvent extends EstimateEvent {
+  final String orderId;
+  GetEstimateNoteEvent({required this.orderId});
+}
+
+class GetEstimateAppointmentEvent extends EstimateEvent {
+  final String orderId;
+  GetEstimateAppointmentEvent({required this.orderId});
+}

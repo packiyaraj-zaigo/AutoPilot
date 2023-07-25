@@ -368,7 +368,13 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
               ));
             } else if (state is EditEstimateState) {
               Navigator.pop(context);
-              Navigator.pop(context, state.createEstimateModel);
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                  );
+                },
+              ));
             }
             // TODO: implement listener
           },

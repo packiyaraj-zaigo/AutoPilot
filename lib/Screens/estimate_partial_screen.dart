@@ -1,4 +1,6 @@
 import 'package:auto_pilot/Models/create_estimate_model.dart';
+import 'package:auto_pilot/Models/estimate_appointment_model.dart';
+import 'package:auto_pilot/Models/estimate_note_model.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
@@ -51,10 +53,20 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   String customerErrorMsg = '';
   String estimateNoteErrorMsg = '';
 
+  //Estimate note model variables
+  EstimateNoteModel? estimateNoteModel;
+
+  //Appoitment Details model variables
+  AppointmentDetailsModel? appointmentDetailsModel;
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+      create: (context) => EstimateBloc(apiRepository: ApiRepository())
+        ..add(GetEstimateNoteEvent(
+            orderId: widget.estimateDetails.data.id.toString()))
+        ..add(GetEstimateAppointmentEvent(
+            orderId: widget.estimateDetails.data.id.toString())),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
           if (state is AddEstimateNoteState) {
@@ -69,6 +81,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                 return BottomBarScreen();
               },
             ), (route) => false);
+          }
+          if (state is GetEstimateNoteState) {
+            estimateNoteModel = state.estimateNoteModel;
+          }
+          if (state is GetEstimateAppointmentState) {
+            appointmentDetailsModel = state.estimateAppointmentModel;
           }
           // TODO: implement listener
         },
@@ -197,11 +215,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                         padding: const EdgeInsets.only(top: 16.0),
                         child: subTitleWidget("Estimate Notes"),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Enter Note", estimateNoteController,
-                            "Note", estimateNoteErrorStatus),
-                      ),
+                      estimateNoteModel?.data != null &&
+                              estimateNoteModel!.data.isNotEmpty
+                          ? estimateNoteWidget()
+                          : Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: textBox(
+                                  "Enter Note",
+                                  estimateNoteController,
+                                  "Note",
+                                  estimateNoteErrorStatus),
+                            ),
                       // Padding(
                       //   padding: const EdgeInsets.only(top: 20.0),
                       //   child: Row(
@@ -253,35 +277,47 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                         padding: const EdgeInsets.only(top: 16.0),
                         child: subTitleWidget("Appointment"),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 24.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            halfTextBox(
-                                "Select Time",
-                                startTimeController,
-                                "Start time",
-                                startTimeErrorStatus,
-                                "start_time"),
-                            halfTextBox("Select Time", endTimeController,
-                                "End time", endTimeErrorStatus, "end_time")
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Select Date", dateController, "Date",
-                            dateErrorStatus),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox(
-                            "Enter Appointment Note",
-                            appointmentController,
-                            "Appointment note",
-                            appointmentErrorStatus),
-                      ),
+                      appointmentDetailsModel?.data != null &&
+                              appointmentDetailsModel!.data.data.isNotEmpty
+                          ? appointmentDetailsWidget()
+                          : Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 24.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      halfTextBox(
+                                          "Select Time",
+                                          startTimeController,
+                                          "Start time",
+                                          startTimeErrorStatus,
+                                          "start_time"),
+                                      halfTextBox(
+                                          "Select Time",
+                                          endTimeController,
+                                          "End time",
+                                          endTimeErrorStatus,
+                                          "end_time")
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: textBox("Select Date", dateController,
+                                      "Date", dateErrorStatus),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: textBox(
+                                      "Enter Appointment Note",
+                                      appointmentController,
+                                      "Appointment note",
+                                      appointmentErrorStatus),
+                                ),
+                              ],
+                            ),
 
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
@@ -578,8 +614,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                   spreadRadius: 0.7,
                   offset: Offset(3, 2))
             ]),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -587,33 +623,40 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "10/10/2023 - 3:34 PM",
-                    style: TextStyle(
+                    estimateNoteModel?.data != null &&
+                            estimateNoteModel?.data != []
+                        ? "${estimateNoteModel?.data[0].createdAt.month}/${estimateNoteModel?.data[0].createdAt.day}/${estimateNoteModel?.data[0].createdAt.year} - ${estimateNoteModel?.data[0].createdAt.hour}:${estimateNoteModel?.data[0].createdAt.minute}"
+                        : "",
+                    style: const TextStyle(
                         color: Color(0xff6A7187),
                         fontSize: 14,
                         fontWeight: FontWeight.w500),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.more_horiz,
                     color: AppColors.primaryColors,
                   )
                 ],
               ),
-              Text(
-                "John Doe",
-                style: TextStyle(
-                    color: Color(0xff6A7187),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500),
-              ),
-              Text(
-                "This is a note entry for the vehicle, it can be multiple lines tall.",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    height: 1.3),
-              ),
+              estimateNoteModel?.data != null && estimateNoteModel?.data != []
+                  ? Text(
+                      "${estimateNoteModel?.data[0].createdBy.firstName} ${estimateNoteModel?.data[0].createdBy.lastName}",
+                      style: const TextStyle(
+                          color: Color(0xff6A7187),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500),
+                    )
+                  : const Text(""),
+              estimateNoteModel?.data != null && estimateNoteModel?.data != []
+                  ? Text(
+                      "${estimateNoteModel?.data[0].comments}",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          height: 1.3),
+                    )
+                  : Text(""),
             ],
           ),
         ),
@@ -660,8 +703,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              appointmentLabelwithValue("Start date", "03/12/23"),
-              appointmentLabelwithValue("Completion date", "08/12/23")
+              appointmentLabelwithValue(
+                  "Start date",
+                  appointmentDetailsModel?.data.data != null &&
+                          appointmentDetailsModel?.data.data != []
+                      ? "${appointmentDetailsModel?.data.data[0].startOn.month}/${appointmentDetailsModel?.data.data[0].startOn.day}/${appointmentDetailsModel?.data.data[0].startOn.year}"
+                      : ""),
+              appointmentLabelwithValue(
+                  "Completion date",
+                  appointmentDetailsModel?.data.data != null &&
+                          appointmentDetailsModel?.data.data != []
+                      ? "${appointmentDetailsModel?.data.data[0].endOn.month}/${appointmentDetailsModel?.data.data[0].endOn.day}/${appointmentDetailsModel?.data.data[0].endOn.year}"
+                      : "")
             ],
           ),
           Padding(
@@ -669,19 +722,38 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                appointmentLabelwithValue("Start time", "08:00 Am"),
-                appointmentLabelwithValue("End time", "12:00 Pm")
+                appointmentLabelwithValue(
+                    "Start time",
+                    appointmentDetailsModel?.data.data != null &&
+                            appointmentDetailsModel?.data.data != []
+                        ? "${appointmentDetailsModel?.data.data[0].startOn.hour}:${appointmentDetailsModel?.data.data[0].startOn.minute}"
+                        : ""),
+                appointmentLabelwithValue(
+                    "End time",
+                    appointmentDetailsModel?.data.data != null &&
+                            appointmentDetailsModel?.data.data != []
+                        ? "${appointmentDetailsModel?.data.data[0].endOn.hour}:${appointmentDetailsModel?.data.data[0].endOn.minute}"
+                        : "")
               ],
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
-            child: appointmentLabelwithValue("Date", "10/10/23"),
+            child: appointmentLabelwithValue(
+                "Date",
+                appointmentDetailsModel?.data.data != null &&
+                        appointmentDetailsModel?.data.data != []
+                    ? "${appointmentDetailsModel?.data.data[0].startOn.month}/${appointmentDetailsModel?.data.data[0].startOn.day}/${appointmentDetailsModel?.data.data[0].startOn.year}"
+                    : ""),
           ),
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
-            child: appointmentLabelwithValue("Appointment note",
-                "Customers girlfriend will drop the car off."),
+            child: appointmentLabelwithValue(
+                "Appointment note",
+                appointmentDetailsModel?.data.data != null &&
+                        appointmentDetailsModel?.data.data != []
+                    ? appointmentDetailsModel?.data.data[0].notes ?? ""
+                    : ""),
           ),
         ],
       ),

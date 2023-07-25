@@ -54,11 +54,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       DummyScreen(name: "Work flow Screen"),
       DummyScreen(name: "Calendar Screen"),
       //  CalendarScreen(),
-      // EstimateScreen(
-      //   tabController: estimateTabController,
-      // )
+      EstimateScreen(
+        tabController: estimateTabController,
+      )
 
-      DummyScreen(name: "Estimate screen")
+      // DummyScreen(name: "Estimate screen")
     ];
     // TODO: implement initState
     super.initState();
@@ -525,10 +525,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Estimate",
                   "assets/images/estimate_icon.svg",
-                  DummyScreen(
-                    name: "Create estimate screen",
-                  )),
-              //  CreateEstimateScreen()),
+                  // DummyScreen(
+                  //   name: "Create estimate screen",
+                  // )),
+                  CreateEstimateScreen()),
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",

@@ -271,16 +271,27 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                 },
               ));
             } else if (state is EditEstimateState) {
-              Navigator.pop(context, state.createEstimateModel);
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                  );
+                },
+              ));
             }
             // TODO: implement listener
           },
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
               return CupertinoAlertDialog(
-                title: const Text("Create Estimate?"),
-                content: Text(
-                    "Do you want to create an Estimate with this Customer?"),
+                title: widget.navigation == "new"
+                    ? const Text("Create Estimate?")
+                    : const Text("Update Estimate?"),
+                content: widget.navigation == "new"
+                    ? const Text(
+                        "Do you want to create an Estimate with this Customer?")
+                    : const Text(
+                        "Do you want to Add this Customer to Estimate?"),
                 actions: <Widget>[
                   CupertinoDialogAction(
                       child: const Text("Yes"),
