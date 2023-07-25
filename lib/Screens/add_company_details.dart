@@ -10,6 +10,7 @@ import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:country_data/country_data.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:csc_picker/csc_picker.dart';
 
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
@@ -20,6 +21,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
+import 'package:url_launcher/url_launcher_string.dart';
 
 class AddCompanyDetailsScreen extends StatefulWidget {
   const AddCompanyDetailsScreen(
@@ -83,6 +85,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
   String businessNameErrorMsg = '';
   String phoneErrorMsg = '';
+  String businessWebsiteError = '';
   String addressErrorMsg = '';
   String countryErrorMsg = '';
   String cityErrorMsg = '';
@@ -404,6 +407,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             errorMessageWidget(phoneErrorMsg, businessPhoneErrorStatus),
             textBox("Enter Business Website", businessWebsiteController,
                 "Business Website", businessWebsiteErrorStatus, false),
+            errorMessageWidget(
+                businessWebsiteError, businessWebsiteErrorStatus),
+
             textBox("Enter Address", addressController, "Address",
                 addressErrorStatus, true),
             errorMessageWidget(addressErrorMsg, addressErrorStatus),
@@ -540,7 +546,9 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                   : MediaQuery.of(context).size.width,
               child: TextField(
                 controller: controller,
-                textCapitalization: TextCapitalization.sentences,
+                textCapitalization: label != "Business Website"
+                    ? TextCapitalization.sentences
+                    : TextCapitalization.none,
                 inputFormatters: label == "Business Phone"
                     ? [PhoneInputFormatter()]
                     : label == "Number of Employees" ||
@@ -1119,7 +1127,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     );
   }
 
-  void validateBasicDetails() {
+  void validateBasicDetails() async {
     if (busineesNameController.text.trim().isEmpty) {
       setState(() {
         businessNameErrorStatus = true;
@@ -1141,7 +1149,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
               .replaceAll(RegExp(r'[^\w\s]+'), '')
               .replaceAll(" ", "")
               .length <
-          6) {
+          10) {
         setState(() {
           businessPhoneErrorStatus = true;
           phoneErrorMsg = "Please enter a valid business phone";
@@ -1152,6 +1160,26 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         });
       }
     }
+    String url = businessWebsiteController.text.trim();
+    final RegExp websiteUrlRegex = RegExp(
+        r'^(?:(?:https?|ftp)://)?' // Protocol (optional)
+        r'(?:www\.)?' // Subdomain "www." (optional)
+        r'([a-zA-Z0-9_\-]+\.)*[a-zA-Z0-9][a-zA-Z0-9_\-]+\.[a-zA-Z]{2,}' // Domain name
+        r'(?::\d{1,5})?' // Port (optional)
+        r'(?:\/[^\s]*)?' // Path (optional)
+        );
+    final validUrl = websiteUrlRegex.hasMatch(url);
+    if (validUrl != true && businessWebsiteController.text.trim().isNotEmpty) {
+      setState(() {
+        businessWebsiteError = 'Please enter a valid website';
+        businessWebsiteErrorStatus = true;
+      });
+    } else {
+      setState(() {
+        businessWebsiteErrorStatus = false;
+      });
+    }
+
     if (addressController.text.trim().isEmpty) {
       setState(() {
         addressErrorStatus = true;

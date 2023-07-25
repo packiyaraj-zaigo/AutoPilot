@@ -1149,7 +1149,7 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
               .replaceAll(RegExp(r'[^\w\s]+'), '')
               .replaceAll(" ", "")
               .length <
-          6) {
+          10) {
         setState(() {
           phoneNumberErrorStatus = true;
           phoneErrorMsg = 'Please enter a valid phone number';

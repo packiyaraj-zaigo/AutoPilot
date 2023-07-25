@@ -265,6 +265,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             width: double.infinity,
             child: CupertinoTextField(
               controller: licSeachController,
+              textCapitalization: TextCapitalization.characters,
               placeholder: "Enter LIC Number",
               suffix: IconButton(
                   onPressed: () {
@@ -563,6 +564,7 @@ class _ScannerScreenState extends State<ScannerScreen>
             width: double.infinity,
             child: CupertinoTextField(
               placeholder: "Search VIN Number",
+              textCapitalization: TextCapitalization.characters,
               controller: searchController,
               suffix: IconButton(
                   onPressed: () {

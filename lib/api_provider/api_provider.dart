@@ -1112,6 +1112,7 @@ class ApiProvider {
     try {
       final response = http.put(Uri.parse('${BASE_URL}api/users/$id'),
           headers: getHeader(token), body: json.encode(model.toJson()));
+      inspect(response);
       return response;
     } catch (e) {
       print(e.toString() + 'Create employee error');
