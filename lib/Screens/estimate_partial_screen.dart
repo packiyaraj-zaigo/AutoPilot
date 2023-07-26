@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_appointment_model.dart';
 import 'package:auto_pilot/Models/estimate_note_model.dart';
+import 'package:auto_pilot/Models/order_image_model.dart' as oi;
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/Screens/select_service_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
@@ -13,10 +17,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EstimatePartialScreen extends StatefulWidget {
-  const EstimatePartialScreen({super.key, required this.estimateDetails});
+  const EstimatePartialScreen(
+      {super.key, required this.estimateDetails, this.navigation});
   final CreateEstimateModel estimateDetails;
+  final String? navigation;
 
   @override
   State<EstimatePartialScreen> createState() => _EstimatePartialScreenState();
@@ -27,6 +34,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   bool isAppointment = false;
   bool isInspectionPhotos = false;
   bool isService = false;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   //Text Editing Controllers
   final vehicleController = TextEditingController();
@@ -59,6 +67,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   //Appoitment Details model variables
   AppointmentDetailsModel? appointmentDetailsModel;
 
+  //Image variables
+  final ImagePicker imagePicker = ImagePicker();
+  List<XFile>? imageFileList = [];
+  File? selectedImage;
+  List<String> networkImageList = ["", "", "", ""];
+  List<oi.Datum> newOrderImageData = [];
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -66,6 +81,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
         ..add(GetEstimateNoteEvent(
             orderId: widget.estimateDetails.data.id.toString()))
         ..add(GetEstimateAppointmentEvent(
+            orderId: widget.estimateDetails.data.id.toString()))
+        ..add(GetAllOrderImageEvent(
             orderId: widget.estimateDetails.data.id.toString())),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
@@ -87,15 +104,49 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
           }
           if (state is GetEstimateAppointmentState) {
             appointmentDetailsModel = state.estimateAppointmentModel;
+          } else if (state is EstimateUploadImageState) {
+            print(state.imagePath);
+            print("emitted ui");
+
+            networkImageList[state.index] = state.imagePath;
+
+            print(networkImageList.length);
+            print(networkImageList);
+          } else if (state is EstimateCreateOrderImageState) {
+            print("image ui state emitted");
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+              builder: (context) {
+                return BottomBarScreen();
+              },
+            ), (route) => false);
           }
+          if (state is GetOrderImageState) {
+            newOrderImageData.addAll(state.orderImageModel.data);
+          }
+
           // TODO: implement listener
         },
         child: BlocBuilder<EstimateBloc, EstimateState>(
           builder: (context, state) {
+            print(state);
             return Scaffold(
+              key: _scaffoldKey,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
+                leading: IconButton(
+                    onPressed: () {
+                      if (widget.navigation == "bottom_nav") {
+                        Navigator.pop(context);
+                      } else {
+                        Navigator.pop(context);
+                        Navigator.pop(context);
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: AppColors.primaryColors,
+                    )),
                 foregroundColor: AppColors.primaryColors,
                 actions: [
                   Padding(
@@ -126,6 +177,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                                       .toString(),
                                   vehicleId: "22"));
                         }
+                        if (networkImageList.isNotEmpty) {
+                          context.read<EstimateBloc>().add(
+                              CreateOrderImageEvent(
+                                  imageUrlList:
+                                      networkImageList.where((element) {
+                                    return element != "";
+                                  }).toList(),
+                                  inspectionId: "",
+                                  orderId: widget.estimateDetails.data.id
+                                      .toString()));
+                        }
+
+                        Navigator.pop(context);
                       },
                       child: const Row(
                         children: [
@@ -174,7 +238,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                       Padding(
                         padding: EdgeInsets.only(top: 16.0),
                         child: Text(
-                          'Estimate #${widget.estimateDetails.data.id}',
+                          'Estimate #${widget.estimateDetails.data.orderNumber}',
                           style: const TextStyle(
                               color: AppColors.primaryTitleColor,
                               fontSize: 18,
@@ -337,16 +401,60 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            GestureDetector(
+                          // children: [
+                          //   GestureDetector(
+                          //       onTap: () {
+                          //         showActionSheet(context);
+                          //       },
+                          //       child: inspectionPhotoWidget(
+                          //           networkImageList.length >= 1
+                          //               ? networkImageList[0]
+                          //               : "")),
+                          //   GestureDetector(
+                          //     onTap: () {
+                          //       showActionSheet(context);
+                          //     },
+                          //     child: inspectionPhotoWidget(
+                          //         networkImageList.length >= 2
+                          //             ? networkImageList[1]
+                          //             : ""),
+                          //   ),
+                          //   GestureDetector(
+                          //       onTap: () {
+                          //         showActionSheet(context);
+                          //       },
+                          //       child: inspectionPhotoWidget(
+                          //           networkImageList.length >= 3
+                          //               ? networkImageList[2]
+                          //               : "")),
+                          //   GestureDetector(
+                          //       onTap: () {
+                          //         showActionSheet(context);
+                          //       },
+                          //       child: inspectionPhotoWidget(
+                          //           networkImageList.length >= 4
+                          //               ? networkImageList[3]
+                          //               : ""))
+                          // ],
+
+                          children: List.generate(4, (index) {
+                            return GestureDetector(
                                 onTap: () {
-                                  showActionSheet(context);
+                                  if (newOrderImageData.length > index ||
+                                      networkImageList[index]
+                                          .contains("http")) {
+                                  } else {
+                                    showActionSheet(context, index);
+                                  }
                                 },
-                                child: inspectionPhotoWidget()),
-                            inspectionPhotoWidget(),
-                            inspectionPhotoWidget(),
-                            inspectionPhotoWidget()
-                          ],
+                                child: newOrderImageData.length > index
+                                    ? inspectionPhotoWidget(
+                                        newOrderImageData[index].fileName,
+                                        newOrderImageData[index].id.toString(),
+                                        index)
+                                    : inspectionPhotoWidget(
+                                        networkImageList[index], "", index));
+                          }),
                         ),
                       ),
 
@@ -1066,6 +1174,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                       );
                     },
                   ));
+                } else if (label == "Service") {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return SelectServiceScreen();
+                    },
+                  ));
                 }
               },
               keyboardType:
@@ -1270,7 +1384,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
     );
   }
 
-  void showActionSheet(BuildContext context) {
+  void showActionSheet(BuildContext context, int index) {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
@@ -1278,7 +1392,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.pop(context);
-                //  selectImages("camera");
+                selectImages("camera").then((value) {
+                  print(selectedImage);
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      EstimateUploadImageEvent(
+                          imagePath: selectedImage!,
+                          orderId: widget.estimateDetails.data.id.toString(),
+                          index: index));
+                });
               },
               child: Row(
                 children: [
@@ -1297,7 +1418,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
             CupertinoActionSheetAction(
               onPressed: () {
                 Navigator.pop(context);
-                //   selectImages("lib");
+                selectImages("lib").then((value) {
+                  print(selectedImage);
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      EstimateUploadImageEvent(
+                          imagePath: selectedImage!,
+                          orderId: widget.estimateDetails.data.id.toString(),
+                          index: index));
+                });
+                ;
               },
               child: Row(
                 children: [
@@ -1324,16 +1453,122 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
     );
   }
 
-  Widget inspectionPhotoWidget() {
+  Widget inspectionPhotoWidget(String networkUrl, String imageId, int index) {
     return Container(
       width: MediaQuery.of(context).size.width / 4.8,
       height: 75,
       decoration: BoxDecoration(
           border: Border.all(color: const Color(0xffE8EAED)),
           borderRadius: BorderRadius.circular(8)),
-      child: const Icon(
-        Icons.add,
-        color: AppColors.primaryColors,
+      child: networkUrl != ""
+          ? ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Stack(
+                fit: StackFit.loose,
+                alignment: AlignmentDirectional.topEnd,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 4.8,
+                    height: 75,
+                    child: Image.network(
+                      networkUrl,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  GestureDetector(
+                      onTap: () {
+                        showPopup(context, "", imageId, index);
+                      },
+                      child: Icon(Icons.close))
+                ],
+              ),
+            )
+          : const Icon(
+              Icons.add,
+              color: AppColors.primaryColors,
+            ),
+    );
+  }
+
+  Future selectImages(source) async {
+    if (source == "camera") {
+      final tempImg = await imagePicker.pickImage(source: ImageSource.camera);
+      // if (imageFileList != null) {
+      if (tempImg != null) {
+        setState(() {
+          selectedImage = File(tempImg.path);
+        });
+      } else {
+        return;
+      }
+
+      // }
+    } else {
+      final tempImage =
+          await imagePicker.pickImage(source: ImageSource.gallery);
+      //  if (imageFile.isNotEmpty) {
+      if (tempImage != null) {
+        setState(() {
+          selectedImage = File(tempImage.path);
+        });
+      } else {
+        return;
+      }
+
+      //  }
+    }
+    //  setState(() {});
+  }
+
+  Future showPopup(BuildContext context, message, String imageId, int index) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is DeleteImageState) {
+              Navigator.pop(context);
+              print("deleted");
+              setState(() {
+                newOrderImageData.removeAt(index);
+              });
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Do You Really Want To Delete?"),
+                content: const Text(
+                    "Deleting this photo will permanently delete it from the database"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        if (imageId != "") {
+                          context
+                              .read<EstimateBloc>()
+                              .add(DeleteOrderImageEvent(imageId: imageId));
+                        } else {
+                          print("heree");
+                          print(index);
+                          setState(() {
+                            networkImageList[index] = "";
+                          });
+
+                          Navigator.pop(context);
+                        }
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

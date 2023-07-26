@@ -71,3 +71,12 @@ class GetAllVendorsErrorState extends ServiceState {
   final String message;
   const GetAllVendorsErrorState({required this.message});
 }
+
+class GetAllCannedServiceState extends ServiceState {
+  final CannedServiceModel cannedServiceModel;
+  GetAllCannedServiceState({required this.cannedServiceModel});
+}
+
+class GetAllCannedServiceLoadingState extends ServiceState {}
+
+class GetAllCannedServiceErrorState extends ServiceState {}

@@ -56,5 +56,34 @@ class GetEstimateNoteEvent extends EstimateEvent {
 
 class GetEstimateAppointmentEvent extends EstimateEvent {
   final String orderId;
+
   GetEstimateAppointmentEvent({required this.orderId});
+}
+
+class EstimateUploadImageEvent extends EstimateEvent {
+  final File imagePath;
+  final String orderId;
+  final int index;
+  EstimateUploadImageEvent(
+      {required this.imagePath, required this.orderId, required this.index});
+}
+
+class CreateOrderImageEvent extends EstimateEvent {
+  final List<String> imageUrlList;
+  final String orderId;
+  final String inspectionId;
+  const CreateOrderImageEvent(
+      {required this.imageUrlList,
+      required this.inspectionId,
+      required this.orderId});
+}
+
+class GetAllOrderImageEvent extends EstimateEvent {
+  final String orderId;
+  GetAllOrderImageEvent({required this.orderId});
+}
+
+class DeleteOrderImageEvent extends EstimateEvent {
+  final String imageId;
+  DeleteOrderImageEvent({required this.imageId});
 }

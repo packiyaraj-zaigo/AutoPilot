@@ -66,3 +66,21 @@ class GetEstimateAppointmentState extends EstimateState {
   final AppointmentDetailsModel estimateAppointmentModel;
   GetEstimateAppointmentState({required this.estimateAppointmentModel});
 }
+
+class EstimateUploadImageState extends EstimateState {
+  final String imagePath;
+  final int index;
+  EstimateUploadImageState({required this.imagePath, required this.index});
+
+  @override
+  List<Object> get props => [imagePath, index];
+}
+
+class EstimateCreateOrderImageState extends EstimateState {}
+
+class GetOrderImageState extends EstimateState {
+  OrderImageModel orderImageModel;
+  GetOrderImageState({required this.orderImageModel});
+}
+
+class DeleteImageState extends EstimateState {}

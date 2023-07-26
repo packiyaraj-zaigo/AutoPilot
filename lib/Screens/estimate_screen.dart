@@ -141,7 +141,9 @@ class _EstimateScreenState extends State<EstimateScreen>
             await Navigator.push(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel);
+                  estimateDetails: state.createEstimateModel,
+                  navigation: "bottom_nav",
+                );
               },
             )).then((value) {
               context.read<EstimateBloc>()
@@ -203,12 +205,24 @@ class _EstimateScreenState extends State<EstimateScreen>
         create: (context) => EstimateBloc(apiRepository: ApiRepository())
           ..add(const GetEstimateEvent(orderStatus: "Estimate")),
         child: BlocListener<EstimateBloc, EstimateState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is GetEstimateState) {
               estimateData.addAll(state.estimateData.data.data);
               print("estimate added");
             } else if (state is GetEstimateLoadingState) {
               estimateData.clear();
+            } else if (state is GetSingleEstimateState) {
+              await Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                    navigation: "bottom_nav",
+                  );
+                },
+              )).then((value) {
+                context.read<EstimateBloc>()
+                  ..add(GetEstimateEvent(orderStatus: ""));
+              });
             }
 
             // TODO: implement listener
@@ -245,12 +259,21 @@ class _EstimateScreenState extends State<EstimateScreen>
                                     : Container();
                               }
 
-                              return tileWidget(
-                                  estimateData[index].orderStatus,
-                                  estimateData[index].orderNumber ?? "",
-                                  estimateData[index].customer?.firstName ?? "",
-                                  "${estimateData[index].vehicle?.vehicleYear} ${estimateData[index].vehicle?.vehicleMake} ${estimateData[index].vehicle?.vehicleModel}",
-                                  estimateData[index].estimationName ?? "");
+                              return GestureDetector(
+                                onTap: () {
+                                  context.read<EstimateBloc>().add(
+                                      GetSingleEstimateEvent(
+                                          orderId:
+                                              recentData[index].id.toString()));
+                                },
+                                child: tileWidget(
+                                    estimateData[index].orderStatus,
+                                    estimateData[index].orderNumber ?? "",
+                                    estimateData[index].customer?.firstName ??
+                                        "",
+                                    "${estimateData[index].vehicle?.vehicleYear} ${estimateData[index].vehicle?.vehicleMake} ${estimateData[index].vehicle?.vehicleModel}",
+                                    estimateData[index].estimationName ?? ""),
+                              );
                             },
                             controller: estimateScrollController
                               ..addListener(() {
@@ -294,12 +317,24 @@ class _EstimateScreenState extends State<EstimateScreen>
         create: (context) => EstimateBloc(apiRepository: ApiRepository())
           ..add(GetEstimateEvent(orderStatus: "Orders")),
         child: BlocListener<EstimateBloc, EstimateState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is GetEstimateState) {
               ordersData.addAll(state.estimateData.data.data);
               print("order added");
             } else if (state is GetEstimateLoadingState) {
               ordersData.clear();
+            } else if (state is GetSingleEstimateState) {
+              await Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                    navigation: "bottom_nav",
+                  );
+                },
+              )).then((value) {
+                context.read<EstimateBloc>()
+                  ..add(GetEstimateEvent(orderStatus: ""));
+              });
             }
 
             // TODO: implement listener
@@ -339,12 +374,21 @@ class _EstimateScreenState extends State<EstimateScreen>
                                         ))
                                     : Container();
                               }
-                              return tileWidget(
-                                  ordersData[index].orderStatus,
-                                  ordersData[index].orderNumber ?? "",
-                                  ordersData[index].customer?.firstName ?? "",
-                                  "${ordersData[index].vehicle?.vehicleYear} ${ordersData[index].vehicle?.vehicleMake} ${ordersData[index].vehicle?.vehicleModel}",
-                                  ordersData[index].estimationName ?? "");
+                              return GestureDetector(
+                                onTap: () {
+                                  context.read<EstimateBloc>().add(
+                                      GetSingleEstimateEvent(
+                                          orderId: recentData[index % 15]
+                                              .id
+                                              .toString()));
+                                },
+                                child: tileWidget(
+                                    ordersData[index].orderStatus,
+                                    ordersData[index].orderNumber ?? "",
+                                    ordersData[index].customer?.firstName ?? "",
+                                    "${ordersData[index].vehicle?.vehicleYear} ${ordersData[index].vehicle?.vehicleMake} ${ordersData[index].vehicle?.vehicleModel}",
+                                    ordersData[index].estimationName ?? ""),
+                              );
                             },
                             controller: orderScrollController
                               ..addListener(() {
@@ -388,12 +432,24 @@ class _EstimateScreenState extends State<EstimateScreen>
         create: (context) => EstimateBloc(apiRepository: ApiRepository())
           ..add(GetEstimateEvent(orderStatus: "Invoice")),
         child: BlocListener<EstimateBloc, EstimateState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is GetEstimateState) {
               print("invoicec added");
               invoiceData.addAll(state.estimateData.data.data);
             } else if (state is GetEstimateLoadingState) {
               invoiceData.clear();
+            } else if (state is GetSingleEstimateState) {
+              await Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                    navigation: "bottom_nav",
+                  );
+                },
+              )).then((value) {
+                context.read<EstimateBloc>()
+                  ..add(GetEstimateEvent(orderStatus: ""));
+              });
             }
 
             // TODO: implement listener
@@ -423,12 +479,20 @@ class _EstimateScreenState extends State<EstimateScreen>
                                     ))
                                 : Container();
                           }
-                          return tileWidget(
-                              invoiceData[index].orderStatus,
-                              invoiceData[index].orderNumber ?? "",
-                              invoiceData[index].customer?.firstName ?? "",
-                              "${invoiceData[index].vehicle?.vehicleYear} ${invoiceData[index].vehicle?.vehicleMake} ${invoiceData[index].vehicle?.vehicleModel}",
-                              invoiceData[index].estimationName ?? "");
+                          return GestureDetector(
+                            onTap: () {
+                              context.read<EstimateBloc>().add(
+                                  GetSingleEstimateEvent(
+                                      orderId:
+                                          recentData[index].id.toString()));
+                            },
+                            child: tileWidget(
+                                invoiceData[index].orderStatus,
+                                invoiceData[index].orderNumber ?? "",
+                                invoiceData[index].customer?.firstName ?? "",
+                                "${invoiceData[index].vehicle?.vehicleYear} ${invoiceData[index].vehicle?.vehicleMake} ${invoiceData[index].vehicle?.vehicleModel}",
+                                invoiceData[index].estimationName ?? ""),
+                          );
                         },
                         controller: invoiceScrollController
                           ..addListener(() {

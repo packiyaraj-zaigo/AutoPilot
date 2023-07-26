@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_appointment_model.dart';
 import 'package:auto_pilot/Models/estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_note_model.dart';
+import 'package:auto_pilot/Models/order_image_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -33,6 +36,10 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<GetSingleEstimateEvent>(getSingleEstimateBloc);
     on<GetEstimateNoteEvent>(getEstimateNoteBloc);
     on<GetEstimateAppointmentEvent>(getEstimateAppointmentBloc);
+    on<EstimateUploadImageEvent>(uploadImageBloc);
+    on<CreateOrderImageEvent>(createOrderImageBloc);
+    on<GetAllOrderImageEvent>(getOrderImageBloc);
+    on<DeleteOrderImageEvent>(deleteOrderImageBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -284,6 +291,137 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
             appointmentDetailsModelFromJson(estimateAppointmentRes.body);
         emit(GetEstimateAppointmentState(
             estimateAppointmentModel: estimateAppointmentModel));
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  uploadImageBloc(
+    EstimateUploadImageEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final Response uploadImageRes =
+          await _apiRepository.uploadImage(token, event.imagePath);
+      final decodedBody = json.decode(uploadImageRes.body);
+
+      log(uploadImageRes.body.toString());
+      if (uploadImageRes.statusCode == 200 ||
+          uploadImageRes.statusCode == 201) {
+        emit(EstimateUploadImageState(
+            imagePath: decodedBody['data']['image'], index: event.index));
+
+        print(decodedBody['data']['image']);
+        print("emitted");
+      } else {
+        emit(CreateAppointmentEstimateErrorState(
+            errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(CreateAppointmentEstimateErrorState(
+          errorMessage: "Something went wrong"));
+      log("$e create appointment bloc error");
+    }
+  }
+
+  createOrderImageBloc(
+    CreateOrderImageEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final Response createInspectionNoteRes =
+          await _apiRepository.createInspectionNote(token, event.orderId);
+      final decodedInspectionResponse =
+          json.decode(createInspectionNoteRes.body);
+
+      log(createInspectionNoteRes.body);
+      if (createInspectionNoteRes.statusCode == 200 ||
+          createInspectionNoteRes.statusCode == 201) {
+        for (int i = 0; i < event.imageUrlList.length; i++) {
+          final Response createOrderImageres =
+              await _apiRepository.createOrderImage(
+                  token,
+                  event.orderId,
+                  event.imageUrlList[i],
+                  decodedInspectionResponse['created_id'].toString());
+
+          if (createOrderImageres.statusCode == 200 ||
+              createOrderImageres.statusCode == 201) {
+            log(createOrderImageres.body);
+            log("image upload completed");
+            emit(EstimateCreateOrderImageState());
+          } else {
+            emit(CreateAppointmentEstimateErrorState(
+                errorMessage: "Something went wrong"));
+          }
+
+          print("emitted");
+        }
+      }
+    } catch (e, s) {
+      emit(CreateAppointmentEstimateErrorState(
+          errorMessage: "Something went wrong"));
+      log("$e create appointment bloc error");
+      print(s);
+      print(e.toString());
+    }
+  }
+
+  Future<void> getOrderImageBloc(
+    GetAllOrderImageEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      OrderImageModel orderImageModel;
+
+      Response orderImageRes =
+          await _apiRepository.getAllOrderImages(token!, event.orderId);
+
+      log("res${orderImageRes.body}");
+
+      if (orderImageRes.statusCode == 200) {
+        orderImageModel = orderImageModelFromJson(orderImageRes.body);
+        emit(GetOrderImageState(orderImageModel: orderImageModel));
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> deleteOrderImageBloc(
+    DeleteOrderImageEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+
+      Response deleteOrderImageRes =
+          await _apiRepository.deleteOrderImage(token!, event.imageId);
+
+      log("res${deleteOrderImageRes.body}");
+
+      if (deleteOrderImageRes.statusCode == 200) {
+        emit(DeleteImageState());
       } else {
         emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
       }
