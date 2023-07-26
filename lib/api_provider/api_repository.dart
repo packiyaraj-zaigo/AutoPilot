@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
@@ -336,6 +338,27 @@ class ApiRepository {
 
   Future getEstimatAppointmentDetails(String token, String orderId) {
     return apiProvider.getEstimateAppointmentDetails(token, orderId);
+  }
+
+  Future uploadImage(String token, File imagePath) {
+    return apiProvider.uploadImage(token, imagePath);
+  }
+
+  Future createOrderImage(
+      String token, String orderId, String imageUrl, String inspectionId) {
+    return apiProvider.createOrderImage(token, orderId, imageUrl, inspectionId);
+  }
+
+  Future createInspectionNote(String token, String orderId) {
+    return apiProvider.createInspectionNotes(token, orderId);
+  }
+
+  Future getAllOrderImages(String token, String orderId) {
+    return apiProvider.getAllOrderImages(token, orderId);
+  }
+
+  Future deleteOrderImage(String token, String imageId) {
+    return apiProvider.deleteOrderImage(token, imageId);
   }
 }
 

@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
+import 'package:auto_pilot/Models/canned_service_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -99,6 +100,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     Emitter<ServiceState> emit,
   ) async {
     try {
+      CannedServiceModel cannedServiceModel;
       emit(ServiceDetailsLoadingState());
       if (currentPage == 1) {
         isEmployeesLoading = true;
@@ -107,17 +109,12 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       final token = await AppUtils.getToken();
       await apiRepo.getServices(token, currentPage, event.query).then((value) {
         if (value.statusCode == 200) {
-          final responseBody = jsonDecode(value.body);
+          cannedServiceModel = cannedServiceModelFromJson(value.body);
           emit(
-            ServiceDetailsSuccessState(
-                // employees: AllEmployeeResponse.fromJson(
-                //   responseBody['data'],
-                // ),
-                ),
-          );
-          final data = responseBody['data'];
-          currentPage = data['current_page'] ?? 1;
-          totalPages = data['last_page'] ?? 1;
+              GetAllCannedServiceState(cannedServiceModel: cannedServiceModel));
+          final data = cannedServiceModel.data;
+          currentPage = data.currentPage;
+          totalPages = data.lastPage;
           if (currentPage <= totalPages) {
             currentPage++;
           }

@@ -12,6 +12,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Models/canned_service_create.dart';
@@ -1242,6 +1243,120 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + " Get all vendors api error");
+    }
+  }
+
+  Future<dynamic> uploadImage(dynamic token, File filePath) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/upload");
+      var request = http.MultipartRequest("POST", url);
+      request.files.add(http.MultipartFile.fromBytes(
+          filename: filePath.path.split("/").last,
+          'image',
+          filePath.readAsBytesSync()));
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createOrderImage(dynamic token, String orderId,
+      String imageUrl, String inspectionId) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/order_images");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['order_id'] = orderId
+        ..fields['file_name'] = imageUrl
+        ..fields['inspection_id'] = inspectionId;
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createInspectionNotes(
+    dynamic token,
+    String orderId,
+  ) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/inspection_notes");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['order_id'] = orderId
+        ..fields['inspection_area'] = "Top"
+        ..fields['comments'] = "static_test_comment";
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> getAllOrderImages(String token, String orderId) async {
+    print("into provider");
+
+    try {
+      // final clientId = await AppUtils.getUserID();
+
+      var url = Uri.parse("${BASE_URL}api/order_images?order_id=$orderId");
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> deleteOrderImage(dynamic token, String imageId) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/order_images/$imageId");
+      var request = http.MultipartRequest("DELETE", url);
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
     }
   }
 }
