@@ -4,9 +4,11 @@ import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
+import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,92 +38,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final TextEditingController taxController = TextEditingController();
   String taxError = '';
   String serviceId = '1';
+
   int? vendorId;
   bool isTax = false;
 
+  CannedServiceCreateModel? service;
   List<CannedServiceAddModel> material = [];
   List<CannedServiceAddModel> part = [];
   List<CannedServiceAddModel> labor = [];
-  List<CannedServiceAddModel> fee = [];
   List<CannedServiceAddModel> subContract = [];
-  CannedServiceCreateModel? service;
-  String subTotal = '0.0';
-
-  //Add material popup controllers
-  final addMaterialNameController = TextEditingController();
-  final addMaterialDescriptionController = TextEditingController();
-  final addMaterialPriceController = TextEditingController();
-  final addMaterialCostController = TextEditingController();
-  final addMaterialDiscountController = TextEditingController();
-  final addMaterialBatchController = TextEditingController();
-
-  //Add material errorstatus and error message variables
-  String adddMaterialNameErrorStatus = '';
-  String addMaterialDescriptionErrorStatus = '';
-  String addMaterialPriceErrorStatus = '';
-  String addMaterialCostErrorStatus = '';
-  String addMaterialDiscountErrorStatus = '';
-  String adddMaterialBatchErrorStatus = '';
-  String addMaterialPricingErrorStatus = '';
-
-  //Add part popup controllers
-  final addPartNameController = TextEditingController();
-  final addPartDescriptionController = TextEditingController();
-  final addPartPriceController = TextEditingController();
-  final addPartCostController = TextEditingController();
-  final addPartDiscountController = TextEditingController();
-  final addPartPartNumberController = TextEditingController();
-
-  //Add part errorstatus and error message variables
-  String addPartNameErrorStatus = '';
-  String addPartDescriptionErrorStatus = '';
-  String addPartPriceErrorStatus = '';
-  String addPartCostErrorStatus = '';
-  String addPartDiscountErrorStatus = '';
-  String adddPartPartNumberErrorStatus = '';
-  String addPartPricingErrorStatus = '';
-
-  //Add Labor popup controllers
-  final addLaborNameController = TextEditingController();
-  final addLaborDescriptionController = TextEditingController();
-  final addLaborCostController = TextEditingController();
-  final addLaborDiscountController = TextEditingController();
-  final addLaborHoursController = TextEditingController();
-
-  //Add Labor errorstatus and error message variables
-  String addLaborNameErrorStatus = '';
-  String addLaborDescriptionErrorStatus = '';
-  String addLaborCostErrorStatus = '';
-  String addLaborDiscountErrorStatus = '';
-  String addLaborHoursErrorStatus = '';
-
-  //Add Fee popup controllers
-  final addFeeNameController = TextEditingController();
-  final addFeeDescriptionController = TextEditingController();
-  final addFeeCostController = TextEditingController();
-  final addFeePriceController = TextEditingController();
-
-  //Add Fee errorstatus and error message variables
-  String addFeeNameErrorStatus = '';
-  String addFeeDescriptionErrorStatus = '';
-  String addFeePriceErrorStatus = '';
-  String addFeeCostErrorStatus = '';
-
-  //Add SubContract popup controllers
-  final addSubContractNameController = TextEditingController();
-  final addSubContractDescriptionController = TextEditingController();
-  final addSubContractCostController = TextEditingController();
-  final addSubContractPriceController = TextEditingController();
-  final addSubContractDiscountController = TextEditingController();
-  final addSubContractVendorController = TextEditingController();
-
-  //Add SubContract errorstatus and error message variables
-  String addSubContractNameErrorStatus = '';
-  String addSubContractDescriptionErrorStatus = '';
-  String addSubContractPriceErrorStatus = '';
-  String addSubContractCostErrorStatus = '';
-  String addSubContractDiscountErrorStatus = '';
-  String addSubContractVendorErrorStatus = '';
+  List<CannedServiceAddModel> fee = [];
 
   dynamic _currentPricingModelSelectedValue;
   List<String> pricingModelList = ['per Sqrt', 'per feet'];
@@ -177,23 +103,47 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             create: (context) => ServiceBloc(),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
-                // if (state is GetTechnicianState) {
-                //   technicianData.addAll(state.technicianModel.data);
-                //   print(technicianData);
-                // }
+                if (state is CreateCannedOrderServiceSuccessState) {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => ServicesListScreen(),
+                  ));
+                  CommonWidgets().showDialog(context, state.message);
+                }
+                if (state is CreateCannedOrderServiceErrorState) {
+                  CommonWidgets().showDialog(context, state.message);
+                }
               },
               child: BlocBuilder<ServiceBloc, ServiceState>(
                 builder: (context, state) {
+                  if (state is CreateCannedOrderServiceLoadingState) {
+                    return const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [CupertinoActivityIndicator()],
+                      ),
+                    );
+                  }
                   return ListView(
                     // crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 16),
-                      textBox('Enter Service Name', serviceNameController,
-                          'Service Name', serviceNameError.isNotEmpty, context),
+                      textBox(
+                          'Enter Service Name',
+                          serviceNameController,
+                          'Service Name',
+                          serviceNameError.isNotEmpty,
+                          context,
+                          true),
                       errorWidget(error: serviceNameError),
                       const SizedBox(height: 16),
-                      textBox('Enter Notes', laborDescriptionController,
-                          'Notes', laborDescriptionError.isNotEmpty, context),
+                      textBox(
+                          'Enter Notes',
+                          laborDescriptionController,
+                          'Notes',
+                          laborDescriptionError.isNotEmpty,
+                          context,
+                          true),
                       errorWidget(error: laborDescriptionError),
 
                       const SizedBox(height: 16),
@@ -494,14 +444,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             rateController,
                             "Labor Rate *For this service",
                             rateError.isNotEmpty,
-                            context),
+                            context,
+                            true),
                       ),
                       errorWidget(error: rateError),
 
                       Padding(
                         padding: const EdgeInsets.only(top: 16.0),
                         child: textBox("Enter Tax", taxController, "Tax",
-                            taxError.isNotEmpty, context),
+                            taxError.isNotEmpty, context, true),
                       ),
                       errorWidget(error: taxError),
 
@@ -512,28 +463,49 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           final validate = validation();
                           if (validate) {
                             log('Here');
-                            final clientId = await AppUtils.getUserID();
-                            service = CannedServiceCreateModel(
-                              clientId: int.parse(clientId),
-                              serviceName: serviceNameController.text,
-                              servicePrice: rateController.text,
-                              discount: '0',
-                              tax: taxController.text,
-                              subTotal: (double.parse(rateController.text) +
-                                      double.parse(taxController.text))
-                                  .toString(),
-                            );
-                            BlocProvider.of<ServiceBloc>(context).add(
-                              CreateCannedOrderServiceEvent(
-                                service: service!,
-                                material: material.isEmpty ? null : material[0],
-                                part: part.isEmpty ? null : part[0],
-                                labor: labor.isEmpty ? null : labor[0],
-                                subcontract:
-                                    subContract.isEmpty ? null : subContract[0],
-                                fee: fee.isEmpty ? null : fee[0],
-                              ),
-                            );
+                            await AppUtils.getUserID().then((clientId) {
+                              double subT = 0;
+                              material.forEach((element) {
+                                subT += double.parse(element.subTotal);
+                              });
+                              part.forEach((element) {
+                                subT += double.parse(element.subTotal);
+                              });
+                              labor.forEach((element) {
+                                subT += double.parse(element.subTotal);
+                              });
+                              subContract.forEach((element) {
+                                subT += double.parse(element.subTotal);
+                              });
+                              fee.forEach((element) {
+                                subT += double.parse(element.subTotal);
+                              });
+                              subT += double.tryParse(rateController.text) ?? 0;
+                              subT += double.tryParse(taxController.text) ?? 0;
+
+                              service = CannedServiceCreateModel(
+                                clientId: int.parse(clientId),
+                                serviceName: serviceNameController.text,
+                                servicePrice: rateController.text,
+                                discount: '0',
+                                tax: taxController.text,
+                                subTotal: subT.toStringAsFixed(2),
+                              );
+                              log(subT.toString());
+                              BlocProvider.of<ServiceBloc>(context).add(
+                                CreateCannedOrderServiceEvent(
+                                  service: service!,
+                                  material:
+                                      material.isEmpty ? null : material[0],
+                                  part: part.isEmpty ? null : part[0],
+                                  labor: labor.isEmpty ? null : labor[0],
+                                  subcontract: subContract.isEmpty
+                                      ? null
+                                      : subContract[0],
+                                  fee: fee.isEmpty ? null : fee[0],
+                                ),
+                              );
+                            });
                           }
                         },
                         child: Container(
@@ -571,18 +543,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   Widget textBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus, BuildContext context,
+      String label, bool errorStatus, BuildContext context, bool isRequired,
       [StateSetter? setState]) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: Color(0xff6A7187),
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff6A7187),
+              ),
+            ),
+            isRequired
+                ? const Text(
+                    " *",
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: Color(
+                        0xffD80027,
+                      ),
+                    ),
+                  )
+                : SizedBox(),
+          ],
         ),
         const SizedBox(height: 3),
         Padding(
@@ -593,13 +581,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
+              onChanged: setState != null
+                  ? (value) {
+                      setState(() {});
+                    }
+                  : null,
               readOnly: label == "Vendor",
               onTap: label == "Vendor"
                   ? () {
                       showModalBottomSheet(
                           context: context,
                           builder: (context) {
-                            return vendorsBottomSheet();
+                            return vendorsBottomSheet(controller, vendorId);
                           },
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent);
@@ -607,39 +600,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   : null,
               controller: controller,
               maxLength: 50,
-              onChanged: label == 'Discount' ||
-                      label == 'Price' ||
-                      label == "Cost"
-                  ? (value) {
-                      if (addMaterialPriceController.text.isNotEmpty &&
-                          addMaterialDiscountController.text.isNotEmpty) {
-                        subTotal =
-                            (double.parse(addMaterialPriceController.text) -
-                                    double.parse(
-                                        addMaterialDiscountController.text))
-                                .toString();
-                        setState!(() {});
-                      } else if (addMaterialPriceController.text.isNotEmpty) {
-                        subTotal = addMaterialPriceController.text;
-                        // setState!(() {});
-                      }
-                      if (label == 'Cost' &&
-                          setState != null &&
-                          addLaborCostController.text.isNotEmpty &&
-                          addLaborDiscountController.text.isNotEmpty) {
-                        subTotal = (double.parse(addLaborCostController.text) -
-                                double.parse(addLaborDiscountController.text))
-                            .toString();
-                        setState(() {});
-                      } else if (addLaborCostController.text.isNotEmpty &&
-                          label == "Cost") {
-                        subTotal = addLaborCostController.text;
-                        setState!(() {});
-                      }
-                    }
-                  : null,
               decoration: InputDecoration(
-                suffixIcon: label == 'Discount'
+                suffixIcon: label == 'Discount' || label.contains("Labor")
                     ? const Icon(
                         CupertinoIcons.money_dollar,
                         color: AppColors.primaryColors,
@@ -649,7 +611,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             CupertinoIcons.chevron_down,
                             color: AppColors.primaryColors,
                           )
-                        : null,
+                        : label == "Tax"
+                            ? const Icon(
+                                Icons.percent,
+                                color: AppColors.primaryColors,
+                                // size: 18,
+                              )
+                            : null,
                 hintText: placeHolder,
                 counterText: "",
                 border: OutlineInputBorder(
@@ -682,143 +650,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         ),
       ],
     );
-  }
-
-  addMaterialValidation(StateSetter setState) {
-    bool status = true;
-    if (addMaterialNameController.text.trim().isEmpty) {
-      adddMaterialNameErrorStatus = 'Service name cannot be empty';
-      status = false;
-    } else {
-      adddMaterialNameErrorStatus = '';
-    }
-    if (addMaterialPriceController.text.trim().isEmpty) {
-      addMaterialPriceErrorStatus = 'Price cannot be empty';
-      status = false;
-    } else {
-      addMaterialPriceErrorStatus = '';
-    }
-    if (addMaterialDiscountController.text.trim().isEmpty) {
-      addMaterialDiscountErrorStatus = 'Discount cannot be empty';
-      status = false;
-    } else {
-      addMaterialDiscountErrorStatus = '';
-    }
-
-    setState(() {});
-    return status;
-  }
-
-  addPartValidation(StateSetter setState) {
-    bool status = true;
-    if (addPartNameController.text.trim().isEmpty) {
-      addPartNameErrorStatus = 'Service name cannot be empty';
-      status = false;
-    } else {
-      addPartNameErrorStatus = '';
-    }
-    if (addPartPriceController.text.trim().isEmpty) {
-      addPartPriceErrorStatus = 'Price cannot be empty';
-      status = false;
-    } else {
-      addPartPriceErrorStatus = '';
-    }
-    if (addPartDiscountController.text.trim().isEmpty) {
-      addPartDiscountErrorStatus = 'Discount cannot be empty';
-      status = false;
-    } else {
-      addPartDiscountErrorStatus = '';
-    }
-
-    setState(() {});
-    return status;
-  }
-
-  addLaborValidation(StateSetter setState) {
-    bool status = true;
-    if (addLaborNameController.text.trim().isEmpty) {
-      addLaborNameErrorStatus = 'Service name cannot be empty';
-      status = false;
-    } else {
-      addLaborNameErrorStatus = '';
-    }
-    if (addLaborCostController.text.trim().isEmpty) {
-      addLaborCostErrorStatus = 'Cost cannot be empty';
-      status = false;
-    } else {
-      addLaborCostErrorStatus = '';
-    }
-    if (addLaborDiscountController.text.trim().isEmpty) {
-      addLaborDiscountErrorStatus = 'Discount cannot be empty';
-      status = false;
-    } else {
-      addLaborDiscountErrorStatus = '';
-    }
-
-    setState(() {});
-    return status;
-  }
-
-  addSubContractValidation(StateSetter setState) {
-    bool status = true;
-    if (addSubContractNameController.text.trim().isEmpty) {
-      addSubContractNameErrorStatus = 'Service name cannot be empty';
-      status = false;
-    } else {
-      addSubContractNameErrorStatus = '';
-    }
-    if (addSubContractPriceController.text.trim().isEmpty) {
-      addSubContractPriceErrorStatus = 'Price cannot be empty';
-      status = false;
-    } else {
-      addSubContractPriceErrorStatus = '';
-    }
-    if (addSubContractDescriptionController.text.trim().isEmpty) {
-      addSubContractDescriptionErrorStatus = 'Description cannot be empty';
-      status = false;
-    } else {
-      addSubContractDescriptionErrorStatus = '';
-    }
-    if (addSubContractDiscountController.text.trim().isEmpty) {
-      addSubContractDiscountErrorStatus = 'Discount cannot be empty';
-      status = false;
-    } else {
-      addSubContractDiscountErrorStatus = '';
-    }
-
-    setState(() {});
-    return status;
-  }
-
-  addFeeValidation(StateSetter setState) {
-    bool status = true;
-    if (addFeeNameController.text.trim().isEmpty) {
-      addFeeNameErrorStatus = 'Service name cannot be empty';
-      status = false;
-    } else {
-      addFeeNameErrorStatus = '';
-    }
-    if (addFeeCostController.text.trim().isEmpty) {
-      addFeeCostErrorStatus = 'Cost cannot be empty';
-      status = false;
-    } else {
-      addFeeCostErrorStatus = '';
-    }
-    if (addFeePriceController.text.trim().isEmpty) {
-      addFeePriceErrorStatus = 'Price cannot be empty';
-      status = false;
-    } else {
-      addFeePriceErrorStatus = '';
-    }
-    if (addFeeDescriptionController.text.trim().isEmpty) {
-      addFeeDescriptionErrorStatus = 'Description cannot be empty';
-      status = false;
-    } else {
-      addFeeDescriptionErrorStatus = '';
-    }
-
-    setState(() {});
-    return status;
   }
 
   validation() {
@@ -878,12 +709,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           GestureDetector(
             onTap: () {
               if (label == "Material") {
-                subTotal = '0.0';
-                adddMaterialNameErrorStatus = '';
-                addMaterialCostErrorStatus = '';
-                addMaterialDescriptionErrorStatus = '';
-                addMaterialDiscountErrorStatus = '';
-                addMaterialPriceErrorStatus = '';
                 showDialog(
                   barrierDismissible: false,
                   context: context,
@@ -896,8 +721,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   },
                 );
               } else if (label == 'Part') {
-                subTotal = '0.0';
-
                 showDialog(
                   barrierDismissible: false,
                   context: context,
@@ -910,8 +733,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   },
                 );
               } else if (label == 'Labor') {
-                subTotal = '0.0';
-
                 showDialog(
                   barrierDismissible: false,
                   context: context,
@@ -924,7 +745,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   },
                 );
               } else if (label == "Fee") {
-                subTotal = '0.0';
                 showDialog(
                   context: context,
                   builder: (context) {
@@ -936,7 +756,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   },
                 );
               } else {
-                subTotal = '0.0';
                 showDialog(
                   context: context,
                   builder: (context) {
@@ -972,220 +791,362 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   addMaterialPopup() {
-    return StatefulBuilder(builder: (context, StateSetter newSetState) {
-      return SingleChildScrollView(
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    "Add Material",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTitleColor),
-                  ),
-                  IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      })
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: textBox("Enter Material Name", addMaterialNameController,
-                    "Name", adddMaterialNameErrorStatus.isNotEmpty, context),
-              ),
-              errorWidget(error: adddMaterialNameErrorStatus),
-              Padding(
-                padding: const EdgeInsets.only(top: 17.0),
-                child: textBox(
-                    "Enter Material Description",
-                    addMaterialDescriptionController,
-                    "Description",
-                    addMaterialDescriptionErrorStatus.isNotEmpty,
-                    context),
-              ),
-              errorWidget(error: addMaterialDescriptionErrorStatus),
-              Padding(
-                padding: const EdgeInsets.only(top: 17.0),
-                child: Row(
+    //Add material popup controllers
+    final addMaterialNameController = TextEditingController();
+    final addMaterialDescriptionController = TextEditingController();
+    final addMaterialPriceController = TextEditingController();
+    final addMaterialCostController = TextEditingController();
+    final addMaterialDiscountController = TextEditingController();
+    final addMaterialBatchController = TextEditingController();
+
+    //Add material errorstatus and error message variables
+    String adddMaterialNameErrorStatus = '';
+    String addMaterialDescriptionErrorStatus = '';
+    String addMaterialPriceErrorStatus = '';
+    String addMaterialCostErrorStatus = '';
+    String addMaterialDiscountErrorStatus = '';
+    String adddMaterialBatchErrorStatus = '';
+
+    double subTotal = 0;
+
+    addMaterialValidation(StateSetter setState) {
+      bool status = true;
+      if (addMaterialNameController.text.trim().isEmpty) {
+        adddMaterialNameErrorStatus = 'Service name cannot be empty';
+        status = false;
+      } else {
+        adddMaterialNameErrorStatus = '';
+      }
+      if (addMaterialDescriptionController.text.trim().isEmpty) {
+        addMaterialDescriptionErrorStatus = 'Description cannot be empty';
+        status = false;
+      } else {
+        addMaterialDescriptionErrorStatus = '';
+      }
+      if (addMaterialPriceController.text.trim().isEmpty) {
+        addMaterialPriceErrorStatus = 'Price cannot be empty';
+        status = false;
+      } else {
+        addMaterialPriceErrorStatus = '';
+      }
+      if (addMaterialDiscountController.text.trim().isEmpty) {
+        addMaterialDiscountErrorStatus = 'Discount cannot be empty';
+        status = false;
+      } else if (subTotal < 0) {
+        addMaterialDiscountErrorStatus = 'Discount should be less than price';
+        status = false;
+      } else {
+        addMaterialDiscountErrorStatus = '';
+      }
+      if (addMaterialBatchController.text.trim().isEmpty) {
+        adddMaterialBatchErrorStatus = 'Part/Batch Number cannot be empty';
+        status = false;
+      } else {
+        adddMaterialBatchErrorStatus = '';
+      }
+
+      setState(() {});
+      return status;
+    }
+
+    return StatefulBuilder(
+      builder: (context, StateSetter newSetState) {
+        if (addMaterialPriceController.text.isNotEmpty) {
+          if (addMaterialDiscountController.text.isEmpty) {
+            subTotal = double.tryParse(addMaterialPriceController.text) ?? 0;
+          } else {
+            subTotal = (double.tryParse(addMaterialPriceController.text) ?? 0) -
+                (double.tryParse(addMaterialDiscountController.text) ?? 0);
+          }
+        }
+        return SingleChildScrollView(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    textBox(
+                    const Text(
+                      "Add Material",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: textBox(
+                      "Enter Material Name",
+                      addMaterialNameController,
+                      "Name",
+                      adddMaterialNameErrorStatus.isNotEmpty,
+                      context,
+                      true),
+                ),
+                errorWidget(error: adddMaterialNameErrorStatus),
+                Padding(
+                  padding: const EdgeInsets.only(top: 17.0),
+                  child: textBox(
+                      "Enter Material Description",
+                      addMaterialDescriptionController,
+                      "Description",
+                      addMaterialDescriptionErrorStatus.isNotEmpty,
+                      context,
+                      true),
+                ),
+                errorWidget(error: addMaterialDescriptionErrorStatus),
+                Padding(
+                  padding: const EdgeInsets.only(top: 17.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      textBox(
                         "Amount",
                         addMaterialPriceController,
                         "Price",
                         addMaterialPriceErrorStatus.isNotEmpty,
                         context,
-                        newSetState),
-                    pricingModelDropDown()
-                  ],
-                ),
-              ),
-              errorWidget(error: addMaterialPriceErrorStatus),
-              Padding(
-                padding: const EdgeInsets.only(top: 17.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    textBox("Amount", addMaterialCostController, "Cost",
-                        addMaterialCostErrorStatus.isNotEmpty, context),
-                    pricingModelDropDown()
-                  ],
-                ),
-              ),
-              errorWidget(error: addMaterialCostErrorStatus),
-              Padding(
-                padding: EdgeInsets.only(top: 17),
-                child: textBox(
-                    "Enter Amount",
-                    addMaterialDiscountController,
-                    "Discount",
-                    addMaterialDiscountErrorStatus.isNotEmpty,
-                    context,
-                    newSetState),
-              ),
-              errorWidget(error: addMaterialDiscountErrorStatus),
-              Padding(
-                padding: const EdgeInsets.only(top: 17),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Label",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xff6A7187),
+                        true,
+                        newSetState,
                       ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        newSetState(() {
-                          tagDataList.add("Tag");
-                        });
-                      },
-                      child: const Row(
-                        children: [
-                          Icon(
-                            Icons.add,
-                            color: AppColors.primaryColors,
-                          ),
-                          Text(
-                            "Add New",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                      pricingModelDropDown()
+                    ],
+                  ),
+                ),
+                errorWidget(error: addMaterialPriceErrorStatus),
+                Padding(
+                  padding: const EdgeInsets.only(top: 17.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      textBox(
+                          "Amount",
+                          addMaterialCostController,
+                          "Cost",
+                          addMaterialCostErrorStatus.isNotEmpty,
+                          context,
+                          false),
+                      pricingModelDropDown()
+                    ],
+                  ),
+                ),
+                errorWidget(error: addMaterialCostErrorStatus),
+                Padding(
+                  padding: EdgeInsets.only(top: 17),
+                  child: textBox(
+                      "Enter Amount",
+                      addMaterialDiscountController,
+                      "Discount",
+                      addMaterialDiscountErrorStatus.isNotEmpty,
+                      context,
+                      true,
+                      newSetState),
+                ),
+                errorWidget(error: addMaterialDiscountErrorStatus),
+                Padding(
+                  padding: const EdgeInsets.only(top: 17),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Label",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xff6A7187),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          newSetState(() {
+                            tagDataList.add("Tag");
+                          });
+                        },
+                        child: const Row(
+                          children: [
+                            Icon(
+                              Icons.add,
                               color: AppColors.primaryColors,
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                            Text(
+                              "Add New",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryColors,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    //  maxCrossAxisExtent: 150,
-                    mainAxisSpacing: 20,
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 3),
-                itemBuilder: (context, index) {
-                  return tagWidget(tagDataList[index], index, newSetState);
-                },
-                itemCount: tagDataList.length,
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 17),
-                child: textBox(
-                    "Enter Batch Number",
-                    addMaterialBatchController,
-                    "Part/Batch Number",
-                    adddMaterialBatchErrorStatus.isNotEmpty,
-                    context),
-              ),
-              errorWidget(error: adddMaterialBatchErrorStatus),
-              Padding(
-                padding: EdgeInsets.only(top: 17),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      "Sub Total :",
+                GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      //  maxCrossAxisExtent: 150,
+                      mainAxisSpacing: 20,
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 3),
+                  itemBuilder: (context, index) {
+                    return tagWidget(tagDataList[index], index, newSetState);
+                  },
+                  itemCount: tagDataList.length,
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 17),
+                  child: textBox(
+                      "Enter Batch Number",
+                      addMaterialBatchController,
+                      "Part/Batch Number",
+                      adddMaterialBatchErrorStatus.isNotEmpty,
+                      context,
+                      true),
+                ),
+                errorWidget(error: adddMaterialBatchErrorStatus),
+                Padding(
+                  padding: EdgeInsets.only(top: 17),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Sub Total :",
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor),
+                      ),
+                      Text(
+                        "\$${subTotal.toStringAsFixed(2)}",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor),
+                      )
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 31),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final status = addMaterialValidation(newSetState);
+                      if (status) {
+                        material.add(CannedServiceAddModel(
+                          cannedServiceId: int.parse(serviceId),
+                          note: addMaterialDescriptionController.text,
+                          part: addMaterialBatchController.text,
+                          itemName: addMaterialNameController.text,
+                          unitPrice: addMaterialPriceController.text,
+                          discount: addMaterialDiscountController.text,
+                          itemType: "Material",
+                          subTotal: subTotal.toStringAsFixed(2),
+                        ));
+                        setState(() {});
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      fixedSize: Size(MediaQuery.of(context).size.width, 56),
+                      primary: AppColors.primaryColors,
+                    ),
+                    child: const Text(
+                      "Continue",
                       style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTitleColor),
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white),
                     ),
-                    Text(
-                      "\$$subTotal",
-                      style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTitleColor),
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 31),
-                child: ElevatedButton(
-                  onPressed: () {
-                    final status = addMaterialValidation(newSetState);
-                    if (status) {
-                      material.add(CannedServiceAddModel(
-                        cannedServiceId: int.parse(serviceId),
-                        note: addMaterialDescriptionController.text,
-                        part: addMaterialBatchController.text,
-                        itemName: addMaterialNameController.text,
-                        unitPrice: addMaterialPriceController.text,
-                        discount: addMaterialDiscountController.text,
-                        itemType: "Material",
-                        subTotal:
-                            (double.parse(addMaterialPriceController.text) -
-                                    double.parse(
-                                        addMaterialDiscountController.text))
-                                .toString(),
-                      ));
-                      setState(() {});
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    fixedSize: Size(MediaQuery.of(context).size.width, 56),
-                    primary: AppColors.primaryColors,
                   ),
-                  child: const Text(
-                    "Continue",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
-                  ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   addPartPopup() {
+    //Add part popup controllers
+    final addPartNameController = TextEditingController();
+    final addPartDescriptionController = TextEditingController();
+    final addPartPriceController = TextEditingController();
+    final addPartCostController = TextEditingController();
+    final addPartDiscountController = TextEditingController();
+    final addPartPartNumberController = TextEditingController();
+
+    //Add part errorstatus and error message variables
+    String addPartNameErrorStatus = '';
+    String addPartDescriptionErrorStatus = '';
+    String addPartPriceErrorStatus = '';
+    String addPartCostErrorStatus = '';
+    String addPartDiscountErrorStatus = '';
+    String adddPartPartNumberErrorStatus = '';
+
+    double subTotal = 0;
+
+    addPartValidation(StateSetter setState) {
+      bool status = true;
+      if (addPartNameController.text.trim().isEmpty) {
+        addPartNameErrorStatus = 'Service name cannot be empty';
+        status = false;
+      } else {
+        addPartNameErrorStatus = '';
+      }
+      if (addPartDescriptionController.text.trim().isEmpty) {
+        addPartDescriptionErrorStatus = 'Description cannot be empty';
+        status = false;
+      } else {
+        addPartDescriptionErrorStatus = '';
+      }
+      if (addPartPriceController.text.trim().isEmpty) {
+        addPartPriceErrorStatus = 'Price cannot be empty';
+        status = false;
+      } else {
+        addPartPriceErrorStatus = '';
+      }
+      if (addPartDiscountController.text.trim().isEmpty) {
+        addPartDiscountErrorStatus = 'Discount cannot be empty';
+        status = false;
+      } else {
+        addPartDiscountErrorStatus = '';
+      }
+      if (addPartPartNumberController.text.trim().isEmpty) {
+        adddPartPartNumberErrorStatus = 'Part Number cannot be empty';
+        status = false;
+      } else {
+        adddPartPartNumberErrorStatus = '';
+      }
+
+      setState(() {});
+      return status;
+    }
+
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      if (addPartPriceController.text.isNotEmpty) {
+        if (addPartDiscountController.text.isEmpty) {
+          subTotal = double.tryParse(addPartPriceController.text) ?? 0;
+        } else {
+          subTotal = (double.tryParse(addPartPriceController.text) ?? 0) -
+              (double.tryParse(addPartDiscountController.text) ?? 0);
+        }
+      }
       return SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -1212,7 +1173,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: textBox("Enter Part Name", addPartNameController, "Name",
-                    addPartNameErrorStatus.isNotEmpty, context),
+                    addPartNameErrorStatus.isNotEmpty, context, true),
               ),
               errorWidget(error: addPartNameErrorStatus),
               Padding(
@@ -1222,7 +1183,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addPartDescriptionController,
                     "Description",
                     addPartDescriptionErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true),
               ),
               errorWidget(error: addPartDescriptionErrorStatus),
               Padding(
@@ -1236,6 +1198,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         "Price",
                         addPartPriceErrorStatus.isNotEmpty,
                         context,
+                        true,
                         newSetState),
                     pricingModelDropDown()
                   ],
@@ -1245,18 +1208,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
                 child: textBox("Amount", addPartCostController, "Cost ",
-                    addPartCostErrorStatus.isNotEmpty, context),
+                    addPartCostErrorStatus.isNotEmpty, context, false),
               ),
               errorWidget(error: addPartCostErrorStatus),
               Padding(
                 padding: EdgeInsets.only(top: 17),
                 child: textBox(
-                    "Enter Amount",
-                    addPartDiscountController,
-                    "Discount",
-                    addPartDiscountErrorStatus.isNotEmpty,
-                    context,
-                    newSetState),
+                  "Enter Amount",
+                  addPartDiscountController,
+                  "Discount",
+                  addPartDiscountErrorStatus.isNotEmpty,
+                  context,
+                  true,
+                  newSetState,
+                ),
               ),
               errorWidget(error: addPartDiscountErrorStatus),
               Padding(
@@ -1319,7 +1284,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addPartPartNumberController,
                     "Part Number",
                     adddPartPartNumberErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true),
               ),
               errorWidget(error: adddPartPartNumberErrorStatus),
               Padding(
@@ -1335,7 +1301,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Text(
-                      "\$$subTotal",
+                      "\$${subTotal.toStringAsFixed(2)}",
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -1358,9 +1324,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         unitPrice: addPartPriceController.text,
                         discount: addPartDiscountController.text,
                         itemType: "Part",
-                        subTotal: (double.parse(addPartPriceController.text) -
-                                double.parse(addPartDiscountController.text))
-                            .toString(),
+                        subTotal: subTotal.toStringAsFixed(2),
                       ));
                       setState(() {});
                       Navigator.pop(context);
@@ -1390,7 +1354,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   addLaborPopup() {
+    //Add Labor popup controllers
+    final addLaborNameController = TextEditingController();
+    final addLaborDescriptionController = TextEditingController();
+    final addLaborCostController = TextEditingController();
+    final addLaborDiscountController = TextEditingController();
+    final addLaborHoursController = TextEditingController();
+
+    //Add Labor errorstatus and error message variables
+    String addLaborNameErrorStatus = '';
+    String addLaborDescriptionErrorStatus = '';
+    String addLaborCostErrorStatus = '';
+    String addLaborDiscountErrorStatus = '';
+    String addLaborHoursErrorStatus = '';
+
+    double subTotal = 0;
+
+    addLaborValidation(StateSetter setState) {
+      bool status = true;
+      if (addLaborNameController.text.trim().isEmpty) {
+        addLaborNameErrorStatus = 'Service name cannot be empty';
+        status = false;
+      } else {
+        addLaborNameErrorStatus = '';
+      }
+      if (addLaborCostController.text.trim().isEmpty) {
+        addLaborCostErrorStatus = 'Cost cannot be empty';
+        status = false;
+      } else {
+        addLaborCostErrorStatus = '';
+      }
+      if (addLaborHoursController.text.trim().isEmpty) {
+        addLaborHoursErrorStatus = 'Hours cannot be empty';
+        status = false;
+      } else {
+        addLaborHoursErrorStatus = '';
+      }
+      if (addLaborDescriptionController.text.trim().isEmpty) {
+        addLaborDescriptionErrorStatus = 'Description cannot be empty';
+        status = false;
+      } else {
+        addLaborDescriptionErrorStatus = '';
+      }
+      if (addLaborDiscountController.text.trim().isEmpty) {
+        addLaborDiscountErrorStatus = 'Discount cannot be empty';
+        status = false;
+      } else {
+        addLaborDiscountErrorStatus = '';
+      }
+
+      setState(() {});
+      return status;
+    }
+
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      if (addLaborCostController.text.isNotEmpty) {
+        if (addLaborDiscountController.text.isEmpty) {
+          subTotal = double.tryParse(addLaborCostController.text) ?? 0;
+        } else {
+          subTotal = (double.tryParse(addLaborCostController.text) ?? 0) -
+              (double.tryParse(addLaborDiscountController.text) ?? 0);
+        }
+      }
       return SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -1417,7 +1442,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: textBox("Enter Labor Name", addLaborNameController,
-                    "Name", addLaborNameErrorStatus.isNotEmpty, context),
+                    "Name", addLaborNameErrorStatus.isNotEmpty, context, true),
               ),
               errorWidget(error: addLaborNameErrorStatus),
               Padding(
@@ -1427,19 +1452,32 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addLaborDescriptionController,
                     "Description",
                     addLaborDescriptionErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true),
               ),
               errorWidget(error: addLaborDescriptionErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
-                child: textBox("Hours", addLaborHoursController, "Hours ",
-                    addLaborHoursErrorStatus.isNotEmpty, context, newSetState),
+                child: textBox(
+                    "Hours",
+                    addLaborHoursController,
+                    "Hours ",
+                    addLaborHoursErrorStatus.isNotEmpty,
+                    context,
+                    true,
+                    newSetState),
               ),
               errorWidget(error: addLaborHoursErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
-                child: textBox("Amount", addLaborCostController, "Cost ",
-                    addLaborCostErrorStatus.isNotEmpty, context),
+                child: textBox(
+                    "Amount",
+                    addLaborCostController,
+                    "Cost ",
+                    addLaborCostErrorStatus.isNotEmpty,
+                    context,
+                    true,
+                    newSetState),
               ),
               errorWidget(error: addLaborCostErrorStatus),
               Padding(
@@ -1450,6 +1488,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     "Discount",
                     addLaborDiscountErrorStatus.isNotEmpty,
                     context,
+                    true,
                     newSetState),
               ),
               errorWidget(error: addLaborDiscountErrorStatus),
@@ -1466,7 +1505,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Text(
-                      "\$$subTotal",
+                      "\$${subTotal.toStringAsFixed(2)}",
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -1491,9 +1530,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         discount: addLaborDiscountController.text,
                         quanityHours: addLaborHoursController.text,
                         itemType: "Labor",
-                        subTotal: (double.parse(addLaborCostController.text) -
-                                double.parse(addLaborDiscountController.text))
-                            .toString(),
+                        subTotal: subTotal.toStringAsFixed(2),
                       ));
                       setState(() {});
                       Navigator.pop(context);
@@ -1523,7 +1560,49 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   addFeePopup() {
+    //Add Fee popup controllers
+    final addFeeNameController = TextEditingController();
+    final addFeeDescriptionController = TextEditingController();
+    final addFeeCostController = TextEditingController();
+    final addFeePriceController = TextEditingController();
+
+    //Add Fee errorstatus and error message variables
+    String addFeeNameErrorStatus = '';
+    String addFeeDescriptionErrorStatus = '';
+    String addFeePriceErrorStatus = '';
+    String addFeeCostErrorStatus = '';
+
+    double subTotal = 0;
+
+    addFeeValidation(StateSetter setState) {
+      bool status = true;
+      if (addFeeNameController.text.trim().isEmpty) {
+        addFeeNameErrorStatus = 'Service name cannot be empty';
+        status = false;
+      } else {
+        addFeeNameErrorStatus = '';
+      }
+      if (addFeePriceController.text.trim().isEmpty) {
+        addFeePriceErrorStatus = 'Price cannot be empty';
+        status = false;
+      } else {
+        addFeePriceErrorStatus = '';
+      }
+      if (addFeeDescriptionController.text.trim().isEmpty) {
+        addFeeDescriptionErrorStatus = 'Description cannot be empty';
+        status = false;
+      } else {
+        addFeeDescriptionErrorStatus = '';
+      }
+
+      setState(() {});
+      return status;
+    }
+
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      if (addFeePriceController.text.isNotEmpty) {
+        subTotal = double.tryParse(addFeePriceController.text) ?? 0;
+      }
       return SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -1550,7 +1629,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: textBox("Enter Fee Name", addFeeNameController, "Name",
-                    addFeeNameErrorStatus.isNotEmpty, context),
+                    addFeeNameErrorStatus.isNotEmpty, context, true),
               ),
               errorWidget(error: addFeeNameErrorStatus),
               Padding(
@@ -1560,19 +1639,26 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addFeeDescriptionController,
                     "Description",
                     addFeeDescriptionErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true),
               ),
               errorWidget(error: addFeeDescriptionErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
-                child: textBox("Amount", addFeePriceController, "Price ",
-                    addFeePriceErrorStatus.isNotEmpty, context),
+                child: textBox(
+                    "Amount",
+                    addFeePriceController,
+                    "Price ",
+                    addFeePriceErrorStatus.isNotEmpty,
+                    context,
+                    true,
+                    newSetState),
               ),
               errorWidget(error: addFeePriceErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
                 child: textBox("Amount", addFeeCostController, "Cost ",
-                    addFeeCostErrorStatus.isNotEmpty, context),
+                    addFeeCostErrorStatus.isNotEmpty, context, false),
               ),
               errorWidget(error: addFeeCostErrorStatus),
               Padding(
@@ -1641,7 +1727,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Text(
-                      "\$$subTotal",
+                      "\$${subTotal.toStringAsFixed(2)}",
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -1665,7 +1751,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           discount: '0',
                           unitPrice: addFeeCostController.text,
                           itemType: "Fee",
-                          subTotal: addFeePriceController.text));
+                          subTotal: subTotal.toStringAsFixed(2)));
                       setState(() {});
                       Navigator.pop(context);
                     }
@@ -1694,7 +1780,65 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 
   addSubContractPopup() {
+    //Add SubContract popup controllers
+    final addSubContractNameController = TextEditingController();
+    final addSubContractDescriptionController = TextEditingController();
+    final addSubContractCostController = TextEditingController();
+    final addSubContractPriceController = TextEditingController();
+    final addSubContractDiscountController = TextEditingController();
+    final addSubContractVendorController = TextEditingController();
+
+    //Add SubContract errorstatus and error message variables
+    String addSubContractNameErrorStatus = '';
+    String addSubContractDescriptionErrorStatus = '';
+    String addSubContractPriceErrorStatus = '';
+    String addSubContractCostErrorStatus = '';
+    String addSubContractDiscountErrorStatus = '';
+    String addSubContractVendorErrorStatus = '';
+
+    double subTotal = 0;
+
+    addSubContractValidation(StateSetter setState) {
+      bool status = true;
+      if (addSubContractNameController.text.trim().isEmpty) {
+        addSubContractNameErrorStatus = 'Service name cannot be empty';
+        status = false;
+      } else {
+        addSubContractNameErrorStatus = '';
+      }
+      if (addSubContractPriceController.text.trim().isEmpty) {
+        addSubContractPriceErrorStatus = 'Price cannot be empty';
+        status = false;
+      } else {
+        addSubContractPriceErrorStatus = '';
+      }
+      if (addSubContractDescriptionController.text.trim().isEmpty) {
+        addSubContractDescriptionErrorStatus = 'Description cannot be empty';
+        status = false;
+      } else {
+        addSubContractDescriptionErrorStatus = '';
+      }
+      if (addSubContractDiscountController.text.trim().isEmpty) {
+        addSubContractDiscountErrorStatus = 'Discount cannot be empty';
+        status = false;
+      } else {
+        addSubContractDiscountErrorStatus = '';
+      }
+
+      setState(() {});
+      return status;
+    }
+
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
+      if (addSubContractPriceController.text.isNotEmpty) {
+        if (addSubContractDiscountController.text.isEmpty) {
+          subTotal = double.tryParse(addSubContractPriceController.text) ?? 0;
+        } else {
+          subTotal =
+              (double.tryParse(addSubContractPriceController.text) ?? 0) -
+                  (double.tryParse(addSubContractDiscountController.text) ?? 0);
+        }
+      }
       return SingleChildScrollView(
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -1725,7 +1869,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addSubContractNameController,
                     "Name",
                     addSubContractNameErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true),
               ),
               errorWidget(error: addSubContractNameErrorStatus),
               Padding(
@@ -1735,7 +1880,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addSubContractDescriptionController,
                     "Description",
                     addSubContractDescriptionErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true),
               ),
               errorWidget(error: addSubContractDescriptionErrorStatus),
               Padding(
@@ -1745,13 +1891,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addSubContractPriceController,
                     "Price ",
                     addSubContractPriceErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true,
+                    newSetState),
               ),
               errorWidget(error: addSubContractPriceErrorStatus),
               Padding(
                 padding: const EdgeInsets.only(top: 17.0),
                 child: textBox("Amount", addSubContractCostController, "Cost ",
-                    addSubContractCostErrorStatus.isNotEmpty, context),
+                    addSubContractCostErrorStatus.isNotEmpty, context, false),
               ),
               errorWidget(error: addSubContractCostErrorStatus),
               Row(
@@ -1775,7 +1923,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addSubContractDiscountController,
                     "Discount",
                     addSubContractDiscountErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    true,
+                    newSetState),
               ),
               errorWidget(error: addSubContractDiscountErrorStatus),
               Padding(
@@ -1838,7 +1988,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     addSubContractVendorController,
                     "Vendor",
                     addSubContractVendorErrorStatus.isNotEmpty,
-                    context),
+                    context,
+                    false),
               ),
               errorWidget(error: addSubContractVendorErrorStatus),
               Padding(
@@ -1854,7 +2005,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           color: AppColors.primaryTitleColor),
                     ),
                     Text(
-                      "\$$subTotal",
+                      "\$${subTotal.toStringAsFixed(2)}",
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -1881,11 +2032,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           vendorId: vendorId,
                           unitPrice: addSubContractPriceController.text,
                           itemType: "SubContract",
-                          subTotal: (double.parse(
-                                      addSubContractPriceController.text) -
-                                  double.parse(
-                                      addSubContractDiscountController.text))
-                              .toString(),
+                          subTotal: subTotal.toStringAsFixed(2),
                         ),
                       );
                       setState(() {});
@@ -1936,9 +2083,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             // padding: const EdgeInsets.all(5),
             decoration: BoxDecoration(
                 border: Border.all(
-                    color: addMaterialPricingErrorStatus.isNotEmpty
-                        ? const Color(0xffD80027)
-                        : const Color(0xffC1C4CD)),
+                    color:
+                        // addMaterialPricingErrorStatus.isNotEmpty
+                        //     ? const Color(0xffD80027)
+                        //     :
+                        const Color(0xffC1C4CD)),
                 borderRadius: BorderRadius.circular(12)),
             child: DropdownButtonHideUnderline(
               child: ButtonTheme(
@@ -2028,7 +2177,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     );
   }
 
-  Widget vendorsBottomSheet() {
+  Widget vendorsBottomSheet(
+      TextEditingController addSubContractVendorController, int? vendorId) {
     final ScrollController vendorController = ScrollController();
 
     return BlocProvider(
