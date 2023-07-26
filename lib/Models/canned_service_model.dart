@@ -99,7 +99,7 @@ class Datum {
   int id;
   int clientId;
   String serviceName;
-  ServiceNote serviceNote;
+  ServiceNote? serviceNote;
   RecommendedService recommendedService;
   Is isVisible;
   Is isAuthorized;
@@ -121,7 +121,7 @@ class Datum {
   CommunicationChannel communicationChannel;
   dynamic reminderTrigger;
   dynamic customMessage;
-  CreatedBy createdBy;
+  CreatedBy? createdBy;
   DateTime createdAt;
   DateTime updatedAt;
   List<dynamic> cannedServiceItems;
@@ -130,7 +130,7 @@ class Datum {
     required this.id,
     required this.clientId,
     required this.serviceName,
-    required this.serviceNote,
+    this.serviceNote,
     required this.recommendedService,
     required this.isVisible,
     required this.isAuthorized,
@@ -152,7 +152,7 @@ class Datum {
     required this.communicationChannel,
     this.reminderTrigger,
     this.customMessage,
-    required this.createdBy,
+    this.createdBy,
     required this.createdAt,
     required this.updatedAt,
     required this.cannedServiceItems,
@@ -162,7 +162,9 @@ class Datum {
         id: json["id"],
         clientId: json["client_id"],
         serviceName: json["service_name"],
-        serviceNote: serviceNoteValues.map[json["service_note"]]!,
+        serviceNote: json["service_note"] != null
+            ? serviceNoteValues.map[json["service_note"]]
+            : null,
         recommendedService:
             recommendedServiceValues.map[json["recommended_service"]]!,
         isVisible: isValues.map[json["is_visible"]]!,
@@ -187,7 +189,9 @@ class Datum {
             communicationChannelValues.map[json["communication_channel"]]!,
         reminderTrigger: json["reminder_trigger"],
         customMessage: json["custom_message"],
-        createdBy: CreatedBy.fromJson(json["created_by"]),
+        createdBy: json["created_by"] != null
+            ? CreatedBy.fromJson(json["created_by"])
+            : null,
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         cannedServiceItems:
@@ -223,7 +227,7 @@ class Datum {
             communicationChannelValues.reverse[communicationChannel],
         "reminder_trigger": reminderTrigger,
         "custom_message": customMessage,
-        "created_by": createdBy.toJson(),
+        "created_by": createdBy!.toJson(),
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "canned_service_items":
@@ -237,23 +241,23 @@ final communicationChannelValues =
     EnumValues({"SMS": CommunicationChannel.SMS});
 
 class CreatedBy {
-  int id;
-  Email email;
-  FirstName firstName;
-  LastName lastName;
+  int? id;
+  Email? email;
+  FirstName? firstName;
+  LastName? lastName;
 
   CreatedBy({
-    required this.id,
-    required this.email,
-    required this.firstName,
-    required this.lastName,
+    this.id,
+    this.email,
+    this.firstName,
+    this.lastName,
   });
 
   factory CreatedBy.fromJson(Map<String, dynamic> json) => CreatedBy(
         id: json["id"],
-        email: emailValues.map[json["email"]]!,
-        firstName: firstNameValues.map[json["first_name"]]!,
-        lastName: lastNameValues.map[json["last_name"]]!,
+        email: emailValues.map[json["email"]],
+        firstName: firstNameValues.map[json["first_name"]],
+        lastName: lastNameValues.map[json["last_name"]],
       );
 
   Map<String, dynamic> toJson() => {
