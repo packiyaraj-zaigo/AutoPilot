@@ -48,7 +48,10 @@ class GetTechnicianErrorState extends ServiceState {
   GetTechnicianErrorState({required this.errorMsg});
 }
 
-class CreateCannedOrderServiceSuccessState extends ServiceState {}
+class CreateCannedOrderServiceSuccessState extends ServiceState {
+  final String message;
+  const CreateCannedOrderServiceSuccessState({required this.message});
+}
 
 class CreateCannedOrderServiceLoadingState extends ServiceState {}
 

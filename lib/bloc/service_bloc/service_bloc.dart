@@ -105,7 +105,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       }
 
       final token = await AppUtils.getToken();
-      await apiRepo.getEmployees(token, currentPage, event.query).then((value) {
+      await apiRepo.getServices(token, currentPage, event.query).then((value) {
         if (value.statusCode == 200) {
           final responseBody = jsonDecode(value.body);
           emit(
@@ -164,11 +164,12 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     Emitter<ServiceState> emit,
   ) async {
     try {
-      bool materialDone = false;
-      bool partDone = false;
-      bool laborDone = false;
-      bool subcontractDone = false;
-      bool feeDone = false;
+      bool materialDone = true;
+      bool partDone = true;
+      bool laborDone = true;
+      bool subcontractDone = true;
+      bool feeDone = true;
+      emit(CreateCannedOrderServiceLoadingState());
       final token = await AppUtils.getToken();
       final Response serviceCreateResponse =
           await apiRepo.createCannedOrderService(token, event.service);
@@ -185,7 +186,8 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           log(materialResponse.body.toString());
           if (materialResponse.statusCode == 200 ||
               materialResponse.statusCode == 201) {
-            materialDone = true;
+          } else {
+            materialDone = false;
           }
         }
         if (event.part != null) {
@@ -193,7 +195,8 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
               .createCannedOrderServiceItem(token, event.part!, serviceId);
           if (partResponse.statusCode == 200 ||
               partResponse.statusCode == 201) {
-            partDone = true;
+          } else {
+            partDone = false;
           }
         }
         if (event.labor != null) {
@@ -201,7 +204,8 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
               .createCannedOrderServiceItem(token, event.labor!, serviceId);
           if (laborResponse.statusCode == 200 ||
               laborResponse.statusCode == 201) {
-            laborDone = true;
+          } else {
+            laborDone = false;
           }
         }
         if (event.subcontract != null) {
@@ -210,17 +214,58 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
                   token, event.subcontract!, serviceId);
           if (subcontractResponse.statusCode == 200 ||
               subcontractResponse.statusCode == 201) {
-            subcontractDone = true;
+          } else {
+            subcontractDone = false;
           }
         }
         if (event.fee != null) {
           final Response feeResponse = await apiRepo
               .createCannedOrderServiceItem(token, event.fee!, serviceId);
           if (feeResponse.statusCode == 200 || feeResponse.statusCode == 201) {
-            feeDone = true;
+          } else {
+            feeDone = false;
           }
         }
-        emit(CreateCannedOrderServiceSuccessState());
+        String message = 'Service Created Successfully';
+        String errorMessage =
+            'Service Created\nBut Something Went Wrong with\n';
+
+        if (!materialDone) {
+          errorMessage += ' Material';
+        }
+        if (!partDone) {
+          if (errorMessage !=
+              'Service Created But Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Part';
+        }
+        if (!laborDone) {
+          if (errorMessage !=
+              'Service Created But Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Labor';
+        }
+        if (!subcontractDone) {
+          if (errorMessage !=
+              'Service Created But Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Sub Contract';
+        }
+        if (!feeDone) {
+          if (errorMessage !=
+              'Service Created But Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Fee';
+        }
+        if (errorMessage != 'Service Created But Something Went Wrong with\n') {
+          message = errorMessage;
+        }
+
+        emit(CreateCannedOrderServiceSuccessState(message: message));
       } else {
         emit(const CreateCannedOrderServiceErrorState(
             message: 'Something went wrong'));

@@ -59,7 +59,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
         actions: [
           GestureDetector(
             onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
                   builder: (context) => const AddServiceScreen()));
             },
             child: const Icon(
