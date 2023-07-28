@@ -113,8 +113,8 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           emit(
               GetAllCannedServiceState(cannedServiceModel: cannedServiceModel));
           final data = cannedServiceModel.data;
-          currentPage = data.currentPage;
-          totalPages = data.lastPage;
+          currentPage = data.currentPage ?? 0;
+          totalPages = data.lastPage ?? 0;
           if (currentPage <= totalPages) {
             currentPage++;
           }

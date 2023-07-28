@@ -162,7 +162,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                         } else {
                           return ScrollConfiguration(
                             behavior: const ScrollBehavior(),
-                            child: ListView.separated(
+                            child: ListView.builder(
                                 shrinkWrap: true,
                                 controller: controller
                                   ..addListener(() {
@@ -179,7 +179,8 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                                       _debouncer.run(() {
                                         BlocProvider.of<ServiceBloc>(context)
                                             .isPagenationLoading = true;
-                                        // BlocProvider.of<ServiceBloc>(context).add(GetAllEmployees());
+                                        BlocProvider.of<ServiceBloc>(context)
+                                            .add(GetAllServicess());
                                       });
                                     }
                                   }),
@@ -297,14 +298,25 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                                       //         ],
                                       //       )
                                       //     : const SizedBox(),
-                                      index == 9
-                                          ? const SizedBox(height: 24)
-                                          : const SizedBox(),
+                                      context.read<ServiceBloc>().currentPage <=
+                                                  context
+                                                      .read<ServiceBloc>()
+                                                      .totalPages &&
+                                              index == serviceList.length - 1
+                                          ? Column(
+                                              children: [
+                                                SizedBox(height: 16),
+                                                Center(
+                                                  child:
+                                                      CupertinoActivityIndicator(),
+                                                ),
+                                                SizedBox(height: 16),
+                                              ],
+                                            )
+                                          : SizedBox(height: 24)
                                     ],
                                   );
                                 },
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 24),
                                 itemCount: serviceList.length),
                           );
                         }
@@ -426,7 +438,8 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                       itemName: item.cannedServiceItems![i].itemName,
                       discount: item.cannedServiceItems![i].discount,
                       discountType:
-                          item.cannedServiceItems![i].discountType.name,
+                          item.cannedServiceItems![i].discountType?.name ??
+                              'Percentage',
                       position: "0",
                       quantityHours: item.cannedServiceItems![i].quanityHours,
                       subTotal: item.cannedServiceItems![i].subTotal,

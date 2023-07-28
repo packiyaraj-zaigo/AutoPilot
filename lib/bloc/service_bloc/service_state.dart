@@ -78,6 +78,9 @@ class GetAllVendorsErrorState extends ServiceState {
 class GetAllCannedServiceState extends ServiceState {
   final CannedServiceModel cannedServiceModel;
   GetAllCannedServiceState({required this.cannedServiceModel});
+
+  @override
+  List<Object> get props => [cannedServiceModel];
 }
 
 class GetAllCannedServiceLoadingState extends ServiceState {}
