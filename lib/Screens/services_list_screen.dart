@@ -5,9 +5,6 @@ import 'package:auto_pilot/Bloc/service_Bloc/service_bloc.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
-import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
-import 'package:auto_pilot/api_provider/api_repository.dart';
-import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -110,9 +107,11 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                         onChanged: (value) {
                           _debouncer.run(() {
                             serviceList.clear();
-                            BlocProvider.of<ServiceBloc>(context).currentPage =
-                                1;
-                            BlocProvider.of<ServiceBloc>(context)
+                            BlocProvider.of<ServiceBloc>(
+                                    scaffoldKey.currentContext!)
+                                .currentPage = 1;
+                            BlocProvider.of<ServiceBloc>(
+                                    scaffoldKey.currentContext!)
                                 .add(GetAllServicess(query: value));
                           });
                         },
@@ -159,9 +158,17 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                           return const Center(
                               child: CupertinoActivityIndicator());
                         } else {
+                          log(context
+                              .read<ServiceBloc>()
+                              .currentPage
+                              .toString());
+                          log(context
+                              .read<ServiceBloc>()
+                              .totalPages
+                              .toString());
                           return ScrollConfiguration(
                             behavior: const ScrollBehavior(),
-                            child: ListView.separated(
+                            child: ListView.builder(
                                 shrinkWrap: true,
                                 controller: controller
                                   ..addListener(() {
@@ -178,7 +185,8 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                                       _debouncer.run(() {
                                         BlocProvider.of<ServiceBloc>(context)
                                             .isPagenationLoading = true;
-                                        // BlocProvider.of<ServiceBloc>(context).add(GetAllEmployees());
+                                        BlocProvider.of<ServiceBloc>(context)
+                                            .add(GetAllServicess());
                                       });
                                     }
                                   }),
@@ -188,18 +196,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                                     children: [
                                       GestureDetector(
                                         behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          // Navigator.of(context).push(
-                                          //   MaterialPageRoute(
-                                          //     builder: (context) =>
-                                          //         EmployeeDetailsScreen(
-                                          //       employee: item,
-                                          //     ),
-                                          //   ),
-                                          // );
-                                          showPopup(
-                                              context, "", serviceList[index]);
-                                        },
+                                        onTap: () {},
                                         child: Container(
                                           height: 77,
                                           width: double.infinity,
@@ -296,14 +293,26 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                                       //         ],
                                       //       )
                                       //     : const SizedBox(),
-                                      index == 9
-                                          ? const SizedBox(height: 24)
-                                          : const SizedBox(),
+
+                                      context.read<ServiceBloc>().currentPage <=
+                                                  context
+                                                      .read<ServiceBloc>()
+                                                      .totalPages &&
+                                              index == serviceList.length - 1
+                                          ? Column(
+                                              children: [
+                                                SizedBox(height: 16),
+                                                Center(
+                                                  child:
+                                                      CupertinoActivityIndicator(),
+                                                ),
+                                                SizedBox(height: 16),
+                                              ],
+                                            )
+                                          : SizedBox(height: 24)
                                     ],
                                   );
                                 },
-                                separatorBuilder: (context, index) =>
-                                    const SizedBox(height: 24),
                                 itemCount: serviceList.length),
                           );
                         }
@@ -403,59 +412,6 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
   //         }),
   //   );
   // }
-
-  Future showPopup(BuildContext context, message, Datum item) {
-    return showCupertinoDialog(
-      context: context,
-      builder: (context) => BlocProvider(
-        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
-        child: BlocListener<EstimateBloc, EstimateState>(
-          listener: (context, state) {
-            if (state is CreateEstimateState) {
-              Navigator.pop(context);
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) {
-                  return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel,
-                  );
-                },
-              ));
-            } else if (state is EditEstimateState) {
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) {
-                  return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel,
-                  );
-                },
-              ));
-            }
-            // TODO: implement listener
-          },
-          child: BlocBuilder<EstimateBloc, EstimateState>(
-            builder: (context, state) {
-              return CupertinoAlertDialog(
-                title: const Text("Update Estimate?"),
-                content:
-                    const Text("Do you want to Add this Service to Estimate?"),
-                actions: <Widget>[
-                  CupertinoDialogAction(
-                      child: const Text("Yes"),
-                      onPressed: () {
-                        context.read<EstimateBloc>().add(CreateEstimateEvent(
-                            id: item.id.toString(), which: "service"));
-                      }),
-                  CupertinoDialogAction(
-                    child: const Text("No"),
-                    onPressed: () => Navigator.of(context).pop(false),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class Debouncer {

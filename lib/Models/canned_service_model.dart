@@ -36,18 +36,18 @@ class CannedServiceModel {
 }
 
 class Data {
-  int currentPage;
+  int? currentPage;
   List<Datum> data;
-  String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
-  String nextPageUrl;
-  String path;
-  String perPage;
+  String? firstPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
+  String? nextPageUrl;
+  String? path;
+  String? perPage;
   dynamic prevPageUrl;
-  int to;
-  int total;
+  int? to;
+  int? total;
 
   Data({
     required this.currentPage,
@@ -104,15 +104,15 @@ class Datum {
   Is isVisible;
   Is isAuthorized;
   String servicePrice;
-  PriceType priceType;
+  PriceType? priceType;
   String discount;
-  Type discountType;
+  Type? discountType;
   String serviceEpa;
-  Type epaType;
+  Type? epaType;
   String shopSupplies;
-  Type shopSuppliesType;
+  Type? shopSuppliesType;
   String tax;
-  Type taxType;
+  Type? taxType;
   String subTotal;
   Is isMaintenance;
   Is isServiceReminder;
@@ -176,7 +176,7 @@ class Datum {
         serviceEpa: json["service_epa"],
         epaType: typeValues.map[json["epa_type"]]!,
         shopSupplies: json["shop_supplies"],
-        shopSuppliesType: typeValues.map[json["shop_supplies_type"]]!,
+        shopSuppliesType: typeValues.map[json["shop_supplies_type"]],
         tax: json["tax"],
         taxType: typeValues.map[json["tax_type"]]!,
         subTotal: json["sub_total"],
@@ -243,16 +243,16 @@ class CannedServiceItem {
   int cannedServiceId;
   String itemType;
   String itemName;
-  String itemServiceNote;
+  String? itemServiceNote;
   String unitPrice;
   String quanityHours;
   String discount;
-  Type discountType;
+  Type? discountType;
   dynamic statusLabels;
   String subTotal;
-  String partName;
-  int vendorId;
-  int categoryId;
+  String? partName;
+  int? vendorId;
+  int? categoryId;
   dynamic tireBrand;
   dynamic tireModel;
   dynamic seasonality;
@@ -267,10 +267,10 @@ class CannedServiceItem {
   String feeLine;
   int feeAppliedItem;
   String feePercentage;
-  Is isTax;
-  Is isDisplayPartNumber;
-  Is isDisplayPriceQuantity;
-  Is isDisplayNote;
+  Is? isTax;
+  Is? isDisplayPartNumber;
+  Is? isDisplayPriceQuantity;
+  Is? isDisplayNote;
   int position;
   DateTime createdAt;
   DateTime updatedAt;
@@ -343,7 +343,7 @@ class CannedServiceItem {
         feeLine: json["fee_line"],
         feeAppliedItem: json["fee_applied_item"],
         feePercentage: json["fee_percentage"],
-        isTax: isValues.map[json["is_tax"]]!,
+        isTax: isValues.map[json["is_tax"]],
         isDisplayPartNumber: isValues.map[json["is_display_part_number"]]!,
         isDisplayPriceQuantity:
             isValues.map[json["is_display_price_quantity"]]!,
