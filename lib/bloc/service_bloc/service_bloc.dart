@@ -178,49 +178,59 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
         final body = jsonDecode(serviceCreateResponse.body);
         serviceId = body['created_id'];
         if (event.material != null) {
-          final Response materialResponse = await apiRepo
-              .createCannedOrderServiceItem(token, event.material!, serviceId);
-          log(materialResponse.body.toString());
-          if (materialResponse.statusCode == 200 ||
-              materialResponse.statusCode == 201) {
-          } else {
-            materialDone = false;
-          }
+          event.material!.forEach((material) async {
+            final Response materialResponse = await apiRepo
+                .createCannedOrderServiceItem(token, material, serviceId);
+            log(materialResponse.body.toString());
+            if (materialResponse.statusCode == 200 ||
+                materialResponse.statusCode == 201) {
+            } else {
+              materialDone = false;
+            }
+          });
         }
         if (event.part != null) {
-          final Response partResponse = await apiRepo
-              .createCannedOrderServiceItem(token, event.part!, serviceId);
-          if (partResponse.statusCode == 200 ||
-              partResponse.statusCode == 201) {
-          } else {
-            partDone = false;
+          for (var part in event.part!) {
+            final Response partResponse = await apiRepo
+                .createCannedOrderServiceItem(token, part, serviceId);
+            if (partResponse.statusCode == 200 ||
+                partResponse.statusCode == 201) {
+            } else {
+              partDone = false;
+            }
           }
         }
         if (event.labor != null) {
-          final Response laborResponse = await apiRepo
-              .createCannedOrderServiceItem(token, event.labor!, serviceId);
-          if (laborResponse.statusCode == 200 ||
-              laborResponse.statusCode == 201) {
-          } else {
-            laborDone = false;
+          for (var labor in event.labor!) {
+            final Response laborResponse = await apiRepo
+                .createCannedOrderServiceItem(token, labor, serviceId);
+            if (laborResponse.statusCode == 200 ||
+                laborResponse.statusCode == 201) {
+            } else {
+              laborDone = false;
+            }
           }
         }
         if (event.subcontract != null) {
-          final Response subcontractResponse =
-              await apiRepo.createCannedOrderServiceItem(
-                  token, event.subcontract!, serviceId);
-          if (subcontractResponse.statusCode == 200 ||
-              subcontractResponse.statusCode == 201) {
-          } else {
-            subcontractDone = false;
+          for (var subcontract in event.subcontract!) {
+            final Response subcontractResponse = await apiRepo
+                .createCannedOrderServiceItem(token, subcontract, serviceId);
+            if (subcontractResponse.statusCode == 200 ||
+                subcontractResponse.statusCode == 201) {
+            } else {
+              subcontractDone = false;
+            }
           }
         }
         if (event.fee != null) {
-          final Response feeResponse = await apiRepo
-              .createCannedOrderServiceItem(token, event.fee!, serviceId);
-          if (feeResponse.statusCode == 200 || feeResponse.statusCode == 201) {
-          } else {
-            feeDone = false;
+          for (var fee in event.fee!) {
+            final Response feeResponse = await apiRepo
+                .createCannedOrderServiceItem(token, fee, serviceId);
+            if (feeResponse.statusCode == 200 ||
+                feeResponse.statusCode == 201) {
+            } else {
+              feeDone = false;
+            }
           }
         }
         String message = 'Service Created Successfully';
@@ -232,33 +242,36 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
         }
         if (!partDone) {
           if (errorMessage !=
-              'Service Created But Something Went Wrong with\n') {
+              'Service Created\nBut Something Went Wrong with\n') {
             errorMessage += ',';
           }
           errorMessage += ' Part';
         }
         if (!laborDone) {
           if (errorMessage !=
-              'Service Created But Something Went Wrong with\n') {
+              'Service Created\nBut Something Went Wrong with\n') {
             errorMessage += ',';
           }
           errorMessage += ' Labor';
         }
         if (!subcontractDone) {
           if (errorMessage !=
-              'Service Created But Something Went Wrong with\n') {
+              'Service Created\nBut Something Went Wrong with\n') {
             errorMessage += ',';
           }
           errorMessage += ' Sub Contract';
         }
         if (!feeDone) {
           if (errorMessage !=
-              'Service Created But Something Went Wrong with\n') {
+              'Service Created\nBut Something Went Wrong with\n') {
             errorMessage += ',';
           }
           errorMessage += ' Fee';
         }
-        if (errorMessage != 'Service Created But Something Went Wrong with\n') {
+        log(message);
+        log(errorMessage);
+        if (errorMessage !=
+            'Service Created\nBut Something Went Wrong with\n') {
           message = errorMessage;
         }
 
