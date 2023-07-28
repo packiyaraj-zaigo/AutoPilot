@@ -87,3 +87,36 @@ class DeleteOrderImageEvent extends EstimateEvent {
   final String imageId;
   DeleteOrderImageEvent({required this.imageId});
 }
+
+class CreateOrderServiceEvent extends EstimateEvent {
+  final String orderId, serviceName, serviceNotes, laborRate, tax;
+  CreateOrderServiceEvent(
+      {required this.orderId,
+      required this.serviceName,
+      required this.serviceNotes,
+      required this.laborRate,
+      required this.tax});
+}
+
+class CreateOrderServiceItemEvent extends EstimateEvent {
+  final String cannedServiceId,
+      itemType,
+      itemName,
+      unitPrice,
+      quantityHours,
+      discount,
+      discountType,
+      position,
+      subTotal;
+
+  CreateOrderServiceItemEvent(
+      {required this.cannedServiceId,
+      required this.itemType,
+      required this.itemName,
+      required this.discount,
+      required this.discountType,
+      required this.position,
+      required this.quantityHours,
+      required this.subTotal,
+      required this.unitPrice});
+}

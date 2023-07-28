@@ -1359,6 +1359,75 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+  Future<dynamic> createOrderService(
+      dynamic token,
+      String orderId,
+      String serviceName,
+      String serviceNotes,
+      String laborRate,
+      String tax) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/order_services");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['order_id'] = orderId
+        ..fields['service_name'] = serviceName
+        ..fields['service_note'] = serviceNotes
+        ..fields['technician_id'] = "0";
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createOrderServiceItem(
+      dynamic token,
+      String cannedServiceId,
+      String itemType,
+      String itemName,
+      String unitPrice,
+      String quantityHours,
+      String discount,
+      String discountType,
+      String position,
+      String subTotal) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/order_service_items");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['order_service_id'] = cannedServiceId
+        ..fields['item_type'] = itemType
+        ..fields['item_name'] = itemName
+        ..fields['unit_price'] = unitPrice
+        ..fields['quanity_hours'] = quantityHours
+        ..fields['discount'] = discount
+        ..fields['discount_type'] = discountType
+        ..fields['position'] = position
+        ..fields['sub_total'] = subTotal;
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
 }
 
 final map = {

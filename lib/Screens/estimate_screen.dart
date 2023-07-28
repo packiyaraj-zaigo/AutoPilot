@@ -1,10 +1,10 @@
 import 'package:auto_pilot/Models/estimate_model.dart';
-import 'package:auto_pilot/Screens/app_drawer.dart';
+
 import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
-import 'package:auto_pilot/utils/app_utils.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -38,92 +38,98 @@ class _EstimateScreenState extends State<EstimateScreen>
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EstimateBloc(apiRepository: ApiRepository()),
-      child: Scaffold(
-          // appBar: AppBar(
-          //   leading: GestureDetector(
-          //     child: Icon(Icons.menu)),
-          //   elevation: 0,
-          //   backgroundColor: Colors.transparent,
-          //   foregroundColor:AppColors.primaryColors ,
-          //   title: const Text("AutoPilot",
-          //   style: TextStyle(
-          //     color: Color(0xff061237),
-          //     fontSize: 16,
-          //     fontWeight: FontWeight.w600
-          //   ),),
-          //   centerTitle: true,
-          //   actions: [IconButton(onPressed: (){}, icon: const Icon(Icons.search,color: AppColors.primaryColors,))],
-          //   bottom:PreferredSize(
-          //     preferredSize: const Size(double.infinity, 80),
-          //     child: Column(
-          //       crossAxisAlignment: CrossAxisAlignment.start,
-          //       children: [
-          //          const Padding(
-          //            padding:  EdgeInsets.symmetric(horizontal:16.0),
-          //            child: Text("Estimates",style: TextStyle(
-          //                 color: AppColors.primaryTitleColor,
-          //                 fontSize: 28,
-          //                 fontWeight: FontWeight.w500
-          //               ),),
-          //          ),
-          //         TabBar(
-          //           controller: tabController,
-          //           enableFeedback: false,
-          //           indicatorColor: AppColors.primaryColors,
+      child: BlocListener<EstimateBloc, EstimateState>(
+        listener: (context, state) {
+          if (state is GetEstimateState) {}
+          // TODO: implement listener
+        },
+        child: Scaffold(
+            // appBar: AppBar(
+            //   leading: GestureDetector(
+            //     child: Icon(Icons.menu)),
+            //   elevation: 0,
+            //   backgroundColor: Colors.transparent,
+            //   foregroundColor:AppColors.primaryColors ,
+            //   title: const Text("AutoPilot",
+            //   style: TextStyle(
+            //     color: Color(0xff061237),
+            //     fontSize: 16,
+            //     fontWeight: FontWeight.w600
+            //   ),),
+            //   centerTitle: true,
+            //   actions: [IconButton(onPressed: (){}, icon: const Icon(Icons.search,color: AppColors.primaryColors,))],
+            //   bottom:PreferredSize(
+            //     preferredSize: const Size(double.infinity, 80),
+            //     child: Column(
+            //       crossAxisAlignment: CrossAxisAlignment.start,
+            //       children: [
+            //          const Padding(
+            //            padding:  EdgeInsets.symmetric(horizontal:16.0),
+            //            child: Text("Estimates",style: TextStyle(
+            //                 color: AppColors.primaryTitleColor,
+            //                 fontSize: 28,
+            //                 fontWeight: FontWeight.w500
+            //               ),),
+            //          ),
+            //         TabBar(
+            //           controller: tabController,
+            //           enableFeedback: false,
+            //           indicatorColor: AppColors.primaryColors,
 
-          //           unselectedLabelColor: const Color(0xFF9A9A9A),
-          //           labelColor: AppColors.primaryColors,
-          //           tabs: const [
-          //             SizedBox(
-          //               height: 50,
-          //               child: Center(
-          //               child: Text(
-          //                 'Recent',
-          //                 style: TextStyle(fontWeight: FontWeight.w500),
-          //               ),
-          //               ),
-          //             ),
-          //             SizedBox(
-          //               height: 50,
-          //               child: Center(
-          //               child: Text(
-          //                 'Estimates',
-          //                 style: TextStyle(fontWeight: FontWeight.w500),
-          //               ),
-          //               ),
-          //             ),
-          //             SizedBox(
-          //               height: 50,
-          //               child: Center(
-          //               child: Text(
-          //                 'Orders',
-          //                 style: TextStyle(fontWeight: FontWeight.w500),
-          //               ),
-          //               ),
-          //             ),
+            //           unselectedLabelColor: const Color(0xFF9A9A9A),
+            //           labelColor: AppColors.primaryColors,
+            //           tabs: const [
+            //             SizedBox(
+            //               height: 50,
+            //               child: Center(
+            //               child: Text(
+            //                 'Recent',
+            //                 style: TextStyle(fontWeight: FontWeight.w500),
+            //               ),
+            //               ),
+            //             ),
+            //             SizedBox(
+            //               height: 50,
+            //               child: Center(
+            //               child: Text(
+            //                 'Estimates',
+            //                 style: TextStyle(fontWeight: FontWeight.w500),
+            //               ),
+            //               ),
+            //             ),
+            //             SizedBox(
+            //               height: 50,
+            //               child: Center(
+            //               child: Text(
+            //                 'Orders',
+            //                 style: TextStyle(fontWeight: FontWeight.w500),
+            //               ),
+            //               ),
+            //             ),
 
-          //                SizedBox(
-          //               height: 50,
-          //               child: Center(
-          //               child: Text(
-          //                 'Invoices',
-          //                 style: TextStyle(fontWeight: FontWeight.w500),
-          //               ),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       ],
-          //     ),
-          //   ) ,
-          // ),
-          //  drawer: showDrawer(context),
-          body: TabBarView(controller: widget.tabController, children: [
-        recentTabWidget(context),
-        estimateTabWidget(context),
-        ordersTabWidget(context),
-        invoiceTabWidget(context)
-      ])),
+            //                SizedBox(
+            //               height: 50,
+            //               child: Center(
+            //               child: Text(
+            //                 'Invoices',
+            //                 style: TextStyle(fontWeight: FontWeight.w500),
+            //               ),
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       ],
+            //     ),
+            //   ) ,
+            // ),
+            //  drawer: showDrawer(context),
+            body: TabBarView(controller: widget.tabController, children: [
+          recentTabWidget(context),
+          estimateTabWidget(context),
+          ordersTabWidget(context),
+          invoiceTabWidget(context)
+        ])),
+      ),
     );
   }
 
@@ -132,22 +138,27 @@ class _EstimateScreenState extends State<EstimateScreen>
       create: (context) => EstimateBloc(apiRepository: ApiRepository())
         ..add(GetEstimateEvent(orderStatus: "")),
       child: BlocListener<EstimateBloc, EstimateState>(
-        listener: (context, state) async {
+        listener: (context, state) {
           if (state is GetEstimateState) {
+            recentData.clear();
             recentData.addAll(state.estimateData.data.data);
           } else if (state is GetEstimateLoadingState) {
             recentData.clear();
           } else if (state is GetSingleEstimateState) {
-            await Navigator.push(context, MaterialPageRoute(
+            Navigator.push(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(
                   estimateDetails: state.createEstimateModel,
                   navigation: "bottom_nav",
+                  controllerIndex: widget.tabController.index,
                 );
               },
             )).then((value) {
-              context.read<EstimateBloc>()
-                ..add(GetEstimateEvent(orderStatus: ""));
+              context
+                  .read<EstimateBloc>()
+                  .add(GetEstimateEvent(orderStatus: ""));
+
+              setState(() {});
             });
           }
 
@@ -217,6 +228,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
                     navigation: "bottom_nav",
+                    controllerIndex: widget.tabController.index,
                   );
                 },
               )).then((value) {
@@ -263,8 +275,9 @@ class _EstimateScreenState extends State<EstimateScreen>
                                 onTap: () {
                                   context.read<EstimateBloc>().add(
                                       GetSingleEstimateEvent(
-                                          orderId:
-                                              recentData[index].id.toString()));
+                                          orderId: estimateData[index]
+                                              .id
+                                              .toString()));
                                 },
                                 child: tileWidget(
                                     estimateData[index].orderStatus,
@@ -329,6 +342,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
                     navigation: "bottom_nav",
+                    controllerIndex: widget.tabController.index,
                   );
                 },
               )).then((value) {
@@ -378,9 +392,8 @@ class _EstimateScreenState extends State<EstimateScreen>
                                 onTap: () {
                                   context.read<EstimateBloc>().add(
                                       GetSingleEstimateEvent(
-                                          orderId: recentData[index % 15]
-                                              .id
-                                              .toString()));
+                                          orderId:
+                                              ordersData[index].id.toString()));
                                 },
                                 child: tileWidget(
                                     ordersData[index].orderStatus,
@@ -444,6 +457,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
                     navigation: "bottom_nav",
+                    controllerIndex: widget.tabController.index,
                   );
                 },
               )).then((value) {
@@ -484,7 +498,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                               context.read<EstimateBloc>().add(
                                   GetSingleEstimateEvent(
                                       orderId:
-                                          recentData[index].id.toString()));
+                                          invoiceData[index].id.toString()));
                             },
                             child: tileWidget(
                                 invoiceData[index].orderStatus,

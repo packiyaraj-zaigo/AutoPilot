@@ -124,7 +124,7 @@ class Datum {
   CreatedBy? createdBy;
   DateTime createdAt;
   DateTime updatedAt;
-  List<dynamic> cannedServiceItems;
+  List<CannedServiceItem>? cannedServiceItems;
 
   Datum({
     required this.id,
@@ -155,7 +155,7 @@ class Datum {
     this.createdBy,
     required this.createdAt,
     required this.updatedAt,
-    required this.cannedServiceItems,
+    this.cannedServiceItems,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -194,8 +194,11 @@ class Datum {
             : null,
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        cannedServiceItems:
-            List<dynamic>.from(json["canned_service_items"].map((x) => x)),
+        cannedServiceItems: json["canned_service_items"] != null &&
+                json["canned_service_items"] != []
+            ? List<CannedServiceItem>.from(json["canned_service_items"]
+                .map((x) => CannedServiceItem.fromJson(x)))
+            : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -231,7 +234,161 @@ class Datum {
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "canned_service_items":
-            List<dynamic>.from(cannedServiceItems.map((x) => x)),
+            List<dynamic>.from(cannedServiceItems!.map((x) => x)),
+      };
+}
+
+class CannedServiceItem {
+  int id;
+  int cannedServiceId;
+  String itemType;
+  String itemName;
+  String itemServiceNote;
+  String unitPrice;
+  String quanityHours;
+  String discount;
+  Type discountType;
+  dynamic statusLabels;
+  String subTotal;
+  String partName;
+  int vendorId;
+  int categoryId;
+  dynamic tireBrand;
+  dynamic tireModel;
+  dynamic seasonality;
+  dynamic binLocation;
+  dynamic size;
+  String markup;
+  String margin;
+  int laborMatrixId;
+  int pricingMatrixId;
+  String hoursMultiplier;
+  String rateMultiplier;
+  String feeLine;
+  int feeAppliedItem;
+  String feePercentage;
+  Is isTax;
+  Is isDisplayPartNumber;
+  Is isDisplayPriceQuantity;
+  Is isDisplayNote;
+  int position;
+  DateTime createdAt;
+  DateTime updatedAt;
+
+  CannedServiceItem({
+    required this.id,
+    required this.cannedServiceId,
+    required this.itemType,
+    required this.itemName,
+    required this.itemServiceNote,
+    required this.unitPrice,
+    required this.quanityHours,
+    required this.discount,
+    required this.discountType,
+    this.statusLabels,
+    required this.subTotal,
+    required this.partName,
+    required this.vendorId,
+    required this.categoryId,
+    this.tireBrand,
+    this.tireModel,
+    this.seasonality,
+    this.binLocation,
+    this.size,
+    required this.markup,
+    required this.margin,
+    required this.laborMatrixId,
+    required this.pricingMatrixId,
+    required this.hoursMultiplier,
+    required this.rateMultiplier,
+    required this.feeLine,
+    required this.feeAppliedItem,
+    required this.feePercentage,
+    required this.isTax,
+    required this.isDisplayPartNumber,
+    required this.isDisplayPriceQuantity,
+    required this.isDisplayNote,
+    required this.position,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory CannedServiceItem.fromJson(Map<String, dynamic> json) =>
+      CannedServiceItem(
+        id: json["id"],
+        cannedServiceId: json["canned_service_id"],
+        itemType: json["item_type"],
+        itemName: json["item_name"],
+        itemServiceNote: json["item_service_note"],
+        unitPrice: json["unit_price"],
+        quanityHours: json["quanity_hours"],
+        discount: json["discount"],
+        discountType: typeValues.map[json["discount_type"]]!,
+        statusLabels: json["status_labels"],
+        subTotal: json["sub_total"],
+        partName: json["part_name"],
+        vendorId: json["vendor_id"],
+        categoryId: json["category_id"],
+        tireBrand: json["tire_brand"],
+        tireModel: json["tire_model"],
+        seasonality: json["seasonality"],
+        binLocation: json["bin_location"],
+        size: json["size"],
+        markup: json["markup"],
+        margin: json["margin"],
+        laborMatrixId: json["labor_matrix_id"],
+        pricingMatrixId: json["pricing_matrix_id"],
+        hoursMultiplier: json["hours_multiplier"],
+        rateMultiplier: json["rate_multiplier"],
+        feeLine: json["fee_line"],
+        feeAppliedItem: json["fee_applied_item"],
+        feePercentage: json["fee_percentage"],
+        isTax: isValues.map[json["is_tax"]]!,
+        isDisplayPartNumber: isValues.map[json["is_display_part_number"]]!,
+        isDisplayPriceQuantity:
+            isValues.map[json["is_display_price_quantity"]]!,
+        isDisplayNote: isValues.map[json["is_display_note"]]!,
+        position: json["position"],
+        createdAt: DateTime.parse(json["created_at"]),
+        updatedAt: DateTime.parse(json["updated_at"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "canned_service_id": cannedServiceId,
+        "item_type": itemType,
+        "item_name": itemName,
+        "item_service_note": itemServiceNote,
+        "unit_price": unitPrice,
+        "quanity_hours": quanityHours,
+        "discount": discount,
+        "discount_type": typeValues.reverse[discountType],
+        "status_labels": statusLabels,
+        "sub_total": subTotal,
+        "part_name": partName,
+        "vendor_id": vendorId,
+        "category_id": categoryId,
+        "tire_brand": tireBrand,
+        "tire_model": tireModel,
+        "seasonality": seasonality,
+        "bin_location": binLocation,
+        "size": size,
+        "markup": markup,
+        "margin": margin,
+        "labor_matrix_id": laborMatrixId,
+        "pricing_matrix_id": pricingMatrixId,
+        "hours_multiplier": hoursMultiplier,
+        "rate_multiplier": rateMultiplier,
+        "fee_line": feeLine,
+        "fee_applied_item": feeAppliedItem,
+        "fee_percentage": feePercentage,
+        "is_tax": isValues.reverse[isTax],
+        "is_display_part_number": isValues.reverse[isDisplayPartNumber],
+        "is_display_price_quantity": isValues.reverse[isDisplayPriceQuantity],
+        "is_display_note": isValues.reverse[isDisplayNote],
+        "position": position,
+        "created_at": createdAt.toIso8601String(),
+        "updated_at": updatedAt.toIso8601String(),
       };
 }
 

@@ -19,7 +19,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SelectServiceScreen extends StatefulWidget {
-  const SelectServiceScreen({super.key});
+  const SelectServiceScreen({super.key, required this.orderId});
+  final String orderId;
 
   @override
   State<SelectServiceScreen> createState() => _SelectServiceScreenState();
@@ -31,7 +32,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
   final ScrollController controller = ScrollController();
   // final List<Employee> servicesList = [];
   List<Datum> serviceList = [];
-  final List servicesList = [0];
+
   final _debouncer = Debouncer();
 
   @override
@@ -113,10 +114,11 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                             top: 14, bottom: 14, left: 16),
                         onChanged: (value) {
                           _debouncer.run(() {
-                            servicesList.clear();
+                            serviceList.clear();
                             BlocProvider.of<ServiceBloc>(context).currentPage =
                                 1;
-                            // BlocProvider.of<ServiceBloc>(context).add(GetAllEmployees(query: value));
+                            BlocProvider.of<ServiceBloc>(context)
+                                .add(GetAllServicess(query: value));
                           });
                         },
                         prefix: const Row(
@@ -403,30 +405,60 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
   //   );
   // }
 
-  Future showPopup(BuildContext context, message, Datum item) {
+  Future showPopup(BuildContext ctx, message, Datum item) {
     return showCupertinoDialog(
       context: context,
       builder: (context) => BlocProvider(
         create: (context) => EstimateBloc(apiRepository: ApiRepository()),
         child: BlocListener<EstimateBloc, EstimateState>(
           listener: (context, state) {
-            if (state is CreateEstimateState) {
-              Navigator.pop(context);
-              Navigator.pushReplacement(context, MaterialPageRoute(
+            if (state is CreateOrderServiceState) {
+              //push to partial estiimate screen.
+              // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+              //   return EstimatePartialScreen(estimateDetails: estimateDetails)
+              // },))
+              if (item.cannedServiceItems != null &&
+                  item.cannedServiceItems!.isNotEmpty) {
+                for (int i = 0; i < item.cannedServiceItems!.length; i++) {
+                  context.read<EstimateBloc>().add(CreateOrderServiceItemEvent(
+                      cannedServiceId: state.orderServiceId,
+                      itemType: item.cannedServiceItems![i].itemType,
+                      itemName: item.cannedServiceItems![i].itemName,
+                      discount: item.cannedServiceItems![i].discount,
+                      discountType:
+                          item.cannedServiceItems![i].discountType.name,
+                      position: "0",
+                      quantityHours: item.cannedServiceItems![i].quanityHours,
+                      subTotal: item.cannedServiceItems![i].subTotal,
+                      unitPrice: item.cannedServiceItems![i].unitPrice));
+                }
+              } else {
+                context
+                    .read<EstimateBloc>()
+                    .add(GetSingleEstimateEvent(orderId: widget.orderId));
+              }
+            }
+
+            if (state is GetSingleEstimateState) {
+              int count = 3;
+              // Navigator.pushReplacement(context, MaterialPageRoute(
+              //   builder: (context) {
+              //     return EstimatePartialScreen(
+              //         estimateDetails: state.createEstimateModel);
+              //   },
+              // ));
+
+              Navigator.pushAndRemoveUntil(ctx, MaterialPageRoute(
                 builder: (context) {
                   return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel,
-                  );
+                      estimateDetails: state.createEstimateModel);
                 },
-              ));
-            } else if (state is EditEstimateState) {
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) {
-                  return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel,
-                  );
-                },
-              ));
+              ), (route) => count-- == 0);
+            }
+            if (state is CreateOrderServiceItemState) {
+              context
+                  .read<EstimateBloc>()
+                  .add(GetSingleEstimateEvent(orderId: widget.orderId));
             }
             // TODO: implement listener
           },
@@ -440,8 +472,13 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
-                        context.read<EstimateBloc>().add(CreateEstimateEvent(
-                            id: item.id.toString(), which: "service"));
+                        context.read<EstimateBloc>().add(
+                            CreateOrderServiceEvent(
+                                orderId: widget.orderId,
+                                serviceName: item.serviceName,
+                                serviceNotes: item.serviceNote.toString(),
+                                laborRate: item.serviceEpa,
+                                tax: item.tax));
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),

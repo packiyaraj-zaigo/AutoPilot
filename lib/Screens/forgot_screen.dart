@@ -368,13 +368,13 @@ class _ResetPasswordState extends State<ResetPassword> {
                                   fontWeight: FontWeight.bold,
                                 ),
                                 length: 4,
-                                validator: (v) {
-                                  // if (v!.length < 4) {
-                                  //   return "Enter a valid OTP";
-                                  // } else {
-                                  //   return null;
-                                  // }
-                                },
+                                // validator: (v) {
+                                //   // if (v!.length < 4) {
+                                //   //   return "Enter a valid OTP";
+                                //   // } else {
+                                //   //   return null;
+                                //   // }
+                                // },
                                 pinTheme: PinTheme(
                                   selectedColor: Colors.black,
                                   inactiveColor: AppColors.greyText,

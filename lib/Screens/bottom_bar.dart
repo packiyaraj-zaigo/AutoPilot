@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
+
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
@@ -25,9 +27,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 // ignore: must_be_immutable
 class BottomBarScreen extends StatefulWidget {
-  BottomBarScreen({
-    super.key,
-  });
+  BottomBarScreen({super.key, this.currentIndex = 0, this.tabControllerIndex});
+  int currentIndex = 0;
+  int? tabControllerIndex;
 
   @override
   State<BottomBarScreen> createState() => _BottomBarScreenState();
@@ -37,16 +39,23 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     with TickerProviderStateMixin {
   late TabController estimateTabController;
   late TabController workFlowTabController;
-  PageController pageController = PageController();
+  late PageController pageController =
+      PageController(initialPage: widget.currentIndex);
+
   List pages = [];
 
-  int currentIndex = 0;
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
-    estimateTabController = TabController(length: 4, vsync: this);
-    workFlowTabController = TabController(length: 2, vsync: this);
+    log(widget.tabControllerIndex.toString());
+
+    estimateTabController = TabController(
+        length: 4, initialIndex: widget.tabControllerIndex ?? 0, vsync: this);
+    workFlowTabController = TabController(
+      length: 2,
+      vsync: this,
+    );
 
     pages = [
       DashBoardScreen(),
@@ -63,6 +72,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     // TODO: implement initState
     super.initState();
     // networkCheck();
+    // pageController.jumpToPage(widget.currentIndex);
     networkCheck().then((value) {
       // if (!network) {
       setState(() {});
@@ -170,7 +180,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                           color: AppColors.primaryColors,
                         ))
                   ],
-                  bottom: currentIndex == 3
+                  bottom: widget.currentIndex == 3
                       ? PreferredSize(
                           preferredSize:
                               Size(MediaQuery.of(context).size.width, 80),
@@ -240,7 +250,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                             ],
                           ),
                         )
-                      : currentIndex == 1
+                      : widget.currentIndex == 1
                           ? PreferredSize(
                               preferredSize: const Size(double.infinity, 90),
                               child: Column(
@@ -320,7 +330,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   width: 25,
                                   child: SvgPicture.asset(
                                       "assets/images/bottom_dashboard.svg",
-                                      color: currentIndex == 0
+                                      color: widget.currentIndex == 0
                                           ? AppColors.primaryColors
                                           : const Color(0xff9A9A9A)),
                                 ),
@@ -328,10 +338,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   padding: const EdgeInsets.only(top: 5.0),
                                   child: Text("Dashboard",
                                       style: TextStyle(
-                                          color: currentIndex == 0
+                                          color: widget.currentIndex == 0
                                               ? AppColors.primaryColors
                                               : const Color(0xff9A9A9A),
-                                          fontWeight: currentIndex == 0
+                                          fontWeight: widget.currentIndex == 0
                                               ? FontWeight.w600
                                               : FontWeight.w400)),
                                 ),
@@ -353,7 +363,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   width: 25,
                                   child: SvgPicture.asset(
                                       "assets/images/workflow_icon.svg",
-                                      color: currentIndex == 1
+                                      color: widget.currentIndex == 1
                                           ? AppColors.primaryColors
                                           : const Color(0xff9A9A9A)),
                                 ),
@@ -361,10 +371,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   padding: const EdgeInsets.only(top: 5.0),
                                   child: Text("Workflow",
                                       style: TextStyle(
-                                          color: currentIndex == 1
+                                          color: widget.currentIndex == 1
                                               ? AppColors.primaryColors
                                               : const Color(0xff9A9A9A),
-                                          fontWeight: currentIndex == 1
+                                          fontWeight: widget.currentIndex == 1
                                               ? FontWeight.w600
                                               : FontWeight.w400)),
                                 ),
@@ -386,7 +396,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   width: 25,
                                   child: SvgPicture.asset(
                                       "assets/images/calender_icon.svg",
-                                      color: currentIndex == 2
+                                      color: widget.currentIndex == 2
                                           ? AppColors.primaryColors
                                           : const Color.fromARGB(
                                               255, 81, 51, 51)),
@@ -395,10 +405,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   padding: const EdgeInsets.only(top: 5.0),
                                   child: Text("Calendar",
                                       style: TextStyle(
-                                          color: currentIndex == 2
+                                          color: widget.currentIndex == 2
                                               ? AppColors.primaryColors
                                               : const Color(0xff9A9A9A),
-                                          fontWeight: currentIndex == 2
+                                          fontWeight: widget.currentIndex == 2
                                               ? FontWeight.w600
                                               : FontWeight.w400)),
                                 ),
@@ -420,7 +430,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   width: 25,
                                   child: SvgPicture.asset(
                                     "assets/images/estimate_icon.svg",
-                                    color: currentIndex == 3
+                                    color: widget.currentIndex == 3
                                         ? AppColors.primaryColors
                                         : Color(0xff9A9A9A),
                                   ),
@@ -430,10 +440,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                   child: Text(
                                     "Estimate",
                                     style: TextStyle(
-                                        color: currentIndex == 3
+                                        color: widget.currentIndex == 3
                                             ? AppColors.primaryColors
                                             : Color(0xff9A9A9A),
-                                        fontWeight: currentIndex == 3
+                                        fontWeight: widget.currentIndex == 3
                                             ? FontWeight.w600
                                             : FontWeight.w400),
                                   ),
@@ -505,7 +515,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
   void changePage(int index) {
     setState(() {
-      currentIndex = index;
+      widget.currentIndex = index;
       pageController.jumpToPage(index);
     });
     networkCheck().then((value) {
