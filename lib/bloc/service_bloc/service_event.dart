@@ -23,11 +23,11 @@ class GetAllServicesEvent extends ServiceEvent {}
 
 class CreateCannedOrderServiceEvent extends ServiceEvent {
   final CannedServiceCreateModel service;
-  final CannedServiceAddModel? material;
-  final CannedServiceAddModel? part;
-  final CannedServiceAddModel? labor;
-  final CannedServiceAddModel? subcontract;
-  final CannedServiceAddModel? fee;
+  final List<CannedServiceAddModel>? material;
+  final List<CannedServiceAddModel>? part;
+  final List<CannedServiceAddModel>? labor;
+  final List<CannedServiceAddModel>? subcontract;
+  final List<CannedServiceAddModel>? fee;
   const CreateCannedOrderServiceEvent({
     required this.service,
     this.material,
