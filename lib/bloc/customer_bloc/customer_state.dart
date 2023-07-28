@@ -54,6 +54,8 @@ class EditCustomerError extends CustomerState {
   List<Object> get props => [message];
 }
 
+class CreateCustomerState extends CustomerState {}
+
 class GetCustomerMessageState extends CustomerState {
   final cm.CustomerMessageModel messageModel;
   const GetCustomerMessageState({required this.messageModel});

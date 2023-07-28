@@ -49,6 +49,10 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to scan QR codes</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs to select images</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app needs microphone</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 	<string>sms</string>

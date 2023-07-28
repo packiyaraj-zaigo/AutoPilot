@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/customer_model.dart';
+import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +16,9 @@ import '../utils/app_strings.dart';
 
 class NewCustomerScreen extends StatefulWidget {
   Datum? customerEdit;
-  NewCustomerScreen({Key? key, this.customerEdit}) : super(key: key);
+  String? navigation;
+  NewCustomerScreen({Key? key, this.customerEdit, this.navigation})
+      : super(key: key);
 
   @override
   State<NewCustomerScreen> createState() => _NewCustomerScreenState();
@@ -123,6 +126,17 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               ));
 
               '==========================errrrrrrrrorrrrrrrrr';
+            } else if (state is CreateCustomerState) {
+              if (widget.navigation != null) {
+                Navigator.pop(context);
+              } else {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => CustomersScreen(),
+                  ),
+                  (route) => false,
+                );
+              }
             } else if (state is AddCustomerLoading) {
               const Center(
                 child: CupertinoActivityIndicator(),
@@ -863,7 +877,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         phoneErrorMsg = "Phone number can't be empty";
         phoneNumberErrorStatus = true;
       });
-    } else if (phoneNumber.length < 9) {
+    } else if (phoneNumber.length < 10) {
       setState(() {
         phoneErrorMsg = "Enter a valid phone number";
         phoneNumberErrorStatus = true;
@@ -916,7 +930,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         zipCodeErrorStatus = true;
         zipCodeErrorMsg = "Zipcode can't be empty";
       });
-    } else if (zipCode.length < 2) {
+    } else if (zipCode.length < 5) {
       setState(() {
         zipCodeErrorStatus = true;
         zipCodeErrorMsg = "Please enter a valid zipcode";
@@ -933,7 +947,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           firstName: firstNameController.text,
           lastName: lastNameController.text,
           email: emailController.text,
-          mobileNo: phoneNumberController.text,
+          mobileNo: phoneNumberController.text
+              .trim()
+              .replaceAll(RegExp(r'[^\w\s]+'), '')
+              .replaceAll(" ", ""),
           customerNotes: customerNotesController.text,
           address: addressController.text,
           city: cityController.text,

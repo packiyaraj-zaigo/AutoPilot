@@ -420,7 +420,9 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return NewCustomerScreen();
+                              return NewCustomerScreen(
+                                navigation: "estimate_screen",
+                              );
                             },
                             isScrollControlled: true,
                             useSafeArea: true);
@@ -504,10 +506,10 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   )).then((value) {
                     selectedVehicleDetails = value;
                     print(selectedVehicleDetails);
-                    setState(() {
-                      vehicleController.text =
-                          "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
-                    });
+                    // setState(() {
+                    //   vehicleController.text =
+                    //       "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
+                    // });
                   });
                 } else {
                   CommonWidgets().showDialog(context,
