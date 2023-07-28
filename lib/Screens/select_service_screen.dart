@@ -64,22 +64,22 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
             style: TextStyle(color: Colors.black87, fontSize: 16),
           ),
           centerTitle: true,
-          actions: [
-            GestureDetector(
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const AddServiceScreen()));
-              },
-              child: const Icon(
-                Icons.add,
-                color: AppColors.primaryColors,
-                size: 30,
-              ),
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-          ],
+          // actions: [
+          //   // GestureDetector(
+          //   //   onTap: () {
+          //   //     Navigator.of(context).push(MaterialPageRoute(
+          //   //         builder: (context) => const AddServiceScreen()));
+          //   //   },
+          //   //   child: const Icon(
+          //   //     Icons.add,
+          //   //     color: AppColors.primaryColors,
+          //   //     size: 30,
+          //   //   ),
+          //   // ),
+          //   const SizedBox(
+          //     width: 20,
+          //   ),
+          // ],
         ),
         body: SafeArea(
           child: Padding(
@@ -115,9 +115,11 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                         onChanged: (value) {
                           _debouncer.run(() {
                             serviceList.clear();
-                            BlocProvider.of<ServiceBloc>(context).currentPage =
-                                1;
-                            BlocProvider.of<ServiceBloc>(context)
+                            BlocProvider.of<ServiceBloc>(
+                                    scaffoldKey.currentContext!)
+                                .currentPage = 1;
+                            BlocProvider.of<ServiceBloc>(
+                                    scaffoldKey.currentContext!)
                                 .add(GetAllServicess(query: value));
                           });
                         },
@@ -162,162 +164,184 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                         } else {
                           return ScrollConfiguration(
                             behavior: const ScrollBehavior(),
-                            child: ListView.builder(
-                                shrinkWrap: true,
-                                controller: controller
-                                  ..addListener(() {
-                                    if (controller.offset ==
-                                            controller
-                                                .position.maxScrollExtent &&
-                                        !BlocProvider.of<ServiceBloc>(context)
-                                            .isPagenationLoading &&
-                                        BlocProvider.of<ServiceBloc>(context)
-                                                .currentPage <=
+                            child: serviceList.isNotEmpty
+                                ? ListView.builder(
+                                    shrinkWrap: true,
+                                    controller: controller
+                                      ..addListener(() {
+                                        if (controller.offset ==
+                                                controller
+                                                    .position.maxScrollExtent &&
+                                            !BlocProvider.of<ServiceBloc>(
+                                                    context)
+                                                .isPagenationLoading &&
+                                            BlocProvider.of<ServiceBloc>(
+                                                        context)
+                                                    .currentPage <=
+                                                BlocProvider.of<ServiceBloc>(
+                                                        context)
+                                                    .totalPages) {
+                                          _debouncer.run(() {
                                             BlocProvider.of<ServiceBloc>(
                                                     context)
-                                                .totalPages) {
-                                      _debouncer.run(() {
-                                        BlocProvider.of<ServiceBloc>(context)
-                                            .isPagenationLoading = true;
-                                        BlocProvider.of<ServiceBloc>(context)
-                                            .add(GetAllServicess());
-                                      });
-                                    }
-                                  }),
-                                itemBuilder: (context, index) {
-                                  // final item = servicesList[index];
-                                  return Column(
-                                    children: [
-                                      GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          // Navigator.of(context).push(
-                                          //   MaterialPageRoute(
-                                          //     builder: (context) =>
-                                          //         EmployeeDetailsScreen(
-                                          //       employee: item,
-                                          //     ),
-                                          //   ),
-                                          // );
-                                          showPopup(
-                                              context, "", serviceList[index]);
-                                        },
-                                        child: Container(
-                                          height: 77,
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.black
-                                                    .withOpacity(0.07),
-                                                offset: const Offset(0, 4),
-                                                blurRadius: 10,
-                                              ),
-                                            ],
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16.0),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  // item.firstName ?? "",
-                                                  serviceList[index]
-                                                      .serviceName,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: const TextStyle(
-                                                    color: Color(0xFF061237),
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
+                                                .isPagenationLoading = true;
+                                            BlocProvider.of<ServiceBloc>(
+                                                    context)
+                                                .add(GetAllServicess());
+                                          });
+                                        }
+                                      }),
+                                    itemBuilder: (context, index) {
+                                      // final item = servicesList[index];
+                                      return Column(
+                                        children: [
+                                          GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () {
+                                              // Navigator.of(context).push(
+                                              //   MaterialPageRoute(
+                                              //     builder: (context) =>
+                                              //         EmployeeDetailsScreen(
+                                              //       employee: item,
+                                              //     ),
+                                              //   ),
+                                              // );
+                                              showPopup(context, "",
+                                                  serviceList[index]);
+                                            },
+                                            child: Container(
+                                              height: 77,
+                                              width: double.infinity,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.07),
+                                                    offset: const Offset(0, 4),
+                                                    blurRadius: 10,
                                                   ),
-                                                ),
-                                                SizedBox(height: 3),
-                                                Row(
+                                                ],
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0),
+                                                child: Column(
                                                   mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      'ID: ${serviceList[index].id}',
+                                                      // item.firstName ?? "",
+                                                      serviceList[index]
+                                                          .serviceName,
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: const TextStyle(
                                                         color:
-                                                            Color(0xFF6A7187),
+                                                            Color(0xFF061237),
+                                                        fontSize: 16,
                                                         fontWeight:
-                                                            FontWeight.w400,
+                                                            FontWeight.w500,
                                                       ),
                                                     ),
-                                                    const Text(
-                                                      'QTY: 0',
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: TextStyle(
-                                                        color:
-                                                            Color(0xFF6A7187),
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      'MSRP: \$ ${serviceList[index].subTotal}',
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                      style: const TextStyle(
-                                                        color:
-                                                            Color(0xFF6A7187),
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                      ),
+                                                    SizedBox(height: 3),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          'ID: ${serviceList[index].id}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Color(
+                                                                0xFF6A7187),
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                        const Text(
+                                                          'QTY: 0',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style: TextStyle(
+                                                            color: Color(
+                                                                0xFF6A7187),
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          'MSRP: \$ ${serviceList[index].subTotal}',
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Color(
+                                                                0xFF6A7187),
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
-                                              ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                      // BlocProvider.of<ServiceBloc>(context).currentPage <= BlocProvider.of<ServiceBloc>(context).totalPages &&
-                                      //         index == servicesList.length - 1
-                                      //     ? const Column(
-                                      //         children: [
-                                      //           SizedBox(height: 24),
-                                      //           Center(
-                                      //             child:
-                                      //                 CupertinoActivityIndicator(),
-                                      //           ),
-                                      //           SizedBox(height: 24),
-                                      //         ],
-                                      //       )
-                                      //     : const SizedBox(),
-                                      context.read<ServiceBloc>().currentPage <=
-                                                  context
-                                                      .read<ServiceBloc>()
-                                                      .totalPages &&
-                                              index == serviceList.length - 1
-                                          ? Column(
-                                              children: [
-                                                SizedBox(height: 16),
-                                                Center(
-                                                  child:
-                                                      CupertinoActivityIndicator(),
-                                                ),
-                                                SizedBox(height: 16),
-                                              ],
-                                            )
-                                          : SizedBox(height: 24)
-                                    ],
-                                  );
-                                },
-                                itemCount: serviceList.length),
+                                          // BlocProvider.of<ServiceBloc>(context).currentPage <= BlocProvider.of<ServiceBloc>(context).totalPages &&
+                                          //         index == servicesList.length - 1
+                                          //     ? const Column(
+                                          //         children: [
+                                          //           SizedBox(height: 24),
+                                          //           Center(
+                                          //             child:
+                                          //                 CupertinoActivityIndicator(),
+                                          //           ),
+                                          //           SizedBox(height: 24),
+                                          //         ],
+                                          //       )
+                                          //     : const SizedBox(),
+                                          context
+                                                          .read<ServiceBloc>()
+                                                          .currentPage <=
+                                                      context
+                                                          .read<ServiceBloc>()
+                                                          .totalPages &&
+                                                  index ==
+                                                      serviceList.length - 1
+                                              ? Column(
+                                                  children: [
+                                                    SizedBox(height: 16),
+                                                    Center(
+                                                      child:
+                                                          CupertinoActivityIndicator(),
+                                                    ),
+                                                    SizedBox(height: 16),
+                                                  ],
+                                                )
+                                              : SizedBox(height: 24)
+                                        ],
+                                      );
+                                    },
+                                    itemCount: serviceList.length)
+                                : const Center(
+                                    child: Text(
+                                      "No Service Found",
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: AppColors.greyText,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
                           );
                         }
                       },
