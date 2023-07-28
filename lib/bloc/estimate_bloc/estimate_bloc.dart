@@ -40,6 +40,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<CreateOrderImageEvent>(createOrderImageBloc);
     on<GetAllOrderImageEvent>(getOrderImageBloc);
     on<DeleteOrderImageEvent>(deleteOrderImageBloc);
+    on<CreateOrderServiceEvent>(createOrderServiceBloc);
+    on<CreateOrderServiceItemEvent>(createOrderServiceItemBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -422,6 +424,80 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
 
       if (deleteOrderImageRes.statusCode == 200) {
         emit(DeleteImageState());
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> createOrderServiceBloc(
+    CreateOrderServiceEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+
+      Response createOrderServiceRes = await _apiRepository.createOrderService(
+          token!,
+          event.orderId,
+          event.serviceName,
+          event.serviceNotes,
+          event.laborRate,
+          event.tax);
+
+      log("orderserviceres${createOrderServiceRes.body}");
+
+      if (createOrderServiceRes.statusCode == 200 ||
+          createOrderServiceRes.statusCode == 201) {
+        final decodedBody = json.decode(createOrderServiceRes.body);
+        emit(CreateOrderServiceState(
+            orderServiceId: decodedBody['created_id'].toString()));
+      } else {
+        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> createOrderServiceItemBloc(
+    CreateOrderServiceItemEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      Response createOrderServiceItem =
+          await _apiRepository.createOrderServiceItem(
+              token,
+              event.cannedServiceId,
+              event.itemType,
+              event.itemName,
+              event.unitPrice,
+              event.quantityHours,
+              event.discount,
+              event.discountType,
+              event.position,
+              event.subTotal);
+
+      log("res${createOrderServiceItem.body}");
+
+      if (createOrderServiceItem.statusCode == 200 ||
+          createOrderServiceItem.statusCode == 201) {
+        emit(CreateOrderServiceItemState());
       } else {
         emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
       }

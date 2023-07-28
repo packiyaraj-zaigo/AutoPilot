@@ -127,7 +127,9 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
         isEmployeesLoading = false;
         isPagenationLoading = false;
       });
-    } catch (e) {
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
       emit(ServiceDetailsErrorState(message: e.toString()));
       isEmployeesLoading = false;
       isPagenationLoading = false;

@@ -84,3 +84,10 @@ class GetOrderImageState extends EstimateState {
 }
 
 class DeleteImageState extends EstimateState {}
+
+class CreateOrderServiceState extends EstimateState {
+  final String orderServiceId;
+  CreateOrderServiceState({required this.orderServiceId});
+}
+
+class CreateOrderServiceItemState extends EstimateState {}

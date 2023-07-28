@@ -18,12 +18,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EstimatePartialScreen extends StatefulWidget {
   const EstimatePartialScreen(
-      {super.key, required this.estimateDetails, this.navigation});
+      {super.key,
+      required this.estimateDetails,
+      this.navigation,
+      this.controllerIndex});
   final CreateEstimateModel estimateDetails;
   final String? navigation;
+  final int? controllerIndex;
 
   @override
   State<EstimatePartialScreen> createState() => _EstimatePartialScreenState();
@@ -73,6 +79,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   File? selectedImage;
   List<String> networkImageList = ["", "", "", ""];
   List<oi.Datum> newOrderImageData = [];
+
+  //Tax and total Amount variables
+  double materialAmount = 0;
+  double laborAmount = 0;
+  double taxAmount = 0;
+  double discountAmount = 0;
+  double totalAmount = 0;
+  double balanceDueAmount = 0;
+
+  @override
+  void initState() {
+    calculateAmount();
+    print(materialAmount.toString() + "amount");
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,428 +151,475 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
         child: BlocBuilder<EstimateBloc, EstimateState>(
           builder: (context, state) {
             print(state);
-            return Scaffold(
-              key: _scaffoldKey,
-              appBar: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leading: IconButton(
-                    onPressed: () {
-                      if (widget.navigation == "bottom_nav") {
-                        Navigator.pop(context);
-                      } else {
-                        Navigator.pop(context);
-                        Navigator.pop(context);
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: AppColors.primaryColors,
-                    )),
-                foregroundColor: AppColors.primaryColors,
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 12.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        if (estimateNoteController.text.isNotEmpty) {
-                          context.read<EstimateBloc>().add(AddEstimateNoteEvent(
-                              orderId:
-                                  widget.estimateDetails.data.id.toString(),
-                              comment: estimateNoteController.text));
-                        }
-                        if (startTimeController.text.isNotEmpty &&
-                            endTimeController.text.isNotEmpty &&
-                            dateController.text.isNotEmpty &&
-                            appointmentController.text.isNotEmpty) {
-                          context.read<EstimateBloc>().add(
-                              CreateAppointmentEstimateEvent(
-                                  startTime: dateController.text +
-                                      startTimeController.text,
-                                  endTime: dateController.text +
-                                      endTimeController.text,
-                                  orderId:
-                                      widget.estimateDetails.data.id.toString(),
-                                  appointmentNote: appointmentController.text,
-                                  customerId: widget
-                                      .estimateDetails.data.customerId
-                                      .toString(),
-                                  vehicleId: "22"));
-                        }
-                        if (networkImageList.isNotEmpty) {
-                          context.read<EstimateBloc>().add(
-                              CreateOrderImageEvent(
-                                  imageUrlList:
-                                      networkImageList.where((element) {
-                                    return element != "";
-                                  }).toList(),
-                                  inspectionId: "",
-                                  orderId: widget.estimateDetails.data.id
-                                      .toString()));
-                        }
+            return WillPopScope(
+              onWillPop: () async {
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                  builder: (context) {
+                    return BottomBarScreen(
+                      currentIndex: 3,
+                    );
+                  },
+                ), (route) => false);
+                return false;
+              },
+              child: Scaffold(
+                key: _scaffoldKey,
+                appBar: AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  leading: IconButton(
+                      onPressed: () {
+                        // if (widget.navigation == "bottom_nav") {
+                        //   Navigator.pop(context);
+                        // } else {
+                        //   Navigator.pop(context);
+                        //   Navigator.pop(context);
+                        // }
 
-                        Navigator.pop(context);
+                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                          builder: (context) {
+                            return BottomBarScreen(
+                              currentIndex: 3,
+                              tabControllerIndex: widget.controllerIndex,
+                            );
+                          },
+                        ), (route) => false);
                       },
-                      child: const Row(
-                        children: [
-                          Text(
-                            "Save & Close",
-                            style: TextStyle(
-                                color: AppColors.primaryColors,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          Icon(
-                            Icons.close,
-                            color: AppColors.primaryColors,
-                          )
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-              body: SingleChildScrollView(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Estimate Details',
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 28,
-                            fontWeight: FontWeight.w600),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          'Follow the step to create an estimate.',
-                          style: TextStyle(
-                              color: AppColors.greyText,
-                              fontSize: 14,
-                              letterSpacing: 1.1,
-                              fontWeight: FontWeight.w400),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: AppColors.primaryColors,
+                      )),
+                  foregroundColor: AppColors.primaryColors,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 12.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (estimateNoteController.text.isNotEmpty) {
+                            context.read<EstimateBloc>().add(
+                                AddEstimateNoteEvent(
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString(),
+                                    comment: estimateNoteController.text));
+                          }
+                          if (startTimeController.text.isNotEmpty &&
+                              endTimeController.text.isNotEmpty &&
+                              dateController.text.isNotEmpty &&
+                              appointmentController.text.isNotEmpty) {
+                            context.read<EstimateBloc>().add(
+                                CreateAppointmentEstimateEvent(
+                                    startTime:
+                                        dateController
+                                                .text +
+                                            startTimeController.text,
+                                    endTime: dateController.text +
+                                        endTimeController.text,
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString(),
+                                    appointmentNote: appointmentController.text,
+                                    customerId: widget
+                                        .estimateDetails.data.customerId
+                                        .toString(),
+                                    vehicleId: "22"));
+                          }
+                          if (networkImageList.isNotEmpty) {
+                            context.read<EstimateBloc>().add(
+                                CreateOrderImageEvent(
+                                    imageUrlList:
+                                        networkImageList.where((element) {
+                                      return element != "";
+                                    }).toList(),
+                                    inspectionId: "",
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString()));
+                          }
+
+                          Navigator.pop(context);
+                        },
+                        child: const Row(
+                          children: [
+                            Text(
+                              "Save & Close",
+                              style: TextStyle(
+                                  color: AppColors.primaryColors,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            Icon(
+                              Icons.close,
+                              color: AppColors.primaryColors,
+                            )
+                          ],
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 16.0),
-                        child: Text(
-                          'Estimate #${widget.estimateDetails.data.orderNumber}',
-                          style: const TextStyle(
+                    )
+                  ],
+                ),
+                body: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24.0, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Estimate Details',
+                          style: TextStyle(
                               color: AppColors.primaryTitleColor,
-                              fontSize: 18,
+                              fontSize: 28,
                               fontWeight: FontWeight.w600),
                         ),
-                      ),
-                      widget.estimateDetails.data.customer != null
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8.0),
+                          child: Text(
+                            'Follow the step to create an estimate.',
+                            style: TextStyle(
+                                color: AppColors.greyText,
+                                fontSize: 14,
+                                letterSpacing: 1.1,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 16.0),
+                          child: Text(
+                            'Estimate #${widget.estimateDetails.data.orderNumber}',
+                            style: const TextStyle(
+                                color: AppColors.primaryTitleColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                        widget.estimateDetails.data.customer != null
+                            ? Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    subTitleWidget("Customer Details"),
+                                    const Icon(
+                                      Icons.more_horiz,
+                                      color: AppColors.primaryColors,
+                                    )
+                                  ],
+                                ),
+                              )
+                            : const SizedBox(),
+                        widget.estimateDetails.data.customer != null
+                            ? customerDetailsWidget()
+                            : textBox("Select Existing", customerController,
+                                "Customer", customerErrorStatus),
+                        widget.estimateDetails.data.vehicle != null
+                            ? vehicleDetailsWidget()
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: textBox(
+                                    "Select Exsisting",
+                                    vehicleController,
+                                    "Vehicle",
+                                    vehicleErrorStatus),
+                              ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: subTitleWidget("Estimate Notes"),
+                        ),
+                        estimateNoteModel?.data != null &&
+                                estimateNoteModel!.data.isNotEmpty
+                            ? estimateNoteWidget()
+                            : Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: textBox(
+                                    "Enter Note",
+                                    estimateNoteController,
+                                    "Note",
+                                    estimateNoteErrorStatus),
+                              ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 20.0),
+                        //   child: Row(
+                        //     children: [
+                        //       subTitleWidget("Estimate Notes"),
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(left: 6.0),
+                        //         child: GestureDetector(
+                        //             onTap: () {
+                        //               showEstimateNotes("estimate");
+                        //             },
+                        //             child: Icon(
+                        //               isEstimateNotes
+                        //                   ? Icons.keyboard_arrow_down_rounded
+                        //                   : Icons.keyboard_arrow_up_rounded,
+                        //               size: 32,
+                        //             )),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+                        // isEstimateNotes ? estimateNoteWidget() : const SizedBox(),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 20.0),
+                        //   child: Row(
+                        //     children: [
+                        //       subTitleWidget("Appointment"),
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(left: 6.0),
+                        //         child: GestureDetector(
+                        //             onTap: () {
+                        //               showEstimateNotes("appointment");
+                        //             },
+                        //             child: Icon(
+                        //               isAppointment
+                        //                   ? Icons.keyboard_arrow_down_rounded
+                        //                   : Icons.keyboard_arrow_up_rounded,
+                        //               size: 32,
+                        //             )),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+                        // isAppointment
+                        //     ? appointmentDetailsWidget()
+                        //     : const SizedBox(),
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: subTitleWidget("Appointment"),
+                        ),
+                        appointmentDetailsModel?.data != null &&
+                                appointmentDetailsModel!.data.data.isNotEmpty
+                            ? appointmentDetailsWidget()
+                            : Column(
                                 children: [
-                                  subTitleWidget("Customer Details"),
-                                  const Icon(
-                                    Icons.more_horiz,
-                                    color: AppColors.primaryColors,
-                                  )
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 24.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        halfTextBox(
+                                            "Select Time",
+                                            startTimeController,
+                                            "Start time",
+                                            startTimeErrorStatus,
+                                            "start_time"),
+                                        halfTextBox(
+                                            "Select Time",
+                                            endTimeController,
+                                            "End time",
+                                            endTimeErrorStatus,
+                                            "end_time")
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: textBox(
+                                        "Select Date",
+                                        dateController,
+                                        "Date",
+                                        dateErrorStatus),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 16.0),
+                                    child: textBox(
+                                        "Enter Appointment Note",
+                                        appointmentController,
+                                        "Appointment note",
+                                        appointmentErrorStatus),
+                                  ),
                                 ],
                               ),
-                            )
-                          : const SizedBox(),
-                      widget.estimateDetails.data.customer != null
-                          ? customerDetailsWidget()
-                          : textBox("Select Existing", customerController,
-                              "Customer", customerErrorStatus),
-                      widget.estimateDetails.data.vehicle != null
-                          ? vehicleDetailsWidget()
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: textBox(
-                                  "Select Exsisting",
-                                  vehicleController,
-                                  "Vehicle",
-                                  vehicleErrorStatus),
-                            ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: subTitleWidget("Estimate Notes"),
-                      ),
-                      estimateNoteModel?.data != null &&
-                              estimateNoteModel!.data.isNotEmpty
-                          ? estimateNoteWidget()
-                          : Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: textBox(
-                                  "Enter Note",
-                                  estimateNoteController,
-                                  "Note",
-                                  estimateNoteErrorStatus),
-                            ),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 20.0),
-                      //   child: Row(
-                      //     children: [
-                      //       subTitleWidget("Estimate Notes"),
-                      //       Padding(
-                      //         padding: const EdgeInsets.only(left: 6.0),
-                      //         child: GestureDetector(
-                      //             onTap: () {
-                      //               showEstimateNotes("estimate");
-                      //             },
-                      //             child: Icon(
-                      //               isEstimateNotes
-                      //                   ? Icons.keyboard_arrow_down_rounded
-                      //                   : Icons.keyboard_arrow_up_rounded,
-                      //               size: 32,
-                      //             )),
-                      //       )
-                      //     ],
-                      //   ),
-                      // ),
-                      // isEstimateNotes ? estimateNoteWidget() : const SizedBox(),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 20.0),
-                      //   child: Row(
-                      //     children: [
-                      //       subTitleWidget("Appointment"),
-                      //       Padding(
-                      //         padding: const EdgeInsets.only(left: 6.0),
-                      //         child: GestureDetector(
-                      //             onTap: () {
-                      //               showEstimateNotes("appointment");
-                      //             },
-                      //             child: Icon(
-                      //               isAppointment
-                      //                   ? Icons.keyboard_arrow_down_rounded
-                      //                   : Icons.keyboard_arrow_up_rounded,
-                      //               size: 32,
-                      //             )),
-                      //       )
-                      //     ],
-                      //   ),
-                      // ),
-                      // isAppointment
-                      //     ? appointmentDetailsWidget()
-                      //     : const SizedBox(),
 
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: subTitleWidget("Appointment"),
-                      ),
-                      appointmentDetailsModel?.data != null &&
-                              appointmentDetailsModel!.data.data.isNotEmpty
-                          ? appointmentDetailsWidget()
-                          : Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 24.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      halfTextBox(
-                                          "Select Time",
-                                          startTimeController,
-                                          "Start time",
-                                          startTimeErrorStatus,
-                                          "start_time"),
-                                      halfTextBox(
-                                          "Select Time",
-                                          endTimeController,
-                                          "End time",
-                                          endTimeErrorStatus,
-                                          "end_time")
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16.0),
-                                  child: textBox("Select Date", dateController,
-                                      "Date", dateErrorStatus),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 16.0),
-                                  child: textBox(
-                                      "Enter Appointment Note",
-                                      appointmentController,
-                                      "Appointment note",
-                                      appointmentErrorStatus),
-                                ),
-                              ],
-                            ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: subTitleWidget("Inspection Photos"),
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16.0),
-                        child: Text(
-                          "Upload photo",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187)),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: subTitleWidget("Inspection Photos"),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          // children: [
-                          //   GestureDetector(
-                          //       onTap: () {
-                          //         showActionSheet(context);
-                          //       },
-                          //       child: inspectionPhotoWidget(
-                          //           networkImageList.length >= 1
-                          //               ? networkImageList[0]
-                          //               : "")),
-                          //   GestureDetector(
-                          //     onTap: () {
-                          //       showActionSheet(context);
-                          //     },
-                          //     child: inspectionPhotoWidget(
-                          //         networkImageList.length >= 2
-                          //             ? networkImageList[1]
-                          //             : ""),
-                          //   ),
-                          //   GestureDetector(
-                          //       onTap: () {
-                          //         showActionSheet(context);
-                          //       },
-                          //       child: inspectionPhotoWidget(
-                          //           networkImageList.length >= 3
-                          //               ? networkImageList[2]
-                          //               : "")),
-                          //   GestureDetector(
-                          //       onTap: () {
-                          //         showActionSheet(context);
-                          //       },
-                          //       child: inspectionPhotoWidget(
-                          //           networkImageList.length >= 4
-                          //               ? networkImageList[3]
-                          //               : ""))
-                          // ],
-
-                          children: List.generate(4, (index) {
-                            return GestureDetector(
-                                onTap: () {
-                                  if (newOrderImageData.length > index ||
-                                      networkImageList[index]
-                                          .contains("http")) {
-                                  } else {
-                                    showActionSheet(context, index);
-                                  }
-                                },
-                                child: newOrderImageData.length > index
-                                    ? inspectionPhotoWidget(
-                                        newOrderImageData[index].fileName,
-                                        newOrderImageData[index].id.toString(),
-                                        index)
-                                    : inspectionPhotoWidget(
-                                        networkImageList[index], "", index));
-                          }),
-                        ),
-                      ),
-
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 16.0),
-                      //   child: Row(
-                      //     children: [
-                      //       subTitleWidget("Services"),
-                      //       Padding(
-                      //         padding: const EdgeInsets.only(left: 6.0),
-                      //         child: GestureDetector(
-                      //             onTap: () {
-                      //               showEstimateNotes("service");
-                      //             },
-                      //             child: Icon(
-                      //               isService
-                      //                   ? Icons.keyboard_arrow_down_rounded
-                      //                   : Icons.keyboard_arrow_up_rounded,
-                      //               size: 32,
-                      //             )),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                      // isService ? serviceDetailsWidget() : const SizedBox(),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: subTitleWidget("Services"),
-                      ),
-
-                      //Service dropdown
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Select Existing", serviceController,
-                            "Service", serviceErrorStatus),
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15.0),
-                        child: taxDetailsWidget("Material", "\$399"),
-                      ),
-                      taxDetailsWidget("Labor", "\$399"),
-                      taxDetailsWidget("Tax", "\$399"),
-                      taxDetailsWidget("Discount", "\$399"),
-                      taxDetailsWidget("Total", "\$399"),
-                      taxDetailsWidget("Balace due", "\$399"),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 45.0),
-                      //   child: GestureDetector(
-                      //     onTap: () {},
-                      //     child: Container(
-                      //       height: 56,
-                      //       alignment: Alignment.center,
-                      //       width: MediaQuery.of(context).size.width,
-                      //       decoration: BoxDecoration(
-                      //         borderRadius: BorderRadius.circular(12),
-                      //         color: Colors.white,
-                      //       ),
-                      //       child: const Text(
-                      //         "Send to customer",
-                      //         style: TextStyle(
-                      //           fontSize: 16,
-                      //           fontWeight: FontWeight.w500,
-                      //           color: AppColors.primaryColors,
-                      //         ),
-                      //       ),
-                      //     ),
-                      //   ),
-                      // ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 46.0),
-                        child: GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            height: 56,
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: AppColors.primaryColors),
-                            child: const Text(
-                              "Update Estimate",
-                              style: TextStyle(
-                                fontSize: 16,
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16.0),
+                          child: Text(
+                            "Upload photo",
+                            style: TextStyle(
+                                fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white,
+                                color: Color(0xff6A7187)),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // children: [
+                            //   GestureDetector(
+                            //       onTap: () {
+                            //         showActionSheet(context);
+                            //       },
+                            //       child: inspectionPhotoWidget(
+                            //           networkImageList.length >= 1
+                            //               ? networkImageList[0]
+                            //               : "")),
+                            //   GestureDetector(
+                            //     onTap: () {
+                            //       showActionSheet(context);
+                            //     },
+                            //     child: inspectionPhotoWidget(
+                            //         networkImageList.length >= 2
+                            //             ? networkImageList[1]
+                            //             : ""),
+                            //   ),
+                            //   GestureDetector(
+                            //       onTap: () {
+                            //         showActionSheet(context);
+                            //       },
+                            //       child: inspectionPhotoWidget(
+                            //           networkImageList.length >= 3
+                            //               ? networkImageList[2]
+                            //               : "")),
+                            //   GestureDetector(
+                            //       onTap: () {
+                            //         showActionSheet(context);
+                            //       },
+                            //       child: inspectionPhotoWidget(
+                            //           networkImageList.length >= 4
+                            //               ? networkImageList[3]
+                            //               : ""))
+                            // ],
+
+                            children: List.generate(4, (index) {
+                              return GestureDetector(
+                                  onTap: () {
+                                    if (newOrderImageData.length > index ||
+                                        networkImageList[index]
+                                            .contains("http")) {
+                                    } else {
+                                      showActionSheet(context, index);
+                                    }
+                                  },
+                                  child: newOrderImageData.length > index
+                                      ? inspectionPhotoWidget(
+                                          newOrderImageData[index].fileName,
+                                          newOrderImageData[index]
+                                              .id
+                                              .toString(),
+                                          index)
+                                      : inspectionPhotoWidget(
+                                          networkImageList[index], "", index));
+                            }),
+                          ),
+                        ),
+
+                        // Padding(
+                        //   padding: const EdgeInsets.only(top: 16.0),
+                        //   child: Row(
+                        //     children: [
+                        //       subTitleWidget("Services"),
+                        //       Padding(
+                        //         padding: const EdgeInsets.only(left: 6.0),
+                        //         child: GestureDetector(
+                        //             onTap: () {
+                        //               showEstimateNotes("service");
+                        //             },
+                        //             child: Icon(
+                        //               isService
+                        //                   ? Icons.keyboard_arrow_down_rounded
+                        //                   : Icons.keyboard_arrow_up_rounded,
+                        //               size: 32,
+                        //             )),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // isService ? serviceDetailsWidget() : const SizedBox(),
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: subTitleWidget("Services"),
+                        ),
+
+                        //Service dropdown
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: textBox("Select Existing", serviceController,
+                              "Service", serviceErrorStatus),
+                        ),
+                        widget.estimateDetails.data.orderService != null &&
+                                widget.estimateDetails.data.orderService!
+                                    .isNotEmpty
+                            ? serviceDetailsWidget()
+                            : const SizedBox(),
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: taxDetailsWidget(
+                              "Material", "\$ ${materialAmount}"),
+                        ),
+                        taxDetailsWidget("Labor", "\$ ${laborAmount}"),
+                        taxDetailsWidget("Tax", "\$ ${taxAmount}"),
+                        taxDetailsWidget("Discount", "\$ ${discountAmount}"),
+                        taxDetailsWidget("Total", "\$ ${totalAmount}"),
+                        taxDetailsWidget("Balance due", "\$ ${totalAmount}"),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 45.0),
+                          child: GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              height: 56,
+                              alignment: Alignment.center,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey.shade50,
+                              ),
+                              child: const Text(
+                                "Send to customer",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryColors,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 30,
-                      )
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: EdgeInsets.all(20),
+                                    insetPadding: EdgeInsets.all(20),
+                                    content: paymentPopUp(),
+                                  );
+                                },
+                              );
+                            },
+                            child: Container(
+                              height: 56,
+                              alignment: Alignment.center,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: AppColors.primaryColors),
+                              child: const Text(
+                                "Collect Payment",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 30,
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -614,9 +683,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                       color: AppColors.primaryTitleColor,
                       fontWeight: FontWeight.w400),
                 ),
-                SvgPicture.asset(
-                  "assets/images/mail_icons.svg",
-                  color: AppColors.primaryColors,
+                GestureDetector(
+                  onTap: () {
+                    if (widget.estimateDetails.data.customer?.email != null) {
+                      String? encodeQueryParameters(
+                          Map<String, String> params) {
+                        return params.entries
+                            .map((MapEntry<String, String> e) =>
+                                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                            .join('&');
+                      }
+
+                      final Uri emailLaunchUri = Uri(
+                        scheme: 'mailto',
+                        path: widget.estimateDetails.data.customer?.email ?? "",
+                        query: encodeQueryParameters(<String, String>{
+                          'subject': ' ',
+                        }),
+                      );
+
+                      launchUrl(emailLaunchUri);
+                    }
+                  },
+                  child: SvgPicture.asset(
+                    "assets/images/mail_icons.svg",
+                    color: AppColors.primaryColors,
+                  ),
                 )
               ],
             ),
@@ -635,15 +727,39 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                 ),
                 Row(
                   children: [
-                    SvgPicture.asset(
-                      "assets/images/sms_icons.svg",
-                      color: AppColors.primaryColors,
+                    GestureDetector(
+                      onTap: () {
+                        if (widget.estimateDetails.data.customer?.phone !=
+                                null &&
+                            widget.estimateDetails.data.customer?.phone != "") {
+                          final Uri smsLaunchUri = Uri(
+                            scheme: 'sms',
+                            path: widget.estimateDetails.data.customer?.phone,
+                          );
+                          launchUrl(smsLaunchUri);
+                        }
+                      },
+                      child: SvgPicture.asset(
+                        "assets/images/sms_icons.svg",
+                        color: AppColors.primaryColors,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 34.0),
-                      child: SvgPicture.asset(
-                        "assets/images/phone_icon.svg",
-                        color: AppColors.primaryColors,
+                      child: GestureDetector(
+                        onTap: () {
+                          final Uri emailLaunchUri = Uri(
+                            scheme: 'tel',
+                            path: widget.estimateDetails.data.customer?.phone ??
+                                "",
+                          );
+
+                          launchUrl(emailLaunchUri);
+                        },
+                        child: SvgPicture.asset(
+                          "assets/images/phone_icon.svg",
+                          color: AppColors.primaryColors,
+                        ),
                       ),
                     ),
                   ],
@@ -733,7 +849,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                   Text(
                     estimateNoteModel?.data != null &&
                             estimateNoteModel?.data != []
-                        ? "${estimateNoteModel?.data[0].createdAt.month}/${estimateNoteModel?.data[0].createdAt.day}/${estimateNoteModel?.data[0].createdAt.year} - ${estimateNoteModel?.data[0].createdAt.hour}:${estimateNoteModel?.data[0].createdAt.minute}"
+                        ? "${estimateNoteModel?.data[0].createdAt.month}/${estimateNoteModel?.data[0].createdAt.day}/${estimateNoteModel?.data[0].createdAt.year} -  ${DateFormat('hh:mm a').format(estimateNoteModel!.data[0].createdAt)}"
                         : "",
                     style: const TextStyle(
                         color: Color(0xff6A7187),
@@ -834,13 +950,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                     "Start time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? "${appointmentDetailsModel?.data.data[0].startOn.hour}:${appointmentDetailsModel?.data.data[0].startOn.minute}"
+                        ? DateFormat('hh:mm a').format(
+                            appointmentDetailsModel!.data.data[0].startOn)
                         : ""),
                 appointmentLabelwithValue(
                     "End time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? "${appointmentDetailsModel?.data.data[0].endOn.hour}:${appointmentDetailsModel?.data.data[0].endOn.minute}"
+                        ? DateFormat('hh:mm a')
+                            .format(appointmentDetailsModel!.data.data[0].endOn)
                         : "")
               ],
             ),
@@ -928,12 +1046,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   }
 
   Widget serviceDetailsWidget() {
-    return Column(
-      children: [serviceTileWidget()],
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return serviceTileWidget(index);
+      },
+      shrinkWrap: true,
+      itemCount: widget.estimateDetails.data.orderService?.length ?? 0,
+      physics: const ClampingScrollPhysics(),
     );
   }
 
-  Widget serviceTileWidget() {
+  Widget serviceTileWidget(int serviceIndex) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Container(
@@ -948,7 +1071,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                   spreadRadius: 0.7,
                   offset: Offset(3, 2))
             ]),
-        child: const Padding(
+        child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -957,78 +1080,60 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Downpie updgrade",
-                    style: TextStyle(
+                    widget.estimateDetails.data.orderService?[serviceIndex]
+                            .serviceName ??
+                        "",
+                    style: const TextStyle(
                         color: AppColors.primaryTitleColor,
                         fontSize: 16,
                         fontWeight: FontWeight.w600),
                   ),
-                  Icon(
+                  const Icon(
                     Icons.more_horiz,
                     color: AppColors.primaryColors,
                   )
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Blue Wrap 1.00",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500),
+              ListView.builder(
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: EdgeInsets.only(top: 5.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget
+                                  .estimateDetails
+                                  .data
+                                  .orderService?[serviceIndex]
+                                  .orderServiceItems?[index]
+                                  .itemName ??
+                              "",
+                          style: const TextStyle(
+                              color: AppColors.primaryTitleColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500),
+                        ),
+                        Text(
+                            "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].orderServiceItems?[index].subTotal ?? ""}",
+                            style: const TextStyle(
+                                color: AppColors.primaryTitleColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500))
+                      ],
                     ),
-                    Text("\$599.00",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500))
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Blue Wrap 1.00",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    Text("\$599.00",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500))
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 5.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Blue Wrap 1.00",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    Text("\$599.00",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500))
-                  ],
-                ),
-              ),
+                  );
+                },
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                itemCount: widget
+                        .estimateDetails
+                        .data
+                        .orderService?[serviceIndex]
+                        .orderServiceItems
+                        ?.length ??
+                    0,
+              )
             ],
           ),
         ),
@@ -1177,7 +1282,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                 } else if (label == "Service") {
                   Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
-                      return SelectServiceScreen();
+                      return SelectServiceScreen(
+                        orderId: widget.estimateDetails.data.id.toString(),
+                      );
                     },
                   ));
                 }
@@ -1391,14 +1498,20 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
           actions: <CupertinoActionSheetAction>[
             CupertinoActionSheetAction(
               onPressed: () {
+                setState(() {
+                  selectedImage = null;
+                });
                 Navigator.pop(context);
                 selectImages("camera").then((value) {
-                  print(selectedImage);
-                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
-                      EstimateUploadImageEvent(
-                          imagePath: selectedImage!,
-                          orderId: widget.estimateDetails.data.id.toString(),
-                          index: index));
+                  if (selectedImage != null) {
+                    print("this works");
+                    print(selectedImage);
+                    _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                        EstimateUploadImageEvent(
+                            imagePath: selectedImage!,
+                            orderId: widget.estimateDetails.data.id.toString(),
+                            index: index));
+                  }
                 });
               },
               child: Row(
@@ -1417,16 +1530,20 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
             ),
             CupertinoActionSheetAction(
               onPressed: () {
+                setState(() {
+                  selectedImage = null;
+                });
                 Navigator.pop(context);
                 selectImages("lib").then((value) {
-                  print(selectedImage);
-                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
-                      EstimateUploadImageEvent(
-                          imagePath: selectedImage!,
-                          orderId: widget.estimateDetails.data.id.toString(),
-                          index: index));
+                  if (selectedImage != null) {
+                    print(selectedImage);
+                    _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                        EstimateUploadImageEvent(
+                            imagePath: selectedImage!,
+                            orderId: widget.estimateDetails.data.id.toString(),
+                            index: index));
+                  }
                 });
-                ;
               },
               child: Row(
                 children: [
@@ -1475,11 +1592,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  GestureDetector(
-                      onTap: () {
-                        showPopup(context, "", imageId, index);
-                      },
-                      child: Icon(Icons.close))
+                  Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: GestureDetector(
+                        onTap: () {
+                          showPopup(context, "", imageId, index);
+                        },
+                        child: const CircleAvatar(
+                            radius: 10,
+                            backgroundColor: Colors.red,
+                            child: Icon(
+                              Icons.close,
+                              size: 12,
+                              color: Colors.white,
+                            ))),
+                  )
                 ],
               ),
             )
@@ -1569,6 +1696,58 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
             },
           ),
         ),
+      ),
+    );
+  }
+
+  calculateAmount() {
+    widget.estimateDetails.data.orderService?.forEach((element) {
+      element.orderServiceItems!.forEach((element2) {
+        if (element2.itemType.toLowerCase() == "material") {
+          setState(() {
+            materialAmount = materialAmount + double.parse(element2.subTotal);
+          });
+        }
+        if (element2.itemType.toLowerCase() == "labor") {
+          setState(() {
+            laborAmount = laborAmount + double.parse(element2.subTotal);
+          });
+        }
+
+        setState(() {
+          taxAmount = taxAmount + double.parse(element2.tax);
+          discountAmount = discountAmount + double.parse(element2.discount);
+        });
+      });
+    });
+
+    setState(() {
+      totalAmount = (materialAmount + laborAmount + taxAmount) - discountAmount;
+    });
+  }
+
+  paymentPopUp() {
+    return Container(
+      color: Colors.white,
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 1.5,
+      child: const Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Payment",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTitleColor,
+                ),
+              ),
+              Icon(Icons.close)
+            ],
+          )
+        ],
       ),
     );
   }

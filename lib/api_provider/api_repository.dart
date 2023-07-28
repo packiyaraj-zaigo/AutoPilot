@@ -360,6 +360,36 @@ class ApiRepository {
   Future deleteOrderImage(String token, String imageId) {
     return apiProvider.deleteOrderImage(token, imageId);
   }
+
+  Future createOrderService(String token, String orderId, String serviceName,
+      String serviceNotes, String laborRate, String tax) {
+    return apiProvider.createOrderService(
+        token, orderId, serviceName, serviceNotes, laborRate, tax);
+  }
+
+  Future createOrderServiceItem(
+      dynamic token,
+      String cannedServiceId,
+      String itemType,
+      String itemName,
+      String unitPrice,
+      String quantityHours,
+      String discount,
+      String discountType,
+      String position,
+      String subTotal) {
+    return apiProvider.createOrderServiceItem(
+        token,
+        cannedServiceId,
+        itemType,
+        itemName,
+        unitPrice,
+        quantityHours,
+        discount,
+        discountType,
+        position,
+        subTotal);
+  }
 }
 
 class NetworkError extends Error {}
