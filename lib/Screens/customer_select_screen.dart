@@ -33,6 +33,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
   final ScrollController controller = ScrollController();
   final List<Datum> customerList = [];
   final _debouncer = Debouncer();
+  final customerSearchController = TextEditingController();
 
   @override
   void initState() {
@@ -107,6 +108,20 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                     height: 50,
                     child: CupertinoTextField(
                       textAlignVertical: TextAlignVertical.bottom,
+                      controller: customerSearchController,
+                      suffix: GestureDetector(
+                        onTap: () {
+                          customerSearchController.clear();
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.only(right: 12.0),
+                          child: Icon(
+                            Icons.close,
+                            color: AppColors.primaryColors,
+                            size: 18,
+                          ),
+                        ),
+                      ),
                       padding:
                           const EdgeInsets.only(top: 14, bottom: 14, left: 16),
                       onChanged: (value) {
@@ -289,9 +304,9 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                     : const Text("Update Estimate?"),
                 content: widget.navigation == "new"
                     ? const Text(
-                        "Do you want to create an Estimate with this Customer?")
+                        "Do you want to create an estimate with this customer?")
                     : const Text(
-                        "Do you want to Add this Customer to Estimate?"),
+                        "Do you want to add this customer to estimate?"),
                 actions: <Widget>[
                   CupertinoDialogAction(
                       child: const Text("Yes"),

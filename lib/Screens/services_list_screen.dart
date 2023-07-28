@@ -152,7 +152,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                       builder: (context, state) {
                         print(state);
                         print(serviceList);
-                        if (state is GetAllCannedServiceLoadingState &&
+                        if (state is ServiceDetailsLoadingState &&
                             !BlocProvider.of<ServiceBloc>(context)
                                 .isPagenationLoading) {
                           return const Center(
@@ -161,6 +161,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                           if (serviceList.isEmpty) {
                             return const Center(
                                 child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text('No Services Found',
                                     style: TextStyle(

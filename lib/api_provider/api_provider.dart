@@ -231,12 +231,12 @@ class ApiProvider {
 
   Future<dynamic> getServices(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}api/canned_services?page=$page';
+      final clientId = await AppUtils.getUserID();
+      String url =
+          '${BASE_URL}api/canned_services?page=$page&orderby=id&sort=DESC&client_id=$clientId';
 
       if (query != '') {
         url = '$url&service_name=$query';
-      } else {
-        url = '${BASE_URL}api/canned_services?page=$page';
       }
 
       print(url);

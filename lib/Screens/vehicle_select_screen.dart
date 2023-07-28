@@ -167,7 +167,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                         return vechile.isEmpty
                             ? const Center(
                                 child: Text(
-                                'No Vechile found',
+                                'No Vehicle found',
                                 style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -386,9 +386,9 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                     : const Text("Update Estimate?"),
                 content: widget.navigation == "new"
                     ? const Text(
-                        "Do you want to create an Estimate with this vehicle?")
+                        "Do you want to create an estimate with this vehicle?")
                     : const Text(
-                        "Do you want to Add this Vehicle to Estimate?"),
+                        "Do you want to add this vehicle to estimate?"),
                 actions: <Widget>[
                   CupertinoDialogAction(
                       child: const Text("Yes"),

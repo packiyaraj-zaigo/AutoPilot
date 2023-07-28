@@ -120,12 +120,14 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           loadedResponse.statusCode == 201) {
         print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
 
-        Navigator.of(event.context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => CustomersScreen(),
-          ),
-          (route) => false,
-        );
+        emit(CreateCustomerState());
+
+        // Navigator.of(event.context).pushAndRemoveUntil(
+        //   MaterialPageRoute(
+        //     builder: (context) => CustomersScreen(),
+        //   ),
+        //   (route) => false,
+        // );
       }
     } catch (e) {
       showLoading = 0;

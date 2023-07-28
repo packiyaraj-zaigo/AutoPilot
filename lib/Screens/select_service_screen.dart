@@ -50,11 +50,11 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(
-              Icons.menu,
+              Icons.arrow_back,
               color: AppColors.primaryColors,
             ),
             onPressed: () {
-              scaffoldKey.currentState!.openDrawer();
+              Navigator.pop(context);
             },
           ),
           backgroundColor: const Color(0xFFFAFAFA),
@@ -156,7 +156,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                     },
                     child: BlocBuilder<ServiceBloc, ServiceState>(
                       builder: (context, state) {
-                        if (state is GetAllCannedServiceLoadingState &&
+                        if (state is ServiceDetailsLoadingState &&
                             !BlocProvider.of<ServiceBloc>(context)
                                 .isPagenationLoading) {
                           return const Center(

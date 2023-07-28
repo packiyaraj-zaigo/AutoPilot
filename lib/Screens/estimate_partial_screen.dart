@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_pilot/Models/create_estimate_model.dart';
@@ -15,6 +16,7 @@ import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -105,6 +107,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   bool creditCardNumberErrorStatus = false;
   bool creditRefNumberErrorStatus = false;
   late TabController tabController;
+
+  bool isServiceCreate = false;
 
   @override
   void initState() {
@@ -215,6 +219,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       padding: const EdgeInsets.only(right: 12.0),
                       child: GestureDetector(
                         onTap: () {
+                          bool isError = false;
                           if (estimateNoteController.text.isNotEmpty) {
                             context.read<EstimateBloc>().add(
                                 AddEstimateNoteEvent(
@@ -226,21 +231,36 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               endTimeController.text.isNotEmpty &&
                               dateController.text.isNotEmpty &&
                               appointmentController.text.isNotEmpty) {
-                            context.read<EstimateBloc>().add(
-                                CreateAppointmentEstimateEvent(
-                                    startTime:
-                                        dateController
-                                                .text +
-                                            startTimeController.text,
-                                    endTime: dateController.text +
-                                        endTimeController.text,
-                                    orderId: widget.estimateDetails.data.id
-                                        .toString(),
-                                    appointmentNote: appointmentController.text,
-                                    customerId: widget
-                                        .estimateDetails.data.customerId
-                                        .toString(),
-                                    vehicleId: "22"));
+                            log((int.parse(startTimeController.text
+                                        .substring(0, 2)) <
+                                    int.parse(
+                                        endTimeController.text.substring(0, 2)))
+                                .toString());
+                            if (int.parse(
+                                    startTimeController.text.substring(0, 2)) <
+                                int.parse(
+                                    endTimeController.text.substring(0, 2))) {
+                              CommonWidgets().showDialog(context,
+                                  'Appointment start time should be less than appointment end time');
+                              isError = true;
+                            } else {
+                              context.read<EstimateBloc>().add(
+                                  CreateAppointmentEstimateEvent(
+                                      startTime:
+                                          dateController
+                                                  .text +
+                                              startTimeController.text,
+                                      endTime: dateController.text +
+                                          endTimeController.text,
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      appointmentNote:
+                                          appointmentController.text,
+                                      customerId: widget
+                                          .estimateDetails.data.customerId
+                                          .toString(),
+                                      vehicleId: "22"));
+                            }
                           }
                           if (networkImageList.isNotEmpty) {
                             context.read<EstimateBloc>().add(
@@ -254,7 +274,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         .toString()));
                           }
 
-                          Navigator.pop(context);
+                          if (!isError) {
+                            Navigator.pushAndRemoveUntil(context,
+                                MaterialPageRoute(
+                              builder: (context) {
+                                return BottomBarScreen(
+                                  currentIndex: 3,
+                                  tabControllerIndex: widget.controllerIndex,
+                                );
+                              },
+                            ), (route) => false);
+                          }
                         },
                         child: const Row(
                           children: [
@@ -420,13 +450,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         halfTextBox(
                                             "Select Time",
                                             startTimeController,
-                                            "Start time",
+                                            "Start Time",
                                             startTimeErrorStatus,
                                             "start_time"),
                                         halfTextBox(
                                             "Select Time",
                                             endTimeController,
-                                            "End time",
+                                            "End Time",
                                             endTimeErrorStatus,
                                             "end_time")
                                       ],
@@ -445,7 +475,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                     child: textBox(
                                         "Enter Appointment Note",
                                         appointmentController,
-                                        "Appointment note",
+                                        "Appointment Note",
                                         appointmentErrorStatus),
                                   ),
                                 ],
@@ -458,7 +488,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         const Padding(
                           padding: EdgeInsets.only(top: 16.0),
                           child: Text(
-                            "Upload photo",
+                            "Upload Photo",
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
@@ -813,23 +843,23 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               )
             ],
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: Text(
-              "McLaren 765LT, 2022",
+              "${widget.estimateDetails.data.vehicle?.vehicleModel ?? ''} ${widget.estimateDetails.data.vehicle?.vehicleYear ?? ''}",
               style: TextStyle(
                   fontSize: 16,
                   color: AppColors.primaryTitleColor,
                   fontWeight: FontWeight.w400),
             ),
           ),
-          const Padding(
+          Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "1,387mi",
+                  "${widget.estimateDetails.data.vehicle?.kilometers ?? '0'} km",
                   style: TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryTitleColor,
@@ -967,14 +997,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 appointmentLabelwithValue(
-                    "Start time",
+                    "Start Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
                         ? DateFormat('hh:mm a').format(
                             appointmentDetailsModel!.data.data[0].startOn)
                         : ""),
                 appointmentLabelwithValue(
-                    "End time",
+                    "End Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
                         ? DateFormat('hh:mm a')
@@ -995,7 +1025,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
             child: appointmentLabelwithValue(
-                "Appointment note",
+                "Appointment Note",
                 appointmentDetailsModel?.data.data != null &&
                         appointmentDetailsModel?.data.data != []
                     ? appointmentDetailsModel?.data.data[0].notes ?? ""
@@ -1008,7 +1038,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
   Widget appointmentLabelwithValue(String label, String value) {
     return SizedBox(
-      width: label == "Appointment note"
+      width: label == "Appointment Note"
           ? MediaQuery.of(context).size.width
           : MediaQuery.of(context).size.width / 2.3,
       child: Column(
@@ -1312,13 +1342,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     },
                   ));
                 } else if (label == "Service") {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return SelectServiceScreen(
-                        orderId: widget.estimateDetails.data.id.toString(),
-                      );
-                    },
-                  ));
+                  if (estimateNoteController.text.isEmpty &&
+                      startTimeController.text.isEmpty &&
+                      endTimeController.text.isEmpty &&
+                      dateController.text.isEmpty &&
+                      appointmentController.text.isEmpty) {
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) {
+                        return SelectServiceScreen(
+                          orderId: widget.estimateDetails.data.id.toString(),
+                        );
+                      },
+                    ));
+                  } else {
+                    CommonWidgets().showDialog(context,
+                        "Please save the unsaved changes before selecting the service");
+                  }
                 }
               },
               keyboardType:
