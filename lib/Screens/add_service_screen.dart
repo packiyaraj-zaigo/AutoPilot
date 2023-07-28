@@ -20,7 +20,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AddServiceScreen extends StatefulWidget {
-  const AddServiceScreen({super.key});
+  const AddServiceScreen({super.key, this.navigation});
+  final String? navigation;
 
   @override
   State<AddServiceScreen> createState() => _AddServiceScreenState();
@@ -104,9 +105,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
                 if (state is CreateCannedOrderServiceSuccessState) {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => ServicesListScreen(),
-                  ));
+                  if (widget.navigation != null) {
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => ServicesListScreen(),
+                    ));
+                  }
+
                   CommonWidgets().showDialog(context, state.message);
                 }
                 if (state is CreateCannedOrderServiceErrorState) {

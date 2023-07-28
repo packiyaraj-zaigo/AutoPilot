@@ -16,6 +16,7 @@ import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   final appointmentController = TextEditingController();
   final customerController = TextEditingController();
   final vehicleController = TextEditingController();
+  final servicesController = TextEditingController();
 
   CustomerModel? customerModel;
   vm.VechileResponse? vehicleModel;
@@ -62,6 +64,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
   bool appointmentErrorStatus = false;
   bool customerErrorStatus = false;
   bool vehicleErrorStatus = false;
+  bool serviceErrorStatus = false;
 
   String noteErrorMsg = '';
   String dateErrorMsg = '';
@@ -227,47 +230,37 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   children: [
                     GestureDetector(
                         onTap: () {
-                          showActionSheet(context);
+                          // showActionSheet(context);
+                          CommonWidgets().showDialog(context,
+                              "Please create an Estimate by selecting a customer or vehicle");
                         },
                         child: inspectionPhotoWidget()),
-                    inspectionPhotoWidget(),
-                    inspectionPhotoWidget(),
-                    inspectionPhotoWidget()
+                    GestureDetector(
+                        onTap: () {
+                          CommonWidgets().showDialog(context,
+                              "Please create an Estimate by selecting a customer or vehicle");
+                        },
+                        child: inspectionPhotoWidget()),
+                    GestureDetector(
+                        onTap: () {
+                          CommonWidgets().showDialog(context,
+                              "Please create an Estimate by selecting a customer or vehicle");
+                        },
+                        child: inspectionPhotoWidget()),
+                    GestureDetector(
+                        onTap: () {
+                          CommonWidgets().showDialog(context,
+                              "Please create an Estimate by selecting a customer or vehicle");
+                        },
+                        child: inspectionPhotoWidget())
                   ],
                 ),
               ),
               subTitleWidget("Services"),
-              const Padding(
-                padding: EdgeInsets.only(top: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Select Services",
-                      style: TextStyle(
-                          color: AppColors.greyText,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500),
-                    ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.add,
-                          color: AppColors.primaryColors,
-                        ),
-                        Text(
-                          "Add new",
-                          style: TextStyle(
-                              color: AppColors.primaryColors,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-              ),
-              customerDropdown(),
+              Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: textBox("Select Existing", servicesController,
+                      "Services", serviceErrorStatus)),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
                 child: taxDetailsWidget("Total Material", "0.00"),
@@ -286,6 +279,8 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                     //     return EstimateDetailsScreen();
                     //   },
                     // ));
+                    CommonWidgets().showDialog(context,
+                        "Please create an Estimate by selecting a customer or vehicle");
                   },
                   child: Container(
                     height: 56,
@@ -418,7 +413,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
-            label == "Customer" || label == "Vehicle"
+            label == "Customer" || label == "Vehicle" || label == "Services"
                 ? GestureDetector(
                     onTap: () {
                       if (label == "Customer") {
@@ -465,18 +460,17 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              readOnly:
-                  label == 'Date' || label == "Vehicle" || label == "Customer"
-                      ? true
-                      : false,
+              readOnly: true,
               onTap: () async {
                 if (label == 'Date') {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) {
-                      return datePicker("");
-                    },
-                  );
+                  // showCupertinoModalPopup(
+                  //   context: context,
+                  //   builder: (context) {
+                  //     return datePicker("");
+                  //   },
+                  // );
+                  CommonWidgets().showDialog(context,
+                      "Please create an Estimate by selecting a customer or vehicle");
                 } else if (label == "Customer") {
                   // showModalBottomSheet(
                   //     context: context,
@@ -515,6 +509,9 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
                     });
                   });
+                } else {
+                  CommonWidgets().showDialog(context,
+                      "Please create an Estimate by selecting a customer or vehicle");
                 }
               },
               keyboardType:
@@ -527,10 +524,12 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
-                  suffixIcon: label == "Customer" || label == "Vehicle"
+                  suffixIcon: label == "Customer" ||
+                          label == "Vehicle" ||
+                          label == "Services"
                       ? const Icon(
-                          Icons.arrow_drop_down,
-                          color: AppColors.greyText,
+                          Icons.keyboard_arrow_down_rounded,
+                          color: AppColors.primaryColors,
                         )
                       : const SizedBox(),
                   border: OutlineInputBorder(
@@ -585,12 +584,14 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               maxLength: 50,
               readOnly: true,
               onTap: () {
-                showCupertinoModalPopup(
-                  context: context,
-                  builder: (context) {
-                    return timerPicker("time_from");
-                  },
-                );
+                CommonWidgets().showDialog(context,
+                    "Please create an Estimate by selecting a customer or vehicle");
+                // showCupertinoModalPopup(
+                //   context: context,
+                //   builder: (context) {
+                //     return timerPicker("time_from");
+                //   },
+                // );
               },
               decoration: InputDecoration(
                   hintText: placeHolder,

@@ -375,3 +375,45 @@ class PhoneInputFormatter extends TextInputFormatter {
     );
   }
 }
+
+class CardNumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    String rawText = newValue.text.replaceAll(RegExp(r'\D'), '');
+    String lastFourDigits =
+        rawText.length >= 4 ? rawText.substring(rawText.length - 4) : rawText;
+    if (newValue.text.length > 19) {
+      return oldValue;
+    }
+    if (oldValue.text.endsWith('XXXX ')) {
+      if (lastFourDigits.isNotEmpty) {
+        String formattedValue = 'XXXX XXXX XXXX ' + lastFourDigits;
+        return TextEditingValue(
+          text: formattedValue,
+          selection: TextSelection.collapsed(offset: formattedValue.length),
+        );
+      } else {
+        return oldValue;
+      }
+    }
+    String formattedValue = '';
+    int index = 0;
+    for (int i = 0; i < lastFourDigits.length; i++) {
+      if (i % 4 == 0 && i != 0) {
+        formattedValue += ' ';
+      }
+      formattedValue += lastFourDigits[i];
+      index++;
+    }
+
+    formattedValue = 'XXXX XXXX XXXX ' + formattedValue;
+
+    return TextEditingValue(
+      text: formattedValue,
+      selection: TextSelection.collapsed(offset: formattedValue.length),
+    );
+  }
+}

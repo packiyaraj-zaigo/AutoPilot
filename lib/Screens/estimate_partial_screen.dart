@@ -4,6 +4,7 @@ import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_appointment_model.dart';
 import 'package:auto_pilot/Models/estimate_note_model.dart';
 import 'package:auto_pilot/Models/order_image_model.dart' as oi;
+import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
@@ -13,6 +14,7 @@ import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,7 +37,8 @@ class EstimatePartialScreen extends StatefulWidget {
   State<EstimatePartialScreen> createState() => _EstimatePartialScreenState();
 }
 
-class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
+class _EstimatePartialScreenState extends State<EstimatePartialScreen>
+    with TickerProviderStateMixin {
   bool isEstimateNotes = false;
   bool isAppointment = false;
   bool isInspectionPhotos = false;
@@ -88,10 +91,26 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
   double totalAmount = 0;
   double balanceDueAmount = 0;
 
+  //Payment popup variables
+  final paymentAmountController = TextEditingController();
+  final cashDateController = TextEditingController();
+  final cashNoteController = TextEditingController();
+  final creditNameOnCardController = TextEditingController();
+  final creditCardNumberController = TextEditingController();
+  final creditRefNumberController = TextEditingController();
+  bool paymentAmountErrorStatus = false;
+  bool cashDateErrorStatus = false;
+  bool cashNoteErrorStatus = false;
+  bool creditNameErrorStatus = false;
+  bool creditCardNumberErrorStatus = false;
+  bool creditRefNumberErrorStatus = false;
+  late TabController tabController;
+
   @override
   void initState() {
     calculateAmount();
     print(materialAmount.toString() + "amount");
+    tabController = TabController(length: 3, vsync: this);
     // TODO: implement initState
     super.initState();
   }
@@ -164,6 +183,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
               },
               child: Scaffold(
                 key: _scaffoldKey,
+                resizeToAvoidBottomInset: false,
                 appBar: AppBar(
                   backgroundColor: Colors.transparent,
                   elevation: 0,
@@ -1202,6 +1222,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
                             },
                             isScrollControlled: true,
                             useSafeArea: true);
+                      } else if (label == "Service") {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return AddServiceScreen(
+                                navigation: "partial_estimate",
+                              );
+                            },
+                            isScrollControlled: true,
+                            useSafeArea: true);
                       }
                     },
                     child: const Row(
@@ -1230,6 +1260,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              inputFormatters:
+                  label == "Card Number" ? [CardNumberInputFormatter()] : [],
               readOnly: label == 'Date' ||
                       label == "Vehicle" ||
                       label == "Customer" ||
@@ -1730,24 +1762,173 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen> {
     return Container(
       color: Colors.white,
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 1.5,
-      child: const Column(
+      height: MediaQuery.of(context).size.height / 1.3,
+      child: Column(
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "Payment",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: AppColors.primaryTitleColor,
                 ),
               ),
               Icon(Icons.close)
             ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 27.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Balance Due",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor,
+                        ),
+                      ),
+                      Text(
+                        "\$5,709.32",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: textBox("Enter Amount", paymentAmountController,
+                        "Amount To Pay", paymentAmountErrorStatus),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: TabBar(
+                      controller: tabController,
+                      enableFeedback: false,
+                      labelPadding: EdgeInsets.all(0),
+                      indicatorColor: AppColors.primaryColors,
+                      unselectedLabelColor: const Color(0xFF9A9A9A),
+                      labelColor: AppColors.primaryColors,
+                      tabs: const [
+                        SizedBox(
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              'Cash',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              'Credit',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 50,
+                          child: Center(
+                            child: Text(
+                              'Cheque',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  LimitedBox(
+                    maxHeight: MediaQuery.of(context).size.height / 2.8,
+                    maxWidth: MediaQuery.of(context).size.width,
+                    child: TabBarView(controller: tabController, children: [
+                      cashTabWidget(),
+                      creditTabWidget(),
+                      cashTabWidget()
+                    ]),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 24.0),
+                    child: Container(
+                      height: 56,
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColors.primaryColors),
+                      child: const Text(
+                        "Authorize",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget cashTabWidget() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Column(
+          children: [
+            textBox(
+                "Select Date", cashDateController, "Date", cashDateErrorStatus),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: textBox("Enter Note", cashNoteController, "Note",
+                  cashNoteErrorStatus),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget creditTabWidget() {
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.only(top: 16.0),
+        child: Column(
+          children: [
+            textBox("Enter Name on Card", creditNameOnCardController,
+                "Name On Card", creditNameErrorStatus),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: textBox(
+                  "Enter Last 4 Digits of Card",
+                  creditCardNumberController,
+                  "Card Number",
+                  creditCardNumberErrorStatus),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: textBox("Enter Transaction Id", creditRefNumberController,
+                  "Transaction Id", creditRefNumberErrorStatus),
+            )
+          ],
+        ),
       ),
     );
   }
