@@ -158,14 +158,18 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                           return const Center(
                               child: CupertinoActivityIndicator());
                         } else {
-                          log(context
-                              .read<ServiceBloc>()
-                              .currentPage
-                              .toString());
-                          log(context
-                              .read<ServiceBloc>()
-                              .totalPages
-                              .toString());
+                          if (serviceList.isEmpty) {
+                            return const Center(
+                                child: Column(
+                              children: [
+                                Text('No Services Found',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        color: AppColors.greyText,
+                                        fontWeight: FontWeight.w600))
+                              ],
+                            ));
+                          }
                           return ScrollConfiguration(
                             behavior: const ScrollBehavior(),
                             child: ListView.builder(
