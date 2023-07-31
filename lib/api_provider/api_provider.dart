@@ -587,7 +587,7 @@ class ApiProvider {
 
       var url = Uri.parse(
         orderStatus == ""
-            ? "${BASE_URL}api/orders"
+            ? "${BASE_URL}api/orders?client_id=$clientId"
             : orderStatus == "Estimate"
                 ? "${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}&client_id=$clientId"
                 : orderStatus == "Orders"
@@ -996,6 +996,45 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> editEstimateNote(
+      String orderId, String comment, dynamic token, String id) async {
+    print("into provider");
+    print(id + "idddddddddddddddddd");
+    print(orderId + "ooooderrrr iddd");
+    print(comment + "cooommmennttt");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/work_order_notes/$id");
+      // var request = http.MultipartRequest("PUT", url)
+      //   ..fields['order_id'] = orderId
+      //   ..fields['comments'] = comment;
+
+      // request.headers.addAll(getHeader(token));
+      // var response = await request.send();
+      Map<String, String> body = {"order_id": orderId, "comments": comment};
+
+      Response response = await http.put(url,
+          body: json.encode(body), headers: getHeader(token));
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return response;
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> deleteEstimateNote(String token, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/work_order_notes/$id');
+      final response = await http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Delete provider error");
+    }
+  }
+
   Future<dynamic> getAllWorkflows(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();
@@ -1089,6 +1128,37 @@ class ApiProvider {
       };
       final url = Uri.parse('${BASE_URL}api/appointments');
       final response = await http.post(
+        url,
+        headers: getHeader(token),
+        body: json.encode(body),
+      );
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + " create appointment api error");
+    }
+  }
+
+  Future<dynamic> editAppointmentEstimate(
+      dynamic token,
+      String orderId,
+      String customerId,
+      String vehicleId,
+      String startTime,
+      String endTime,
+      String notes,
+      String id) async {
+    try {
+      final body = {
+        "appointment_title": orderId,
+        "customer_id": customerId,
+        "vehicle_id": vehicleId,
+        "notes": notes,
+        "start_on": startTime,
+        "end_on": endTime
+      };
+      final url = Uri.parse('${BASE_URL}api/appointments/$id');
+      final response = await http.put(
         url,
         headers: getHeader(token),
         body: json.encode(body),

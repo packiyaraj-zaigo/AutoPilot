@@ -2,8 +2,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_pilot/Models/create_estimate_model.dart';
-import 'package:auto_pilot/Models/estimate_appointment_model.dart';
-import 'package:auto_pilot/Models/estimate_note_model.dart';
+import 'package:auto_pilot/Models/estimate_appointment_model.dart' as ea;
+import 'package:auto_pilot/Models/estimate_note_model.dart' as en;
 import 'package:auto_pilot/Models/order_image_model.dart' as oi;
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
@@ -73,10 +73,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   String estimateNoteErrorMsg = '';
 
   //Estimate note model variables
-  EstimateNoteModel? estimateNoteModel;
+
+  List<en.Datum> estimateNoteList = [];
 
   //Appoitment Details model variables
-  AppointmentDetailsModel? appointmentDetailsModel;
+  ea.AppointmentDetailsModel? appointmentDetailsModel;
 
   //Image variables
   final ImagePicker imagePicker = ImagePicker();
@@ -110,6 +111,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
   bool isServiceCreate = false;
 
+  //Esitmate Edit variables
+  bool isCustomerEdit = false;
+  bool isVehicleEdit = false;
+  bool isEstimateNoteEdit = false;
+  bool isAppointmentEdit = false;
+
+  String estimateNoteEditId = "";
+  String estimateAppointmentEditId = "";
+
   @override
   void initState() {
     calculateAmount();
@@ -131,6 +141,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             orderId: widget.estimateDetails.data.id.toString())),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
+          log(state.toString());
           if (state is AddEstimateNoteState) {
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
               builder: (context) {
@@ -145,7 +156,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ), (route) => false);
           }
           if (state is GetEstimateNoteState) {
-            estimateNoteModel = state.estimateNoteModel;
+            estimateNoteList.addAll(state.estimateNoteModel.data);
           }
           if (state is GetEstimateAppointmentState) {
             appointmentDetailsModel = state.estimateAppointmentModel;
@@ -167,6 +178,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           }
           if (state is GetOrderImageState) {
             newOrderImageData.addAll(state.orderImageModel.data);
+          }
+          if (state is EditEstimateNoteErrorState) {
+            CommonWidgets().showDialog(context, state.errorMessage);
+          }
+          if (state is DeleteEstimateNoteState) {
+            print("this statee");
+            context.read<EstimateBloc>().add(GetEstimateNoteEvent(
+                orderId: widget.estimateDetails.data.id.toString()));
           }
 
           // TODO: implement listener
@@ -221,36 +240,83 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         onTap: () {
                           bool isError = false;
                           if (estimateNoteController.text.isNotEmpty) {
-                            context.read<EstimateBloc>().add(
-                                AddEstimateNoteEvent(
-                                    orderId: widget.estimateDetails.data.id
-                                        .toString(),
-                                    comment: estimateNoteController.text));
+                            if (!isEstimateNoteEdit) {
+                              context.read<EstimateBloc>().add(
+                                  AddEstimateNoteEvent(
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      comment: estimateNoteController.text));
+                            } else {
+                              context.read<EstimateBloc>().add(
+                                  EditEstimateNoteEvent(
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      comment: estimateNoteController.text,
+                                      id: estimateNoteEditId));
+                            }
                           }
                           if (startTimeController.text.isNotEmpty &&
                               endTimeController.text.isNotEmpty &&
                               dateController.text.isNotEmpty &&
                               appointmentController.text.isNotEmpty) {
-                            log((int.parse(startTimeController.text
-                                        .substring(0, 2)) <
-                                    int.parse(
-                                        endTimeController.text.substring(0, 2)))
-                                .toString());
-                            if (int.parse(
-                                    startTimeController.text.substring(0, 2)) <
-                                int.parse(
-                                    endTimeController.text.substring(0, 2))) {
-                              CommonWidgets().showDialog(context,
-                                  'Appointment start time should be less than appointment end time');
-                              isError = true;
+                            if (isAppointmentEdit == false) {
+                              print("createdddd");
+                              log((int.parse(startTimeController.text
+                                          .substring(0, 2)) <
+                                      int.parse(endTimeController.text
+                                          .substring(0, 2)))
+                                  .toString());
+                              if (int.parse(startTimeController.text
+                                      .substring(0, 2)) <
+                                  int.parse(
+                                      endTimeController.text.substring(0, 2))) {
+                                CommonWidgets().showDialog(context,
+                                    'Appointment start time should be less than appointment end time');
+                                isError = true;
+                              } else {
+                                context
+                                    .read<EstimateBloc>()
+                                    .add(
+                                        CreateAppointmentEstimateEvent(
+                                            startTime: dateController.text +
+                                                startTimeController.text,
+                                            endTime: dateController.text +
+                                                endTimeController.text,
+                                            orderId: widget
+                                                .estimateDetails.data.id
+                                                .toString(),
+                                            appointmentNote:
+                                                appointmentController.text,
+                                            customerId: widget
+                                                .estimateDetails.data.customerId
+                                                .toString(),
+                                            vehicleId: widget.estimateDetails
+                                                    .data.vehicle?.id
+                                                    .toString() ??
+                                                ""));
+                              }
                             } else {
+                              print("editteeddd");
+                              // if (int.parse(startTimeController.text
+                              //         .substring(0, 2)) <
+                              //     int.parse(
+                              //         endTimeController.text.substring(0, 2))) {
+                              //   print(
+                              //       startTimeController.text + "starttt timee");
+
+                              //   print(endTimeController.text + "endddd timee");
+
+                              //   CommonWidgets().showDialog(context,
+                              //       'Appointment start time should be less than appointment end time');
+                              //   isError = true;
+                              // } else {
                               context.read<EstimateBloc>().add(
-                                  CreateAppointmentEstimateEvent(
-                                      startTime:
-                                          dateController
-                                                  .text +
-                                              startTimeController.text,
+                                  EditAppointmentEstimateEvent(
+                                      startTime: dateController.text +
+                                          " " +
+                                          startTimeController.text,
                                       endTime: dateController.text +
+                                          " " +
                                           endTimeController.text,
                                       orderId: widget.estimateDetails.data.id
                                           .toString(),
@@ -259,9 +325,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       customerId: widget
                                           .estimateDetails.data.customerId
                                           .toString(),
-                                      vehicleId: "22"));
+                                      vehicleId: widget
+                                              .estimateDetails.data.vehicle?.id
+                                              .toString() ??
+                                          "",
+                                      id: estimateAppointmentEditId));
                             }
                           }
+                          //  }
                           if (networkImageList.isNotEmpty) {
                             context.read<EstimateBloc>().add(
                                 CreateOrderImageEvent(
@@ -348,19 +419,33 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     subTitleWidget("Customer Details"),
-                                    const Icon(
-                                      Icons.more_horiz,
-                                      color: AppColors.primaryColors,
+                                    GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          backgroundColor: Colors.transparent,
+                                          context: context,
+                                          builder: (context) {
+                                            return editCustomerBottomSheet();
+                                          },
+                                        );
+                                      },
+                                      child: const Icon(
+                                        Icons.more_horiz,
+                                        color: AppColors.primaryColors,
+                                      ),
                                     )
                                   ],
                                 ),
                               )
                             : const SizedBox(),
-                        widget.estimateDetails.data.customer != null
+                        widget.estimateDetails.data.customer != null &&
+                                isCustomerEdit == false
                             ? customerDetailsWidget()
                             : textBox("Select Existing", customerController,
                                 "Customer", customerErrorStatus),
-                        widget.estimateDetails.data.vehicle != null
+                        widget.estimateDetails.data.vehicle != null &&
+                                isVehicleEdit == false
                             ? vehicleDetailsWidget()
                             : Padding(
                                 padding: const EdgeInsets.only(top: 16.0),
@@ -374,8 +459,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           padding: const EdgeInsets.only(top: 16.0),
                           child: subTitleWidget("Estimate Notes"),
                         ),
-                        estimateNoteModel?.data != null &&
-                                estimateNoteModel!.data.isNotEmpty
+                        estimateNoteList.isNotEmpty &&
+                                isEstimateNoteEdit == false
                             ? estimateNoteWidget()
                             : Padding(
                                 padding: const EdgeInsets.only(top: 16.0),
@@ -434,10 +519,31 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                         Padding(
                           padding: const EdgeInsets.only(top: 16.0),
-                          child: subTitleWidget("Appointment"),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                subTitleWidget("Appointment"),
+                                GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return editAppointmentSheet(
+                                            appointmentDetailsModel!
+                                                .data.data[0]);
+                                      },
+                                    );
+                                  },
+                                  child: const Icon(
+                                    Icons.more_horiz,
+                                    color: AppColors.primaryColors,
+                                  ),
+                                )
+                              ]),
                         ),
                         appointmentDetailsModel?.data != null &&
-                                appointmentDetailsModel!.data.data.isNotEmpty
+                                appointmentDetailsModel!.data.data.isNotEmpty &&
+                                isAppointmentEdit == false
                             ? appointmentDetailsWidget()
                             : Column(
                                 children: [
@@ -874,67 +980,80 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget estimateNoteWidget() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.grey.shade200,
-                  blurRadius: 0.6,
-                  spreadRadius: 0.7,
-                  offset: Offset(3, 2))
-            ]),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 16.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.grey.shade200,
+                      blurRadius: 0.6,
+                      spreadRadius: 0.7,
+                      offset: Offset(3, 2))
+                ]),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${estimateNoteList[index].createdAt.month}/${estimateNoteList[index].createdAt.day}/${estimateNoteList[index].createdAt.year} -  ${DateFormat('hh:mm a').format(estimateNoteList[index].createdAt)}",
+                        style: const TextStyle(
+                            color: Color(0xff6A7187),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return editEstimateNoteSheet(
+                                  estimateNoteList[index].id.toString(),
+                                  estimateNoteList[index].comments.toString());
+                            },
+                          );
+                        },
+                        child: const Icon(
+                          Icons.more_horiz,
+                          color: AppColors.primaryColors,
+                        ),
+                      )
+                    ],
+                  ),
                   Text(
-                    estimateNoteModel?.data != null &&
-                            estimateNoteModel?.data != []
-                        ? "${estimateNoteModel?.data[0].createdAt.month}/${estimateNoteModel?.data[0].createdAt.day}/${estimateNoteModel?.data[0].createdAt.year} -  ${DateFormat('hh:mm a').format(estimateNoteModel!.data[0].createdAt)}"
-                        : "",
+                    "${estimateNoteList[index].createdBy.firstName} ${estimateNoteList[index].createdBy.lastName}",
                     style: const TextStyle(
                         color: Color(0xff6A7187),
                         fontSize: 14,
                         fontWeight: FontWeight.w500),
                   ),
-                  const Icon(
-                    Icons.more_horiz,
-                    color: AppColors.primaryColors,
+                  Text(
+                    estimateNoteList[index].comments,
+                    style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        height: 1.3),
                   )
                 ],
               ),
-              estimateNoteModel?.data != null && estimateNoteModel?.data != []
-                  ? Text(
-                      "${estimateNoteModel?.data[0].createdBy.firstName} ${estimateNoteModel?.data[0].createdBy.lastName}",
-                      style: const TextStyle(
-                          color: Color(0xff6A7187),
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500),
-                    )
-                  : const Text(""),
-              estimateNoteModel?.data != null && estimateNoteModel?.data != []
-                  ? Text(
-                      "${estimateNoteModel?.data[0].comments}",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          height: 1.3),
-                    )
-                  : Text(""),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
+      itemCount: estimateNoteList.length,
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
     );
   }
 
@@ -1431,7 +1550,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               //   CommonWidgets().commonDividerLine(context),
               Flexible(
                 child: CupertinoDatePicker(
-                  initialDateTime: DateTime.now(),
+                  initialDateTime: isAppointmentEdit
+                      ? appointmentDetailsModel?.data.data[0].startOn
+                      : DateTime.now(),
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =
@@ -1515,6 +1636,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
   Widget timerPicker(String timeType) {
     String selectedTime = "";
+    if (timeType == "start_time" && isAppointmentEdit) {
+      selectedTime = DateFormat('hh:mm')
+          .format(appointmentDetailsModel!.data.data[0].startOn)
+          .toString();
+    } else if (timeType == "end_time" && isAppointmentEdit) {
+      selectedTime = DateFormat('hh:mm')
+          .format(appointmentDetailsModel!.data.data[0].endOn)
+          .toString();
+    }
+
     return CupertinoPopupSurface(
       child: Container(
         color: CupertinoColors.white,
@@ -1539,16 +1670,33 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
             Flexible(
               child: CupertinoTimerPicker(
-                mode: CupertinoTimerPickerMode.hms,
+                mode: CupertinoTimerPickerMode.hm,
                 minuteInterval: 1,
                 secondInterval: 1,
-                initialTimerDuration: const Duration(),
+                initialTimerDuration: isAppointmentEdit &&
+                        timeType == "start_time"
+                    ? Duration(
+                        hours: appointmentDetailsModel
+                                ?.data.data[0].startOn.hour ??
+                            0,
+                        minutes: appointmentDetailsModel
+                                ?.data.data[0].startOn.minute ??
+                            0)
+                    : isAppointmentEdit && timeType == "end_time"
+                        ? Duration(
+                            hours: appointmentDetailsModel
+                                    ?.data.data[0].endOn.hour ??
+                                0,
+                            minutes: appointmentDetailsModel
+                                    ?.data.data[0].endOn.minute ??
+                                0)
+                        : Duration(),
                 onTimerDurationChanged: (Duration changeTimer) {
                   setState(() {
                     // initialTimer = changeTimer;
 
                     selectedTime =
-                        ' ${changeTimer.inHours > 10 ? changeTimer.inHours : "0${changeTimer.inHours}"}:${changeTimer.inMinutes % 60 > 10 ? changeTimer.inMinutes % 60 : "0${changeTimer.inMinutes % 60}"}:${changeTimer.inSeconds % 60 > 10 ? changeTimer.inSeconds % 60 : "0${changeTimer.inSeconds % 60}"}';
+                        ' ${changeTimer.inHours > 10 ? changeTimer.inHours : "0${changeTimer.inHours}"}:${changeTimer.inMinutes % 60 > 10 ? changeTimer.inMinutes % 60 : "0${changeTimer.inMinutes % 60}"}';
 
                     print(
                         '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
@@ -1967,6 +2115,430 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   "Transaction Id", creditRefNumberErrorStatus),
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget editCustomerBottomSheet() {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 2.6,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Select an option",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isCustomerEdit = true;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Edit Customer",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isVehicleEdit = true;
+                  });
+
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Edit Vehcile",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                height: 56,
+                decoration: BoxDecoration(
+                    color: const Color(0xffF6F6F6),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget editEstimateNoteSheet(String id, String oldNote) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 2.6,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Select an option",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isEstimateNoteEdit = true;
+                    estimateNoteEditId = id;
+                    estimateNoteController.text = oldNote;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Edit",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  print("ontapped");
+                  deleteEstimatNotePopup(context, "", id);
+
+                  // Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/delete_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(
+                              color: Color(0xffFF5C5C),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                height: 56,
+                decoration: BoxDecoration(
+                    color: const Color(0xffF6F6F6),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget editAppointmentSheet(ea.Datum appointmentDetails) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 2.6,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Select an option",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    isAppointmentEdit = true;
+                    startTimeController.text = DateFormat('hh:mm')
+                        .format(appointmentDetails.startOn)
+                        .toString();
+
+                    endTimeController.text = DateFormat('hh:mm')
+                        .format(appointmentDetails.endOn)
+                        .toString();
+
+                    appointmentController.text = appointmentDetails.notes;
+                    dateController.text =
+                        "${appointmentDetails.startOn.year}-${appointmentDetails.startOn.month}-${appointmentDetails.startOn.day}";
+
+                    estimateAppointmentEditId =
+                        appointmentDetails.id.toString();
+
+                    print(estimateAppointmentEditId + "appointment idd");
+
+                    // isEstimateNoteEdit = true;
+                    // estimateNoteEditId = id;
+                    // estimateNoteController.text = oldNote;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Edit",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  print("ontapped");
+                  //  deleteEstimatNotePopup(context, "", id);
+
+                  // Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/delete_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(
+                              color: Color(0xffFF5C5C),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                height: 56,
+                decoration: BoxDecoration(
+                    color: const Color(0xffF6F6F6),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future deleteEstimatNotePopup(BuildContext ctx, message, String id) {
+    return showCupertinoDialog(
+      context: ctx,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is DeleteEstimateNoteState) {
+              log(state.toString() + "popppupp");
+              context.read<EstimateBloc>().add(GetEstimateNoteEvent(
+                  orderId: widget.estimateDetails.data.id.toString()));
+
+              Navigator.pop(context);
+            }
+            if (state is GetEstimateNoteState) {
+              estimateNoteList.clear();
+              estimateNoteList.addAll(state.estimateNoteModel.data);
+              setState(() {});
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Estimate Note?"),
+                content:
+                    const Text("Do you want to remove this estimate note?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context
+                            .read<EstimateBloc>()
+                            .add(DeleteEstimateNoteEvent(id: id));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

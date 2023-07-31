@@ -864,7 +864,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addMaterialValidation(StateSetter setState) {
       bool status = true;
       if (addMaterialNameController.text.trim().isEmpty) {
-        adddMaterialNameErrorStatus = 'Service name cannot be empty';
+        adddMaterialNameErrorStatus = 'Material name cannot be empty';
         status = false;
       } else {
         adddMaterialNameErrorStatus = '';
