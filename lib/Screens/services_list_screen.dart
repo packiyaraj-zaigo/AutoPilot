@@ -5,6 +5,7 @@ import 'package:auto_pilot/Bloc/service_Bloc/service_bloc.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/canned_service_details.dart';
 
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -201,7 +202,16 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                                     children: [
                                       GestureDetector(
                                         behavior: HitTestBehavior.opaque,
-                                        onTap: () {},
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CannedServiceDetailsPage(
+                                                service: serviceList[index],
+                                              ),
+                                            ),
+                                          );
+                                        },
                                         child: Container(
                                           height: 77,
                                           width: double.infinity,

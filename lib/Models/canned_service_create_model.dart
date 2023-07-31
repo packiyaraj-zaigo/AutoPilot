@@ -12,6 +12,7 @@ String cannedServiceAddMaterialModelToJson(CannedServiceAddModel data) =>
 
 class CannedServiceAddModel {
   int cannedServiceId;
+  String id;
   String itemName;
   String unitPrice;
   String discount;
@@ -33,6 +34,7 @@ class CannedServiceAddModel {
     required this.subTotal,
     required this.note,
     required this.part,
+    this.id = '',
     this.itemType = 'Material',
     this.quanityHours = '0',
     this.discountType = 'Percentage',

@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
+import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
@@ -17,9 +18,23 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class AddServiceScreen extends StatefulWidget {
+  const AddServiceScreen({
+    super.key,
+    this.service,
+    this.material,
+    this.part,
+    this.labor,
+    this.subContract,
+    this.fee,
+  });
+  final cs.Datum? service;
+  final List<CannedServiceAddModel>? material;
+  final List<CannedServiceAddModel>? part;
+  final List<CannedServiceAddModel>? labor;
+  final List<CannedServiceAddModel>? subContract;
+  final List<CannedServiceAddModel>? fee;
   const AddServiceScreen({super.key, this.navigation});
   final String? navigation;
 
@@ -61,12 +76,26 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   CountryCode? selectedCountry;
   final countryPicker = const FlCountryCodePicker();
   List<String> tagDataList = [];
+  List<String> deletedItems = [];
+
+  populateData() {
+    serviceNameController.text = widget.service!.serviceName;
+    laborDescriptionController.text = widget.service!.serviceNote.toString();
+    rateController.text = widget.service!.servicePrice;
+    taxController.text = widget.service!.tax;
+    material.addAll(widget.material!);
+    part.addAll(widget.part!);
+    labor.addAll(widget.labor!);
+    subContract.addAll(widget.subContract!);
+    fee.addAll(widget.fee!);
+  }
 
   @override
   void initState() {
     super.initState();
-    // bloc = BlocProvider.of<EmployeeBloc>(context);
-    // bloc.add(GetAllRoles());
+    if (widget.service != null) {
+      populateData();
+    }
   }
 
   @override
@@ -118,10 +147,21 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 if (state is CreateCannedOrderServiceErrorState) {
                   CommonWidgets().showDialog(context, state.message);
                 }
+                if (state is EditCannedServiceSuccessState) {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => ServicesListScreen(),
+                  ));
+                  CommonWidgets().showDialog(context, state.message);
+                }
+                if (state is EditCannedServiceErrorState) {
+                  CommonWidgets().showDialog(context, state.message);
+                }
               },
               child: BlocBuilder<ServiceBloc, ServiceState>(
                 builder: (context, state) {
-                  if (state is CreateCannedOrderServiceLoadingState) {
+                  if (state is CreateCannedOrderServiceLoadingState ||
+                      state is EditCannedServiceLoadingState) {
                     return const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -287,11 +327,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -300,6 +344,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       )),
                                   GestureDetector(
                                     onTap: () {
+                                      if (widget.service != null &&
+                                          item.id.isNotEmpty) {
+                                        deletedItems.add(item.id.toString());
+                                      }
                                       material.removeAt(index);
                                       setState(() {});
                                     },
@@ -327,11 +375,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -340,6 +392,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       )),
                                   GestureDetector(
                                     onTap: () {
+                                      if (widget.service != null &&
+                                          item.id.isNotEmpty) {
+                                        deletedItems.add(item.id.toString());
+                                      }
                                       part.removeAt(index);
                                       setState(() {});
                                     },
@@ -366,11 +422,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -379,6 +439,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       )),
                                   GestureDetector(
                                     onTap: () {
+                                      if (widget.service != null &&
+                                          item.id.isNotEmpty) {
+                                        deletedItems.add(item.id.toString());
+                                      }
                                       labor.removeAt(index);
                                       setState(() {});
                                     },
@@ -405,11 +469,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -418,6 +486,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       )),
                                   GestureDetector(
                                     onTap: () {
+                                      if (widget.service != null &&
+                                          item.id.isNotEmpty) {
+                                        deletedItems.add(item.id.toString());
+                                      }
                                       subContract.removeAt(index);
                                       setState(() {});
                                     },
@@ -444,11 +516,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -457,6 +532,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       )),
                                   GestureDetector(
                                     onTap: () {
+                                      if (widget.service != null &&
+                                          item.id.isNotEmpty) {
+                                        deletedItems.add(item.id.toString());
+                                      }
                                       fee.removeAt(index);
                                       setState(() {});
                                     },
@@ -517,7 +596,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 subT += double.parse(element.subTotal);
                               });
                               subT += double.tryParse(rateController.text) ?? 0;
-                              subT += double.tryParse(taxController.text) ?? 0;
+                              subT += (double.tryParse(rateController.text) ??
+                                      0) *
+                                  (double.tryParse(taxController.text) ?? 0) /
+                                  100;
 
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),
@@ -528,17 +610,60 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 subTotal: subT.toStringAsFixed(2),
                               );
                               log(subT.toString());
-                              BlocProvider.of<ServiceBloc>(context).add(
-                                CreateCannedOrderServiceEvent(
-                                  service: service!,
-                                  material: material.isEmpty ? null : material,
-                                  part: part.isEmpty ? null : part,
-                                  labor: labor.isEmpty ? null : labor,
-                                  subcontract:
-                                      subContract.isEmpty ? null : subContract,
-                                  fee: fee.isEmpty ? null : fee,
-                                ),
-                              );
+                              if (widget.service != null) {
+                                BlocProvider.of<ServiceBloc>(context).add(
+                                  EditCannedOrderServiceEvent(
+                                    id: widget.service!.id.toString(),
+                                    service: service!,
+                                    material: material.isEmpty
+                                        ? null
+                                        : material
+                                            .where(
+                                                (element) => element.id == '')
+                                            .toList(),
+                                    part: part.isEmpty
+                                        ? null
+                                        : part
+                                            .where(
+                                                (element) => element.id == '')
+                                            .toList(),
+                                    labor: labor.isEmpty
+                                        ? null
+                                        : labor
+                                            .where(
+                                                (element) => element.id == '')
+                                            .toList(),
+                                    subcontract: subContract.isEmpty
+                                        ? null
+                                        : subContract
+                                            .where(
+                                                (element) => element.id == '')
+                                            .toList(),
+                                    fee: fee.isEmpty
+                                        ? null
+                                        : fee
+                                            .where(
+                                                (element) => element.id == '')
+                                            .toList(),
+                                    deletedItems: deletedItems,
+                                  ),
+                                );
+                                log(deletedItems.toString());
+                              } else {
+                                BlocProvider.of<ServiceBloc>(context).add(
+                                  CreateCannedOrderServiceEvent(
+                                    service: service!,
+                                    material:
+                                        material.isEmpty ? null : material,
+                                    part: part.isEmpty ? null : part,
+                                    labor: labor.isEmpty ? null : labor,
+                                    subcontract: subContract.isEmpty
+                                        ? null
+                                        : subContract,
+                                    fee: fee.isEmpty ? null : fee,
+                                  ),
+                                );
+                              }
                             });
                           }
                         },
@@ -615,6 +740,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
+              textCapitalization: TextCapitalization.sentences,
               onChanged: setState != null
                   ? (value) {
                       setState(() {});
@@ -848,7 +974,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addMaterialDescriptionController = TextEditingController();
     final addMaterialPriceController = TextEditingController();
     final addMaterialCostController = TextEditingController();
-    final addMaterialDiscountController = TextEditingController();
+    final addMaterialDiscountController = TextEditingController(text: '0');
     final addMaterialBatchController = TextEditingController();
 
     //Add material errorstatus and error message variables
@@ -1149,7 +1275,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addPartDescriptionController = TextEditingController();
     final addPartPriceController = TextEditingController();
     final addPartCostController = TextEditingController();
-    final addPartDiscountController = TextEditingController();
+    final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
 
     //Add part errorstatus and error message variables
@@ -1165,7 +1291,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addPartValidation(StateSetter setState) {
       bool status = true;
       if (addPartNameController.text.trim().isEmpty) {
-        addPartNameErrorStatus = 'Service name cannot be empty';
+        addPartNameErrorStatus = 'Part name cannot be empty';
         status = false;
       } else {
         addPartNameErrorStatus = '';
@@ -1433,7 +1559,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addLaborNameController = TextEditingController();
     final addLaborDescriptionController = TextEditingController();
     final addLaborCostController = TextEditingController();
-    final addLaborDiscountController = TextEditingController();
+    final addLaborDiscountController = TextEditingController(text: '0');
     final addLaborHoursController = TextEditingController();
 
     //Add Labor errorstatus and error message variables
@@ -1448,7 +1574,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addLaborValidation(StateSetter setState) {
       bool status = true;
       if (addLaborNameController.text.trim().isEmpty) {
-        addLaborNameErrorStatus = 'Service name cannot be empty';
+        addLaborNameErrorStatus = 'Labor name cannot be empty';
         status = false;
       } else {
         addLaborNameErrorStatus = '';
@@ -1664,7 +1790,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addFeeValidation(StateSetter setState) {
       bool status = true;
       if (addFeeNameController.text.trim().isEmpty) {
-        addFeeNameErrorStatus = 'Service name cannot be empty';
+        addFeeNameErrorStatus = 'Fee name cannot be empty';
         status = false;
       } else {
         addFeeNameErrorStatus = '';
@@ -1846,7 +1972,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 part: '',
                                 itemName: addFeeNameController.text,
                                 discount: '0',
-                                unitPrice: addFeeCostController.text,
+                                unitPrice: addFeePriceController.text,
                                 itemType: "Fee",
                                 subTotal: subTotal.toStringAsFixed(2)));
                             setState(() {});
@@ -1886,7 +2012,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addSubContractDescriptionController = TextEditingController();
     final addSubContractCostController = TextEditingController();
     final addSubContractPriceController = TextEditingController();
-    final addSubContractDiscountController = TextEditingController();
+    final addSubContractDiscountController = TextEditingController(text: '0');
     final addSubContractVendorController = TextEditingController();
 
     //Add SubContract errorstatus and error message variables
@@ -1902,7 +2028,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addSubContractValidation(StateSetter setState) {
       bool status = true;
       if (addSubContractNameController.text.trim().isEmpty) {
-        addSubContractNameErrorStatus = 'Service name cannot be empty';
+        addSubContractNameErrorStatus = 'Sub Contract name cannot be empty';
         status = false;
       } else {
         addSubContractNameErrorStatus = '';

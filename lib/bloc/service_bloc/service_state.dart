@@ -86,3 +86,24 @@ class GetAllCannedServiceState extends ServiceState {
 class GetAllCannedServiceLoadingState extends ServiceState {}
 
 class GetAllCannedServiceErrorState extends ServiceState {}
+
+class DeleteCannedServiceLoadingState extends ServiceState {}
+
+class DeleteCannedServiceErrorState extends ServiceState {
+  final String message;
+  const DeleteCannedServiceErrorState({required this.message});
+}
+
+class DeleteCannedServiceSuccessState extends ServiceState {}
+
+class EditCannedServiceLoadingState extends ServiceState {}
+
+class EditCannedServiceErrorState extends ServiceState {
+  final String message;
+  const EditCannedServiceErrorState({required this.message});
+}
+
+class EditCannedServiceSuccessState extends ServiceState {
+  final String message;
+  const EditCannedServiceSuccessState({required this.message});
+}

@@ -39,3 +39,29 @@ class CreateCannedOrderServiceEvent extends ServiceEvent {
 }
 
 class GetAllVendorsEvent extends ServiceEvent {}
+
+class EditCannedOrderServiceEvent extends ServiceEvent {
+  final String id;
+  final CannedServiceCreateModel service;
+  final List<CannedServiceAddModel>? material;
+  final List<CannedServiceAddModel>? part;
+  final List<CannedServiceAddModel>? labor;
+  final List<CannedServiceAddModel>? subcontract;
+  final List<CannedServiceAddModel>? fee;
+  final List<String>? deletedItems;
+  const EditCannedOrderServiceEvent({
+    required this.id,
+    required this.service,
+    this.material,
+    this.part,
+    this.labor,
+    this.subcontract,
+    this.fee,
+    this.deletedItems,
+  });
+}
+
+class DeleteCannedServiceEvent extends ServiceEvent {
+  final String id;
+  const DeleteCannedServiceEvent({required this.id});
+}

@@ -1498,20 +1498,43 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
-}
 
-final map = {
-  "canned_service_id": 34,
-  "item_type": "Material",
-  "item_name": "ldkjfg",
-  "unit_price": 23948,
-  "quanity_hours": 0,
-  "discount": 23498,
-  "discount_type": "Price",
-  "sub_total": 450.0,
-  "position": 0,
-  "item_service_note": "ldfkj",
-  "part_name": 2,
-  "is_tax": "N",
-  "vendor_id": null
-};
+  Future<dynamic> deleteCannedService(dynamic token, String serviceId) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/canned_services/$serviceId");
+      var response = http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Delete Canned Service api error");
+    }
+  }
+
+  Future<dynamic> deleteCannedServiceItem(dynamic token, String id) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/canned_service_items/$id");
+      var response = http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Delete Canned Service api error");
+    }
+  }
+
+  Future<dynamic> editCannedOrderService(
+      String token, CannedServiceCreateModel model, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/canned_services/$id');
+
+      final response = await http.put(url,
+          headers: getHeader(token), body: json.encode(model.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
+    }
+  }
+}

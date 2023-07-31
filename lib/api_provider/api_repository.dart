@@ -412,6 +412,19 @@ class ApiRepository {
         position,
         subTotal);
   }
+
+  Future deleteCannedService(String token, String serviceId) {
+    return apiProvider.deleteCannedService(token, serviceId);
+  }
+
+  Future deleteCannedServiceItem(String token, String id) {
+    return apiProvider.deleteCannedServiceItem(token, id);
+  }
+
+  Future<dynamic> editCannedOrderService(
+      String token, CannedServiceCreateModel model, String id) async {
+    return apiProvider.editCannedOrderService(token, model, id);
+  }
 }
 
 class NetworkError extends Error {}
