@@ -322,11 +322,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -366,11 +370,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -409,11 +417,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -452,11 +464,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -495,11 +511,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               SizedBox(height: 8),
                               Row(
                                 children: [
-                                  Text(item.itemName,
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
+                                  Flexible(
+                                    child: Text(item.itemName,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
                                   const Expanded(child: SizedBox()),
                                   Text('\$${item.subTotal} ',
                                       style: TextStyle(
@@ -716,6 +735,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
+              textCapitalization: TextCapitalization.sentences,
               onChanged: setState != null
                   ? (value) {
                       setState(() {});
@@ -949,7 +969,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addMaterialDescriptionController = TextEditingController();
     final addMaterialPriceController = TextEditingController();
     final addMaterialCostController = TextEditingController();
-    final addMaterialDiscountController = TextEditingController();
+    final addMaterialDiscountController = TextEditingController(text: '0');
     final addMaterialBatchController = TextEditingController();
 
     //Add material errorstatus and error message variables
@@ -965,7 +985,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addMaterialValidation(StateSetter setState) {
       bool status = true;
       if (addMaterialNameController.text.trim().isEmpty) {
-        adddMaterialNameErrorStatus = 'Service name cannot be empty';
+        adddMaterialNameErrorStatus = 'Material name cannot be empty';
         status = false;
       } else {
         adddMaterialNameErrorStatus = '';
@@ -1250,7 +1270,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addPartDescriptionController = TextEditingController();
     final addPartPriceController = TextEditingController();
     final addPartCostController = TextEditingController();
-    final addPartDiscountController = TextEditingController();
+    final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
 
     //Add part errorstatus and error message variables
@@ -1266,7 +1286,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addPartValidation(StateSetter setState) {
       bool status = true;
       if (addPartNameController.text.trim().isEmpty) {
-        addPartNameErrorStatus = 'Service name cannot be empty';
+        addPartNameErrorStatus = 'Part name cannot be empty';
         status = false;
       } else {
         addPartNameErrorStatus = '';
@@ -1534,7 +1554,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addLaborNameController = TextEditingController();
     final addLaborDescriptionController = TextEditingController();
     final addLaborCostController = TextEditingController();
-    final addLaborDiscountController = TextEditingController();
+    final addLaborDiscountController = TextEditingController(text: '0');
     final addLaborHoursController = TextEditingController();
 
     //Add Labor errorstatus and error message variables
@@ -1549,7 +1569,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addLaborValidation(StateSetter setState) {
       bool status = true;
       if (addLaborNameController.text.trim().isEmpty) {
-        addLaborNameErrorStatus = 'Service name cannot be empty';
+        addLaborNameErrorStatus = 'Labor name cannot be empty';
         status = false;
       } else {
         addLaborNameErrorStatus = '';
@@ -1765,7 +1785,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addFeeValidation(StateSetter setState) {
       bool status = true;
       if (addFeeNameController.text.trim().isEmpty) {
-        addFeeNameErrorStatus = 'Service name cannot be empty';
+        addFeeNameErrorStatus = 'Fee name cannot be empty';
         status = false;
       } else {
         addFeeNameErrorStatus = '';
@@ -1987,7 +2007,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addSubContractDescriptionController = TextEditingController();
     final addSubContractCostController = TextEditingController();
     final addSubContractPriceController = TextEditingController();
-    final addSubContractDiscountController = TextEditingController();
+    final addSubContractDiscountController = TextEditingController(text: '0');
     final addSubContractVendorController = TextEditingController();
 
     //Add SubContract errorstatus and error message variables
@@ -2003,7 +2023,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addSubContractValidation(StateSetter setState) {
       bool status = true;
       if (addSubContractNameController.text.trim().isEmpty) {
-        addSubContractNameErrorStatus = 'Service name cannot be empty';
+        addSubContractNameErrorStatus = 'Sub Contract name cannot be empty';
         status = false;
       } else {
         addSubContractNameErrorStatus = '';

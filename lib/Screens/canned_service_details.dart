@@ -365,11 +365,15 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Text(item.itemName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            )),
+                        Flexible(
+                          child: Text(item.itemName,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                              )),
+                        ),
                         const Expanded(child: SizedBox()),
                         Text('\$${item.subTotal} ',
                             style: const TextStyle(
