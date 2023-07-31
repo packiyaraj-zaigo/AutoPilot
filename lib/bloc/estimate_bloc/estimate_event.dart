@@ -32,6 +32,17 @@ class AddEstimateNoteEvent extends EstimateEvent {
   AddEstimateNoteEvent({required this.orderId, required this.comment});
 }
 
+class EditEstimateNoteEvent extends EstimateEvent {
+  final String orderId, comment, id;
+  EditEstimateNoteEvent(
+      {required this.orderId, required this.comment, required this.id});
+}
+
+class DeleteEstimateNoteEvent extends EstimateEvent {
+  final String id;
+  DeleteEstimateNoteEvent({required this.id});
+}
+
 class CreateAppointmentEstimateEvent extends EstimateEvent {
   final String startTime, endTime, orderId, appointmentNote;
   final String customerId, vehicleId;
@@ -42,6 +53,19 @@ class CreateAppointmentEstimateEvent extends EstimateEvent {
       required this.appointmentNote,
       required this.customerId,
       required this.vehicleId});
+}
+
+class EditAppointmentEstimateEvent extends EstimateEvent {
+  final String startTime, endTime, orderId, appointmentNote;
+  final String customerId, vehicleId, id;
+  EditAppointmentEstimateEvent(
+      {required this.startTime,
+      required this.endTime,
+      required this.orderId,
+      required this.appointmentNote,
+      required this.customerId,
+      required this.vehicleId,
+      required this.id});
 }
 
 class GetSingleEstimateEvent extends EstimateEvent {

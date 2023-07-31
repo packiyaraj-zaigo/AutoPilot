@@ -265,6 +265,19 @@ class ApiRepository {
         token, orderId, customerId, vehicleId, startTime, endTime, note);
   }
 
+  Future editAppointmentEstimate(
+      dynamic token,
+      String orderId,
+      String customerId,
+      String vehicleId,
+      String startTime,
+      String endTime,
+      String note,
+      String id) {
+    return apiProvider.editAppointmentEstimate(
+        token, orderId, customerId, vehicleId, startTime, endTime, note, id);
+  }
+
   Future editEstimate(String id, String which, dynamic token, String orderId,
       String customerId) {
     return apiProvider.editEstimate(id, which, token, orderId, customerId);
@@ -272,6 +285,15 @@ class ApiRepository {
 
   Future addEstimateNote(String orderId, String comment, dynamic token) {
     return apiProvider.addEstimateNote(orderId, comment, token);
+  }
+
+  Future editEstimateNote(
+      String orderId, String comment, dynamic token, String id) {
+    return apiProvider.editEstimateNote(orderId, comment, token, id);
+  }
+
+  Future deleteEstimateNote(dynamic token, String id) {
+    return apiProvider.deleteEstimateNote(token, id);
   }
 
   Future getAllWorkflows(String token, int page) {

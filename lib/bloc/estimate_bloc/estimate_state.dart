@@ -47,6 +47,17 @@ class AddEstimateNoteErrorState extends EstimateState {}
 
 class CreateAppointmentEstimateState extends EstimateState {}
 
+class EditAppointmentEstimateState extends EstimateState {}
+
+class EditEstimateNoteState extends EstimateState {}
+
+class EditEstimateNoteErrorState extends EstimateState {
+  final String errorMessage;
+  EditEstimateNoteErrorState({required this.errorMessage});
+}
+
+class DeleteEstimateNoteState extends EstimateState {}
+
 class CreateAppointmentEstimateErrorState extends EstimateState {
   final String errorMessage;
   CreateAppointmentEstimateErrorState({required this.errorMessage});
