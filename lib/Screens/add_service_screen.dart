@@ -28,6 +28,7 @@ class AddServiceScreen extends StatefulWidget {
     this.labor,
     this.subContract,
     this.fee,
+    this.navigation
   });
   final cs.Datum? service;
   final List<CannedServiceAddModel>? material;
@@ -35,7 +36,7 @@ class AddServiceScreen extends StatefulWidget {
   final List<CannedServiceAddModel>? labor;
   final List<CannedServiceAddModel>? subContract;
   final List<CannedServiceAddModel>? fee;
-  const AddServiceScreen({super.key, this.navigation});
+  
   final String? navigation;
 
   @override
