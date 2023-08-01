@@ -783,7 +783,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price' ||
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
-                      label == "Hours"
+                      label == "Hours" ||
+                      label == 'Price '
                   ? TextInputType.number
                   : null,
               inputFormatters: label == 'Discount' ||
@@ -792,7 +793,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price' ||
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
-                      label == "Hours"
+                      label == "Hours" ||
+                      label == 'Price '
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : [],
               maxLength: 50,
@@ -1068,10 +1070,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       (double.tryParse(addMaterialPriceController.text) ?? 0);
             } else {
               subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                          0) -
-                      (double.tryParse(addMaterialDiscountController.text) ??
-                          0)) *
-                  tax *
+                              0) -
+                          (double.tryParse(
+                                  addMaterialDiscountController.text) ??
+                              0)) *
+                      tax +
                   ((double.tryParse(addMaterialPriceController.text) ?? 0) -
                       (double.tryParse(addMaterialDiscountController.text) ??
                           0));
