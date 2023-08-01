@@ -65,6 +65,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   final taxRateController = TextEditingController();
   final numberOfEmployeeController = TextEditingController();
   final timeZoneController = TextEditingController();
+
+  final laborTaxRateController = TextEditingController();
+  final partsTaxRateController = TextEditingController();
+  final materialTaxRateController = TextEditingController();
+
   bool businessNameErrorStatus = false;
   bool businessPhoneErrorStatus = false;
   bool businessWebsiteErrorStatus = false;
@@ -110,6 +115,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   int? provinceId;
   String numberOfEmployeeString = "";
   String timeZoneString = '';
+
+  bool isTaxLaborRate = false;
+  bool isTaxPartRate = false;
+  bool isTaxMaterialRate = false;
 
   List<Employee> employeeList = [];
   late EmployeeBloc bloc;
@@ -480,12 +489,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
             textBox("Ex. \$45", labourRateController, "Shop Hourly Labor Rate",
                 labourRateErrorStatus, true),
             errorMessageWidget(laborRateErrorMsg, labourRateErrorStatus),
-            textBox("Enter Percentage Rate", taxRateController, "Tax Rate",
-                taxRateErrorStatus, true),
+            textBox("Enter Percentage Rate", laborTaxRateController,
+                "Labor Tax Rate", taxRateErrorStatus, isTaxLaborRate),
             errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),
-            taxSwitchWidget("Tax Labor", taxLabourSwitchValue),
-            taxSwitchWidget("Tax Parts", taxPartSwitchValue),
-            taxSwitchWidget("Tax Material", taxMaterialSwitchValue)
+            textBox("Enter Percentage Rate", partsTaxRateController,
+                "Parts Tax Rate", taxRateErrorStatus, isTaxPartRate),
+            textBox("Enter Percentage Rate", materialTaxRateController,
+                "Material Tax Rate", taxRateErrorStatus, isTaxMaterialRate),
+            // taxSwitchWidget("Tax Labor", taxLabourSwitchValue),
+            // taxSwitchWidget("Tax Parts", taxPartSwitchValue),
+            // taxSwitchWidget("Tax Material", taxMaterialSwitchValue)
           ],
         ),
       ),
@@ -553,7 +566,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     ? [PhoneInputFormatter()]
                     : label == "Number of Employees" ||
                             label == 'Zip' ||
-                            label == "Tax Rate"
+                            label == "Labor Tax Rate"
                         ? [
                             FilteringTextInputFormatter.digitsOnly,
                           ]
@@ -566,10 +579,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
                         label == "Shop Hourly Labor Rate" ||
-                        label == "Tax Rate" ||
+                        label == "Labor Tax Rate" ||
                         label == 'Zip'
                     ? TextInputType.number
                     : null,
+                readOnly: readOnlyFun(label),
                 maxLength: label == 'Business Phone'
                     ? 14
                     : label == 'Password'
@@ -582,10 +596,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     //         labourRateController.text.isNotEmpty
                     //     ? '\$'
                     //     : null,
-                    contentPadding:
-                        label == "Shop Hourly Labor Rate" || label == "Tax Rate"
-                            ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
-                            : null,
+                    contentPadding: label == "Shop Hourly Labor Rate" ||
+                            label == "Labor Tax Rate"
+                        ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
+                        : null,
                     hintText: placeHolder,
                     counterText: "",
                     suffixStyle: const TextStyle(
@@ -594,22 +608,33 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         ? Text(
                             "Per Hour",
                           )
-                        : label == "Tax Rate"
-                            ? const Padding(
-                                padding: EdgeInsets.only(right: 10.0),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "%",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: AppColors.primaryColors),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : const SizedBox(),
+                        // : label == "Labor Tax Rate"
+                        //     ? Transform.scale(
+                        //         scale: 0.7,
+                        //         child: CupertinoSwitch(
+                        //             value: true, onChanged: (value) {}),
+                        //       )
+                        : null,
+                    suffixIcon: label == "Labor Tax Rate" ||
+                            label == "Parts Tax Rate" ||
+                            label == "Material Tax Rate"
+                        ? Transform.scale(
+                            scale: 0.7,
+                            child: CupertinoSwitch(
+                                value: switchValue(label),
+                                onChanged: (value) {
+                                  setState(() {
+                                    if (label == "Labor Tax Rate") {
+                                      isTaxLaborRate = value;
+                                    } else if (label == "Parts Tax Rate") {
+                                      isTaxPartRate = value;
+                                    } else if (label == "Material Tax Rate") {
+                                      isTaxMaterialRate = value;
+                                    }
+                                  });
+                                }),
+                          )
+                        : null,
 
                     // prefixIcon: label == 'Business Phone'
                     //     ? countryPickerWidget()
@@ -1492,16 +1517,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         labourRateErrorStatus = false;
       });
     }
-    if (taxRateController.text.isEmpty) {
-      setState(() {
-        taxRateErrorStatus = true;
-        taxRateErrorMsg = "Tax rate can't be empty";
-      });
-    } else {
-      setState(() {
-        taxRateErrorStatus = false;
-      });
-    }
+    // if (taxRateController.text.isEmpty) {
+    //   setState(() {
+    //     taxRateErrorStatus = true;
+    //     taxRateErrorMsg = "Labor Tax Rate can't be empty";
+    //   });
+    // } else {
+    //   setState(() {
+    //     taxRateErrorStatus = false;
+    //   });
+    // }
 
     if (!numberOfEmployeeErrorStatus &&
         !timeZoneErrorStatus &&
@@ -1511,7 +1536,12 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "employee_count": numberOfEmployeeController.text,
         "time_zone": timeZoneString,
         "base_labor_cost": labourRateController.text,
-        "sales_tax_rate": taxRateController.text
+        "sales_tax_rate": partsTaxRateController.text,
+        "labor_tax_rate": laborTaxRateController.text,
+        "material_tax_rate": materialTaxRateController.text,
+        "tax_on_parts": isTaxPartRate ? "Y" : "N",
+        "tax_on_material": isTaxMaterialRate ? "Y" : "N",
+        "tax_on_labors": isTaxLaborRate ? "Y" : "N"
       });
 
       Navigator.pop(context, operationDetailsMap);
@@ -1693,6 +1723,13 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     taxRateController.text = operationDetailsMap?['sales_tax_rate'] ?? "";
     numberOfEmployeeController.text =
         operationDetailsMap?['employee_count'] ?? "";
+    materialTaxRateController.text =
+        operationDetailsMap['material_tax_rate'] ?? "";
+    partsTaxRateController.text = operationDetailsMap['sales_tax_rate'] ?? "";
+    laborTaxRateController.text = operationDetailsMap['labor_tax_rate'] ?? "";
+    isTaxLaborRate = operationDetailsMap['tax_on_labors'] == "Y";
+    isTaxMaterialRate = operationDetailsMap['tax_on_material'] == "Y";
+    isTaxPartRate = operationDetailsMap['tax_on_parts'] == "Y";
 
     timeZones.forEach((element) {
       print(element.name);
@@ -1747,6 +1784,30 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     print(employeeDetailsMap);
 
     Navigator.pop(context, employeeDetailsMap);
+  }
+
+  bool switchValue(String label) {
+    if (label == "Labor Tax Rate") {
+      return isTaxLaborRate;
+    } else if (label == "Parts Tax Rate") {
+      return isTaxPartRate;
+    } else if (label == "Material Tax Rate") {
+      return isTaxMaterialRate;
+    }
+
+    return false;
+  }
+
+  bool readOnlyFun(label) {
+    if (label == "Labor Tax Rate") {
+      return !isTaxLaborRate;
+    } else if (label == "Parts Tax Rate") {
+      return !isTaxPartRate;
+    } else if (label == "Material Tax Rate") {
+      return !isTaxMaterialRate;
+    }
+
+    return false;
   }
 }
 

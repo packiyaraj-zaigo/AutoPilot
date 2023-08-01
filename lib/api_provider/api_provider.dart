@@ -812,10 +812,17 @@ class ApiProvider {
         "service_type": "Full service",
         "time_zone": dataMap['time_zone'],
         "sales_tax_rate": dataMap['sales_tax_rate'],
+        "labor_tax_rate": dataMap["labor_tax_rate"],
+        "material_tax_rate": dataMap["material_tax_rate"],
+        "tax_on_parts": dataMap["tax_on_parts"],
+        "tax_on_material": dataMap["tax_on_material"],
+        "tax_on_labors": dataMap["tax_on_labors"],
         "base_labor_cost":
             dataMap['base_labor_cost'].toString().replaceAll("\$", "")
       };
       var encodedBody = json.encode(bodyMap);
+      log(bodyMap.toString());
+      log(clientId);
 
       var response =
           http.put(url, body: encodedBody, headers: getHeader(token));
