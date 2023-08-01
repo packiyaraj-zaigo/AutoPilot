@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/province_model.dart';
 import 'package:auto_pilot/Models/revenue_chart_model.dart';
 import 'package:auto_pilot/Models/user_profile_model.dart';
+import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
@@ -164,11 +165,15 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         prefs.setBool('add_company', true);
         emit(AddCompanySucessState());
         AppUtils.setTempVar("");
-        Navigator.pushReplacement(event.context, MaterialPageRoute(
+        Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
           builder: (context) {
             return BottomBarScreen();
           },
-        ));
+        ), (route) => false);
+
+        operationDetailsMap.clear();
+        basicDetailsMap.clear();
+        employeeDetailsMap.clear();
       } else {
         emit(AddCompanyErrorState(
             errorMessage: "Adding your company has been failed!"));
@@ -177,8 +182,6 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       //   emit(CreateAccountErrorState());
       //   errorRes=createAccData;
       // }
-       
-       
     } catch (e) {
       // emit(CreateAccountErrorState());
       emit(AddCompanyErrorState(
