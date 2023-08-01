@@ -170,10 +170,6 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
             return BottomBarScreen();
           },
         ), (route) => false);
-
-        operationDetailsMap.clear();
-        basicDetailsMap.clear();
-        employeeDetailsMap.clear();
       } else {
         emit(AddCompanyErrorState(
             errorMessage: "Adding your company has been failed!"));
