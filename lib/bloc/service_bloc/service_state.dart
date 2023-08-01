@@ -107,3 +107,15 @@ class EditCannedServiceSuccessState extends ServiceState {
   final String message;
   const EditCannedServiceSuccessState({required this.message});
 }
+
+class GetClientLoadingState extends ServiceState {}
+
+class GetClientErrorState extends ServiceState {
+  final String message;
+  const GetClientErrorState({required this.message});
+}
+
+class GetClientSuccessState extends ServiceState {
+  final ClientModel client;
+  const GetClientSuccessState({required this.client});
+}

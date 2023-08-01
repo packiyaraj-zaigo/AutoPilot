@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
+import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -33,6 +34,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     on<EditCannedOrderServiceEvent>(editCannedOrderService);
     on<GetAllVendorsEvent>(getAllVendors);
     on<DeleteCannedServiceEvent>(deleteCannedService);
+    on<GetClientByIdEvent>(getClientById);
   }
 
   // createEmployee(
@@ -62,6 +64,24 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
   //     emit(EmployeeCreateErrorState(message: "Something went wrong"));
   //   }
   // }
+
+  Future<void> getClientById(
+      GetClientByIdEvent event, Emitter<ServiceState> emit) async {
+    try {
+      final response = await apiRepo.getClientByClientId();
+      if (response.statusCode == 200) {
+        final body = await jsonDecode(response.body);
+        log(body.toString());
+        emit(GetClientSuccessState(
+            client: ClientModel.fromJson(body['client'])));
+      } else {
+        emit(GetClientErrorState(message: 'Something went wrong'));
+      }
+    } catch (e) {
+      log(e.toString() + " Get client bloc error");
+      emit(GetClientErrorState(message: 'Something went wrong'));
+    }
+  }
 
   Future<void> editCannedOrderService(
     EditCannedOrderServiceEvent event,
