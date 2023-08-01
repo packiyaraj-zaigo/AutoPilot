@@ -1620,7 +1620,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addLaborDescriptionController = TextEditingController();
     final addLaborCostController = TextEditingController();
     final addLaborDiscountController = TextEditingController(text: '0');
-    final addLaborHoursController = TextEditingController();
+    final addLaborHoursController = TextEditingController(text: '1');
 
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
@@ -1680,15 +1680,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         } else {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal =
-                (double.tryParse(addLaborCostController.text) ?? 0) * tax +
-                    (double.tryParse(addLaborCostController.text) ?? 0);
+            subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
+                        (double.tryParse(addLaborCostController.text) ?? 0)) *
+                    tax +
+                ((double.tryParse(addLaborHoursController.text) ?? 1) *
+                    (double.tryParse(addLaborCostController.text) ?? 0));
           } else {
-            subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
+            subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
+                            (double.tryParse(addLaborCostController.text) ??
+                                0)) -
                         (double.tryParse(addLaborDiscountController.text) ??
                             0)) *
                     tax +
-                ((double.tryParse(addLaborCostController.text) ?? 0) -
+               (((double.tryParse(addLaborHoursController.text) ?? 1) *
+                        (double.tryParse(addLaborCostController.text) ?? 0)) -
                     (double.tryParse(addLaborDiscountController.text) ?? 0));
           }
         }
