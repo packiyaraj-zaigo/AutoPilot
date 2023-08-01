@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
+import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
@@ -20,23 +21,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class AddServiceScreen extends StatefulWidget {
-  const AddServiceScreen({
-    super.key,
-    this.service,
-    this.material,
-    this.part,
-    this.labor,
-    this.subContract,
-    this.fee,
-    this.navigation
-  });
+  const AddServiceScreen(
+      {super.key,
+      this.service,
+      this.material,
+      this.part,
+      this.labor,
+      this.subContract,
+      this.fee,
+      this.navigation});
   final cs.Datum? service;
   final List<CannedServiceAddModel>? material;
   final List<CannedServiceAddModel>? part;
   final List<CannedServiceAddModel>? labor;
   final List<CannedServiceAddModel>? subContract;
   final List<CannedServiceAddModel>? fee;
-  
+
   final String? navigation;
 
   @override
@@ -78,6 +78,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final countryPicker = const FlCountryCodePicker();
   List<String> tagDataList = [];
   List<String> deletedItems = [];
+
+  ClientModel? client;
 
   populateData() {
     serviceNameController.text = widget.service!.serviceName;
@@ -131,7 +133,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
           child: BlocProvider(
-            create: (context) => ServiceBloc(),
+            create: (context) => ServiceBloc()..add(GetClientByIdEvent()),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
                 if (state is CreateCannedOrderServiceSuccessState) {
@@ -158,11 +160,25 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 if (state is EditCannedServiceErrorState) {
                   CommonWidgets().showDialog(context, state.message);
                 }
+                if (state is GetClientErrorState) {
+                  if (widget.navigation != null) {
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => ServicesListScreen(),
+                    ));
+                  }
+                  CommonWidgets().showDialog(context, state.message);
+                }
+                if (state is GetClientSuccessState) {
+                  client = state.client;
+                }
               },
               child: BlocBuilder<ServiceBloc, ServiceState>(
                 builder: (context, state) {
                   if (state is CreateCannedOrderServiceLoadingState ||
-                      state is EditCannedServiceLoadingState) {
+                      state is EditCannedServiceLoadingState ||
+                      state is GetClientLoadingState) {
                     return const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -1031,11 +1047,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return StatefulBuilder(
       builder: (context, StateSetter newSetState) {
         if (addMaterialPriceController.text.isNotEmpty) {
-          if (addMaterialDiscountController.text.isEmpty) {
-            subTotal = double.tryParse(addMaterialPriceController.text) ?? 0;
+          if (client?.taxOnMaterial == 'N') {
+            if (addMaterialDiscountController.text.isEmpty) {
+              subTotal =
+                  (double.tryParse(addMaterialPriceController.text) ?? 0);
+            } else {
+              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+                      0) -
+                  (double.tryParse(addMaterialDiscountController.text) ?? 0));
+            }
           } else {
-            subTotal = (double.tryParse(addMaterialPriceController.text) ?? 0) -
-                (double.tryParse(addMaterialDiscountController.text) ?? 0);
+            final tax =
+                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
+
+            if (addMaterialDiscountController.text.isEmpty) {
+              subTotal =
+                  (double.tryParse(addMaterialPriceController.text) ?? 0) *
+                          tax +
+                      (double.tryParse(addMaterialPriceController.text) ?? 0);
+            } else {
+              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+                          0) -
+                      (double.tryParse(addMaterialDiscountController.text) ??
+                          0)) *
+                  tax *
+                  ((double.tryParse(addMaterialPriceController.text) ?? 0) -
+                      (double.tryParse(addMaterialDiscountController.text) ??
+                          0));
+            }
           }
         }
         return Column(
@@ -1328,11 +1367,27 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addPartPriceController.text.isNotEmpty) {
-        if (addPartDiscountController.text.isEmpty) {
-          subTotal = double.tryParse(addPartPriceController.text) ?? 0;
+        if (client?.taxOnParts == "N") {
+          if (addPartDiscountController.text.isEmpty) {
+            subTotal = (double.tryParse(addPartPriceController.text) ?? 0);
+          } else {
+            subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
+                (double.tryParse(addPartDiscountController.text) ?? 0));
+          }
         } else {
-          subTotal = (double.tryParse(addPartPriceController.text) ?? 0) -
-              (double.tryParse(addPartDiscountController.text) ?? 0);
+          final tax = (double.tryParse(client?.salesTaxRate ?? '') ?? 0) / 100;
+          if (addPartDiscountController.text.isEmpty) {
+            subTotal =
+                (double.tryParse(addPartPriceController.text) ?? 0) * tax +
+                    (double.tryParse(addPartPriceController.text) ?? 0);
+          } else {
+            subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
+                        (double.tryParse(addPartDiscountController.text) ??
+                            0)) *
+                    tax +
+                ((double.tryParse(addPartPriceController.text) ?? 0) -
+                    (double.tryParse(addPartDiscountController.text) ?? 0));
+          }
         }
       }
       return Column(
@@ -1611,11 +1666,27 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addLaborCostController.text.isNotEmpty) {
-        if (addLaborDiscountController.text.isEmpty) {
-          subTotal = double.tryParse(addLaborCostController.text) ?? 0;
+        if (client?.taxOnLabors == 'N') {
+          if (addLaborDiscountController.text.isEmpty) {
+            subTotal = (double.tryParse(addLaborCostController.text) ?? 0);
+          } else {
+            subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
+                (double.tryParse(addLaborDiscountController.text) ?? 0));
+          }
         } else {
-          subTotal = (double.tryParse(addLaborCostController.text) ?? 0) -
-              (double.tryParse(addLaborDiscountController.text) ?? 0);
+          final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
+          if (addLaborDiscountController.text.isEmpty) {
+            subTotal =
+                (double.tryParse(addLaborCostController.text) ?? 0) * tax +
+                    (double.tryParse(addLaborCostController.text) ?? 0);
+          } else {
+            subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
+                        (double.tryParse(addLaborDiscountController.text) ??
+                            0)) *
+                    tax +
+                ((double.tryParse(addLaborCostController.text) ?? 0) -
+                    (double.tryParse(addLaborDiscountController.text) ?? 0));
+          }
         }
       }
       return Column(
@@ -1815,7 +1886,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addFeePriceController.text.isNotEmpty) {
-        subTotal = double.tryParse(addFeePriceController.text) ?? 0;
+        final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
+
+        if (client?.taxOnLabors == "N") {
+          subTotal = (double.tryParse(addFeePriceController.text) ?? 0);
+        } else {
+          subTotal = (double.tryParse(addFeePriceController.text) ?? 0) * tax +
+              (double.tryParse(addFeePriceController.text) ?? 0);
+        }
       }
       return Column(
         children: [
@@ -2059,12 +2137,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addSubContractPriceController.text.isNotEmpty) {
-        if (addSubContractDiscountController.text.isEmpty) {
-          subTotal = double.tryParse(addSubContractPriceController.text) ?? 0;
+        if (client?.taxOnLabors == 'N') {
+          if (addSubContractDiscountController.text.isEmpty) {
+            subTotal =
+                (double.tryParse(addSubContractPriceController.text) ?? 0);
+          } else {
+            subTotal = ((double.tryParse(addSubContractPriceController.text) ??
+                    0) -
+                (double.tryParse(addSubContractDiscountController.text) ?? 0));
+          }
         } else {
-          subTotal =
-              (double.tryParse(addSubContractPriceController.text) ?? 0) -
-                  (double.tryParse(addSubContractDiscountController.text) ?? 0);
+          final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
+
+          if (addSubContractDiscountController.text.isEmpty) {
+            subTotal =
+                (double.tryParse(addSubContractPriceController.text) ?? 0) *
+                        tax +
+                    (double.tryParse(addSubContractPriceController.text) ?? 0);
+          } else {
+            subTotal = ((double.tryParse(addSubContractPriceController.text) ??
+                            0) -
+                        (double.tryParse(
+                                addSubContractDiscountController.text) ??
+                            0)) *
+                    tax +
+                ((double.tryParse(addSubContractPriceController.text) ?? 0) -
+                    (double.tryParse(addSubContractDiscountController.text) ??
+                        0));
+          }
         }
       }
       return Column(

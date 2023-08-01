@@ -65,3 +65,5 @@ class DeleteCannedServiceEvent extends ServiceEvent {
   final String id;
   const DeleteCannedServiceEvent({required this.id});
 }
+
+class GetClientByIdEvent extends ServiceEvent {}

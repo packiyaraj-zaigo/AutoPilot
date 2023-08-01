@@ -425,6 +425,10 @@ class ApiRepository {
       String token, CannedServiceCreateModel model, String id) async {
     return apiProvider.editCannedOrderService(token, model, id);
   }
+
+  Future<dynamic> getClientByClientId() async {
+    return apiProvider.getClientByClientId();
+  }
 }
 
 class NetworkError extends Error {}

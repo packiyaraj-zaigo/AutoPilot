@@ -1537,4 +1537,16 @@ class ApiProvider {
       log(e.toString() + " Create canned order service api error");
     }
   }
+
+  Future<dynamic> getClientByClientId() async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final token = await AppUtils.getToken();
+      final url = Uri.parse('${BASE_URL}api/clients/$clientId');
+      final response = await http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Get client api error");
+    }
+  }
 }
