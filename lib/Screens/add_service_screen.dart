@@ -172,6 +172,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 }
                 if (state is GetClientSuccessState) {
                   client = state.client;
+                  rateController.text = client?.baseLaborCost ?? '0';
                 }
               },
               child: BlocBuilder<ServiceBloc, ServiceState>(
