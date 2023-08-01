@@ -1257,9 +1257,24 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         fontSize: 16,
                         fontWeight: FontWeight.w600),
                   ),
-                  const Icon(
-                    Icons.more_horiz,
-                    color: AppColors.primaryColors,
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return editServiceSheet(
+                              widget.estimateDetails.data
+                                      .orderService?[serviceIndex].id
+                                      .toString() ??
+                                  "",
+                              serviceIndex);
+                        },
+                      );
+                    },
+                    child: const Icon(
+                      Icons.more_horiz,
+                      color: AppColors.primaryColors,
+                    ),
                   )
                 ],
               ),
@@ -2496,6 +2511,127 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
+  Widget editServiceSheet(String id, int index) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 2.6,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Select an option",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    // isEstimateNoteEdit = true;
+                    // estimateNoteEditId = id;
+                    // estimateNoteController.text = oldNote;
+                  });
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Edit",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  deleteOrderServicePopup(context, "", id, index);
+                  // print("ontapped");
+                  // deleteEstimatNotePopup(context, "", id);
+
+                  // Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/delete_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(
+                              color: Color(0xffFF5C5C),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                height: 56,
+                decoration: BoxDecoration(
+                    color: const Color(0xffF6F6F6),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Future deleteEstimatNotePopup(BuildContext ctx, message, String id) {
     return showCupertinoDialog(
       context: ctx,
@@ -2530,6 +2666,51 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         context
                             .read<EstimateBloc>()
                             .add(DeleteEstimateNoteEvent(id: id));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future deleteOrderServicePopup(
+      BuildContext ctx, message, String id, int index) {
+    return showCupertinoDialog(
+      context: ctx,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is DeleteOrderServiceState) {
+              log(state.toString() + "popppupp");
+              widget.estimateDetails.data.orderService!.removeAt(index);
+              setState(() {});
+
+              Navigator.pop(context);
+            }
+
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Order Service?"),
+                content: const Text(
+                    "Do you want to remove this Order service from this estimate?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context
+                            .read<EstimateBloc>()
+                            .add(DeleteOrderServiceEvent(id: id));
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),
