@@ -623,6 +623,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 clientId: int.parse(clientId),
                                 serviceName: serviceNameController.text,
                                 servicePrice: rateController.text,
+                                serviceNote: laborDescriptionController.text,
                                 discount: '0',
                                 tax: taxController.text,
                                 subTotal: subT.toStringAsFixed(2),
@@ -1692,7 +1693,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         (double.tryParse(addLaborDiscountController.text) ??
                             0)) *
                     tax +
-               (((double.tryParse(addLaborHoursController.text) ?? 1) *
+                (((double.tryParse(addLaborHoursController.text) ?? 1) *
                         (double.tryParse(addLaborCostController.text) ?? 0)) -
                     (double.tryParse(addLaborDiscountController.text) ?? 0));
           }
