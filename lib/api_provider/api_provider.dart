@@ -1556,4 +1556,14 @@ class ApiProvider {
       log(e.toString() + " Get client api error");
     }
   }
+
+  Future<dynamic> deleteOrderService(String token, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/order_services/$id');
+      final response = await http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Delete provider error");
+    }
+  }
 }

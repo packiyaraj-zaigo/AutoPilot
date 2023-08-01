@@ -102,3 +102,10 @@ class CreateOrderServiceState extends EstimateState {
 }
 
 class CreateOrderServiceItemState extends EstimateState {}
+
+class DeleteOrderServiceState extends EstimateState {}
+
+class DeleteOrderServiceErrorState extends EstimateState {
+  final String errorMessage;
+  DeleteOrderServiceErrorState({required this.errorMessage});
+}

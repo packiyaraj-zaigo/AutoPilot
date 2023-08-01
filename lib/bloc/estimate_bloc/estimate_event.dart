@@ -144,3 +144,8 @@ class CreateOrderServiceItemEvent extends EstimateEvent {
       required this.subTotal,
       required this.unitPrice});
 }
+
+class DeleteOrderServiceEvent extends EstimateEvent {
+  final String id;
+  DeleteOrderServiceEvent({required this.id});
+}
