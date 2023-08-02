@@ -444,7 +444,9 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               controller: controller,
               maxLength: label == "Phone"
                   ? 14
-                  : label == "Customer Notes" || label == "Address"
+                  : label == "Customer Notes" ||
+                          label == "Address" ||
+                          label == "Email"
                       ? 50
                       : 25,
               keyboardType: label == "Phone"
@@ -973,7 +975,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             firstName: firstNameController.text,
             lastName: lastNameController.text,
             email: emailController.text,
-            mobileNo: phoneNumberController.text,
+            mobileNo: phoneNumberController.text
+                .trim()
+                .replaceAll(RegExp(r'[^\w\s]+'), '')
+                .replaceAll(" ", ""),
             customerNotes: customerNotesController.text,
             address: addressController.text,
             city: cityController.text,
