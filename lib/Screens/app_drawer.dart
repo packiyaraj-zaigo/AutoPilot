@@ -160,6 +160,7 @@ Widget drawerBottomTile(String label, BuildContext context, constructor) {
       if (label == "Sign Out") {
         AppUtils.setToken("");
         AppUtils.setUserName("");
+        AppUtils.setTokenValidity('');
         final prefs = await SharedPreferences.getInstance();
         prefs.setBool('add_company', false);
 

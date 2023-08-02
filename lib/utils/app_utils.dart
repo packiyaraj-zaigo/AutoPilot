@@ -244,6 +244,11 @@ class AppUtils {
     prefs.setString(AppConstants.USER_ID, value);
   }
 
+  static Future<void> setTokenValidity(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('token_expiry', value);
+  }
+
   static Future<String> getUserID() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? userID = prefs.getString(AppConstants.USER_ID);
