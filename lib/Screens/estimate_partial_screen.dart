@@ -262,42 +262,58 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               endTimeController.text.isNotEmpty &&
                               dateController.text.isNotEmpty &&
                               appointmentController.text.isNotEmpty) {
+                            bool validateDurations(String firstDurationStr,
+                                String secondDurationStr) {
+                              // Parse the durations into hours and minutes
+                              List<String> firstParts =
+                                  firstDurationStr.split(':');
+                              List<String> secondParts =
+                                  secondDurationStr.split(':');
+                              int firstHours = int.parse(firstParts[0]);
+                              int firstMinutes = int.parse(firstParts[1]);
+                              int secondHours = int.parse(secondParts[0]);
+                              int secondMinutes = int.parse(secondParts[1]);
+
+                              // Convert the durations to total minutes for comparison
+                              int firstTotalMinutes =
+                                  firstHours * 60 + firstMinutes;
+                              int secondTotalMinutes =
+                                  secondHours * 60 + secondMinutes;
+
+                              // Compare the durations and return the result
+                              return firstTotalMinutes < secondTotalMinutes;
+                            }
+
+                            final validate = validateDurations(
+                                startTimeController.text.trim(),
+                                endTimeController.text.trim());
+
+                            if (!validate) {
+                              CommonWidgets().showDialog(context,
+                                  'Start time should be less than end time');
+                              return;
+                            }
+
                             if (isAppointmentEdit == false) {
-                              print("createdddd");
-                              log((int.parse(startTimeController.text
-                                          .substring(0, 2)) <
-                                      int.parse(endTimeController.text
-                                          .substring(0, 2)))
-                                  .toString());
-                              if (int.parse(startTimeController.text
-                                      .substring(0, 2)) >
-                                  int.parse(
-                                      endTimeController.text.substring(0, 2))) {
-                                CommonWidgets().showDialog(context,
-                                    'Appointment start time should be less than appointment end time');
-                                isError = true;
-                              } else {
-                                context
-                                    .read<EstimateBloc>()
-                                    .add(
-                                        CreateAppointmentEstimateEvent(
-                                            startTime: dateController.text +
-                                                startTimeController.text,
-                                            endTime: dateController.text +
-                                                endTimeController.text,
-                                            orderId: widget
-                                                .estimateDetails.data.id
-                                                .toString(),
-                                            appointmentNote:
-                                                appointmentController.text,
-                                            customerId: widget
-                                                .estimateDetails.data.customerId
-                                                .toString(),
-                                            vehicleId: widget.estimateDetails
-                                                    .data.vehicle?.id
-                                                    .toString() ??
-                                                ""));
-                              }
+                              context.read<EstimateBloc>().add(
+                                    CreateAppointmentEstimateEvent(
+                                      startTime: dateController.text +
+                                          startTimeController.text,
+                                      endTime: dateController.text +
+                                          endTimeController.text,
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      appointmentNote:
+                                          appointmentController.text,
+                                      customerId: widget
+                                          .estimateDetails.data.customerId
+                                          .toString(),
+                                      vehicleId: widget
+                                              .estimateDetails.data.vehicle?.id
+                                              .toString() ??
+                                          "",
+                                    ),
+                                  );
                             } else {
                               print("editteeddd");
                               // if (int.parse(startTimeController.text
@@ -338,14 +354,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           //  }
                           if (networkImageList.isNotEmpty) {
                             context.read<EstimateBloc>().add(
-                                CreateOrderImageEvent(
+                                  CreateOrderImageEvent(
                                     imageUrlList:
                                         networkImageList.where((element) {
                                       return element != "";
                                     }).toList(),
                                     inspectionId: "",
                                     orderId: widget.estimateDetails.data.id
-                                        .toString()));
+                                        .toString(),
+                                  ),
+                                );
                           }
 
                           if (!isError) {
@@ -1654,7 +1672,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget timerPicker(String timeType) {
-    String selectedTime = "";
+    String selectedTime = "00:00";
     if (timeType == "start_time" && isAppointmentEdit) {
       selectedTime = DateFormat('hh:mm')
           .format(appointmentDetailsModel!.data.data[0].startOn)
@@ -1663,6 +1681,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       selectedTime = DateFormat('hh:mm')
           .format(appointmentDetailsModel!.data.data[0].endOn)
           .toString();
+    }
+    if (timeType == "start_time" && endTimeController.text.trim().isNotEmpty) {
+      selectedTime = startTimeController.text;
+    } else if (timeType == "end_time" &&
+        endTimeController.text.trim().isNotEmpty) {
+      selectedTime = endTimeController.text;
+    } else if (timeType == "end_time" &&
+        endTimeController.text.trim().isEmpty) {
+      selectedTime = startTimeController.text;
     }
 
     return CupertinoPopupSurface(
@@ -1695,8 +1722,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 initialTimerDuration: isAppointmentEdit &&
                         timeType == "start_time"
                     ? Duration(
-                        hours: appointmentDetailsModel
-                                ?.data.data[0].startOn.hour ??
+                        hours: appointmentDetailsModel?.data.data[0].startOn.hour ??
                             0,
                         minutes: appointmentDetailsModel
                                 ?.data.data[0].startOn.minute ??
@@ -1709,13 +1735,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             minutes: appointmentDetailsModel
                                     ?.data.data[0].endOn.minute ??
                                 0)
-                        : Duration(),
+                        : timeType == 'end_time' &&
+                                    startTimeController.text.isNotEmpty ||
+                                timeType == 'start_time' &&
+                                    startTimeController.text.isNotEmpty
+                            ? Duration(
+                                hours: int.parse(startTimeController.text
+                                    .trim()
+                                    .substring(0, 2)),
+                                minutes: int.parse(startTimeController.text.trim().substring(3)))
+                            : Duration(),
                 onTimerDurationChanged: (Duration changeTimer) {
                   setState(() {
                     // initialTimer = changeTimer;
 
                     selectedTime =
-                        ' ${changeTimer.inHours > 10 ? changeTimer.inHours : "0${changeTimer.inHours}"}:${changeTimer.inMinutes % 60 > 10 ? changeTimer.inMinutes % 60 : "0${changeTimer.inMinutes % 60}"}';
+                        ' ${changeTimer.inHours >= 10 ? changeTimer.inHours : "0${changeTimer.inHours}"}:${changeTimer.inMinutes % 60 >= 10 ? changeTimer.inMinutes % 60 : "0${changeTimer.inMinutes % 60}"}';
 
                     print(
                         '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');

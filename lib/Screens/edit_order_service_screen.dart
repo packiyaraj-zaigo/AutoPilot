@@ -694,6 +694,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),
                                 serviceName: serviceNameController.text,
+                                serviceNote: laborDescriptionController.text,
                                 servicePrice: rateController.text,
                                 discount: '0',
                                 tax: taxController.text,
