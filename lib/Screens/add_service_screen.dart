@@ -663,6 +663,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 clientId: int.parse(clientId),
                                 serviceName: serviceNameController.text,
                                 servicePrice: rateController.text,
+                                serviceNote: laborDescriptionController.text,
                                 discount: '0',
                                 tax: taxController.text,
                                 subTotal: subT.toStringAsFixed(2),

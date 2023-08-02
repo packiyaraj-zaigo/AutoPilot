@@ -26,6 +26,7 @@ class CannedServiceCreateModel {
   String tax;
   String taxType;
   String subTotal;
+  String serviceNote;
 
   CannedServiceCreateModel({
     required this.clientId,
@@ -34,6 +35,7 @@ class CannedServiceCreateModel {
     required this.discount,
     required this.tax,
     required this.subTotal,
+    required this.serviceNote,
     this.recommendedService = 'Y',
     this.isAuthorized = 'N',
     this.priceType = 'Fixed',
@@ -49,6 +51,7 @@ class CannedServiceCreateModel {
       CannedServiceCreateModel(
         clientId: json["client_id"],
         serviceName: json["service_name"],
+        serviceNote: json["service_note"],
         recommendedService: json["recommended_service"],
         isAuthorized: json["is_authorized"],
         servicePrice: json["service_price"],
@@ -80,5 +83,6 @@ class CannedServiceCreateModel {
         "tax": tax,
         "tax_type": taxType,
         "sub_total": subTotal,
+        "service_note": serviceNote
       };
 }
