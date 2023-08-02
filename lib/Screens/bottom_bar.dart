@@ -542,10 +542,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
-                  DummyScreen(
-                    name: "New Customer Screen",
-                  )),
-              //  NewCustomerScreen()),
+                  // DummyScreen(
+                  //   name: "New Customer Screen",
+                  // )),
+                  NewCustomerScreen()),
               bottomSheetTile(
                   "New Vehicle",
                   "assets/images/vehicle_icon.svg",
