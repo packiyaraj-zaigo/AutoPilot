@@ -3,6 +3,7 @@ import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/parts_list_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/Screens/time_card_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
@@ -77,7 +78,7 @@ showDrawer(BuildContext context) {
         // VehiclesScreen()),
 
         drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
-            context, BottomBarScreen()),
+            context, PartsScreen()),
         drawerTileWidget(
             "assets/images/service_drawer_icon.svg",
             "Services",

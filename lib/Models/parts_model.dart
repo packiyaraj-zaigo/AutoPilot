@@ -33,18 +33,18 @@ class Parts {
 }
 
 class Data {
-  int currentPage;
+  int? currentPage;
   List<PartsDatum> data;
-  String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
+  String? firstPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
   dynamic nextPageUrl;
-  String path;
-  String perPage;
+  String? path;
+  String? perPage;
   dynamic prevPageUrl;
-  int to;
-  int total;
+  int? to;
+  int? total;
 
   Data({
     required this.currentPage,
@@ -118,7 +118,7 @@ class PartsDatum {
   DateTime createdAt;
   DateTime updatedAt;
   dynamic categoryInfo;
-  CreatedUser createdUser;
+  CreatedUser? createdUser;
   dynamic vendorInfo;
 
   PartsDatum({
@@ -175,7 +175,9 @@ class PartsDatum {
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         categoryInfo: json["category_info"],
-        createdUser: CreatedUser.fromJson(json["created_user"]),
+        createdUser: json["created_user"] == null
+            ? null
+            : CreatedUser.fromJson(json["created_user"]),
         vendorInfo: json["vendor_info"],
       );
 
@@ -204,7 +206,7 @@ class PartsDatum {
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "category_info": categoryInfo,
-        "created_user": createdUser.toJson(),
+        "created_user": createdUser == null ? {} : createdUser!.toJson(),
         "vendor_info": vendorInfo,
       };
 }

@@ -621,16 +621,14 @@ class ApiProvider {
 
   Future<dynamic> getParts(String token, int page, String query) async {
     try {
-      String url = '${BASE_URL}api/inventory_parts';
+      final clientId = await AppUtils.getUserID();
+      String url =
+          '${BASE_URL}api/inventory_parts?order_by=id&sort=DESC&client_id=$clientId';
       if (page != 1) {
-        url = '$url?page=$page';
+        url = '$url&page=$page';
       }
       if (query != '') {
-        if (url.contains('?')) {
-          url = '$url&item_name=$query';
-        } else {
-          url = '$url?item_name=$query';
-        }
+        url = '$url&item_name=$query';
       }
       var response = http.get(Uri.parse(url), headers: getHeader(token));
       print(response);
@@ -653,31 +651,66 @@ class ApiProvider {
     cost,
   ) async {
     try {
-      print("${serialnumber}");
       var url = Uri.parse('${BASE_URL}api/inventory_parts');
-      print('hjjjjjjjjjjjjjjjj${token}');
-      var request = http.MultipartRequest("POST", url)
-        ..headers['Authorization'] = "Bearer $token"
-        ..fields['item_name'] = itemname
-        ..fields['part_name'] = "serialnumber"
-        ..fields['sub_total'] = "120"
-        ..fields['quantity_in_hand'] = "1"
-        ..fields['item_service_note'] = "dhjhjhhjdh"
-        ..fields['vendor_id'] = "12"
-        ..fields['category_id'] = "12"
-        ..fields['bin_location'] = "chennai"
-        ..fields['quantity_critical'] = "12"
-        ..fields['markup'] = "12"
-        ..fields['margin'] = "1"
-        ..fields['unit_price'] = "12"
-        ..fields['client_id'] = "1234";
-      var response = await request.send();
-      print('object===============================');
-      if (response.statusCode == 200 || response.statusCode == 201) {}
-      print(response.statusCode.toString());
-      return http.Response.fromStream(response);
+      final clientId = await AppUtils.getUserID();
+      final map = {};
+      log(quantity.toString());
+      map['item_name'] = itemname;
+      map['part_name'] = itemname;
+      map['sub_total'] =
+          (double.tryParse(cost) ?? 0 * (double.tryParse(quantity) ?? 0));
+      map['quantity_in_hand'] = double.tryParse(quantity) ?? 0;
+      map['item_service_note'] = serialnumber;
+      map['vendor_id'] = "0";
+      map['category_id'] = "0";
+      map['bin_location'] = "top";
+      map['quantity_critical'] = double.tryParse(quantity) ?? 0;
+      map['markup'] = "0";
+      map['margin'] = "0";
+      map['unit_price'] = double.tryParse(cost) ?? 0;
+      map['client_id'] = clientId;
+      final response = await http.post(url,
+          body: jsonEncode(map), headers: getHeader(token));
+
+      return response;
     } catch (e) {
-      print("errroor draft found ${e.toString()}");
+      log("Part api error ${e.toString()}");
+    }
+  }
+
+  Future<dynamic> editParts(
+    token,
+    itemname,
+    serialnumber,
+    quantity,
+    cost,
+    id,
+  ) async {
+    try {
+      var url = Uri.parse('${BASE_URL}api/inventory_parts/$id');
+      final clientId = await AppUtils.getUserID();
+      final map = {};
+      log(quantity.toString());
+      map['item_name'] = itemname;
+      map['part_name'] = itemname;
+      map['sub_total'] =
+          (double.tryParse(cost) ?? 0 * (double.tryParse(quantity) ?? 0));
+      map['quantity_in_hand'] = double.tryParse(quantity) ?? 0;
+      map['item_service_note'] = serialnumber;
+      map['vendor_id'] = "0";
+      map['category_id'] = "0";
+      map['bin_location'] = "top";
+      map['quantity_critical'] = double.tryParse(quantity) ?? 0;
+      map['markup'] = "0";
+      map['margin'] = "0";
+      map['unit_price'] = double.tryParse(cost) ?? 0;
+      map['client_id'] = clientId;
+      final response =
+          await http.put(url, body: jsonEncode(map), headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      log("Part api error ${e.toString()}");
     }
   }
 
@@ -690,6 +723,18 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + 'Edit part provider error');
+    }
+  }
+
+  Future<dynamic> deleteParts(String id, String token) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${BASE_URL}api/inventory_parts/$id'),
+        headers: getHeader(token),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
     }
   }
 
