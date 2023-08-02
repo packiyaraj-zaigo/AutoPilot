@@ -35,6 +35,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     on<GetAllVendorsEvent>(getAllVendors);
     on<DeleteCannedServiceEvent>(deleteCannedService);
     on<GetClientByIdEvent>(getClientById);
+    on<EditOrderServiceEvent>(editOrderService);
   }
 
   // createEmployee(
@@ -215,6 +216,148 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
         }
 
         emit(EditCannedServiceSuccessState(message: message));
+      } else {
+        emit(const CreateCannedOrderServiceErrorState(
+            message: 'Something went wrong'));
+      }
+    } catch (e) {
+      log("$e Create service bloc error");
+      emit(const EditCannedServiceErrorState(message: "Something went wrong"));
+    }
+  }
+
+  Future<void> editOrderService(
+    EditOrderServiceEvent event,
+    Emitter<ServiceState> emit,
+  ) async {
+    try {
+      bool materialDone = true;
+      bool partDone = true;
+      bool laborDone = true;
+      bool subcontractDone = true;
+      bool feeDone = true;
+      bool deleteDone = true;
+      emit(EditCannedServiceLoadingState());
+      final token = await AppUtils.getToken();
+      final Response serviceCreateResponse = await apiRepo.editOrderService(
+          token, event.service, event.id, event.technicianId);
+
+      log(serviceCreateResponse.body.toString());
+
+      if (serviceCreateResponse.statusCode == 200 ||
+          serviceCreateResponse.statusCode == 201) {
+        serviceId = int.parse(event.id);
+        if (event.material != null && event.material!.isNotEmpty) {
+          event.material!.forEach((material) async {
+            final Response materialResponse =
+                await apiRepo.editOrderServiceItem(token, material, serviceId);
+            log(materialResponse.body.toString());
+            if (materialResponse.statusCode == 200 ||
+                materialResponse.statusCode == 201) {
+            } else {
+              materialDone = false;
+            }
+          });
+        }
+        if (event.part != null && event.part!.isNotEmpty) {
+          for (var part in event.part!) {
+            final Response partResponse =
+                await apiRepo.editOrderServiceItem(token, part, serviceId);
+            if (partResponse.statusCode == 200 ||
+                partResponse.statusCode == 201) {
+            } else {
+              partDone = false;
+            }
+          }
+        }
+        if (event.labor != null && event.labor!.isNotEmpty) {
+          for (var labor in event.labor!) {
+            final Response laborResponse =
+                await apiRepo.editOrderServiceItem(token, labor, serviceId);
+            if (laborResponse.statusCode == 200 ||
+                laborResponse.statusCode == 201) {
+            } else {
+              laborDone = false;
+            }
+          }
+        }
+        if (event.subcontract != null && event.subcontract!.isNotEmpty) {
+          for (var subcontract in event.subcontract!) {
+            final Response subcontractResponse = await apiRepo
+                .editOrderServiceItem(token, subcontract, serviceId);
+            if (subcontractResponse.statusCode == 200 ||
+                subcontractResponse.statusCode == 201) {
+            } else {
+              subcontractDone = false;
+            }
+          }
+        }
+        if (event.fee != null && event.fee!.isNotEmpty) {
+          for (var fee in event.fee!) {
+            final Response feeResponse =
+                await apiRepo.editOrderServiceItem(token, fee, serviceId);
+            if (feeResponse.statusCode == 200 ||
+                feeResponse.statusCode == 201) {
+            } else {
+              feeDone = false;
+            }
+          }
+        }
+        if (event.deletedItems!.isNotEmpty) {
+          for (var element in event.deletedItems!) {
+            final Response deleteResponse =
+                await apiRepo.deleteOrderServiceItem(token, element);
+            log(deleteResponse.body);
+            if (deleteResponse.statusCode == 200 ||
+                deleteResponse.statusCode == 201) {
+            } else {
+              deleteDone = false;
+            }
+          }
+        }
+        String message = 'Service Updated Successfully';
+        String errorMessage =
+            'Service Updated\nBut Something Went Wrong with\n';
+
+        if (!materialDone) {
+          errorMessage += ' Material';
+        }
+        if (!partDone) {
+          if (errorMessage !=
+              'Service Updated\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Part';
+        }
+        if (!laborDone) {
+          if (errorMessage !=
+              'Service Updated\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Labor';
+        }
+        if (!subcontractDone) {
+          if (errorMessage !=
+              'Service Updated\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Sub Contract';
+        }
+        if (!feeDone) {
+          if (errorMessage !=
+              'Service Updated\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Fee';
+        }
+        log(message);
+        log(errorMessage);
+        if (errorMessage !=
+            'Service Updated\nBut Something Went Wrong with\n') {
+          message = errorMessage;
+        }
+
+        emit(EditOrderServiceSuccessState(message: message));
       } else {
         emit(const CreateCannedOrderServiceErrorState(
             message: 'Something went wrong'));

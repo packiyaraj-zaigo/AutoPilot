@@ -77,8 +77,8 @@ class Datum {
 
 class CreatedBy {
   int id;
-  FirstName firstName;
-  LastName lastName;
+  String firstName;
+  String lastName;
 
   CreatedBy({
     required this.id,
@@ -88,8 +88,8 @@ class CreatedBy {
 
   factory CreatedBy.fromJson(Map<String, dynamic> json) => CreatedBy(
         id: json["id"],
-        firstName: firstNameValues.map[json["first_name"]]!,
-        lastName: lastNameValues.map[json["last_name"]]!,
+        firstName: json["first_name"],
+        lastName: json["last_name"],
       );
 
   Map<String, dynamic> toJson() => {

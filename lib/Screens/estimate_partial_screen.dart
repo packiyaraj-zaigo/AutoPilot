@@ -1,14 +1,17 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_appointment_model.dart' as ea;
 import 'package:auto_pilot/Models/estimate_note_model.dart' as en;
 import 'package:auto_pilot/Models/order_image_model.dart' as oi;
+import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
+import 'package:auto_pilot/Screens/edit_order_service_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/select_service_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
@@ -267,7 +270,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                           .substring(0, 2)))
                                   .toString());
                               if (int.parse(startTimeController.text
-                                      .substring(0, 2)) <
+                                      .substring(0, 2)) >
                                   int.parse(
                                       endTimeController.text.substring(0, 2))) {
                                 CommonWidgets().showDialog(context,
@@ -1257,9 +1260,24 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         fontSize: 16,
                         fontWeight: FontWeight.w600),
                   ),
-                  const Icon(
-                    Icons.more_horiz,
-                    color: AppColors.primaryColors,
+                  GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return editServiceSheet(
+                              widget.estimateDetails.data
+                                      .orderService?[serviceIndex].id
+                                      .toString() ??
+                                  "",
+                              serviceIndex);
+                        },
+                      );
+                    },
+                    child: const Icon(
+                      Icons.more_horiz,
+                      color: AppColors.primaryColors,
+                    ),
                   )
                 ],
               ),
@@ -1409,6 +1427,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              textCapitalization: TextCapitalization.sentences,
               inputFormatters:
                   label == "Card Number" ? [CardNumberInputFormatter()] : [],
               readOnly: label == 'Date' ||
@@ -2496,6 +2515,278 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
+  Widget editServiceSheet(String id, int index) {
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height / 2.6,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Select an option",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  // setState(() {
+                  //   // isEstimateNoteEdit = true;
+                  //   // estimateNoteEditId = id;
+                  //   // estimateNoteController.text = oldNote;
+                  // });
+                  List<CannedServiceAddModel> materialAddModel = [];
+                  List<CannedServiceAddModel> partAddModel = [];
+                  List<CannedServiceAddModel> laborAddModel = [];
+                  List<CannedServiceAddModel> feeAddModel = [];
+                  List<CannedServiceAddModel> subContractAddModel = [];
+
+                  // print(widget.estimateDetails.data.orderService![index]
+                  //         .orderServiceItems![2]
+                  //         .toJson()
+                  //         .toString() +
+                  //     "lissttt");
+
+                  if (widget.estimateDetails.data.orderService![index]
+                      .orderServiceItems!.isNotEmpty) {
+                    widget.estimateDetails.data.orderService![index]
+                        .orderServiceItems!
+                        .forEach((e) {
+                      print("maapppp");
+
+                      if (e.itemType == "Material") {
+                        print("map in if");
+                        materialAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "part") {
+                        partAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? '',
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "labor") {
+                        laborAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "fee") {
+                        feeAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "subcontract") {
+                        subContractAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      }
+                    });
+                  }
+
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return EditOrderServiceScreen(
+                        material: materialAddModel,
+                        fee: feeAddModel,
+                        labor: laborAddModel,
+                        part: partAddModel,
+                        technicianId: widget.estimateDetails.data
+                                    .orderService![index].technicianId !=
+                                0
+                            ? widget.estimateDetails.data.orderService![index]
+                                .technicianId
+                                .toString()
+                            : "",
+                        orderId: widget.estimateDetails.data.id.toString(),
+                        subContract: subContractAddModel,
+                        service: cs.Datum(
+                            id: widget
+                                .estimateDetails.data.orderService![index].id,
+                            clientId: widget.estimateDetails.data.clientId,
+                            serviceName: widget.estimateDetails.data
+                                .orderService![index].serviceName,
+                            servicePrice: widget.estimateDetails.data
+                                .orderService![index].servicePrice,
+                            discount: widget.estimateDetails.data
+                                .orderService![index].discount,
+                            serviceEpa: widget.estimateDetails.data
+                                .orderService![index].serviceEpa,
+                            shopSupplies: widget.estimateDetails.data
+                                .orderService![index].shopSupplies,
+                            tax: widget
+                                .estimateDetails.data.orderService![index].tax,
+                            subTotal: widget.estimateDetails.data
+                                .orderService![index].subTotal,
+                            maintenancePeriod: widget.estimateDetails.data
+                                .orderService![index].maintenancePeriod,
+                            maintenancePeriodType: widget.estimateDetails.data
+                                .orderService![index].maintenancePeriodType,
+                            communicationChannel: widget.estimateDetails.data
+                                .orderService![index].communicationChannel,
+                            createdAt: widget.estimateDetails.data
+                                .orderService![index].createdAt,
+                            updatedAt: widget.estimateDetails.data
+                                .orderService![index].updatedAt),
+                      );
+                    },
+                  ));
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Edit",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  deleteOrderServicePopup(context, "", id, index);
+                  // print("ontapped");
+                  // deleteEstimatNotePopup(context, "", id);
+
+                  // Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SvgPicture.asset("assets/images/delete_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Remove",
+                          style: TextStyle(
+                              color: Color(0xffFF5C5C),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: Container(
+                alignment: Alignment.center,
+                width: MediaQuery.of(context).size.width,
+                height: 56,
+                decoration: BoxDecoration(
+                    color: const Color(0xffF6F6F6),
+                    borderRadius: BorderRadius.circular(8)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        "Cancel",
+                        style: TextStyle(
+                            color: AppColors.primaryTitleColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Future deleteEstimatNotePopup(BuildContext ctx, message, String id) {
     return showCupertinoDialog(
       context: ctx,
@@ -2530,6 +2821,51 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         context
                             .read<EstimateBloc>()
                             .add(DeleteEstimateNoteEvent(id: id));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future deleteOrderServicePopup(
+      BuildContext ctx, message, String id, int index) {
+    return showCupertinoDialog(
+      context: ctx,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is DeleteOrderServiceState) {
+              log(state.toString() + "popppupp");
+              widget.estimateDetails.data.orderService!.removeAt(index);
+              setState(() {});
+
+              Navigator.pop(context);
+            }
+
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Order Service?"),
+                content: const Text(
+                    "Do you want to remove this Order service from this estimate?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context
+                            .read<EstimateBloc>()
+                            .add(DeleteOrderServiceEvent(id: id));
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),

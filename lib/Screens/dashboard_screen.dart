@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:auto_pilot/Models/revenue_chart_model.dart';
+import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -62,6 +63,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   @override
   void initState() {
     super.initState();
+    operationDetailsMap.clear();
+    basicDetailsMap.clear();
+    employeeDetailsMap.clear();
     networkCheck();
   }
 

@@ -346,6 +346,11 @@ class ApiRepository {
     return apiProvider.createCannedOrderServiceItem(token, model, serviceId);
   }
 
+  Future<dynamic> editOrderServiceItem(
+      String token, CannedServiceAddModel model, int serviceId) {
+    return apiProvider.editOrderServiceItem(token, model, serviceId);
+  }
+
   Future<dynamic> getAllVendors(String token, int page) {
     return apiProvider.getAllVendors(token, page);
   }
@@ -421,13 +426,26 @@ class ApiRepository {
     return apiProvider.deleteCannedServiceItem(token, id);
   }
 
+  Future deleteOrderServiceItem(String token, String id) {
+    return apiProvider.deleteOrderServiceItem(token, id);
+  }
+
   Future<dynamic> editCannedOrderService(
       String token, CannedServiceCreateModel model, String id) async {
     return apiProvider.editCannedOrderService(token, model, id);
   }
 
+  Future<dynamic> editOrderService(String token, CannedServiceCreateModel model,
+      String id, String technicianId) async {
+    return apiProvider.editOrderService(token, model, id, technicianId);
+  }
+
   Future<dynamic> getClientByClientId() async {
     return apiProvider.getClientByClientId();
+  }
+
+  Future<dynamic> deleteOrderService(dynamic token, String id) async {
+    return apiProvider.deleteOrderService(token, id);
   }
 }
 
