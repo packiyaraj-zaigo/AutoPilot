@@ -22,12 +22,15 @@ import 'bloc/customer_bloc/customer_bloc.dart';
 
 String? initScreen;
 bool? addCompany;
+bool? tokenValidity;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SharedPreferences prefs = await SharedPreferences.getInstance();
   initScreen = prefs.getString(AppConstants.USER_TOKEN);
   addCompany = prefs.getBool('add_company');
-
+  final tokenDate = prefs.getString('token_expiry');
+  final date = DateTime.parse(tokenDate ?? DateTime.now().toString());
+  tokenValidity = DateTime.now().isBefore(date);
   runApp(const MyApp());
 }
 
@@ -72,7 +75,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'AutoPilot',
-        initialRoute: initScreen != "" && initScreen != null
+        initialRoute: initScreen != "" &&
+                initScreen != null &&
+                tokenValidity != null &&
+                tokenValidity!
             ? addCompany == true
                 ? "/home"
                 : '/add_company'
