@@ -803,7 +803,10 @@ class ApiProvider {
       // var response = await request.send();
       Map bodyMap = {
         "company_name": dataMap['company_name'],
-        "phone": dataMap['phone'],
+        "phone": dataMap['phone']
+            .toString()
+            .replaceAll(RegExp(r'[^\w\s]+'), '')
+            .replaceAll(" ", ""),
         "address_1": dataMap['address_1'],
         "town_city": dataMap['town_city'],
         "province_id": dataMap['province_id'],
@@ -1337,12 +1340,14 @@ class ApiProvider {
 
       request.headers.addAll(getHeader(token));
       inspect(request);
+
       var response = await request.send();
       inspect(response);
       print(response.statusCode.toString() + "provider status code");
       print(response.toString() + "provider response");
       return http.Response.fromStream(response);
-    } catch (e) {
+    } catch (e, s) {
+      print(s);
       print(e.toString() + "provider error");
     }
   }
@@ -1539,6 +1544,56 @@ class ApiProvider {
 
       final response = await http.put(url,
           headers: getHeader(token), body: json.encode(model.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
+    }
+  }
+
+  Future<dynamic> editOrderServiceItem(
+      String token, CannedServiceAddModel model, int serviceId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/order_service_items');
+      final map = model.toJson();
+      if (map['vendor_id'] == null) {
+        map.remove('vendor_id');
+      }
+      map['order_service_id'] = serviceId;
+      map.remove('canned_service_id');
+
+      final response = await http.post(url,
+          headers: getHeader(token), body: json.encode(map));
+
+      log(map.toString());
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
+    }
+  }
+
+  Future<dynamic> deleteOrderServiceItem(dynamic token, String id) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/order_service_items/$id");
+      var response = http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Delete Canned Service api error");
+    }
+  }
+
+  Future<dynamic> editOrderService(String token, CannedServiceCreateModel model,
+      String id, String technicianId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/order_services/$id');
+      final map = model.toJson();
+      map['technician_id'] = technicianId;
+
+      final response = await http.put(url,
+          headers: getHeader(token), body: json.encode(map));
       return response;
     } catch (e) {
       log(e.toString() + " Create canned order service api error");

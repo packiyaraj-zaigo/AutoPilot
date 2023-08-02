@@ -6,6 +6,7 @@ import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
 import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
+import 'package:auto_pilot/Screens/dummy_service.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -20,8 +21,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
-class AddServiceScreen extends StatefulWidget {
-  const AddServiceScreen(
+class EditOrderServiceScreen extends StatefulWidget {
+  const EditOrderServiceScreen(
       {super.key,
       this.service,
       this.material,
@@ -29,21 +30,25 @@ class AddServiceScreen extends StatefulWidget {
       this.labor,
       this.subContract,
       this.fee,
-      this.navigation});
+      this.navigation,
+      this.technicianId,
+      required this.orderId});
   final cs.Datum? service;
   final List<CannedServiceAddModel>? material;
   final List<CannedServiceAddModel>? part;
   final List<CannedServiceAddModel>? labor;
   final List<CannedServiceAddModel>? subContract;
   final List<CannedServiceAddModel>? fee;
+  final String orderId;
+  final String? technicianId;
 
   final String? navigation;
 
   @override
-  State<AddServiceScreen> createState() => _AddServiceScreenState();
+  State<EditOrderServiceScreen> createState() => _EditOrderServiceScreenState();
 }
 
-class _AddServiceScreenState extends State<AddServiceScreen> {
+class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
   final TextEditingController serviceNameController = TextEditingController();
   final List<VendorResponseModel> vendors = [];
   String serviceNameError = '';
@@ -58,6 +63,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
   int? vendorId;
   bool isTax = false;
+
+  final technicianController = TextEditingController();
+  String technicianId = '';
 
   CannedServiceCreateModel? service;
   List<CannedServiceAddModel> material = [];
@@ -133,17 +141,24 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
           child: BlocProvider(
-            create: (context) => ServiceBloc()..add(GetClientByIdEvent()),
+            create: (context) => ServiceBloc()
+              ..add(GetClientByIdEvent())
+              ..add(GetTechnicianEvent()),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
-                if (state is CreateCannedOrderServiceSuccessState) {
-                  if (widget.navigation != null) {
-                    Navigator.pop(context);
-                  } else {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => ServicesListScreen(),
-                    ));
-                  }
+                if (state is EditOrderServiceSuccessState) {
+                  // if (widget.navigation != null) {
+                  //   Navigator.pop(context);
+                  // } else {
+                  //   Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  //     builder: (context) => ServicesListScreen(),
+                  //   ));
+                  // }
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) {
+                      return DummyServiceScreen(orderId: widget.orderId);
+                    },
+                  ));
 
                   CommonWidgets().showDialog(context, state.message);
                 }
@@ -173,6 +188,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 if (state is GetClientSuccessState) {
                   client = state.client;
                   rateController.text = client?.baseLaborCost ?? '0';
+                }
+                if (state is GetTechnicianState) {
+                  print("correct state");
+                  if (widget.technicianId != null &&
+                      widget.technicianId != "") {
+                    state.technicianModel.data.forEach((element) {
+                      if (element.id.toString() == widget.technicianId) {
+                        print(element.firstName + "tecchhh");
+                        technicianController.text =
+                            element.firstName + " " + element.lastName;
+                        technicianId = element.id.toString();
+                      }
+                    });
+                  }
                 }
               },
               child: BlocBuilder<ServiceBloc, ServiceState>(
@@ -211,6 +240,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       errorWidget(error: laborDescriptionError),
 
                       const SizedBox(height: 16),
+
+                      textBox('Select Technician', technicianController,
+                          'Technician', technicianId.isEmpty, context, true),
                       // const Text(
                       //   "Technician",
                       //   style: TextStyle(
@@ -338,12 +370,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: material.length,
-                        physics: const ClampingScrollPhysics(),
+                        physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = material[index];
                           return Column(
                             children: [
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -352,12 +384,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     child: Text(item.itemName,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
                                         )),
                                   ),
-                                  const Expanded(child: SizedBox()),
+                                  // const Expanded(child: SizedBox()),
                                   Row(
                                     children: [
                                       Text('\$${item.subTotal} ',
@@ -384,7 +416,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                             ],
                           );
                         },
@@ -394,12 +426,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: part.length,
-                        physics: const ClampingScrollPhysics(),
+                        physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = part[index];
                           return Column(
                             children: [
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -440,7 +472,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                             ],
                           );
                         },
@@ -449,7 +481,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: labor.length,
-                        physics: const ClampingScrollPhysics(),
+                        physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = labor[index];
                           return Column(
@@ -504,12 +536,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: subContract.length,
-                        physics: const ClampingScrollPhysics(),
+                        physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = subContract[index];
                           return Column(
                             children: [
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -559,7 +591,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: fee.length,
-                        physics: const ClampingScrollPhysics(),
+                        physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = fee[index];
                           return Column(
@@ -670,41 +702,41 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               log(subT.toString());
                               if (widget.service != null) {
                                 BlocProvider.of<ServiceBloc>(context).add(
-                                  EditCannedOrderServiceEvent(
-                                    id: widget.service!.id.toString(),
-                                    service: service!,
-                                    material: material.isEmpty
-                                        ? null
-                                        : material
-                                            .where(
-                                                (element) => element.id == '')
-                                            .toList(),
-                                    part: part.isEmpty
-                                        ? null
-                                        : part
-                                            .where(
-                                                (element) => element.id == '')
-                                            .toList(),
-                                    labor: labor.isEmpty
-                                        ? null
-                                        : labor
-                                            .where(
-                                                (element) => element.id == '')
-                                            .toList(),
-                                    subcontract: subContract.isEmpty
-                                        ? null
-                                        : subContract
-                                            .where(
-                                                (element) => element.id == '')
-                                            .toList(),
-                                    fee: fee.isEmpty
-                                        ? null
-                                        : fee
-                                            .where(
-                                                (element) => element.id == '')
-                                            .toList(),
-                                    deletedItems: deletedItems,
-                                  ),
+                                  EditOrderServiceEvent(
+                                      id: widget.service!.id.toString(),
+                                      service: service!,
+                                      material: material.isEmpty
+                                          ? null
+                                          : material
+                                              .where(
+                                                  (element) => element.id == '')
+                                              .toList(),
+                                      part: part.isEmpty
+                                          ? null
+                                          : part
+                                              .where(
+                                                  (element) => element.id == '')
+                                              .toList(),
+                                      labor: labor.isEmpty
+                                          ? null
+                                          : labor
+                                              .where(
+                                                  (element) => element.id == '')
+                                              .toList(),
+                                      subcontract: subContract.isEmpty
+                                          ? null
+                                          : subContract
+                                              .where(
+                                                  (element) => element.id == '')
+                                              .toList(),
+                                      fee: fee.isEmpty
+                                          ? null
+                                          : fee
+                                              .where(
+                                                  (element) => element.id == '')
+                                              .toList(),
+                                      deletedItems: deletedItems,
+                                      technicianId: technicianId),
                                 );
                                 log(deletedItems.toString());
                               } else {
@@ -804,7 +836,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       setState(() {});
                     }
                   : null,
-              readOnly: label == "Vendor",
+              readOnly: label == "Vendor" || label == "Technician",
               onTap: label == "Vendor"
                   ? () {
                       showModalBottomSheet(
@@ -815,7 +847,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent);
                     }
-                  : null,
+                  : label == "Technician"
+                      ? () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return technicianBottomSheet();
+                            },
+                          );
+                        }
+                      : null,
               controller: controller,
               keyboardType: label == 'Discount' ||
                       label == 'Cost' ||
@@ -844,7 +885,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         CupertinoIcons.money_dollar,
                         color: AppColors.primaryColors,
                       )
-                    : label == "Vendor"
+                    : label == "Vendor" || label == "Technician"
                         ? const Icon(
                             CupertinoIcons.chevron_down,
                             color: AppColors.primaryColors,
@@ -2694,6 +2735,109 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     )
                   ],
                 ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget technicianBottomSheet() {
+    return BlocProvider(
+      create: (context) => ServiceBloc()..add(GetTechnicianEvent()),
+      child: BlocListener<ServiceBloc, ServiceState>(
+        listener: (context, state) {
+          if (state is GetTechnicianState) {
+            technicianData.addAll(state.technicianModel.data);
+
+            print(technicianData);
+          }
+          // TODO: implement listener
+        },
+        child: BlocBuilder<ServiceBloc, ServiceState>(
+          builder: (context, state) {
+            return Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: state is GetTechnicianLoadingState
+                    ? const Center(
+                        child: CupertinoActivityIndicator(),
+                      )
+                    : technicianData.isNotEmpty
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Technician",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12.0),
+                                child: LimitedBox(
+                                  maxHeight:
+                                      MediaQuery.of(context).size.height / 2 -
+                                          90,
+                                  child: ListView.builder(
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 12.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            print("heyy");
+
+                                            technicianController
+                                                .text = technicianData[index]
+                                                    .firstName +
+                                                " " +
+                                                technicianData[index].lastName;
+                                            technicianId = technicianData[index]
+                                                .id
+                                                .toString();
+
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[100],
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
+                                              child: Text(
+                                                technicianData[index].firstName,
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: technicianData.length,
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        : const Center(
+                            child: Text("No Technician Found!"),
+                          ),
               ),
             );
           },

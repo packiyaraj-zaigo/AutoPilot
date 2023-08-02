@@ -106,6 +106,14 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   bool taxPartSwitchValue = false;
   bool taxMaterialSwitchValue = false;
 
+  bool materialTaxRateErrorStatus = false;
+  bool laborTaxRateErrorStatus = false;
+  bool partTaxRateErrorStatus = false;
+
+  String materialTaxErrorMsg = "";
+  String partsTaxErrorMsg = "";
+  String laborTaxErrorMsg = '';
+
   // Map<String, dynamic> basicDetailsmap = {};
   // Map<String, dynamic> operationDetailsMap = {};
   // Map<String, dynamic> employeeDetailsMap = {};
@@ -1517,6 +1525,43 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         labourRateErrorStatus = false;
       });
     }
+    if (isTaxMaterialRate) {
+      if (materialTaxRateController.text.isEmpty) {
+        setState(() {
+          materialTaxRateErrorStatus = true;
+          materialTaxErrorMsg = "Material tax rate can't be empty";
+          //material empty error
+        });
+      } else {
+        setState(() {
+          materialTaxRateErrorStatus = false;
+        });
+      }
+    }
+    if (isTaxLaborRate) {
+      if (laborTaxRateController.text.isEmpty) {
+        setState(() {
+          laborTaxRateErrorStatus = true;
+          laborRateErrorMsg = "Labor tax rate can't be empty";
+        });
+      } else {
+        setState(() {
+          laborTaxRateErrorStatus = false;
+        });
+      }
+    }
+    if (isTaxPartRate) {
+      if (partsTaxRateController.text.isEmpty) {
+        setState(() {
+          partTaxRateErrorStatus = true;
+          partsTaxErrorMsg = "Part tax rate can't be empty";
+        });
+      } else {
+        setState(() {
+          partTaxRateErrorStatus = false;
+        });
+      }
+    }
     // if (taxRateController.text.isEmpty) {
     //   setState(() {
     //     taxRateErrorStatus = true;
@@ -1531,7 +1576,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     if (!numberOfEmployeeErrorStatus &&
         !timeZoneErrorStatus &&
         !labourRateErrorStatus &&
-        !taxRateErrorStatus) {
+        !taxRateErrorStatus &&
+        !materialTaxRateErrorStatus &&
+        !partTaxRateErrorStatus &&
+        !laborTaxRateErrorStatus) {
       operationDetailsMap!.addAll({
         "employee_count": numberOfEmployeeController.text,
         "time_zone": timeZoneString,

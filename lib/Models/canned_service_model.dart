@@ -100,25 +100,19 @@ class Datum {
   int clientId;
   String serviceName;
   ServiceNote? serviceNote;
-  RecommendedService recommendedService;
-  Is isVisible;
-  Is isAuthorized;
+
   String servicePrice;
-  PriceType? priceType;
+
   String discount;
-  Type? discountType;
+
   String serviceEpa;
-  Type? epaType;
   String shopSupplies;
-  Type? shopSuppliesType;
   String tax;
-  Type? taxType;
   String subTotal;
-  Is isMaintenance;
-  Is isServiceReminder;
+
   int maintenancePeriod;
-  MaintenancePeriodType maintenancePeriodType;
-  CommunicationChannel communicationChannel;
+  String maintenancePeriodType;
+  String communicationChannel;
   dynamic reminderTrigger;
   dynamic customMessage;
   CreatedBy? createdBy;
@@ -131,22 +125,12 @@ class Datum {
     required this.clientId,
     required this.serviceName,
     this.serviceNote,
-    required this.recommendedService,
-    required this.isVisible,
-    required this.isAuthorized,
     required this.servicePrice,
-    required this.priceType,
     required this.discount,
-    required this.discountType,
     required this.serviceEpa,
-    required this.epaType,
     required this.shopSupplies,
-    required this.shopSuppliesType,
     required this.tax,
-    required this.taxType,
     required this.subTotal,
-    required this.isMaintenance,
-    required this.isServiceReminder,
     required this.maintenancePeriod,
     required this.maintenancePeriodType,
     required this.communicationChannel,
@@ -165,28 +149,15 @@ class Datum {
         serviceNote: json["service_note"] != null
             ? serviceNoteValues.map[json["service_note"]]
             : null,
-        recommendedService:
-            recommendedServiceValues.map[json["recommended_service"]]!,
-        isVisible: isValues.map[json["is_visible"]]!,
-        isAuthorized: isValues.map[json["is_authorized"]]!,
         servicePrice: json["service_price"],
-        priceType: priceTypeValues.map[json["price_type"]]!,
         discount: json["discount"],
-        discountType: typeValues.map[json["discount_type"]]!,
         serviceEpa: json["service_epa"],
-        epaType: typeValues.map[json["epa_type"]]!,
         shopSupplies: json["shop_supplies"],
-        shopSuppliesType: typeValues.map[json["shop_supplies_type"]],
         tax: json["tax"],
-        taxType: typeValues.map[json["tax_type"]]!,
         subTotal: json["sub_total"],
-        isMaintenance: isValues.map[json["is_maintenance"]]!,
-        isServiceReminder: isValues.map[json["is_service_reminder"]]!,
         maintenancePeriod: json["maintenance_period"],
-        maintenancePeriodType:
-            maintenancePeriodTypeValues.map[json["maintenance_period_type"]]!,
-        communicationChannel:
-            communicationChannelValues.map[json["communication_channel"]]!,
+        maintenancePeriodType: json["maintenance_period_type"]!,
+        communicationChannel: json["communication_channel"]!,
         reminderTrigger: json["reminder_trigger"],
         customMessage: json["custom_message"],
         createdBy: json["created_by"] != null
@@ -206,23 +177,12 @@ class Datum {
         "client_id": clientId,
         "service_name": serviceName,
         "service_note": serviceNoteValues.reverse[serviceNote],
-        "recommended_service":
-            recommendedServiceValues.reverse[recommendedService],
-        "is_visible": isValues.reverse[isVisible],
-        "is_authorized": isValues.reverse[isAuthorized],
         "service_price": servicePrice,
-        "price_type": priceTypeValues.reverse[priceType],
         "discount": discount,
-        "discount_type": typeValues.reverse[discountType],
         "service_epa": serviceEpa,
-        "epa_type": typeValues.reverse[epaType],
         "shop_supplies": shopSupplies,
-        "shop_supplies_type": typeValues.reverse[shopSuppliesType],
         "tax": tax,
-        "tax_type": typeValues.reverse[taxType],
         "sub_total": subTotal,
-        "is_maintenance": isValues.reverse[isMaintenance],
-        "is_service_reminder": isValues.reverse[isServiceReminder],
         "maintenance_period": maintenancePeriod,
         "maintenance_period_type":
             maintenancePeriodTypeValues.reverse[maintenancePeriodType],
