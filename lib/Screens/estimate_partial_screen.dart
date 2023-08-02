@@ -270,7 +270,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                           .substring(0, 2)))
                                   .toString());
                               if (int.parse(startTimeController.text
-                                      .substring(0, 2)) <
+                                      .substring(0, 2)) >
                                   int.parse(
                                       endTimeController.text.substring(0, 2))) {
                                 CommonWidgets().showDialog(context,
@@ -1427,6 +1427,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              textCapitalization: TextCapitalization.sentences,
               inputFormatters:
                   label == "Card Number" ? [CardNumberInputFormatter()] : [],
               readOnly: label == 'Date' ||
@@ -2544,103 +2545,106 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   List<CannedServiceAddModel> feeAddModel = [];
                   List<CannedServiceAddModel> subContractAddModel = [];
 
-                  print(widget.estimateDetails.data.orderService![index]
-                          .orderServiceItems![2]
-                          .toJson()
-                          .toString() +
-                      "lissttt");
+                  // print(widget.estimateDetails.data.orderService![index]
+                  //         .orderServiceItems![2]
+                  //         .toJson()
+                  //         .toString() +
+                  //     "lissttt");
 
-                  widget.estimateDetails.data.orderService![index]
-                      .orderServiceItems!
-                      .forEach((e) {
-                    print("maapppp");
+                  if (widget.estimateDetails.data.orderService![index]
+                      .orderServiceItems!.isNotEmpty) {
+                    widget.estimateDetails.data.orderService![index]
+                        .orderServiceItems!
+                        .forEach((e) {
+                      print("maapppp");
 
-                    if (e.itemType == "Material") {
-                      print("map in if");
-                      materialAddModel.add(CannedServiceAddModel(
-                          cannedServiceId: e.orderServiceId,
-                          itemName: e.itemName,
-                          unitPrice: e.unitPrice,
-                          discount: e.discount,
-                          subTotal: e.subTotal,
-                          note: e.itemServiceNote ?? "",
-                          part: e.partName ?? "",
-                          discountType: e.discountType,
-                          id: e.id.toString(),
-                          itemType: e.itemType,
-                          position: e.position,
-                          quanityHours: e.quanityHours,
-                          tax: e.tax,
-                          vendorId: e.vendorId));
-                    } else if (e.itemType.toLowerCase() == "part") {
-                      partAddModel.add(CannedServiceAddModel(
-                          cannedServiceId: e.orderServiceId,
-                          itemName: e.itemName,
-                          unitPrice: e.unitPrice,
-                          discount: e.discount,
-                          subTotal: e.subTotal,
-                          note: e.itemServiceNote ?? '',
-                          part: e.partName ?? "",
-                          discountType: e.discountType,
-                          id: e.id.toString(),
-                          itemType: e.itemType,
-                          position: e.position,
-                          quanityHours: e.quanityHours,
-                          tax: e.tax,
-                          vendorId: e.vendorId));
-                    } else if (e.itemType.toLowerCase() == "labor") {
-                      laborAddModel.add(CannedServiceAddModel(
-                          cannedServiceId: e.orderServiceId,
-                          itemName: e.itemName,
-                          unitPrice: e.unitPrice,
-                          discount: e.discount,
-                          subTotal: e.subTotal,
-                          note: e.itemServiceNote ?? "",
-                          part: e.partName ?? "",
-                          discountType: e.discountType,
-                          id: e.id.toString(),
-                          itemType: e.itemType,
-                          position: e.position,
-                          quanityHours: e.quanityHours,
-                          tax: e.tax,
-                          vendorId: e.vendorId));
-                    } else if (e.itemType.toLowerCase() == "fee") {
-                      feeAddModel.add(CannedServiceAddModel(
-                          cannedServiceId: e.orderServiceId,
-                          itemName: e.itemName,
-                          unitPrice: e.unitPrice,
-                          discount: e.discount,
-                          subTotal: e.subTotal,
-                          note: e.itemServiceNote ?? "",
-                          part: e.partName ?? "",
-                          discountType: e.discountType,
-                          id: e.id.toString(),
-                          itemType: e.itemType,
-                          position: e.position,
-                          quanityHours: e.quanityHours,
-                          tax: e.tax,
-                          vendorId: e.vendorId));
-                    } else if (e.itemType.toLowerCase() == "subcontract") {
-                      subContractAddModel.add(CannedServiceAddModel(
-                          cannedServiceId: e.orderServiceId,
-                          itemName: e.itemName,
-                          unitPrice: e.unitPrice,
-                          discount: e.discount,
-                          subTotal: e.subTotal,
-                          note: e.itemServiceNote ?? "",
-                          part: e.partName ?? "",
-                          discountType: e.discountType,
-                          id: e.id.toString(),
-                          itemType: e.itemType,
-                          position: e.position,
-                          quanityHours: e.quanityHours,
-                          tax: e.tax,
-                          vendorId: e.vendorId));
-                    }
-                  });
+                      if (e.itemType == "Material") {
+                        print("map in if");
+                        materialAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "part") {
+                        partAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? '',
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "labor") {
+                        laborAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "fee") {
+                        feeAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      } else if (e.itemType.toLowerCase() == "subcontract") {
+                        subContractAddModel.add(CannedServiceAddModel(
+                            cannedServiceId: e.orderServiceId,
+                            itemName: e.itemName,
+                            unitPrice: e.unitPrice,
+                            discount: e.discount,
+                            subTotal: e.subTotal,
+                            note: e.itemServiceNote ?? "",
+                            part: e.partName ?? "",
+                            discountType: e.discountType,
+                            id: e.id.toString(),
+                            itemType: e.itemType,
+                            position: e.position,
+                            quanityHours: e.quanityHours,
+                            tax: e.tax,
+                            vendorId: e.vendorId));
+                      }
+                    });
+                  }
 
                   Navigator.pop(context);
-                  Navigator.pushReplacement(context, MaterialPageRoute(
+                  Navigator.push(context, MaterialPageRoute(
                     builder: (context) {
                       return EditOrderServiceScreen(
                         material: materialAddModel,

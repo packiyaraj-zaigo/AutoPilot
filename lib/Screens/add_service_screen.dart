@@ -338,45 +338,53 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: material.length,
+                        physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = material[index];
                           return Column(
                             children: [
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Text(item.itemName,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
                                         )),
                                   ),
                                   const Expanded(child: SizedBox()),
-                                  Text('\$${item.subTotal} ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (widget.service != null &&
-                                          item.id.isNotEmpty) {
-                                        deletedItems.add(item.id.toString());
-                                      }
-                                      material.removeAt(index);
-                                      setState(() {});
-                                    },
-                                    child: Icon(
-                                      CupertinoIcons.clear_thick_circled,
-                                      color: Color(0xFFFF5C5C),
-                                    ),
-                                  )
+                                  Row(
+                                    children: [
+                                      Text('\$${item.subTotal} ',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (widget.service != null &&
+                                              item.id.isNotEmpty) {
+                                            deletedItems
+                                                .add(item.id.toString());
+                                          }
+                                          material.removeAt(index);
+                                          setState(() {});
+                                        },
+                                        child: const Icon(
+                                          CupertinoIcons.clear_thick_circled,
+                                          color: Color(0xFFFF5C5C),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                             ],
                           );
                         },
@@ -386,45 +394,53 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: part.length,
+                        physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = part[index];
                           return Column(
                             children: [
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Text(item.itemName,
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
                                         )),
                                   ),
                                   const Expanded(child: SizedBox()),
-                                  Text('\$${item.subTotal} ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (widget.service != null &&
-                                          item.id.isNotEmpty) {
-                                        deletedItems.add(item.id.toString());
-                                      }
-                                      part.removeAt(index);
-                                      setState(() {});
-                                    },
-                                    child: Icon(
-                                      CupertinoIcons.clear_thick_circled,
-                                      color: Color(0xFFFF5C5C),
-                                    ),
-                                  )
+                                  Row(
+                                    children: [
+                                      Text('\$${item.subTotal} ',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (widget.service != null &&
+                                              item.id.isNotEmpty) {
+                                            deletedItems
+                                                .add(item.id.toString());
+                                          }
+                                          part.removeAt(index);
+                                          setState(() {});
+                                        },
+                                        child: const Icon(
+                                          CupertinoIcons.clear_thick_circled,
+                                          color: Color(0xFFFF5C5C),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                             ],
                           );
                         },
@@ -433,45 +449,53 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: labor.length,
+                        physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = labor[index];
                           return Column(
                             children: [
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Text(item.itemName,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
                                         )),
                                   ),
                                   const Expanded(child: SizedBox()),
-                                  Text('\$${item.subTotal} ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (widget.service != null &&
-                                          item.id.isNotEmpty) {
-                                        deletedItems.add(item.id.toString());
-                                      }
-                                      labor.removeAt(index);
-                                      setState(() {});
-                                    },
-                                    child: Icon(
-                                      CupertinoIcons.clear_thick_circled,
-                                      color: Color(0xFFFF5C5C),
-                                    ),
-                                  )
+                                  Row(
+                                    children: [
+                                      Text('\$${item.subTotal} ',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (widget.service != null &&
+                                              item.id.isNotEmpty) {
+                                            deletedItems
+                                                .add(item.id.toString());
+                                          }
+                                          labor.removeAt(index);
+                                          setState(() {});
+                                        },
+                                        child: const Icon(
+                                          CupertinoIcons.clear_thick_circled,
+                                          color: Color(0xFFFF5C5C),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                             ],
                           );
                         },
@@ -480,45 +504,53 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: subContract.length,
+                        physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = subContract[index];
                           return Column(
                             children: [
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Text(item.itemName,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
                                         )),
                                   ),
                                   const Expanded(child: SizedBox()),
-                                  Text('\$${item.subTotal} ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (widget.service != null &&
-                                          item.id.isNotEmpty) {
-                                        deletedItems.add(item.id.toString());
-                                      }
-                                      subContract.removeAt(index);
-                                      setState(() {});
-                                    },
-                                    child: Icon(
-                                      CupertinoIcons.clear_thick_circled,
-                                      color: Color(0xFFFF5C5C),
-                                    ),
-                                  )
+                                  Row(
+                                    children: [
+                                      Text('\$${item.subTotal} ',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (widget.service != null &&
+                                              item.id.isNotEmpty) {
+                                            deletedItems
+                                                .add(item.id.toString());
+                                          }
+                                          subContract.removeAt(index);
+                                          setState(() {});
+                                        },
+                                        child: const Icon(
+                                          CupertinoIcons.clear_thick_circled,
+                                          color: Color(0xFFFF5C5C),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                             ],
                           );
                         },
@@ -527,44 +559,52 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ListView.builder(
                         shrinkWrap: true,
                         itemCount: fee.length,
+                        physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = fee[index];
                           return Column(
                             children: [
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Text(item.itemName,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w400,
                                         )),
                                   ),
                                   const Expanded(child: SizedBox()),
-                                  Text('\$${item.subTotal} ',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w400,
-                                      )),
-                                  GestureDetector(
-                                    onTap: () {
-                                      if (widget.service != null &&
-                                          item.id.isNotEmpty) {
-                                        deletedItems.add(item.id.toString());
-                                      }
-                                      fee.removeAt(index);
-                                      setState(() {});
-                                    },
-                                    child: Icon(
-                                      CupertinoIcons.clear_thick_circled,
-                                      color: Color(0xFFFF5C5C),
-                                    ),
-                                  )
+                                  Row(
+                                    children: [
+                                      Text('\$${item.subTotal} ',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      GestureDetector(
+                                        onTap: () {
+                                          if (widget.service != null &&
+                                              item.id.isNotEmpty) {
+                                            deletedItems
+                                                .add(item.id.toString());
+                                          }
+                                          fee.removeAt(index);
+                                          setState(() {});
+                                        },
+                                        child: const Icon(
+                                          CupertinoIcons.clear_thick_circled,
+                                          color: Color(0xFFFF5C5C),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                             ],
                           );
                         },
@@ -1692,7 +1732,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         (double.tryParse(addLaborDiscountController.text) ??
                             0)) *
                     tax +
-               (((double.tryParse(addLaborHoursController.text) ?? 1) *
+                (((double.tryParse(addLaborHoursController.text) ?? 1) *
                         (double.tryParse(addLaborCostController.text) ?? 0)) -
                     (double.tryParse(addLaborDiscountController.text) ?? 0));
           }

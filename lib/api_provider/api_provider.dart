@@ -803,7 +803,10 @@ class ApiProvider {
       // var response = await request.send();
       Map bodyMap = {
         "company_name": dataMap['company_name'],
-        "phone": dataMap['phone'],
+        "phone": dataMap['phone']
+            .toString()
+            .replaceAll(RegExp(r'[^\w\s]+'), '')
+            .replaceAll(" ", ""),
         "address_1": dataMap['address_1'],
         "town_city": dataMap['town_city'],
         "province_id": dataMap['province_id'],
@@ -1337,12 +1340,14 @@ class ApiProvider {
 
       request.headers.addAll(getHeader(token));
       inspect(request);
+
       var response = await request.send();
       inspect(response);
       print(response.statusCode.toString() + "provider status code");
       print(response.toString() + "provider response");
       return http.Response.fromStream(response);
-    } catch (e) {
+    } catch (e, s) {
+      print(s);
       print(e.toString() + "provider error");
     }
   }
