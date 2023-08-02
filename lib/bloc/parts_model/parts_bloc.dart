@@ -21,7 +21,25 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
   PartsBloc() : super(PartsInitial()) {
     on<GetAllParts>(getAllParts);
     on<AddParts>(addAllParts);
+    on<EditPartEvent>(editPartEvent);
     on<ChangeQuantity>(changeQuantity);
+    on<DeletePart>(deletePart);
+  }
+
+  Future<void> deletePart(DeletePart event, Emitter<PartsState> emit) async {
+    try {
+      final token = await AppUtils.getToken();
+      final response = await apiRepo.deleteParts(event.id, token);
+      log(response.body.toString());
+      if (response.statusCode == 200) {
+        emit(DeletePartSuccessState());
+      } else {
+        emit(DeletePartErrorState(message: 'Part Deletion Failed'));
+      }
+    } catch (e) {
+      log(e.toString() + " Delete Part bloc error");
+      emit(DeletePartErrorState(message: "Something went wrong"));
+    }
   }
 
   changeQuantity(
@@ -76,8 +94,8 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
       }
       isPartsLoading = false;
       isPagenationLoading = false;
-    } catch (e) {
-      print(e.toString() + "catch error");
+    } catch (e, s) {
+      log(s.toString() + "catch error");
       emit(PartsDetailsErrorState(message: e.toString()));
       isPartsLoading = false;
       isPagenationLoading = false;
@@ -101,14 +119,51 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
           event.context,
           token,
           event.itemname,
-          event.epa,
+          event.serialnumber,
+          event.quantity,
           event.fee,
           event.supplies,
-          event.serialnumber,
+          event.epa,
           event.cost,
-          event.quantity,
           event.type);
       var partsAdd = _decoder.convert(response.body);
+      log(partsAdd.toString());
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        isPartsLoading = false;
+
+        emit(AddPardDetailsSuccessState());
+      } else {
+        if (partsAdd['message'] != null) {
+          emit(AddPartDetailsErrorState(message: partsAdd['message']));
+        } else {
+          emit(AddPartDetailsErrorState(
+              message: partsAdd[partsAdd.keys.first][0]));
+        }
+        errorRes = partsAdd;
+      }
+    } catch (e) {
+      emit(PartsDetailsErrorState(message: 'Something went wrong'));
+      isPartsLoading = false;
+    }
+  }
+
+  Future<void> editPartEvent(
+    EditPartEvent event,
+    Emitter<PartsState> emit,
+  ) async {
+    try {
+      isPartsLoading = true;
+      emit(AddPartsDetailsLoadingState());
+      final token = await AppUtils.getToken();
+      // Response addVechileRes = await _apiRepository.addVechile(
+      //     event.context,event.year,event.type,event.make,event.model,event.licNumber,event.vinNumber,event.color,event.engine,event.submodel,event.email);
+      // var addVechileData = _decoder.convert(addVechileRes.body);
+      //
+
+      Response response = await apiRepo.editParts(token, event.itemname,
+          event.serialnumber, event.quantity, event.cost, event.id);
+      var partsAdd = _decoder.convert(response.body);
+      log(partsAdd.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
         isPartsLoading = false;
 

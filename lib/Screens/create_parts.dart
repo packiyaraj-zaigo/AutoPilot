@@ -1,5 +1,6 @@
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
+import 'package:auto_pilot/Screens/parts_list_screen.dart';
 import 'package:auto_pilot/bloc/parts_model/parts_bloc.dart';
 import 'package:auto_pilot/bloc/parts_model/parts_event.dart';
 import 'package:auto_pilot/bloc/parts_model/parts_state.dart';
@@ -7,11 +8,14 @@ import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CreatePartsScreen extends StatefulWidget {
-  const CreatePartsScreen({super.key});
+  const CreatePartsScreen({super.key, this.part});
+
+  final PartsDatum? part;
 
   @override
   State<CreatePartsScreen> createState() => _CreatePartsScreenState();
@@ -50,6 +54,21 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
   List<DropdownDatum> dropdownData = [];
   dynamic _currentSelectedTypeValue;
 
+  populateData() {
+    itemnameController.text = widget.part!.itemName;
+    serialnumberController.text = widget.part!.itemServiceNote;
+    quantityController.text = widget.part!.quantityInHand.toString();
+    costController.text = widget.part!.unitPrice;
+  }
+
+  @override
+  initState() {
+    super.initState();
+    if (widget.part != null) {
+      populateData();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -82,11 +101,18 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
           listener: (context, state) {
             if (state is AddPartDetailsErrorState) {
               CommonWidgets().showDialog(context, state.message);
-            } else if (state is PartsDetailsSuccessStates) {
+            } else if (state is AddPardDetailsSuccessState) {
               Navigator.pop(context, true);
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PartsScreen(),
+                  ));
               ScaffoldMessenger.of((context)).showSnackBar(
-                const SnackBar(
-                  content: Text('Part created successfully'),
+                SnackBar(
+                  content: Text(widget.part == null
+                      ? 'Part Created Successfully'
+                      : "Part Updated Successfully"),
                   backgroundColor: Colors.green,
                 ),
               );
@@ -111,7 +137,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                         const SizedBox(height: 16),
                         // textBox("Enter name...", nameController,
                         //     "Owner", nameErrorStatus),
-                        textBox("Enter ItemName...", itemnameController,
+                        textBox("Enter Item Name", itemnameController,
                             "Item Name", itemnameErrorStaus),
 
                         // Visibility(
@@ -127,33 +153,33 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                         //       ),
                         //     )),
 
-                        textBox("Enter number...", serialnumberController,
+                        textBox("Enter Serial Number", serialnumberController,
                             "Serial Number", serialnumberErrorStatus),
                         // SizedBox(
                         //   height: 15,
                         // ),
-                        textBox("Enter quanitynumber...", quantityController,
+                        textBox("Enter Quanity Number", quantityController,
                             "Quantity", quantityErrorStatus),
-                        textBox("Enter fee...", feeController, "Fee",
-                            feeErrorStatus),
-                        textBox("Enter supplies...", suppliesController,
+                        textBox(
+                            "Enter Fee", feeController, "Fee", feeErrorStatus),
+                        textBox("Enter Supplies", suppliesController,
                             "Supplies", suppliesErrorStatus),
-                        textBox("Enter epanumber...", epaController, "Supplies",
+                        textBox("Enter EPA Number", epaController, "EPA",
                             epaErrorStatus),
-                        textBox("Enter cost...", costController, "Supplies",
+                        textBox("Enter Cost", costController, "Cost",
                             costErrorStatus),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
                             onPressed: () {
-                              print("ApiCall");
                               validateParts(
                                 context,
                                 itemnameController.text,
                                 serialnumberController.text,
                                 stateUpdate,
                               );
+
                               // Navigator.push(
                               //     context,
                               //     MaterialPageRoute(
@@ -161,9 +187,9 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                               //             VechileInformation()));
                             },
                             style: ElevatedButton.styleFrom(
-                              primary: AppColors.primaryColors,
-                              shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(10.0),
+                              backgroundColor: AppColors.primaryColors,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
                               ),
                             ),
                             child: state is PartsDetailsSuccessStates
@@ -210,19 +236,32 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
     }
 
     if (!itemnameErrorStaus && !serialnumberErrorStatus) {
-      context.read<PartsBloc>().add(
-            AddParts(
-              context: context,
-              itemname: itemnameController.text,
-              quantity: quantityController.text,
-              serialnumber: serialnumberController.text,
-              fee: feeController.text,
-              supplies: suppliesController.text,
-              epa: epaController.text,
-              cost: costController.text,
-              type: _currentSelectedTypeValue.toString(),
-            ),
-          );
+      if (widget.part != null) {
+        context.read<PartsBloc>().add(
+              EditPartEvent(
+                itemname: itemnameController.text,
+                quantity: quantityController.text,
+                serialnumber: serialnumberController.text,
+                fee: feeController.text,
+                cost: costController.text,
+                id: widget.part!.id.toString(),
+              ),
+            );
+      } else {
+        context.read<PartsBloc>().add(
+              AddParts(
+                context: context,
+                itemname: itemnameController.text,
+                quantity: quantityController.text,
+                serialnumber: serialnumberController.text,
+                fee: feeController.text,
+                supplies: suppliesController.text,
+                epa: epaController.text,
+                cost: costController.text,
+                type: _currentSelectedTypeValue.toString(),
+              ),
+            );
+      }
     }
   }
 }
@@ -244,6 +283,14 @@ Widget textBox(String placeHolder, TextEditingController controller,
         child: SizedBox(
           height: 56,
           child: TextField(
+            keyboardType:
+                label == 'Fee' || label == "Quantity" || label == "Cost"
+                    ? TextInputType.number
+                    : null,
+            inputFormatters:
+                label == 'Fee' || label == "Quantity" || label == "Cost"
+                    ? [FilteringTextInputFormatter.digitsOnly]
+                    : [],
             controller: controller,
             decoration: InputDecoration(
                 hintText: placeHolder,

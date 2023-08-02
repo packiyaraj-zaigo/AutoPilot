@@ -35,6 +35,22 @@ class ChangeQuantity extends PartsEvent {
   const ChangeQuantity({required this.part});
 }
 
+class DeletePart extends PartsEvent {
+  final String id;
+  const DeletePart({required this.id});
+}
+
+class EditPartEvent extends PartsEvent {
+  final String itemname, serialnumber, quantity, fee, cost, id;
+  const EditPartEvent({
+    required this.itemname,
+    required this.serialnumber,
+    required this.quantity,
+    required this.fee,
+    required this.cost,
+    required this.id,
+  });
+}
 // class AddPart extends PartsEvent {
 //   final BuildContext context;
 //   final String itemname, serialnumber, quantity, fee, supplies, epa, cost;

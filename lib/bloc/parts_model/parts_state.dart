@@ -43,3 +43,12 @@ class PartsDetailsSuccessStates extends PartsState {
   @override
   List<Object> get props => [part];
 }
+
+class DeletePartLoadingState extends PartsState {}
+
+class DeletePartErrorState extends PartsState {
+  final String message;
+  const DeletePartErrorState({required this.message});
+}
+
+class DeletePartSuccessState extends PartsState {}

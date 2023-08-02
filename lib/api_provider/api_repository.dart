@@ -226,8 +226,34 @@ class ApiRepository {
     String cost,
     String type,
   ) {
-    return apiProvider.addParts(token, context, itemname, serialnumber,
-        quantity, fee, supplies, epa, cost, type);
+    return apiProvider.addParts(
+      token,
+      context,
+      itemname,
+      serialnumber,
+      type,
+      quantity,
+      fee,
+      supplies,
+      epa,
+      cost,
+    );
+  }
+
+  Future editParts(
+    String token,
+    String itemname,
+    String serialnumber,
+    String quantity,
+    String cost,
+    String id,
+  ) {
+    return apiProvider.editParts(
+        token, itemname, serialnumber, quantity, cost, id);
+  }
+
+  Future deleteParts(String id, String token) async {
+    return apiProvider.deleteParts(id, token);
   }
 
   Future getProvince(String token, int currentPage) {
