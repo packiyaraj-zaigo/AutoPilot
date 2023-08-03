@@ -9,6 +9,7 @@ import 'package:auto_pilot/Models/estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_note_model.dart';
 import 'package:auto_pilot/Models/order_image_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
@@ -46,6 +47,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<DeleteEstimateNoteEvent>(deleteEstimateNoteBloc);
     on<EditAppointmentEstimateEvent>(editAppointmentEstimateBloc);
     on<DeleteOrderServiceEvent>(deleteOrderServiceBloc);
+    on<SendEstimateToCustomerEvent>(sendEstimateToCustomerBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -636,6 +638,36 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       print(s);
 
       print("hereee");
+    }
+  }
+
+  Future<void> sendEstimateToCustomerBloc(
+    SendEstimateToCustomerEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      emit(SendEstimateToCustomerLoadingState());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+
+      Response sendEstimateRes = await _apiRepository.sendToCustomerEstimate(
+          token, event.customerId, event.orderId, event.subject);
+
+      log("res${sendEstimateRes.body}");
+
+      if (sendEstimateRes.statusCode == 201) {
+        emit(SendEstimateToCustomerState());
+      } else {
+        emit(
+            SendEstimateToCustomerErrorState(errorMsg: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(SendEstimateToCustomerErrorState(errorMsg: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
     }
   }
 }

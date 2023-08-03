@@ -109,3 +109,12 @@ class DeleteOrderServiceErrorState extends EstimateState {
   final String errorMessage;
   DeleteOrderServiceErrorState({required this.errorMessage});
 }
+
+class SendEstimateToCustomerState extends EstimateState {}
+
+class SendEstimateToCustomerErrorState extends EstimateState {
+  final String errorMsg;
+  SendEstimateToCustomerErrorState({required this.errorMsg});
+}
+
+class SendEstimateToCustomerLoadingState extends EstimateState {}

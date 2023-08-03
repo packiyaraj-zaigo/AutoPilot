@@ -1666,4 +1666,25 @@ class ApiProvider {
       log(e.toString() + " Delete provider error");
     }
   }
+
+  Future<dynamic> sendToCustomerEstimate(
+      String token, String customerId, String orderId, String subject) async {
+    try {
+      final body = {
+        "customer_id": customerId,
+        "order_id": orderId,
+        "template_id": 2,
+        "subject": subject
+      };
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse('${BASE_URL}api/authorize_digital_signatures');
+      final response = await http.post(url,
+          headers: getHeader(token), body: jsonEncode(body));
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + "send to customer provider  error");
+    }
+  }
 }

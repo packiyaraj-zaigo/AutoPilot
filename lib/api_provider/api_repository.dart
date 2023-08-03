@@ -473,6 +473,12 @@ class ApiRepository {
   Future<dynamic> deleteOrderService(dynamic token, String id) async {
     return apiProvider.deleteOrderService(token, id);
   }
+
+  Future<dynamic> sendToCustomerEstimate(
+      dynamic token, String customerId, String orderId, String subject) async {
+    return apiProvider.sendToCustomerEstimate(
+        token, customerId, orderId, subject);
+  }
 }
 
 class NetworkError extends Error {}
