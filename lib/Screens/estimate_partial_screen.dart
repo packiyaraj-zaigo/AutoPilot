@@ -190,6 +190,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             context.read<EstimateBloc>().add(GetEstimateNoteEvent(
                 orderId: widget.estimateDetails.data.id.toString()));
           }
+          if (state is SendEstimateToCustomerState) {
+            showModalBottomSheet(
+              isScrollControlled: true,
+              useSafeArea: true,
+              isDismissible: false,
+              context: context,
+              builder: (context) {
+                return estimateSuccessSheet();
+              },
+            );
+          }
 
           // TODO: implement listener
         },
@@ -739,7 +750,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         Padding(
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              context.read<EstimateBloc>().add(
+                                  SendEstimateToCustomerEvent(
+                                      customerId: widget
+                                              .estimateDetails.data.customer?.id
+                                              .toString() ??
+                                          "",
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      subject: widget
+                                          .estimateDetails.data.orderNumber
+                                          .toString()));
+                            },
                             child: Container(
                               height: 56,
                               alignment: Alignment.center,
@@ -2909,6 +2932,77 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 ],
               );
             },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget estimateSuccessSheet() {
+    return Scaffold(
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+              builder: (context) {
+                return BottomBarScreen(
+                  currentIndex: 3,
+                );
+              },
+            ), (route) => false);
+          },
+          child: Container(
+            height: 56,
+            alignment: Alignment.center,
+            width: MediaQuery.of(context).size.width,
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: AppColors.primaryColors),
+            child: const Text(
+              "Continue",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset("assets/images/success_icon.svg"),
+              const Padding(
+                padding: EdgeInsets.only(top: 24.0),
+                child: Text(
+                  "Estimate Sent\nSuccessfully",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 32,
+                    height: 1.3,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTitleColor,
+                  ),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Text(
+                  "Fusce lacinia sed metus eu fringilla. Phasellus\nlobortis maximus posuere nunc placerat.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.greyText,
+                      height: 1.5),
+                ),
+              )
+            ],
           ),
         ),
       ),
