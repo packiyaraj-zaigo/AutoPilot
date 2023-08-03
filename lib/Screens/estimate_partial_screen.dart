@@ -23,6 +23,7 @@ import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -145,19 +146,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
           log(state.toString());
-          if (state is AddEstimateNoteState) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen();
-              },
-            ), (route) => false);
-          } else if (state is CreateAppointmentEstimateState) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen();
-              },
-            ), (route) => false);
-          }
+          // if (state is AddEstimateNoteState) {
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BottomBarScreen();
+          //     },
+          //   ), (route) => false);
+          // } else if (state is CreateAppointmentEstimateState) {
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BottomBarScreen();
+          //     },
+          //   ), (route) => false);
+          // }
           if (state is GetEstimateNoteState) {
             estimateNoteList.addAll(state.estimateNoteModel.data);
           }
@@ -171,14 +172,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
             print(networkImageList.length);
             print(networkImageList);
-          } else if (state is EstimateCreateOrderImageState) {
-            print("image ui state emitted");
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen();
-              },
-            ), (route) => false);
           }
+          //  else if (state is EstimateCreateOrderImageState) {
+          //   print("image ui state emitted");
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BottomBarScreen();
+          //     },
+          //   ), (route) => false);
+          // }
           if (state is GetOrderImageState) {
             newOrderImageData.addAll(state.orderImageModel.data);
           }
@@ -309,8 +311,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               context.read<EstimateBloc>().add(
                                     CreateAppointmentEstimateEvent(
                                       startTime: dateController.text +
+                                          " " +
                                           startTimeController.text,
                                       endTime: dateController.text +
+                                          " " +
                                           endTimeController.text,
                                       orderId: widget.estimateDetails.data.id
                                           .toString(),
@@ -585,22 +589,24 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 subTitleWidget("Appointment"),
-                                GestureDetector(
-                                  onTap: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return editAppointmentSheet(
-                                            appointmentDetailsModel!
-                                                .data.data[0]);
-                                      },
-                                    );
-                                  },
-                                  child: const Icon(
-                                    Icons.more_horiz,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                )
+                                appointmentDetailsModel != null
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return editAppointmentSheet(
+                                                  appointmentDetailsModel!
+                                                      .data.data[0]);
+                                            },
+                                          );
+                                        },
+                                        child: const Icon(
+                                          Icons.more_horiz,
+                                          color: AppColors.primaryColors,
+                                        ),
+                                      )
+                                    : const SizedBox()
                               ]),
                         ),
                         appointmentDetailsModel?.data != null &&
@@ -1960,8 +1966,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       final tempImg = await imagePicker.pickImage(source: ImageSource.camera);
       // if (imageFileList != null) {
       if (tempImg != null) {
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          tempImg.path,
+          '${tempImg.path}.jpg',
+          quality: 80,
+        );
         setState(() {
-          selectedImage = File(tempImg.path);
+          if (compressedImage != null) {
+            selectedImage = File(compressedImage.path);
+          }
         });
       } else {
         return;
@@ -1969,12 +1982,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
       // }
     } else {
-      final tempImage =
-          await imagePicker.pickImage(source: ImageSource.gallery);
-      //  if (imageFile.isNotEmpty) {
-      if (tempImage != null) {
+      final tempImg = await imagePicker.pickImage(source: ImageSource.gallery);
+      // if (imageFileList != null) {
+      if (tempImg != null) {
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          tempImg.path,
+          '${tempImg.path}.jpg',
+          quality: 80,
+        );
         setState(() {
-          selectedImage = File(tempImage.path);
+          if (compressedImage != null) {
+            selectedImage = File(compressedImage.path);
+          }
         });
       } else {
         return;
@@ -2321,7 +2340,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       const Padding(
                         padding: EdgeInsets.only(left: 8.0),
                         child: Text(
-                          "Edit Vehcile",
+                          "Edit Vehicle",
                           style: TextStyle(
                               color: AppColors.primaryColors,
                               fontSize: 18,
