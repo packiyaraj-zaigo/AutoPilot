@@ -313,7 +313,7 @@ class ApiProvider {
 
     //  LoadingFormModel? loadingFormModel;
     try {
-      final clientId = AppUtils.getUserID();
+      final clientId = await AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/vehicles?client_id=$clientId");
       var request = http.MultipartRequest("POST", url)
         ..headers['Authorization'] = "Bearer $token  "
@@ -985,7 +985,7 @@ class ApiProvider {
   }
 
   Future<dynamic> editEstimate(String id, String which, dynamic token,
-      String orderId, String customerId) async {
+      String orderId, String customerId, String? dropSchedule) async {
     print("into provider");
     print(customerId + "cusstomerrr");
 
@@ -995,11 +995,15 @@ class ApiProvider {
       var url = Uri.parse("${BASE_URL}api/orders/$orderId");
       Object customerBody = {"client_id": clientId, "customer_id": id};
 
-      Object vehicleBody = {
+      final vehicleBody = {
         "client_id": clientId,
         "customer_id": customerId,
-        "vehicle_id": id
+        "vehicle_id": id,
       };
+
+      if (dropSchedule != null) {
+        vehicleBody["drop_schedule"] = dropSchedule;
+      }
       // var request = http.MultipartRequest("PUT", url)
       //   ..fields['client_id'] = clientId;
       // if (which == "vehicle") {

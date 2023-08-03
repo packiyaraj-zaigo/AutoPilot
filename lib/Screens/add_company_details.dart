@@ -498,12 +498,19 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 labourRateErrorStatus, true),
             errorMessageWidget(laborRateErrorMsg, labourRateErrorStatus),
             textBox("Enter Percentage Rate", laborTaxRateController,
-                "Labor Tax Rate", taxRateErrorStatus, isTaxLaborRate),
-            errorMessageWidget(taxRateErrorMsg, taxRateErrorStatus),
+                "Labor Tax Rate", laborTaxRateErrorStatus, isTaxLaborRate),
+            errorMessageWidget(laborRateErrorMsg, laborTaxRateErrorStatus),
             textBox("Enter Percentage Rate", partsTaxRateController,
-                "Parts Tax Rate", taxRateErrorStatus, isTaxPartRate),
-            textBox("Enter Percentage Rate", materialTaxRateController,
-                "Material Tax Rate", taxRateErrorStatus, isTaxMaterialRate),
+                "Parts Tax Rate", partTaxRateErrorStatus, isTaxPartRate),
+            errorMessageWidget(partsTaxErrorMsg, partTaxRateErrorStatus),
+
+            textBox(
+                "Enter Percentage Rate",
+                materialTaxRateController,
+                "Material Tax Rate",
+                materialTaxRateErrorStatus,
+                isTaxMaterialRate),
+            errorMessageWidget(materialTaxErrorMsg, materialTaxRateErrorStatus),
             // taxSwitchWidget("Tax Labor", taxLabourSwitchValue),
             // taxSwitchWidget("Tax Parts", taxPartSwitchValue),
             // taxSwitchWidget("Tax Material", taxMaterialSwitchValue)
@@ -1537,6 +1544,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           materialTaxRateErrorStatus = false;
         });
       }
+    } else {
+      setState(() {
+        materialTaxRateErrorStatus = false;
+      });
     }
     if (isTaxLaborRate) {
       if (laborTaxRateController.text.isEmpty) {
@@ -1549,6 +1560,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           laborTaxRateErrorStatus = false;
         });
       }
+    } else {
+      setState(() {
+        laborTaxRateErrorStatus = false;
+      });
     }
     if (isTaxPartRate) {
       if (partsTaxRateController.text.isEmpty) {
@@ -1561,6 +1576,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           partTaxRateErrorStatus = false;
         });
       }
+    } else {
+      setState(() {
+        partTaxRateErrorStatus = false;
+      });
     }
     // if (taxRateController.text.isEmpty) {
     //   setState(() {

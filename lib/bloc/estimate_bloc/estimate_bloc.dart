@@ -137,7 +137,12 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       emit(CreateEstimateLoadingState());
 
       Response editEstimateRes = await _apiRepository.editEstimate(
-          event.id, event.which, token, event.orderId, event.customerId);
+          event.id,
+          event.which,
+          token,
+          event.orderId,
+          event.customerId,
+          event.dropScedule);
 
       log("res${editEstimateRes.body}");
 

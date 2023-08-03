@@ -186,11 +186,13 @@ class _EstimateScreenState extends State<EstimateScreen>
                                             recentData[index].id.toString()));
                               },
                               child: tileWidget(
-                                  recentData[index].orderStatus,
-                                  recentData[index].orderNumber ?? "",
-                                  recentData[index].customer?.firstName ?? "",
-                                  "${recentData[index].vehicle?.vehicleYear} ${recentData[index].vehicle?.vehicleMake} ${recentData[index].vehicle?.vehicleModel}",
-                                  recentData[index].estimationName ?? ""),
+                                recentData[index].orderStatus,
+                                recentData[index].orderNumber ?? "",
+                                recentData[index].customer?.firstName ?? "",
+                                "${recentData[index].vehicle?.vehicleYear ?? ""} ${recentData[index].vehicle?.vehicleMake ?? ""} ${recentData[index].vehicle?.vehicleModel ?? ""}",
+                                recentData[index].estimationName ?? "",
+                                recentData[index].dropSchedule ?? "",
+                              ),
                             );
                           },
                           itemCount: recentData.length,
@@ -280,12 +282,13 @@ class _EstimateScreenState extends State<EstimateScreen>
                                               .toString()));
                                 },
                                 child: tileWidget(
-                                    estimateData[index].orderStatus,
-                                    estimateData[index].orderNumber ?? "",
-                                    estimateData[index].customer?.firstName ??
-                                        "",
-                                    "${estimateData[index].vehicle?.vehicleYear} ${estimateData[index].vehicle?.vehicleMake} ${estimateData[index].vehicle?.vehicleModel}",
-                                    estimateData[index].estimationName ?? ""),
+                                  estimateData[index].orderStatus,
+                                  estimateData[index].orderNumber ?? "",
+                                  estimateData[index].customer?.firstName ?? "",
+                                  "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleMake ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
+                                  estimateData[index].estimationName ?? "",
+                                  estimateData[index].dropSchedule ?? "",
+                                ),
                               );
                             },
                             controller: estimateScrollController
@@ -396,11 +399,13 @@ class _EstimateScreenState extends State<EstimateScreen>
                                               ordersData[index].id.toString()));
                                 },
                                 child: tileWidget(
-                                    ordersData[index].orderStatus,
-                                    ordersData[index].orderNumber ?? "",
-                                    ordersData[index].customer?.firstName ?? "",
-                                    "${ordersData[index].vehicle?.vehicleYear} ${ordersData[index].vehicle?.vehicleMake} ${ordersData[index].vehicle?.vehicleModel}",
-                                    ordersData[index].estimationName ?? ""),
+                                  ordersData[index].orderStatus,
+                                  ordersData[index].orderNumber ?? "",
+                                  ordersData[index].customer?.firstName ?? "",
+                                  "${ordersData[index].vehicle?.vehicleYear ?? ""} ${ordersData[index].vehicle?.vehicleMake ?? ""} ${ordersData[index].vehicle?.vehicleModel ?? ""}",
+                                  ordersData[index].estimationName ?? "",
+                                  ordersData[index].dropSchedule ?? "",
+                                ),
                               );
                             },
                             controller: orderScrollController
@@ -476,59 +481,74 @@ class _EstimateScreenState extends State<EstimateScreen>
                     ? const Center(
                         child: CupertinoActivityIndicator(),
                       )
-                    : ListView.builder(
-                        itemBuilder: (context, index) {
-                          if (index == invoiceData.length) {
-                            return BlocProvider.of<EstimateBloc>(context)
+                    : invoiceData.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "No Invoice Found!",
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            itemBuilder: (context, index) {
+                              if (index == invoiceData.length) {
+                                return BlocProvider.of<EstimateBloc>(context)
+                                                .currentPage <=
+                                            BlocProvider.of<EstimateBloc>(
+                                                    context)
+                                                .totalPages &&
+                                        BlocProvider.of<EstimateBloc>(context)
+                                                .currentPage !=
+                                            0
+                                    ? const SizedBox(
+                                        height: 40,
+                                        child: CupertinoActivityIndicator(
+                                          color: AppColors.primaryColors,
+                                        ))
+                                    : Container();
+                              }
+                              return GestureDetector(
+                                onTap: () {
+                                  context.read<EstimateBloc>().add(
+                                      GetSingleEstimateEvent(
+                                          orderId: invoiceData[index]
+                                              .id
+                                              .toString()));
+                                },
+                                child: tileWidget(
+                                  invoiceData[index].orderStatus,
+                                  invoiceData[index].orderNumber ?? "",
+                                  invoiceData[index].customer?.firstName ?? "",
+                                  "${invoiceData[index].vehicle?.vehicleYear ?? ""} ${invoiceData[index].vehicle?.vehicleMake ?? ""} ${invoiceData[index].vehicle?.vehicleModel ?? ""}",
+                                  invoiceData[index].estimationName ?? "",
+                                  invoiceData[index].dropSchedule ?? "",
+                                ),
+                              );
+                            },
+                            controller: invoiceScrollController
+                              ..addListener(() {
+                                if ((BlocProvider.of<EstimateBloc>(context)
                                             .currentPage <=
                                         BlocProvider.of<EstimateBloc>(context)
-                                            .totalPages &&
+                                            .totalPages) &&
+                                    invoiceScrollController.offset ==
+                                        invoiceScrollController
+                                            .position.maxScrollExtent &&
                                     BlocProvider.of<EstimateBloc>(context)
                                             .currentPage !=
-                                        0
-                                ? const SizedBox(
-                                    height: 40,
-                                    child: CupertinoActivityIndicator(
-                                      color: AppColors.primaryColors,
-                                    ))
-                                : Container();
-                          }
-                          return GestureDetector(
-                            onTap: () {
-                              context.read<EstimateBloc>().add(
-                                  GetSingleEstimateEvent(
-                                      orderId:
-                                          invoiceData[index].id.toString()));
-                            },
-                            child: tileWidget(
-                                invoiceData[index].orderStatus,
-                                invoiceData[index].orderNumber ?? "",
-                                invoiceData[index].customer?.firstName ?? "",
-                                "${invoiceData[index].vehicle?.vehicleYear} ${invoiceData[index].vehicle?.vehicleMake} ${invoiceData[index].vehicle?.vehicleModel}",
-                                invoiceData[index].estimationName ?? ""),
-                          );
-                        },
-                        controller: invoiceScrollController
-                          ..addListener(() {
-                            if ((BlocProvider.of<EstimateBloc>(context)
-                                        .currentPage <=
-                                    BlocProvider.of<EstimateBloc>(context)
-                                        .totalPages) &&
-                                invoiceScrollController.offset ==
-                                    invoiceScrollController
-                                        .position.maxScrollExtent &&
-                                BlocProvider.of<EstimateBloc>(context)
-                                        .currentPage !=
-                                    0 &&
-                                !BlocProvider.of<EstimateBloc>(context)
-                                    .isFetching) {
-                              context.read<EstimateBloc>()
-                                ..isFetching = true
-                                ..add(GetEstimateEvent(orderStatus: "Invoice"));
-                            }
-                          }),
-                        itemCount: invoiceData.length + 1,
-                      ),
+                                        0 &&
+                                    !BlocProvider.of<EstimateBloc>(context)
+                                        .isFetching) {
+                                  context.read<EstimateBloc>()
+                                    ..isFetching = true
+                                    ..add(GetEstimateEvent(
+                                        orderStatus: "Invoice"));
+                                }
+                              }),
+                            itemCount: invoiceData.length + 1,
+                          ),
               );
             },
           ),
@@ -538,7 +558,7 @@ class _EstimateScreenState extends State<EstimateScreen>
   }
 
   Widget tileWidget(String estimateName, estimateId, String customerName,
-      String carModel, String serviceName) {
+      String carModel, String serviceName, String dropSchedule) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Container(
@@ -559,26 +579,32 @@ class _EstimateScreenState extends State<EstimateScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  SvgPicture.asset("assets/images/calendar_estimate_icon.svg"),
-                  const Text(
-                    " 3/7/23 9:00 Am - ",
-                    style: TextStyle(
-                        color: AppColors.greyText,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400),
-                  ),
-                  SvgPicture.asset("assets/images/calendar_estimate_icon.svg"),
-                  const Text(
-                    " 3/7/23 9:00 Am",
-                    style: TextStyle(
-                        color: AppColors.greyText,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400),
-                  )
-                ],
-              ),
+              dropSchedule != ""
+                  ? Row(
+                      children: [
+                        SvgPicture.asset(
+                            "assets/images/calendar_estimate_icon.svg"),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            dropSchedule.substring(0, 10),
+                            style: const TextStyle(
+                                color: AppColors.greyText,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        // SvgPicture.asset("assets/images/calendar_estimate_icon.svg"),
+                        // const Text(
+                        //   " 3/7/23 9:00 Am",
+                        //   style: TextStyle(
+                        //       color: AppColors.greyText,
+                        //       fontSize: 12,
+                        //       fontWeight: FontWeight.w400),
+                        // )
+                      ],
+                    )
+                  : const SizedBox(),
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(

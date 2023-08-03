@@ -51,7 +51,10 @@ class AddVechileLoading extends VechileState {
   AddVechileLoading();
 }
 
-class AddVechileDetailsPageNationLoading extends VechileState {}
+class AddVechileDetailsPageNationLoading extends VechileState {
+  final String createdId;
+  AddVechileDetailsPageNationLoading({required this.createdId});
+}
 
 class AddVechileDetailsErrorState extends VechileState {}
 

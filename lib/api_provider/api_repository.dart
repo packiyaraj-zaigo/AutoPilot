@@ -305,8 +305,9 @@ class ApiRepository {
   }
 
   Future editEstimate(String id, String which, dynamic token, String orderId,
-      String customerId) {
-    return apiProvider.editEstimate(id, which, token, orderId, customerId);
+      String customerId, String? dropSchedule) {
+    return apiProvider.editEstimate(
+        id, which, token, orderId, customerId, dropSchedule);
   }
 
   Future addEstimateNote(String orderId, String comment, dynamic token) {

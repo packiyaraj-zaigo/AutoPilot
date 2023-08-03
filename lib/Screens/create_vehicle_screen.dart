@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vin_global_response.dart';
+import 'package:auto_pilot/Screens/dummy_vehcile_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
@@ -145,12 +146,20 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
               } else if (state is VechileDetailsErrorState) {
                 CommonWidgets().showDialog(context, state.message);
               } else if (state is AddVechileDetailsPageNationLoading) {
-                if (widget.navigation != null) {
+                if (widget.navigation != null && !isChecked) {
                   log('here');
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(builder: (context) => VehiclesScreen()),
                     (route) => false,
                   );
+                } else if (widget.navigation != null && isChecked) {
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return DummyVehicleScreen(
+                        vehicleId: state.createdId.toString(),
+                      );
+                    },
+                  ));
                 } else {
                   Navigator.pop(context, vinController.text);
                 }
