@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:alphabet_scroll_view/alphabet_scroll_view.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_employee_screen.dart';
 import 'package:auto_pilot/Screens/employee_details_screen.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
@@ -63,196 +64,212 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         }
       });
     });
-    return Scaffold(
-      key: scaffoldKey,
-      drawer: showDrawer(context),
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.menu,
-            color: AppColors.primaryColors,
-          ),
-          onPressed: () {
-            scaffoldKey.currentState!.openDrawer();
-          },
-        ),
-        backgroundColor: const Color(0xFFFAFAFA),
-        elevation: 0,
-        title: const Text(
-          'Autopilot',
-          style: TextStyle(color: Colors.black87, fontSize: 16),
-        ),
-        centerTitle: true,
-        actions: [
-          GestureDetector(
-            onTap: () async {
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) =>
-                    const CreateEmployeeScreen(navigation: "add_employee"),
-              ));
-            },
-            child: const Icon(
-              Icons.add,
-              color: AppColors.primaryColors,
-              size: 30,
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => BottomBarScreen(),
             ),
+            (route) => false);
+        return false;
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        drawer: showDrawer(context),
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.menu,
+              color: AppColors.primaryColors,
+            ),
+            onPressed: () {
+              scaffoldKey.currentState!.openDrawer();
+            },
           ),
-          const SizedBox(
-            width: 20,
+          backgroundColor: const Color(0xFFFAFAFA),
+          elevation: 0,
+          title: const Text(
+            'Autopilot',
+            style: TextStyle(color: Colors.black87, fontSize: 16),
           ),
-        ],
-      ),
-      body: !network
-          ? NoInternetScreen(state: setState)
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Employees',
-                          style: TextStyle(
-                              fontSize: 28, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 16),
-                        Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.07),
-                                offset: const Offset(0, 4),
-                                blurRadius: 10,
-                              )
-                            ],
-                          ),
-                          height: 50,
-                          child: CupertinoTextField(
-                            textAlignVertical: TextAlignVertical.bottom,
-                            padding: const EdgeInsets.only(
-                                top: 14, bottom: 14, left: 16),
-                            onChanged: (value) {
-                              _debouncer.run(() {
-                                employeeList.clear();
-                                bloc.currentPage = 1;
-                                bloc.add(GetAllEmployees(query: value));
-                              });
-                            },
-                            prefix: const Row(
-                              children: [
-                                SizedBox(width: 24),
-                                Icon(
-                                  CupertinoIcons.search,
-                                  color: Color(0xFF7F808C),
-                                  size: 20,
-                                ),
-                              ],
-                            ),
-                            placeholder: 'Type First Name To Search',
-                            maxLines: 1,
-                            placeholderStyle: const TextStyle(
-                              color: Color(0xFF7F808C),
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Expanded(
-                      child: BlocListener<EmployeeBloc, EmployeeState>(
-                        listener: (context, state) {
-                          if (state is EmployeeDetailsSuccessState) {
-                            employeeList
-                                .addAll(state.employees.employeeList ?? []);
-
-                            print(state.employees.employeeList!.length);
-                          }
-                        },
-                        child: BlocBuilder<EmployeeBloc, EmployeeState>(
-                          builder: (context, state) {
-                            if (state is EmployeeDetailsLoadingState &&
-                                !bloc.isPagenationLoading) {
-                              return const Center(
-                                  child: CupertinoActivityIndicator());
-                            } else {
-                              return employeeList.isEmpty
-                                  ? const Center(
-                                      child: Text(
-                                      'No User Found',
-                                      style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.primaryTextColors),
-                                    ))
-                                  : ScrollConfiguration(
-                                      behavior: const ScrollBehavior(),
-                                      child: ListView.separated(
-                                          shrinkWrap: true,
-                                          controller: controller
-                                            ..addListener(() {
-                                              if (controller.offset ==
-                                                      controller.position
-                                                          .maxScrollExtent &&
-                                                  !bloc.isPagenationLoading &&
-                                                  bloc.currentPage <=
-                                                      bloc.totalPages) {
-                                                _debouncer.run(() {
-                                                  bloc.isPagenationLoading =
-                                                      true;
-                                                  bloc.add(GetAllEmployees());
-                                                });
-                                              }
-                                            }),
-                                          itemBuilder: (context, index) {
-                                            final item = employeeList[index];
-                                            return Column(
-                                              children: [
-                                                CommonWidgets()
-                                                    .employeeCard(item: item),
-                                                bloc.currentPage <=
-                                                            bloc.totalPages &&
-                                                        index ==
-                                                            employeeList
-                                                                    .length -
-                                                                1
-                                                    ? const Column(
-                                                        children: [
-                                                          SizedBox(height: 24),
-                                                          Center(
-                                                            child:
-                                                                CupertinoActivityIndicator(),
-                                                          ),
-                                                          SizedBox(height: 24),
-                                                        ],
-                                                      )
-                                                    : const SizedBox(),
-                                                index == employeeList.length - 1
-                                                    ? const SizedBox(height: 24)
-                                                    : const SizedBox(),
-                                              ],
-                                            );
-                                          },
-                                          separatorBuilder: (context, index) =>
-                                              const SizedBox(height: 24),
-                                          itemCount: employeeList.length),
-                                    );
-                            }
-                          },
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+          centerTitle: true,
+          actions: [
+            GestureDetector(
+              onTap: () async {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (context) =>
+                      const CreateEmployeeScreen(navigation: "add_employee"),
+                ));
+              },
+              child: const Icon(
+                Icons.add,
+                color: AppColors.primaryColors,
+                size: 30,
               ),
             ),
+            const SizedBox(
+              width: 20,
+            ),
+          ],
+        ),
+        body: !network
+            ? NoInternetScreen(state: setState)
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 10),
+                          const Text(
+                            'Employees',
+                            style: TextStyle(
+                                fontSize: 28, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 16),
+                          Container(
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.07),
+                                  offset: const Offset(0, 4),
+                                  blurRadius: 10,
+                                )
+                              ],
+                            ),
+                            height: 50,
+                            child: CupertinoTextField(
+                              textAlignVertical: TextAlignVertical.bottom,
+                              padding: const EdgeInsets.only(
+                                  top: 14, bottom: 14, left: 16),
+                              onChanged: (value) {
+                                _debouncer.run(() {
+                                  employeeList.clear();
+                                  bloc.currentPage = 1;
+                                  bloc.add(GetAllEmployees(query: value));
+                                });
+                              },
+                              prefix: const Row(
+                                children: [
+                                  SizedBox(width: 24),
+                                  Icon(
+                                    CupertinoIcons.search,
+                                    color: Color(0xFF7F808C),
+                                    size: 20,
+                                  ),
+                                ],
+                              ),
+                              placeholder: 'Type First Name To Search',
+                              maxLines: 1,
+                              placeholderStyle: const TextStyle(
+                                color: Color(0xFF7F808C),
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Expanded(
+                        child: BlocListener<EmployeeBloc, EmployeeState>(
+                          listener: (context, state) {
+                            if (state is EmployeeDetailsSuccessState) {
+                              employeeList
+                                  .addAll(state.employees.employeeList ?? []);
+
+                              print(state.employees.employeeList!.length);
+                            }
+                          },
+                          child: BlocBuilder<EmployeeBloc, EmployeeState>(
+                            builder: (context, state) {
+                              if (state is EmployeeDetailsLoadingState &&
+                                  !bloc.isPagenationLoading) {
+                                return const Center(
+                                    child: CupertinoActivityIndicator());
+                              } else {
+                                return employeeList.isEmpty
+                                    ? const Center(
+                                        child: Text(
+                                        'No User Found',
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.primaryTextColors),
+                                      ))
+                                    : ScrollConfiguration(
+                                        behavior: const ScrollBehavior(),
+                                        child: ListView.separated(
+                                            shrinkWrap: true,
+                                            controller: controller
+                                              ..addListener(() {
+                                                if (controller.offset ==
+                                                        controller.position
+                                                            .maxScrollExtent &&
+                                                    !bloc.isPagenationLoading &&
+                                                    bloc.currentPage <=
+                                                        bloc.totalPages) {
+                                                  _debouncer.run(() {
+                                                    bloc.isPagenationLoading =
+                                                        true;
+                                                    bloc.add(GetAllEmployees());
+                                                  });
+                                                }
+                                              }),
+                                            itemBuilder: (context, index) {
+                                              final item = employeeList[index];
+                                              return Column(
+                                                children: [
+                                                  CommonWidgets()
+                                                      .employeeCard(item: item),
+                                                  bloc.currentPage <=
+                                                              bloc.totalPages &&
+                                                          index ==
+                                                              employeeList
+                                                                      .length -
+                                                                  1
+                                                      ? const Column(
+                                                          children: [
+                                                            SizedBox(
+                                                                height: 24),
+                                                            Center(
+                                                              child:
+                                                                  CupertinoActivityIndicator(),
+                                                            ),
+                                                            SizedBox(
+                                                                height: 24),
+                                                          ],
+                                                        )
+                                                      : const SizedBox(),
+                                                  index ==
+                                                          employeeList.length -
+                                                              1
+                                                      ? const SizedBox(
+                                                          height: 24)
+                                                      : const SizedBox(),
+                                                ],
+                                              );
+                                            },
+                                            separatorBuilder:
+                                                (context, index) =>
+                                                    const SizedBox(height: 24),
+                                            itemCount: employeeList.length),
+                                      );
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      ),
     );
   }
 
