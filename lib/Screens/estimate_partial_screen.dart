@@ -23,6 +23,7 @@ import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -1965,8 +1966,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       final tempImg = await imagePicker.pickImage(source: ImageSource.camera);
       // if (imageFileList != null) {
       if (tempImg != null) {
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          tempImg.path,
+          '${tempImg.path}.jpg',
+          quality: 80,
+        );
         setState(() {
-          selectedImage = File(tempImg.path);
+          if (compressedImage != null) {
+            selectedImage = File(compressedImage.path);
+          }
         });
       } else {
         return;
@@ -1974,12 +1982,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
       // }
     } else {
-      final tempImage =
-          await imagePicker.pickImage(source: ImageSource.gallery);
-      //  if (imageFile.isNotEmpty) {
-      if (tempImage != null) {
+      final tempImg = await imagePicker.pickImage(source: ImageSource.gallery);
+      // if (imageFileList != null) {
+      if (tempImg != null) {
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          tempImg.path,
+          '${tempImg.path}.jpg',
+          quality: 80,
+        );
         setState(() {
-          selectedImage = File(tempImage.path);
+          if (compressedImage != null) {
+            selectedImage = File(compressedImage.path);
+          }
         });
       } else {
         return;
@@ -2326,7 +2340,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       const Padding(
                         padding: EdgeInsets.only(left: 8.0),
                         child: Text(
-                          "Edit Vehcile",
+                          "Edit Vehicle",
                           style: TextStyle(
                               color: AppColors.primaryColors,
                               fontSize: 18,

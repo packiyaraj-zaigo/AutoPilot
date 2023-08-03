@@ -1387,6 +1387,8 @@ class ApiProvider {
           'image',
           filePath.readAsBytesSync()));
 
+      log(filePath.readAsBytesSync().toString());
+
       request.headers.addAll(getHeader(token));
       inspect(request);
 

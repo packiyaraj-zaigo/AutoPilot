@@ -420,7 +420,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           await _apiRepository.uploadImage(token, event.imagePath);
       final decodedBody = json.decode(uploadImageRes.body);
 
-      log(uploadImageRes.body.toString());
+      log(uploadImageRes.body.toString() + "upload bloccc");
+      print(decodedBody.toString() + "stattuss");
       if (uploadImageRes.statusCode == 200 ||
           uploadImageRes.statusCode == 201) {
         emit(EstimateUploadImageState(
