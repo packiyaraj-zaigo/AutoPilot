@@ -145,19 +145,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
           log(state.toString());
-          if (state is AddEstimateNoteState) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen();
-              },
-            ), (route) => false);
-          } else if (state is CreateAppointmentEstimateState) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen();
-              },
-            ), (route) => false);
-          }
+          // if (state is AddEstimateNoteState) {
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BottomBarScreen();
+          //     },
+          //   ), (route) => false);
+          // } else if (state is CreateAppointmentEstimateState) {
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BottomBarScreen();
+          //     },
+          //   ), (route) => false);
+          // }
           if (state is GetEstimateNoteState) {
             estimateNoteList.addAll(state.estimateNoteModel.data);
           }
@@ -171,14 +171,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
             print(networkImageList.length);
             print(networkImageList);
-          } else if (state is EstimateCreateOrderImageState) {
-            print("image ui state emitted");
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen();
-              },
-            ), (route) => false);
           }
+          //  else if (state is EstimateCreateOrderImageState) {
+          //   print("image ui state emitted");
+          //   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return BottomBarScreen();
+          //     },
+          //   ), (route) => false);
+          // }
           if (state is GetOrderImageState) {
             newOrderImageData.addAll(state.orderImageModel.data);
           }
@@ -309,8 +310,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               context.read<EstimateBloc>().add(
                                     CreateAppointmentEstimateEvent(
                                       startTime: dateController.text +
+                                          " " +
                                           startTimeController.text,
                                       endTime: dateController.text +
+                                          " " +
                                           endTimeController.text,
                                       orderId: widget.estimateDetails.data.id
                                           .toString(),
@@ -585,22 +588,24 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 subTitleWidget("Appointment"),
-                                GestureDetector(
-                                  onTap: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      builder: (context) {
-                                        return editAppointmentSheet(
-                                            appointmentDetailsModel!
-                                                .data.data[0]);
-                                      },
-                                    );
-                                  },
-                                  child: const Icon(
-                                    Icons.more_horiz,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                )
+                                appointmentDetailsModel != null
+                                    ? GestureDetector(
+                                        onTap: () {
+                                          showModalBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return editAppointmentSheet(
+                                                  appointmentDetailsModel!
+                                                      .data.data[0]);
+                                            },
+                                          );
+                                        },
+                                        child: const Icon(
+                                          Icons.more_horiz,
+                                          color: AppColors.primaryColors,
+                                        ),
+                                      )
+                                    : const SizedBox()
                               ]),
                         ),
                         appointmentDetailsModel?.data != null &&
