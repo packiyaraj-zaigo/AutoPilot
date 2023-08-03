@@ -412,15 +412,20 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           }
 
                           if (!isError) {
-                            Navigator.pushAndRemoveUntil(context,
-                                MaterialPageRoute(
-                              builder: (context) {
-                                return BottomBarScreen(
-                                  currentIndex: 3,
-                                  tabControllerIndex: widget.controllerIndex,
-                                );
-                              },
-                            ), (route) => false);
+                            if (isCustomerEdit) {
+                              CommonWidgets().showDialog(
+                                  context, "Please select a customer");
+                            } else {
+                              Navigator.pushAndRemoveUntil(context,
+                                  MaterialPageRoute(
+                                builder: (context) {
+                                  return BottomBarScreen(
+                                    currentIndex: 3,
+                                    tabControllerIndex: widget.controllerIndex,
+                                  );
+                                },
+                              ), (route) => false);
+                            }
                           }
                         },
                         child: const Row(
@@ -589,7 +594,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 subTitleWidget("Appointment"),
-                                appointmentDetailsModel != null
+                                appointmentDetailsModel != null &&
+                                        appointmentDetailsModel!
+                                            .data.data.isNotEmpty
                                     ? GestureDetector(
                                         onTap: () {
                                           showModalBottomSheet(
@@ -2590,7 +2597,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 onTap: () {
                   Navigator.pop(context);
                   print("ontapped");
-                  //  deleteEstimatNotePopup(context, "", id);
+                  deleteAppointmentPopup(
+                      context, "", appointmentDetails.id.toString());
 
                   // Navigator.pop(context);
                 },
@@ -2968,6 +2976,52 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         context
                             .read<EstimateBloc>()
                             .add(DeleteEstimateNoteEvent(id: id));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future deleteAppointmentPopup(BuildContext ctx, message, String id) {
+    return showCupertinoDialog(
+      context: ctx,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is DeleteAppointmentEstimateState) {
+              log(state.toString() + "popppupp");
+              context.read<EstimateBloc>().add(GetEstimateAppointmentEvent(
+                  orderId: widget.estimateDetails.data.id.toString()));
+
+              Navigator.pop(context);
+            }
+            if (state is GetEstimateAppointmentState) {
+              appointmentDetailsModel = state.estimateAppointmentModel;
+              setState(() {});
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Appointment?"),
+                content: const Text("Do you want to remove this appointment?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context
+                            .read<EstimateBloc>()
+                            .add(DeleteAppointmentEstimateEvent(appointmetId: id));
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),

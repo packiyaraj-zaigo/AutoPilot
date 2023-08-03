@@ -480,6 +480,11 @@ class ApiRepository {
     return apiProvider.sendToCustomerEstimate(
         token, customerId, orderId, subject);
   }
+
+  Future<dynamic> deleteAppointmentEstimate(
+      dynamic token, String appointmentId) async {
+    return apiProvider.deleteAppointment(token, appointmentId);
+  }
 }
 
 class NetworkError extends Error {}

@@ -1693,4 +1693,24 @@ class ApiProvider {
       log(e.toString() + "send to customer provider  error");
     }
   }
+
+  Future<dynamic> deleteAppointment(dynamic token, String appointmentId) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/appointments/$appointmentId");
+      var request = http.MultipartRequest("DELETE", url);
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
 }
