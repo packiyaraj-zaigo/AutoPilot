@@ -87,7 +87,7 @@ class Datum {
   DateTime updatedAt;
   List<dynamic> appointmentRepeats;
   CreatedBy customer;
-  Vehicle vehicle;
+  Vehicle? vehicle;
 
   Datum({
     required this.id,
@@ -112,7 +112,7 @@ class Datum {
     required this.updatedAt,
     required this.appointmentRepeats,
     required this.customer,
-    required this.vehicle,
+    this.vehicle,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -139,7 +139,8 @@ class Datum {
         appointmentRepeats:
             List<dynamic>.from(json["appointment_repeats"].map((x) => x)),
         customer: CreatedBy.fromJson(json["customer"]),
-        vehicle: Vehicle.fromJson(json["vehicle"]),
+        vehicle:
+            json["vehicle"] != null ? Vehicle.fromJson(json["vehicle"]) : null,
       );
 
   Map<String, dynamic> toJson() => {
@@ -166,7 +167,7 @@ class Datum {
         "appointment_repeats":
             List<dynamic>.from(appointmentRepeats.map((x) => x)),
         "customer": customer.toJson(),
-        "vehicle": vehicle.toJson(),
+        "vehicle": vehicle!.toJson(),
       };
 }
 

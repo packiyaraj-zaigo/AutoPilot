@@ -20,11 +20,13 @@ class CreateEstimateEvent extends EstimateEvent {
 
 class EditEstimateEvent extends EstimateEvent {
   final String id, orderId, which, customerId;
+  final String? dropScedule;
   EditEstimateEvent(
       {required this.id,
       required this.orderId,
       required this.which,
-      required this.customerId});
+      required this.customerId,
+      this.dropScedule});
 }
 
 class AddEstimateNoteEvent extends EstimateEvent {

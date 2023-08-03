@@ -322,9 +322,24 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       vehicleId: widget
                                               .estimateDetails.data.vehicle?.id
                                               .toString() ??
-                                          "",
+                                          "0",
                                     ),
                                   );
+
+                              context.read<EstimateBloc>().add(
+                                  EditEstimateEvent(
+                                      id: widget
+                                              .estimateDetails.data.vehicle?.id
+                                              .toString() ??
+                                          "0",
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      which: "vehicle",
+                                      customerId: widget
+                                              .estimateDetails.data.customer?.id
+                                              .toString() ??
+                                          "",
+                                      dropScedule: dateController.text));
                             } else {
                               print("editteeddd");
                               // if (int.parse(startTimeController.text
@@ -360,6 +375,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .toString() ??
                                           "",
                                       id: estimateAppointmentEditId));
+
+                              context.read<EstimateBloc>().add(
+                                  EditEstimateEvent(
+                                      id: widget
+                                              .estimateDetails.data.vehicle?.id
+                                              .toString() ??
+                                          "0",
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      which: "vehicle",
+                                      customerId: widget
+                                              .estimateDetails.data.customer?.id
+                                              .toString() ??
+                                          "",
+                                      dropScedule: dateController.text));
                             }
                           }
                           //  }
@@ -786,14 +816,23 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           padding: const EdgeInsets.only(top: 8.0),
                           child: GestureDetector(
                             onTap: () {
-                              showDialog(
+                              // showDialog(
+                              //   context: context,
+                              //   builder: (context) {
+                              //     return AlertDialog(
+                              //       contentPadding: EdgeInsets.all(20),
+                              //       insetPadding: EdgeInsets.all(20),
+                              //       content: paymentPopUp(),
+                              //     );
+                              //   },
+                              // );
+
+                              showModalBottomSheet(
                                 context: context,
+                                backgroundColor: Colors.transparent,
+                                isScrollControlled: true,
                                 builder: (context) {
-                                  return AlertDialog(
-                                    contentPadding: EdgeInsets.all(20),
-                                    insetPadding: EdgeInsets.all(20),
-                                    content: paymentPopUp(),
-                                  );
+                                  return paymentPopUp();
                                 },
                               );
                             },
@@ -1329,18 +1368,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          widget
-                                  .estimateDetails
-                                  .data
-                                  .orderService?[serviceIndex]
-                                  .orderServiceItems?[index]
-                                  .itemName ??
-                              "",
-                          style: const TextStyle(
-                              color: AppColors.primaryTitleColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500),
+                        Flexible(
+                          child: Text(
+                            widget
+                                    .estimateDetails
+                                    .data
+                                    .orderService?[serviceIndex]
+                                    .orderServiceItems?[index]
+                                    .itemName ??
+                                "",
+                            style: const TextStyle(
+                                color: AppColors.primaryTitleColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                         Text(
                             "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].orderServiceItems?[index].subTotal ?? ""}",
@@ -2024,129 +2066,137 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
   paymentPopUp() {
     return Container(
-      color: Colors.white,
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(12)),
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 1.3,
-      child: Column(
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Payment",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primaryTitleColor,
+      height: MediaQuery.of(context).size.height / 1.2,
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Payment",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTitleColor,
+                  ),
                 ),
-              ),
-              Icon(Icons.close)
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 27.0),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Balance Due",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTitleColor,
-                        ),
-                      ),
-                      Text(
-                        "\$5,709.32",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTitleColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: textBox("Enter Amount", paymentAmountController,
-                        "Amount To Pay", paymentAmountErrorStatus),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0),
-                    child: TabBar(
-                      controller: tabController,
-                      enableFeedback: false,
-                      labelPadding: EdgeInsets.all(0),
-                      indicatorColor: AppColors.primaryColors,
-                      unselectedLabelColor: const Color(0xFF9A9A9A),
-                      labelColor: AppColors.primaryColors,
-                      tabs: const [
-                        SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              'Cash',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.close))
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 27.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Balance Due",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
                           ),
                         ),
-                        SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              'Credit',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 50,
-                          child: Center(
-                            child: Text(
-                              'Cheque',
-                              style: TextStyle(fontWeight: FontWeight.w600),
-                            ),
+                        Text(
+                          "\$5,709.32",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor,
                           ),
                         ),
                       ],
                     ),
-                  ),
-                  LimitedBox(
-                    maxHeight: MediaQuery.of(context).size.height / 2.8,
-                    maxWidth: MediaQuery.of(context).size.width,
-                    child: TabBarView(controller: tabController, children: [
-                      cashTabWidget(),
-                      creditTabWidget(),
-                      cashTabWidget()
-                    ]),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 24.0),
-                    child: Container(
-                      height: 56,
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: AppColors.primaryColors),
-                      child: const Text(
-                        "Authorize",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: textBox("Enter Amount", paymentAmountController,
+                          "Amount To Pay", paymentAmountErrorStatus),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: TabBar(
+                        controller: tabController,
+                        enableFeedback: false,
+                        labelPadding: EdgeInsets.all(0),
+                        indicatorColor: AppColors.primaryColors,
+                        unselectedLabelColor: const Color(0xFF9A9A9A),
+                        labelColor: AppColors.primaryColors,
+                        tabs: const [
+                          SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: Text(
+                                'Cash',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: Text(
+                                'Credit',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 50,
+                            child: Center(
+                              child: Text(
+                                'Cheque',
+                                style: TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    LimitedBox(
+                      maxHeight: MediaQuery.of(context).size.height / 2.8,
+                      maxWidth: MediaQuery.of(context).size.width,
+                      child: TabBarView(controller: tabController, children: [
+                        cashTabWidget(),
+                        creditTabWidget(),
+                        cashTabWidget()
+                      ]),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24.0),
+                      child: Container(
+                        height: 56,
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.primaryColors),
+                        child: const Text(
+                          "Authorize",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -2285,27 +2335,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
-              child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                height: 56,
-                decoration: BoxDecoration(
-                    color: const Color(0xffF6F6F6),
-                    borderRadius: BorderRadius.circular(8)),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: AppColors.primaryTitleColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             )
@@ -2405,27 +2460,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
-              child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                height: 56,
-                decoration: BoxDecoration(
-                    color: const Color(0xffF6F6F6),
-                    borderRadius: BorderRadius.circular(8)),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: AppColors.primaryTitleColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             )
@@ -2543,27 +2603,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
-              child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                height: 56,
-                decoration: BoxDecoration(
-                    color: const Color(0xffF6F6F6),
-                    borderRadius: BorderRadius.circular(8)),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: AppColors.primaryTitleColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             )
@@ -2815,27 +2880,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
-              child: Container(
-                alignment: Alignment.center,
-                width: MediaQuery.of(context).size.width,
-                height: 56,
-                decoration: BoxDecoration(
-                    color: const Color(0xffF6F6F6),
-                    borderRadius: BorderRadius.circular(8)),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        "Cancel",
-                        style: TextStyle(
-                            color: AppColors.primaryTitleColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: AppColors.primaryTitleColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             )

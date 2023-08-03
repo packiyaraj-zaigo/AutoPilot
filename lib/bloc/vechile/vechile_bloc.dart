@@ -160,7 +160,8 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
             backgroundColor: Colors.green,
           ),
         );
-        emit(AddVechileDetailsPageNationLoading());
+        emit(AddVechileDetailsPageNationLoading(
+            createdId: vechileAdd['created_id'].toString()));
       } else if (response.statusCode == 422) {
         emit(AddVechileDetailsErrorState());
         errorRes = vechileAdd;
