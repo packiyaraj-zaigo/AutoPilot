@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:auto_pilot/Screens/customers_screen.dart' as cs;
+import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +85,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           },
           icon: Icon(
             Icons.arrow_back,
-            color: AppColors.primaryBlackColors,
+            color: AppColors.primaryColors,
             size: AppStrings.fontSize16,
           ),
         ),
@@ -105,7 +106,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
               icon: Icon(
                 Icons.more_horiz,
                 size: AppStrings.fontSize20,
-                color: AppColors.primaryBlackColors,
+                color: AppColors.primaryColors,
               )),
           const SizedBox(
             width: 20,
@@ -593,230 +594,202 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
       ),
       builder: (BuildContext context) {
         return SizedBox(
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery.of(context).size.height / 2.3,
           child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(
-                  height: 18,
-                ),
-                Center(
-                  child: Container(
-                    height: 6,
-                    width: 40,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(50)),
-                      color: AppColors.buttonColors,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 18,
+                  ),
+                  Center(
+                    child: Container(
+                      height: 6,
+                      width: 40,
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(50)),
+                        color: AppColors.buttonColors,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 18.0),
-                  child: Text(
-                    "Select an option",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primaryTitleColor),
+                  const SizedBox(
+                    height: 10,
                   ),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                AppUtils.verticalDivider(),
-                const SizedBox(
-                  height: 20,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 18.0, right: 18),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 57,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppColors.buttonColors,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                color: AppColors.primaryColors,
-                                size: 16,
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                'New Estimate',
-                                style: TextStyle(
-                                    color: AppColors.primaryColors,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: '.SF Pro Text',
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        height: 57,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppColors.buttonColors,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                color: AppColors.primaryColors,
-                                size: 16,
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                'Add Customer',
-                                style: TextStyle(
-                                    color: AppColors.primaryColors,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: '.SF Pro Text',
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
-                        height: 57,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppColors.buttonColors,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                color: AppColors.primaryColors,
-                                size: 16,
-                              ),
-                              SizedBox(
-                                width: 8,
-                              ),
-                              Text(
-                                'Edit Customer',
-                                style: TextStyle(
-                                    color: AppColors.primaryColors,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: '.SF Pro Text',
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => NewCustomerScreen(
-                                        customerEdit: widget.customerData)));
-                          },
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      SizedBox(
+                  const Padding(
+                    padding: EdgeInsets.only(left: 18.0),
+                    child: Text(
+                      "Select an option",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 16,
+                  ),
+                  AppUtils.verticalDivider(),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 18.0, right: 18),
+                    child: Column(
+                      children: [
+                        SizedBox(
                           height: 57,
                           width: double.infinity,
                           child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: AppColors.buttonColors,
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10.0),
+                            style: ElevatedButton.styleFrom(
+                              primary: AppColors.buttonColors,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.add,
+                                  color: AppColors.primaryColors,
+                                  size: 16,
                                 ),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.delete,
-                                    color: AppColors.primaryColors,
-                                    size: 16,
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    'Delete Customer',
-                                    style: TextStyle(
-                                        color: AppColors.primaryColors,
-                                        fontFamily: '.SF Pro Text',
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16),
-                                  ),
-                                ],
-                              ),
-                              onPressed: () async {
-                                BlocProvider.of<CustomerBloc>(context).add(
-                                    DeleteCustomerEvent(
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  'New Estimate',
+                                  style: TextStyle(
+                                      color: AppColors.primaryColors,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: '.SF Pro Text',
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            onPressed: () =>
+                                Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                      builder: (context) => DummyCustomerScreen(
                                         customerId:
                                             widget.customerData.id.toString(),
-                                        context: context));
-                              })),
-                    ],
+                                      ),
+                                    ),
+                                    (route) => false),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        SizedBox(
+                          height: 57,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: AppColors.buttonColors,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.edit,
+                                  color: AppColors.primaryColors,
+                                  size: 16,
+                                ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Text(
+                                  'Edit Customer',
+                                  style: TextStyle(
+                                      color: AppColors.primaryColors,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: '.SF Pro Text',
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NewCustomerScreen(
+                                          customerEdit: widget.customerData)));
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        SizedBox(
+                            height: 57,
+                            width: double.infinity,
+                            child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: AppColors.buttonColors,
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.delete,
+                                      color: AppColors.primaryColors,
+                                      size: 16,
+                                    ),
+                                    SizedBox(
+                                      width: 8,
+                                    ),
+                                    Text(
+                                      'Delete Customer',
+                                      style: TextStyle(
+                                          color: AppColors.primaryColors,
+                                          fontFamily: '.SF Pro Text',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                                onPressed: () async {
+                                  BlocProvider.of<CustomerBloc>(context).add(
+                                      DeleteCustomerEvent(
+                                          customerId:
+                                              widget.customerData.id.toString(),
+                                          context: context));
+                                })),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Center(
-                  child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text(
-                        "Cancel",
-                        style: TextStyle(
-                            color: AppColors.primaryColors,
-                            fontWeight: FontWeight.w500,
-                            fontFamily: '.SF Pro Text',
-                            fontSize: 16),
-                      )),
-                )
-              ],
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Center(
+                    child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontWeight: FontWeight.w500,
+                              fontFamily: '.SF Pro Text',
+                              fontSize: 16),
+                        )),
+                  )
+                ],
+              ),
             ),
           ),
         );
