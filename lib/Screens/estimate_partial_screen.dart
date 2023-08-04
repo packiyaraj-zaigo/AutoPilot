@@ -3019,9 +3019,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
-                        context
-                            .read<EstimateBloc>()
-                            .add(DeleteAppointmentEstimateEvent(appointmetId: id));
+                        context.read<EstimateBloc>().add(
+                            DeleteAppointmentEstimateEvent(appointmetId: id));
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),
