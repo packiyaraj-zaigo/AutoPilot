@@ -118,3 +118,10 @@ class SendEstimateToCustomerErrorState extends EstimateState {
 }
 
 class SendEstimateToCustomerLoadingState extends EstimateState {}
+
+class DeleteAppointmentEstimateState extends EstimateState {}
+
+class DeleteAppointmentEstimateErrorState extends EstimateState {
+  final String errorMessage;
+  DeleteAppointmentEstimateErrorState({required this.errorMessage});
+}

@@ -157,3 +157,8 @@ class SendEstimateToCustomerEvent extends EstimateEvent {
   SendEstimateToCustomerEvent(
       {required this.customerId, required this.orderId, required this.subject});
 }
+
+class DeleteAppointmentEstimateEvent extends EstimateEvent {
+  final String appointmetId;
+  DeleteAppointmentEstimateEvent({required this.appointmetId});
+}
