@@ -22,11 +22,11 @@ class CreateVehicleScreen extends StatefulWidget {
       {super.key,
       this.vehicle,
       this.vin = '',
-      this.Editvechile,
+      this.editVehicle,
       this.navigation});
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
-  final Datum? Editvechile;
+  final Datum? editVehicle;
   String? navigation;
 
   @override
@@ -35,9 +35,6 @@ class CreateVehicleScreen extends StatefulWidget {
 
 class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  // VechileBloc? _bloc;
-
-  final _debouncer = Debouncer();
 
   int selectedIndex = 0;
   final TextEditingController nameController = TextEditingController();
@@ -92,26 +89,27 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     typeController.text = widget.vehicle!.vehicleType ?? '';
   }
 
+  editVehicleDataIntegration() {
+    yearController.text = widget.editVehicle!.vehicleYear;
+    makeController.text = widget.editVehicle!.vehicleMake;
+    modelController.text = widget.editVehicle!.vehicleModel;
+    subModelController.text = widget.editVehicle!.subModel ?? "";
+    engineController.text = widget.editVehicle!.engineSize ?? "";
+    colorController.text = widget.editVehicle!.vehicleColor ?? "";
+    licController.text = widget.editVehicle!.licencePlate ?? "";
+    typeController.text = widget.editVehicle!.vehicleType;
+    vinController.text = widget.editVehicle!.vin ?? '';
+  }
+
   @override
   void initState() {
     super.initState();
     vinController.text = widget.vin;
     if (widget.vehicle != null) {
       addDataToFields();
+    } else if (widget.editVehicle != null) {
+      editVehicleDataIntegration();
     }
-    if (widget.Editvechile != null) {
-      yearController.text = widget.Editvechile?.vehicleYear ?? "";
-      yearController.text = widget.Editvechile?.vehicleMake ?? "";
-      yearController.text = widget.Editvechile?.vehicleModel ?? "";
-      // yearController.text = widget.Editvechile?.subModel ?? "";
-      // yearController.text = widget.Editvechile?.engineSize ?? "";
-      yearController.text = widget.Editvechile?.vehicleColor ?? "";
-      // yearController.text = widget.Editvechile?.licencePlate ?? "";
-      // yearController.text = widget.Editvechile?.vehicleType ?? "";
-    }
-    // _bloc = BlocProvider.of<VechileBloc>(context);
-    // _bloc?.currentPage = 1;
-    // _bloc?.add(GetAllVechile());
   }
 
   @override
@@ -133,23 +131,15 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
           create: (context) => VechileBloc()..add(DropDownVechile()),
           child: BlocListener<VechileBloc, VechileState>(
             listener: (context, state) {
-              if (state is AddVechileDetailsLoadingState) {
-                CommonWidgets().showDialog(
-                    context, 'Something went wrong please try again later');
-                if (widget.navigation != null) {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => VehiclesScreen()));
-                } else {
-                  Navigator.pop(context);
-                }
-                // vechileList.addAll(state.vechile.data.data ?? []);
-              } else if (state is VechileDetailsErrorState) {
+              log(state.toString());
+              if (state is CreateVehicleErrorState) {
                 CommonWidgets().showDialog(context, state.message);
-              } else if (state is AddVechileDetailsPageNationLoading) {
+              } else if (state is CreateVehicleSuccessState) {
                 if (widget.navigation != null && !isChecked) {
                   log('here');
                   Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(builder: (context) => VehiclesScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const VehiclesScreen()),
                     (route) => false,
                   );
                 } else if (widget.navigation != null && isChecked) {
@@ -163,172 +153,22 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                 } else {
                   Navigator.pop(context, vinController.text);
                 }
-                // roles.clear();
-                // roles.addAll(state.roles);
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vehicle Added Successfully')));
+              } else if (state is EditVehicleErrorState) {
+                CommonWidgets().showDialog(context, state.message);
+              } else if (state is EditVehicleSuccessState) {
+                log('here');
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const VehiclesScreen()),
+                  (route) => false,
+                );
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Vehicle Added Successfully')));
               } else if (state is DropdownVechileDetailsSuccessState) {
                 dropdownData.addAll(state.dropdownData.data.data);
-              } else if (state is AddVechileDetailsErrorState) {
-                if (BlocProvider.of<VechileBloc>(context).errorRes.isNotEmpty) {
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vehicle_year")) {
-                    print("vehicle_year");
-
-                    yearErrorStaus = true;
-
-                    print(yearErrorStaus);
-                    yearErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vehicle_year'][0];
-                    print(yearErrorMsg);
-                    // }
-                  } else {
-                    yearErrorStaus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vehicle_model")) {
-                    modelErrorStatus = true;
-                    modelErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vehicle_model'][0];
-                  } else {
-                    modelErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vehicle_type")) {
-                    print("vehicle_type");
-
-                    typeErrorStatus = true;
-
-                    print(typeErrorStatus);
-                    typeErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vehicle_type'][0];
-                    print(typeErrorMsg);
-                    // }
-                  } else {
-                    typeErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vehicle_make")) {
-                    print("vehicle_make");
-
-                    makeErrorStatus = true;
-
-                    print(makeErrorStatus);
-                    makeErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vehicle_make'][0];
-                    print(makeErrorMsg);
-                    // }
-                  } else {
-                    makeErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vehicle_color")) {
-                    print("vehicle_color");
-
-                    colorErrorStatus = true;
-
-                    print(colorErrorStatus);
-                    colorErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vehicle_color'][0];
-                    print(colorErrorMsg);
-                    // }
-                  } else {
-                    colorErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vehicle_color")) {
-                    print("vehicle_color");
-
-                    colorErrorStatus = true;
-
-                    print(colorErrorStatus);
-                    colorErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vehicle_color'][0];
-                    print(colorErrorMsg);
-                    // }
-                  } else {
-                    colorErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vin")) {
-                    print("vin");
-
-                    vinErrorStatus = true;
-
-                    print(vinErrorStatus);
-                    vinErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vin'][0];
-                    print(vinErrorMsg);
-                    // }
-                  } else {
-                    vinErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("vin")) {
-                    print("vin");
-
-                    vinErrorStatus = true;
-
-                    print(vinErrorStatus);
-                    vinErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['vin'][0];
-                    print(vinErrorMsg);
-                    // }
-                  } else {
-                    vinErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("sub_model")) {
-                    print("sub_model");
-
-                    subModelErrorStatus = true;
-
-                    print(subModelErrorStatus);
-                    submodelErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['sub_model'][0];
-                    print(submodelErrorMsg);
-                    // }
-                  } else {
-                    subModelErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("licence_plate")) {
-                    print("licence_plate");
-
-                    licErrorStatus = true;
-
-                    print(subModelErrorStatus);
-                    licErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['licence_plate'][0];
-                    print(licErrorMsg);
-                    // }
-                  } else {
-                    licErrorStatus = false;
-                  }
-                  if (BlocProvider.of<VechileBloc>(context)
-                      .errorRes
-                      .containsKey("engine_size")) {
-                    print("engine_size");
-
-                    engineErrorStatus = true;
-
-                    print(engineErrorStatus);
-                    engineErrorMsg = BlocProvider.of<VechileBloc>(context)
-                        .errorRes['engine_size'][0];
-                    print(engineErrorMsg);
-                    // }
-                  } else {
-                    engineErrorStatus = false;
-                  }
-                }
               }
             },
             child: BlocBuilder<VechileBloc, VechileState>(
@@ -704,20 +544,34 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
       }
     }
     if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
-      context.read<VechileBloc>().add(AddVechile(
-            context: context,
-            email: nameController.text,
-            year: yearController.text,
-            model: modelController.text,
-            submodel: subModelController.text,
-            engine: engineController.text,
-            color: colorController.text,
-            vinNumber: vinController.text,
-            licNumber: licController.text,
-            make: makeController.text,
-            type: typeController.text,
-            navigation: widget.navigation,
-          ));
+      if (widget.editVehicle != null) {
+        context.read<VechileBloc>().add(EditVehicleEvent(
+              id: widget.editVehicle!.id.toString(),
+              email: nameController.text,
+              year: yearController.text,
+              model: modelController.text,
+              submodel: subModelController.text,
+              engine: engineController.text,
+              color: colorController.text,
+              vinNumber: vinController.text,
+              licNumber: licController.text,
+              make: makeController.text,
+              type: typeController.text,
+            ));
+      } else {
+        context.read<VechileBloc>().add(AddVechile(
+              email: nameController.text,
+              year: yearController.text,
+              model: modelController.text,
+              submodel: subModelController.text,
+              engine: engineController.text,
+              color: colorController.text,
+              vinNumber: vinController.text,
+              licNumber: licController.text,
+              make: makeController.text,
+              type: typeController.text,
+            ));
+      }
     }
   }
 

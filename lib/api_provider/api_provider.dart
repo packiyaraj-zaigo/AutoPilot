@@ -296,7 +296,6 @@ class ApiProvider {
   // }
 
   Future<dynamic> addVechile(
-    BuildContext context,
     String token,
     String email,
     String year,
@@ -309,9 +308,6 @@ class ApiProvider {
     String type,
     String make,
   ) async {
-    print("eeeeeeeeeeeeeeeeeeeeeeeeeee$token");
-
-    //  LoadingFormModel? loadingFormModel;
     try {
       final clientId = await AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/vehicles?client_id=$clientId");
@@ -330,34 +326,62 @@ class ApiProvider {
       // final map = {};
       var response = await request.send();
       inspect(response);
-      print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");
-      print(response.toString() + "provider status code");
-      print(response.toString() + "provider response");
       return http.Response.fromStream(response);
     } catch (e) {
-      print(e.toString() + "provider error");
+      log(e.toString() + "Edit vehicle api error");
+    }
+  }
+
+  Future<dynamic> editVechile(
+    String token,
+    String id,
+    String email,
+    String year,
+    String model,
+    String submodel,
+    String engine,
+    String color,
+    String vinNumber,
+    String licNumber,
+    String type,
+    String make,
+  ) async {
+    try {
+      var url = Uri.parse("${BASE_URL}api/vehicles/$id");
+      final map = {};
+      map['customer_id'] = 0;
+      map['vehicle_type'] = type;
+      map['vehicle_year'] = year;
+      map['vehicle_make'] = make;
+      map['vehicle_model'] = model;
+      map['vehicle_color'] = color;
+      map['vin'] = vinNumber;
+      map['sub_model'] = submodel;
+      map['engine_size'] = engine;
+      map['licence_plate'] = licNumber;
+
+      var response =
+          await http.put(url, body: jsonEncode(map), headers: getHeader(token));
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + "Edit vehicle api error");
     }
   }
 
   Future<dynamic> deleteVechile(
     String token,
-    String deleteId,
+    String id,
   ) async {
-    print("eeeeeeeeeeeeeeeeeeeeeeeeeee$token");
-
-    //  LoadingFormModel? loadingFormModel;
     try {
-      var url = Uri.parse("${BASE_URL}api/vehicles/${deleteId}");
+      var url = Uri.parse("${BASE_URL}api/vehicles/$id");
       var request = http.MultipartRequest("DELETE", url)
         ..headers['Authorization'] = "Bearer $token";
       var response = await request.send();
       inspect(response);
-      print("wwwwwwwwwwwwwwwwwwwwwwwwwwwwww${response.statusCode}");
-      print(response.toString() + "provider status code");
-      print(response.toString() + "provider response");
       return http.Response.fromStream(response);
     } catch (e) {
-      print(e.toString() + "provider error");
+      log(e.toString() + "Delete vehicle api error");
     }
   }
 
