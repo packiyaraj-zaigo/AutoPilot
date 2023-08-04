@@ -26,6 +26,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     on<AddVechile>(addAlllVechile);
     on<DropDownVechile>(dropdownVechile);
     on<DeleteVechile>(deleteVechile);
+    on<EditVehicleEvent>(editVehicle);
   }
   getAllVechile(
     GetAllVechile event,
@@ -74,49 +75,6 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     }
   }
 
-  // getAllVechile(
-  //   GetAllVechile event,
-  //   Emitter<VechileState> emit,
-  // ) async {
-  //   try {
-  //     emit(VechileDetailsLoadingState());
-  //     if (currentPage == 1) {
-  //       isVechileLoading = true;
-  //     }
-  //
-  //     final token = await AppUtils.getToken();
-  //     await apiRepo.getEmployees(token, currentPage).then((value) {
-  //       if (value.statusCode == 200) {
-  //         final responseBody = jsonDecode(value.body);
-  //         emit(
-  //           VechileDetailsSuccessStates(
-  //             vechile: VechileResponse.fromJson(
-  //               responseBody['data'],
-  //             ),
-  //           ),
-  //         );
-  //         final data = responseBody['data'];
-  //         currentPage = data['current_page'] ?? 1;
-  //         totalPages = data['last_page'] ?? 1;
-  //         if (currentPage <= totalPages) {
-  //           currentPage++;
-  //         }
-  //         print(value.body.toString());
-  //       } else {
-  //         log(value.body.toString());
-  //         final body = jsonDecode(value.body);
-  //         emit(VechileDetailsErrorState(message: body['message']));
-  //       }
-  //       isVechileLoading = false;
-  //       isPagenationLoading = false;
-  //     });
-  //   } catch (e) {
-  //     emit(VechileDetailsErrorState(message: e.toString()));
-  //     isVechileLoading = false;
-  //     isPagenationLoading = false;
-  //   }
-  // }
-  //
   Future<void> addAlllVechile(
     AddVechile event,
     Emitter<VechileState> emit,
@@ -125,13 +83,8 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       isVechileLoading = true;
       emit(AddVechileDetailsLoadingState());
       final token = await AppUtils.getToken();
-      // Response addVechileRes = await _apiRepository.addVechile(
-      //     event.context,event.year,event.type,event.make,event.model,event.licNumber,event.vinNumber,event.color,event.engine,event.submodel,event.email);
-      // var addVechileData = _decoder.convert(addVechileRes.body);
-      //
 
       final response = await apiRepo.addVechile(
-        event.context,
         token,
         event.email,
         event.year,
@@ -146,28 +99,22 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       );
       var vechileAdd = _decoder.convert(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("${response.body}");
         isVechileLoading = false;
-        // if (event.navigation != null) {
-        //   Navigator.of(event.context).pushReplacement(
-        //       MaterialPageRoute(builder: (context) => VehiclesScreen()));
-        // } else {
-        //   Navigator.pop(event.context, event.vinNumber);
-        // }
-        ScaffoldMessenger.of((event.context)).showSnackBar(
-          SnackBar(
-            content: Text('${vechileAdd['message']}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        emit(AddVechileDetailsPageNationLoading(
+
+        emit(CreateVehicleSuccessState(
             createdId: vechileAdd['created_id'].toString()));
-      } else if (response.statusCode == 422) {
-        emit(AddVechileDetailsErrorState());
-        errorRes = vechileAdd;
+      } else {
+        if (vechileAdd.containsKey('message')) {
+          emit(CreateVehicleErrorState(message: vechileAdd['message']));
+        } else if (vechileAdd.containsKey('error')) {
+          emit(CreateVehicleErrorState(message: vechileAdd['error']));
+        } else {
+          emit(CreateVehicleErrorState(
+              message: vechileAdd[vechileAdd.keys.first][0]));
+        }
       }
     } catch (e) {
-      emit(VechileDetailsErrorState(message: e.toString()));
+      emit(VechileDetailsErrorState(message: 'Something went wrong'));
       isVechileLoading = false;
     }
   }
@@ -183,8 +130,6 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       Response response = await apiRepo.dropdownVechile(token);
       if (response.statusCode == 200) {
         dropdownData = dropDownFromJson(response.body);
-        // print(
-        //     "qqqqqqqqqqqqqqqqqqqqqeeeeeeeeeeeeeeeeeeeeeeeeeewwwwwwwwwwwwwwwwwwwwwwwww${responseBody}");
         emit(
           DropdownVechileDetailsSuccessState(dropdownData: dropdownData),
         );
@@ -200,23 +145,57 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     Emitter<VechileState> emit,
   ) async {
     try {
+      emit(DeleteVechileDetailsLoadingState());
       final token = await AppUtils.getToken();
-      Response response = await apiRepo.deleteVechile(token, event.deleteId);
+      Response response = await apiRepo.deleteVechile(token, event.id);
       if (response.statusCode == 200) {
         final responseBody = jsonDecode(response.body);
-        print(
-            "qqqqqqqqqqqqqqqqqqqqqeeeeeeeeeeeeeeeeeeeeeeeeeewwwwwwwwwwwwwwwwwwwwwwwww${responseBody}");
         emit(
-          DeleteVechileDetailsSuccessState(
-            vechile: VechileResponse.fromJson(
-              responseBody["data"],
-            ),
-          ),
+          DeleteVechileDetailsSuccessState(),
         );
       }
     } catch (e) {
-      emit(VechileDetailsErrorState(message: e.toString()));
+      emit(DeleteVechileDetailsErrorState(message: e.toString()));
       isVechileLoading = false;
+    }
+  }
+
+  editVehicle(
+    EditVehicleEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final response = await apiRepo.editVechile(
+        token,
+        event.id,
+        event.email,
+        event.year,
+        event.model,
+        event.submodel,
+        event.engine,
+        event.color,
+        event.vinNumber,
+        event.licNumber,
+        event.type,
+        event.make,
+      );
+      final body = await jsonDecode(response.body);
+      log(body[body.keys.first][0].toString());
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(EditVehicleSuccessState());
+      } else {
+        if (body.containsKey('message')) {
+          emit(EditVehicleErrorState(message: body['message']));
+        } else if (body.containsKey('error')) {
+          emit(EditVehicleErrorState(message: body['error']));
+        } else {
+          emit(EditVehicleErrorState(message: body[body.keys.first][0]));
+        }
+      }
+    } catch (e) {
+      log(e.toString() + " Edit bloc error");
+      emit(EditVehicleErrorState(message: "Something went wrong"));
     }
   }
 }

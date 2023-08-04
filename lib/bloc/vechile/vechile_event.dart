@@ -21,8 +21,6 @@ class CreateVechile extends VechileEvent {
 }
 
 class AddVechile extends VechileEvent {
-  final BuildContext context;
-  final String? navigation;
   final String email,
       year,
       model,
@@ -34,8 +32,6 @@ class AddVechile extends VechileEvent {
       type,
       make;
   AddVechile({
-    this.navigation,
-    required this.context,
     required this.email,
     required this.year,
     required this.model,
@@ -51,7 +47,34 @@ class AddVechile extends VechileEvent {
 
 class DropDownVechile extends VechileEvent {}
 
+class EditVehicleEvent extends VechileEvent {
+  final String id,
+      email,
+      year,
+      model,
+      submodel,
+      engine,
+      color,
+      vinNumber,
+      licNumber,
+      type,
+      make;
+  const EditVehicleEvent({
+    required this.id,
+    required this.email,
+    required this.year,
+    required this.model,
+    required this.submodel,
+    required this.engine,
+    required this.color,
+    required this.vinNumber,
+    required this.licNumber,
+    required this.type,
+    required this.make,
+  });
+}
+
 class DeleteVechile extends VechileEvent {
-  final String deleteId;
-  DeleteVechile({required this.deleteId});
+  final String id;
+  const DeleteVechile({required this.id});
 }

@@ -145,7 +145,6 @@ class ApiRepository {
   }
 
   Future addVechile(
-    BuildContext context,
     String token,
     String email,
     String year,
@@ -159,8 +158,37 @@ class ApiRepository {
     String make,
   ) {
     return apiProvider.addVechile(
-      context,
       token,
+      email,
+      year,
+      model,
+      submodel,
+      engine,
+      color,
+      vinNumber,
+      licNumber,
+      type,
+      make,
+    );
+  }
+
+  Future editVechile(
+    String token,
+    String id,
+    String email,
+    String year,
+    String model,
+    String submodel,
+    String engine,
+    String color,
+    String vinNumber,
+    String licNumber,
+    String type,
+    String make,
+  ) {
+    return apiProvider.editVechile(
+      token,
+      id,
       email,
       year,
       model,

@@ -79,15 +79,41 @@ class DropdownVechileDetailsErrorState extends VechileState {
   DropdownVechileDetailsErrorState({required this.message});
 }
 
-class DeleteVechileDetailsSuccessState extends VechileState {
-  final VechileResponse vechile;
-  const DeleteVechileDetailsSuccessState({required this.vechile});
+class DeleteVechileDetailsSuccessState extends VechileState {}
 
-  @override
-  List<Object> get props => [];
-}
+class DeleteVechileDetailsLoadingState extends VechileState {}
 
 class DeleteVechileDetailsErrorState extends VechileState {
   final String message;
   DeleteVechileDetailsErrorState({required this.message});
+}
+
+class EditVehicleLoadingState extends VechileState {}
+
+class EditVehicleErrorState extends VechileState {
+  final String message;
+  const EditVehicleErrorState({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class EditVehicleSuccessState extends VechileState {}
+
+class CreateVehicleLoadingState extends VechileState {}
+
+class CreateVehicleErrorState extends VechileState {
+  final String message;
+  const CreateVehicleErrorState({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class CreateVehicleSuccessState extends VechileState {
+  final String createdId;
+  const CreateVehicleSuccessState({required this.createdId});
+
+  @override
+  List<Object> get props => [createdId];
 }
