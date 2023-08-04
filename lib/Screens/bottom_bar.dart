@@ -99,415 +99,428 @@ class _BottomBarScreenState extends State<BottomBarScreen>
         }
       });
     });
-    return BlocProvider(
-      create: (context) => DashboardBloc(apiRepository: ApiRepository())
-        ..add(GetUserProfileEvent()),
-      child: BlocListener<DashboardBloc, DashboardState>(
-        listener: (context, state) {
-          if (state is GetProfileDetailsState) {
-            AppUtils.setUserName(state.userProfile.user[0].firstName);
-            getUserName();
-            print(userName);
-          }
-          // TODO: implement listener
-        },
-        child: BlocBuilder<DashboardBloc, DashboardState>(
-          builder: (context, state) {
-            return Scaffold(
-              backgroundColor: Color(0xffFAFAFA),
-              key: scaffoldKey,
-
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerDocked,
-              floatingActionButton: FloatingActionButton(
-                backgroundColor: AppColors.primaryColors,
-                elevation: 0,
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) {
-                      return mainCreateWidget();
-                    },
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(12.0)),
-                    ),
-                  );
-                },
-                child: Icon(Icons.add),
-              ),
-              appBar: AppBar(
-                  leading: IconButton(
-                    icon: const Icon(
-                      Icons.menu,
-                      color: AppColors.primaryColors,
-                    ),
-                    onPressed: () {
-                      scaffoldKey.currentState!.openDrawer();
-                    },
-                  ),
-                  backgroundColor: Colors.white,
-                  elevation: 0,
-                  title: const Text(
-                    'Autopilot',
-                    style: TextStyle(color: Colors.black87),
-                  ),
-                  centerTitle: true,
-                  actions: [
-                    IconButton(
-                        onPressed: () {
-                          // Navigator.push(context, MaterialPageRoute(
-                          //   builder: (context) {
-                          //     return AddCompanyScreen();
-                          //   },
-                          // ));
-                        },
-                        icon: SvgPicture.asset(
-                          "assets/images/message.svg",
-                          color: AppColors.primaryColors,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          // Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const NotificationScreen(),
-                          //   ),
-                          // );
-                        },
-                        icon: SvgPicture.asset(
-                          "assets/images/notification.svg",
-                          color: AppColors.primaryColors,
-                        ))
-                  ],
-                  bottom: widget.currentIndex == 3
-                      ? PreferredSize(
-                          preferredSize:
-                              Size(MediaQuery.of(context).size.width, 80),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Text(
-                                  "Estimates",
-                                  style: TextStyle(
-                                      color: AppColors.primaryTitleColor,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                              ),
-                              TabBar(
-                                controller: estimateTabController,
-                                enableFeedback: false,
-                                labelPadding: EdgeInsets.all(0),
-                                indicatorColor: AppColors.primaryColors,
-                                unselectedLabelColor: const Color(0xFF9A9A9A),
-                                labelColor: AppColors.primaryColors,
-                                tabs: const [
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Recent',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Estimates',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Orders',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Invoices',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        )
-                      : widget.currentIndex == 1
-                          ? PreferredSize(
-                              preferredSize: const Size(double.infinity, 90),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Padding(
-                                    padding: EdgeInsets.only(left: 16.0),
-                                    child: Text(
-                                      'Workflow',
-                                      style: TextStyle(
-                                          fontSize: 28,
-                                          fontWeight: FontWeight.w600),
-                                    ),
-                                  ),
-                                  PreferredSize(
-                                    preferredSize:
-                                        const Size(double.infinity, 60),
-                                    child: TabBar(
-                                      controller: workFlowTabController,
-                                      enableFeedback: false,
-                                      indicatorColor: AppColors.primaryColors,
-                                      unselectedLabelColor:
-                                          const Color(0xFF9A9A9A),
-                                      labelColor: AppColors.primaryColors,
-                                      tabs: const [
-                                        SizedBox(
-                                          height: 50,
-                                          child: Center(
-                                            child: Text(
-                                              'Orders',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 50,
-                                          child: Center(
-                                            child: Text(
-                                              'Vehicle',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : null),
-
-              drawer: showDrawer(context),
-              bottomNavigationBar: BottomAppBar(
-                shape: const CircularNotchedRectangle(),
-                elevation: 100,
-                color: Colors.white,
-                notchMargin: 8,
-                child: SizedBox(
-                  height: 68,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              changePage(0);
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  height: 25,
-                                  width: 25,
-                                  child: SvgPicture.asset(
-                                      "assets/images/bottom_dashboard.svg",
-                                      color: widget.currentIndex == 0
-                                          ? AppColors.primaryColors
-                                          : const Color(0xff9A9A9A)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
-                                  child: Text("Dashboard",
-                                      style: TextStyle(
-                                          color: widget.currentIndex == 0
-                                              ? AppColors.primaryColors
-                                              : const Color(0xff9A9A9A),
-                                          fontWeight: widget.currentIndex == 0
-                                              ? FontWeight.w600
-                                              : FontWeight.w400)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              changePage(1);
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  height: 25,
-                                  width: 25,
-                                  child: SvgPicture.asset(
-                                      "assets/images/workflow_icon.svg",
-                                      color: widget.currentIndex == 1
-                                          ? AppColors.primaryColors
-                                          : const Color(0xff9A9A9A)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
-                                  child: Text("Workflow",
-                                      style: TextStyle(
-                                          color: widget.currentIndex == 1
-                                              ? AppColors.primaryColors
-                                              : const Color(0xff9A9A9A),
-                                          fontWeight: widget.currentIndex == 1
-                                              ? FontWeight.w600
-                                              : FontWeight.w400)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              changePage(2);
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  height: 25,
-                                  width: 25,
-                                  child: SvgPicture.asset(
-                                      "assets/images/calender_icon.svg",
-                                      color: widget.currentIndex == 2
-                                          ? AppColors.primaryColors
-                                          : const Color.fromARGB(
-                                              255, 81, 51, 51)),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
-                                  child: Text("Calendar",
-                                      style: TextStyle(
-                                          color: widget.currentIndex == 2
-                                              ? AppColors.primaryColors
-                                              : const Color(0xff9A9A9A),
-                                          fontWeight: widget.currentIndex == 2
-                                              ? FontWeight.w600
-                                              : FontWeight.w400)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.translucent,
-                            onTap: () {
-                              changePage(3);
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  height: 25,
-                                  width: 25,
-                                  child: SvgPicture.asset(
-                                    "assets/images/estimate_icon.svg",
-                                    color: widget.currentIndex == 3
-                                        ? AppColors.primaryColors
-                                        : Color(0xff9A9A9A),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 5.0),
-                                  child: Text(
-                                    "Estimate",
-                                    style: TextStyle(
-                                        color: widget.currentIndex == 3
-                                            ? AppColors.primaryColors
-                                            : Color(0xff9A9A9A),
-                                        fontWeight: widget.currentIndex == 3
-                                            ? FontWeight.w600
-                                            : FontWeight.w400),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-                // child: Row(
-                //   children: [
-                //     Column(
-
-                //       children: [
-                //         SvgPicture.asset("assets/images/dashboard_icon.svg"),
-                //         Text("Dashboard")
-
-                //       ],
-                //     )
-                //   ],
-                // ),
-              ),
-              body: PageView.builder(
-                itemBuilder: (context, index) {
-                  return !network
-                      ? NoInternetScreen(state: setState)
-                      : pages[index];
-                },
-                itemCount: pages.length,
-                controller: pageController,
-                physics: const NeverScrollableScrollPhysics(),
-              ),
-
-              // body: SafeArea(
-              //   child: Column(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       const Center(
-              //         child: Text("Dashboard screen"),
-              //       ),
-              //       Padding(
-              //         padding: const EdgeInsets.only(top:24.0),
-              //         child: GestureDetector(
-              //           onTap: (){
-              //             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-              //               return const WelcomeScreen();
-              //             },), (route) => false);
-              //             AppUtils.setToken("");
-
-              //           },
-              //           child: Text("Signout",style: TextStyle(
-              //             decoration: TextDecoration.underline,
-              //             fontSize: 16
-              //           ),),
-              //         ),
-              //       )
-              //     ],
-              //   ),
-              //  ),
-            );
+    return WillPopScope(
+      onWillPop: () async {
+        pageController.animateTo(1,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut);
+        widget.currentIndex = 0;
+        setState(() {});
+        return false;
+      },
+      child: BlocProvider(
+        create: (context) => DashboardBloc(apiRepository: ApiRepository())
+          ..add(GetUserProfileEvent()),
+        child: BlocListener<DashboardBloc, DashboardState>(
+          listener: (context, state) {
+            if (state is GetProfileDetailsState) {
+              AppUtils.setUserName(state.userProfile.user[0].firstName);
+              getUserName();
+              print(userName);
+            }
+            // TODO: implement listener
           },
+          child: BlocBuilder<DashboardBloc, DashboardState>(
+            builder: (context, state) {
+              return Scaffold(
+                backgroundColor: Color(0xffFAFAFA),
+                key: scaffoldKey,
+
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerDocked,
+                floatingActionButton: FloatingActionButton(
+                  backgroundColor: AppColors.primaryColors,
+                  elevation: 0,
+                  onPressed: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return mainCreateWidget();
+                      },
+                      isScrollControlled: true,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(12.0)),
+                      ),
+                    );
+                  },
+                  child: Icon(Icons.add),
+                ),
+                appBar: AppBar(
+                    leading: IconButton(
+                      icon: const Icon(
+                        Icons.menu,
+                        color: AppColors.primaryColors,
+                      ),
+                      onPressed: () {
+                        scaffoldKey.currentState!.openDrawer();
+                      },
+                    ),
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                    title: const Text(
+                      'Autopilot',
+                      style: TextStyle(color: Colors.black87),
+                    ),
+                    centerTitle: true,
+                    actions: [
+                      IconButton(
+                          onPressed: () {
+                            // Navigator.push(context, MaterialPageRoute(
+                            //   builder: (context) {
+                            //     return AddCompanyScreen();
+                            //   },
+                            // ));
+                          },
+                          icon: SvgPicture.asset(
+                            "assets/images/message.svg",
+                            color: AppColors.primaryColors,
+                          )),
+                      IconButton(
+                          onPressed: () {
+                            // Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //     builder: (context) => const NotificationScreen(),
+                            //   ),
+                            // );
+                          },
+                          icon: SvgPicture.asset(
+                            "assets/images/notification.svg",
+                            color: AppColors.primaryColors,
+                          ))
+                    ],
+                    bottom: widget.currentIndex == 3
+                        ? PreferredSize(
+                            preferredSize:
+                                Size(MediaQuery.of(context).size.width, 80),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Padding(
+                                  padding:
+                                      EdgeInsets.symmetric(horizontal: 16.0),
+                                  child: Text(
+                                    "Estimates",
+                                    style: TextStyle(
+                                        color: AppColors.primaryTitleColor,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                TabBar(
+                                  controller: estimateTabController,
+                                  enableFeedback: false,
+                                  labelPadding: EdgeInsets.all(0),
+                                  indicatorColor: AppColors.primaryColors,
+                                  unselectedLabelColor: const Color(0xFF9A9A9A),
+                                  labelColor: AppColors.primaryColors,
+                                  tabs: const [
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Recent',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Estimates',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Orders',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Invoices',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        : widget.currentIndex == 1
+                            ? PreferredSize(
+                                preferredSize: const Size(double.infinity, 90),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 16.0),
+                                      child: Text(
+                                        'Workflow',
+                                        style: TextStyle(
+                                            fontSize: 28,
+                                            fontWeight: FontWeight.w600),
+                                      ),
+                                    ),
+                                    PreferredSize(
+                                      preferredSize:
+                                          const Size(double.infinity, 60),
+                                      child: TabBar(
+                                        controller: workFlowTabController,
+                                        enableFeedback: false,
+                                        indicatorColor: AppColors.primaryColors,
+                                        unselectedLabelColor:
+                                            const Color(0xFF9A9A9A),
+                                        labelColor: AppColors.primaryColors,
+                                        tabs: const [
+                                          SizedBox(
+                                            height: 50,
+                                            child: Center(
+                                              child: Text(
+                                                'Orders',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 50,
+                                            child: Center(
+                                              child: Text(
+                                                'Vehicle',
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : null),
+
+                drawer: showDrawer(context),
+                bottomNavigationBar: BottomAppBar(
+                  shape: const CircularNotchedRectangle(),
+                  elevation: 100,
+                  color: Colors.white,
+                  notchMargin: 8,
+                  child: SizedBox(
+                    height: 68,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                changePage(0);
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: SvgPicture.asset(
+                                        "assets/images/bottom_dashboard.svg",
+                                        color: widget.currentIndex == 0
+                                            ? AppColors.primaryColors
+                                            : const Color(0xff9A9A9A)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Text("Dashboard",
+                                        style: TextStyle(
+                                            color: widget.currentIndex == 0
+                                                ? AppColors.primaryColors
+                                                : const Color(0xff9A9A9A),
+                                            fontWeight: widget.currentIndex == 0
+                                                ? FontWeight.w600
+                                                : FontWeight.w400)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                changePage(1);
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: SvgPicture.asset(
+                                        "assets/images/workflow_icon.svg",
+                                        color: widget.currentIndex == 1
+                                            ? AppColors.primaryColors
+                                            : const Color(0xff9A9A9A)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Text("Workflow",
+                                        style: TextStyle(
+                                            color: widget.currentIndex == 1
+                                                ? AppColors.primaryColors
+                                                : const Color(0xff9A9A9A),
+                                            fontWeight: widget.currentIndex == 1
+                                                ? FontWeight.w600
+                                                : FontWeight.w400)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                changePage(2);
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: SvgPicture.asset(
+                                        "assets/images/calender_icon.svg",
+                                        color: widget.currentIndex == 2
+                                            ? AppColors.primaryColors
+                                            : const Color.fromARGB(
+                                                255, 81, 51, 51)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Text("Calendar",
+                                        style: TextStyle(
+                                            color: widget.currentIndex == 2
+                                                ? AppColors.primaryColors
+                                                : const Color(0xff9A9A9A),
+                                            fontWeight: widget.currentIndex == 2
+                                                ? FontWeight.w600
+                                                : FontWeight.w400)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              behavior: HitTestBehavior.translucent,
+                              onTap: () {
+                                changePage(3);
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 25,
+                                    width: 25,
+                                    child: SvgPicture.asset(
+                                      "assets/images/estimate_icon.svg",
+                                      color: widget.currentIndex == 3
+                                          ? AppColors.primaryColors
+                                          : Color(0xff9A9A9A),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Text(
+                                      "Estimate",
+                                      style: TextStyle(
+                                          color: widget.currentIndex == 3
+                                              ? AppColors.primaryColors
+                                              : Color(0xff9A9A9A),
+                                          fontWeight: widget.currentIndex == 3
+                                              ? FontWeight.w600
+                                              : FontWeight.w400),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  // child: Row(
+                  //   children: [
+                  //     Column(
+
+                  //       children: [
+                  //         SvgPicture.asset("assets/images/dashboard_icon.svg"),
+                  //         Text("Dashboard")
+
+                  //       ],
+                  //     )
+                  //   ],
+                  // ),
+                ),
+                body: PageView.builder(
+                  itemBuilder: (context, index) {
+                    return !network
+                        ? NoInternetScreen(state: setState)
+                        : pages[index];
+                  },
+                  itemCount: pages.length,
+                  controller: pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                ),
+
+                // body: SafeArea(
+                //   child: Column(
+                //     mainAxisAlignment: MainAxisAlignment.center,
+                //     children: [
+                //       const Center(
+                //         child: Text("Dashboard screen"),
+                //       ),
+                //       Padding(
+                //         padding: const EdgeInsets.only(top:24.0),
+                //         child: GestureDetector(
+                //           onTap: (){
+                //             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
+                //               return const WelcomeScreen();
+                //             },), (route) => false);
+                //             AppUtils.setToken("");
+
+                //           },
+                //           child: Text("Signout",style: TextStyle(
+                //             decoration: TextDecoration.underline,
+                //             fontSize: 16
+                //           ),),
+                //         ),
+                //       )
+                //     ],
+                //   ),
+                //  ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -542,10 +555,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
-                  // DummyScreen(
-                  //   name: "New Customer Screen",
-                  // )),
-                  NewCustomerScreen()),
+                  DummyScreen(
+                    name: "New Customer Screen",
+                  )),
+              //  NewCustomerScreen()),
               bottomSheetTile(
                   "New Vehicle",
                   "assets/images/vehicle_icon.svg",

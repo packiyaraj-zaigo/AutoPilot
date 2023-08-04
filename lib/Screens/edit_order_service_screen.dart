@@ -65,6 +65,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
   bool isTax = false;
 
   final technicianController = TextEditingController();
+  String technicianError = '';
+
   String technicianId = '';
 
   CannedServiceCreateModel? service;
@@ -241,8 +243,15 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
                       const SizedBox(height: 16),
 
-                      textBox('Select Technician', technicianController,
-                          'Technician', technicianId.isEmpty, context, true),
+                      textBox(
+                          'Select Technician',
+                          technicianController,
+                          'Technician',
+                          technicianError.isNotEmpty,
+                          context,
+                          true),
+                      errorWidget(error: technicianError),
+
                       // const Text(
                       //   "Technician",
                       //   style: TextStyle(
@@ -966,6 +975,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
       status = false;
     } else {
       taxError = '';
+    }
+    if (technicianController.text.trim().isEmpty) {
+      technicianError = 'Technician cannot be empty';
+      status = false;
+    } else {
+      technicianError = '';
     }
 
     setState(() {});

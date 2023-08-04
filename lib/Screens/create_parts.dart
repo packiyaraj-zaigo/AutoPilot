@@ -106,7 +106,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PartsScreen(),
+                    builder: (context) => const PartsScreen(),
                   ));
               ScaffoldMessenger.of((context)).showSnackBar(
                 SnackBar(
@@ -135,51 +135,68 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                               color: AppColors.primaryTitleColor),
                         ),
                         const SizedBox(height: 16),
-                        // textBox("Enter name...", nameController,
-                        //     "Owner", nameErrorStatus),
                         textBox("Enter Item Name", itemnameController,
-                            "Item Name", itemnameErrorStaus),
-
-                        // Visibility(
-                        //     visible: yearErrorStaus,
-                        //     child: Text(
-                        //       yearErrorMsg,
-                        //       style: const TextStyle(
-                        //         fontSize: 14,
-                        //         fontWeight: FontWeight.w500,
-                        //         color: Color(
-                        //           0xffD80027,
-                        //         ),
-                        //       ),
-                        //     )),
-
+                            "Item Name", itemnameErrorStaus, true),
+                        errorMessageWidget(
+                            itemnameErrorMsg, itemnameErrorStaus),
                         textBox("Enter Serial Number", serialnumberController,
-                            "Serial Number", serialnumberErrorStatus),
-                        // SizedBox(
-                        //   height: 15,
-                        // ),
+                            "Serial Number", serialnumberErrorStatus, true),
+                        errorMessageWidget(
+                            serialnumberErrorMsg, serialnumberErrorStatus),
                         textBox("Enter Quanity Number", quantityController,
-                            "Quantity", quantityErrorStatus),
-                        textBox(
-                            "Enter Fee", feeController, "Fee", feeErrorStatus),
+                            "Quantity", quantityErrorStatus, true),
+                        errorMessageWidget(
+                            quantityErrorMsg, quantityErrorStatus),
+                        textBox("Enter Fee", feeController, "Fee",
+                            feeErrorStatus, false),
+                        errorMessageWidget(feeErrorMsg, feeErrorStatus),
                         textBox("Enter Supplies", suppliesController,
-                            "Supplies", suppliesErrorStatus),
+                            "Supplies", suppliesErrorStatus, false),
+                        errorMessageWidget(
+                            suppliesErrorMsg, suppliesErrorStatus),
                         textBox("Enter EPA Number", epaController, "EPA",
-                            epaErrorStatus),
+                            epaErrorStatus, false),
+                        errorMessageWidget(epaErrorMsg, epaErrorStatus),
                         textBox("Enter Cost", costController, "Cost",
-                            costErrorStatus),
+                            costErrorStatus, true),
+                        errorMessageWidget(costErrorMsg, costErrorStatus),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
                           child: ElevatedButton(
                             onPressed: () {
-                              validateParts(
-                                context,
-                                itemnameController.text,
-                                serialnumberController.text,
-                                stateUpdate,
-                              );
-
+                              final status = validateParts();
+                              if (status) {
+                                if (widget.part != null) {
+                                  context.read<PartsBloc>().add(
+                                        EditPartEvent(
+                                          itemname: itemnameController.text,
+                                          quantity: quantityController.text,
+                                          serialnumber:
+                                              serialnumberController.text,
+                                          fee: feeController.text,
+                                          cost: costController.text,
+                                          id: widget.part!.id.toString(),
+                                        ),
+                                      );
+                                } else {
+                                  context.read<PartsBloc>().add(
+                                        AddParts(
+                                          context: context,
+                                          itemname: itemnameController.text,
+                                          quantity: quantityController.text,
+                                          serialnumber:
+                                              serialnumberController.text,
+                                          fee: feeController.text,
+                                          supplies: suppliesController.text,
+                                          epa: epaController.text,
+                                          cost: costController.text,
+                                          type: _currentSelectedTypeValue
+                                              .toString(),
+                                        ),
+                                      );
+                                }
+                              }
                               // Navigator.push(
                               //     context,
                               //     MaterialPageRoute(
@@ -196,7 +213,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                                 ? const CupertinoActivityIndicator(
                                     color: Colors.white,
                                   )
-                                : Text(
+                                : const Text(
                                     'Confirm',
                                     style: TextStyle(fontSize: 15),
                                   ),
@@ -212,109 +229,118 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
     );
   }
 
-  validateParts(
-    BuildContext context,
-    String PartsItemname,
-    String serialnumber,
-    StateSetter stateUpdate,
-  ) {
-    if (PartsItemname.isEmpty) {
-      stateUpdate(() {
-        itemnameErrorMsg = 'Itemname cant be empty.';
-        itemnameErrorStaus = true;
-      });
+  bool validateParts() {
+    bool status = true;
+    if (itemnameController.text.isEmpty) {
+      itemnameErrorMsg = "Item name can't be empty.";
+      itemnameErrorStaus = true;
+      status = false;
     } else {
       itemnameErrorStaus = false;
     }
-    if (serialnumber.isEmpty) {
-      stateUpdate(() {
-        serialnumberErrorMsg = 'Itemname cant be empty.';
-        serialnumberErrorStatus = true;
-      });
+    if (serialnumberController.text.isEmpty) {
+      serialnumberErrorMsg = "Item name can't be empty.";
+      serialnumberErrorStatus = true;
+      status = false;
     } else {
       serialnumberErrorStatus = false;
     }
-
-    if (!itemnameErrorStaus && !serialnumberErrorStatus) {
-      if (widget.part != null) {
-        context.read<PartsBloc>().add(
-              EditPartEvent(
-                itemname: itemnameController.text,
-                quantity: quantityController.text,
-                serialnumber: serialnumberController.text,
-                fee: feeController.text,
-                cost: costController.text,
-                id: widget.part!.id.toString(),
-              ),
-            );
-      } else {
-        context.read<PartsBloc>().add(
-              AddParts(
-                context: context,
-                itemname: itemnameController.text,
-                quantity: quantityController.text,
-                serialnumber: serialnumberController.text,
-                fee: feeController.text,
-                supplies: suppliesController.text,
-                epa: epaController.text,
-                cost: costController.text,
-                type: _currentSelectedTypeValue.toString(),
-              ),
-            );
-      }
+    if (quantityController.text.isEmpty) {
+      quantityErrorMsg = "Quantity can't be empty.";
+      quantityErrorStatus = true;
+      status = false;
+    } else {
+      quantityErrorStatus = false;
     }
+    if (costController.text.isEmpty) {
+      costErrorMsg = "Cost can't be empty.";
+      costErrorStatus = true;
+      status = false;
+    } else {
+      costErrorStatus = false;
+    }
+    setState(() {});
+    return status;
   }
-}
 
-Widget textBox(String placeHolder, TextEditingController controller,
-    String label, bool errorStatus) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: TextStyle(
+  Widget errorMessageWidget(String errorMsg, bool isVisible) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6.0, bottom: 16),
+      child: Visibility(
+        visible: isVisible,
+        child: Text(
+          errorMsg,
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Color(0xff6A7187)),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 6.0, bottom: 15),
-        child: SizedBox(
-          height: 56,
-          child: TextField(
-            keyboardType:
-                label == 'Fee' || label == "Quantity" || label == "Cost"
-                    ? TextInputType.number
-                    : null,
-            inputFormatters:
-                label == 'Fee' || label == "Quantity" || label == "Cost"
-                    ? [FilteringTextInputFormatter.digitsOnly]
-                    : [],
-            controller: controller,
-            decoration: InputDecoration(
-                hintText: placeHolder,
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                        color: errorStatus == true
-                            ? Color(0xffD80027)
-                            : Color(0xffC1C4CD))),
-                enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                        color: errorStatus == true
-                            ? Color(0xffD80027)
-                            : Color(0xffC1C4CD))),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                        color: errorStatus == true
-                            ? Color(0xffD80027)
-                            : Color(0xffC1C4CD)))),
+            color: Color(0xFFD80027),
           ),
         ),
       ),
-    ],
-  );
+    );
+  }
+
+  Widget textBox(String placeHolder, TextEditingController controller,
+      String label, bool errorStatus, bool isRequired) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xff6A7187)),
+            ),
+            Text(
+              isRequired ? ' *' : '',
+              style: const TextStyle(
+                  fontSize: 14, fontWeight: FontWeight.w500, color: Colors.red),
+            ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            top: 6.0,
+          ),
+          child: SizedBox(
+            height: 56,
+            child: TextField(
+              keyboardType:
+                  label == 'Fee' || label == "Quantity" || label == "Cost"
+                      ? TextInputType.number
+                      : null,
+              inputFormatters:
+                  label == 'Fee' || label == "Quantity" || label == "Cost"
+                      ? [FilteringTextInputFormatter.digitsOnly]
+                      : [],
+              controller: controller,
+              decoration: InputDecoration(
+                  hintText: placeHolder,
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? Color(0xffD80027)
+                              : Color(0xffC1C4CD))),
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? Color(0xffD80027)
+                              : Color(0xffC1C4CD))),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                          color: errorStatus == true
+                              ? Color(0xffD80027)
+                              : Color(0xffC1C4CD)))),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
