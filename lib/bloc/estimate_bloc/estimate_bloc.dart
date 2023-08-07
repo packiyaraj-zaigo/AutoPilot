@@ -49,6 +49,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<DeleteOrderServiceEvent>(deleteOrderServiceBloc);
     on<SendEstimateToCustomerEvent>(sendEstimateToCustomerBloc);
     on<DeleteAppointmentEstimateEvent>(deleteAppointmentBloc);
+    on<CollectPaymentEstimateEvent>(collectPaymentBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -702,6 +703,42 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     } catch (e, s) {
       emit(DeleteAppointmentEstimateErrorState(
           errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("hereee");
+    }
+  }
+
+  Future<void> collectPaymentBloc(
+    CollectPaymentEstimateEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      emit(CollectPaymentEstimateLoadingState());
+
+      Response collectPaymentRes = await _apiRepository.collectPayment(
+          token,
+          event.customerId,
+          event.orderId,
+          event.paymentMode,
+          event.amount,
+          event.date,
+          event.note);
+
+      log("res${collectPaymentRes.body}");
+
+      if (collectPaymentRes.statusCode == 201) {
+        emit(CollectPaymentEstimateState());
+      } else {
+        //  final decodedResponse = json.decode(deleteAppointmentRes.body);
+        emit(CollectPaymentEstimateErrorState(errorMessage: "Payment failed"));
+      }
+    } catch (e, s) {
+      emit(CollectPaymentEstimateErrorState(errorMessage: "Payment failed"));
 
       print(e.toString());
       print(s);

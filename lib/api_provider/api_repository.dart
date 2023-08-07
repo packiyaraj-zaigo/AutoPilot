@@ -513,6 +513,18 @@ class ApiRepository {
       dynamic token, String appointmentId) async {
     return apiProvider.deleteAppointment(token, appointmentId);
   }
+
+  Future<dynamic> collectPayment(
+      dynamic token,
+      String customerId,
+      String orderId,
+      String paymentMode,
+      String amount,
+      String date,
+      String notes) async {
+    return apiProvider.collectPayment(
+        token, customerId, orderId, paymentMode, amount, date, notes);
+  }
 }
 
 class NetworkError extends Error {}

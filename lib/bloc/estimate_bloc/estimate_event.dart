@@ -162,3 +162,14 @@ class DeleteAppointmentEstimateEvent extends EstimateEvent {
   final String appointmetId;
   DeleteAppointmentEstimateEvent({required this.appointmetId});
 }
+
+class CollectPaymentEstimateEvent extends EstimateEvent {
+  final String customerId, orderId, paymentMode, amount, date, note;
+  CollectPaymentEstimateEvent(
+      {required this.amount,
+      required this.customerId,
+      required this.orderId,
+      required this.paymentMode,
+      required this.date,
+      required this.note});
+}

@@ -1739,4 +1739,33 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+  Future<dynamic> collectPayment(
+      String token,
+      String customerId,
+      String orderId,
+      String paymentMode,
+      String amount,
+      String date,
+      String notes) async {
+    try {
+      final body = {
+        "customer_id": customerId,
+        "order_id": orderId,
+        "payment_mode": paymentMode,
+        "paid_amount": amount,
+        "payment_date": date,
+        "note": notes
+      };
+
+      final url = Uri.parse('${BASE_URL}api/payments');
+      final response = await http.post(url,
+          headers: getHeader(token), body: jsonEncode(body));
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + "send to customer provider  error");
+    }
+  }
 }

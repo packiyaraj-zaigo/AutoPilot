@@ -125,3 +125,12 @@ class DeleteAppointmentEstimateErrorState extends EstimateState {
   final String errorMessage;
   DeleteAppointmentEstimateErrorState({required this.errorMessage});
 }
+
+class CollectPaymentEstimateState extends EstimateState {}
+
+class CollectPaymentEstimateLoadingState extends EstimateState {}
+
+class CollectPaymentEstimateErrorState extends EstimateState {
+  final String errorMessage;
+  CollectPaymentEstimateErrorState({required this.errorMessage});
+}
