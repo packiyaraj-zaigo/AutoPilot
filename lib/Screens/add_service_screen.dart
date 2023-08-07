@@ -895,7 +895,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     bool status = true;
 
     if (serviceNameController.text.trim().isEmpty) {
-      serviceNameError = 'Service name cannot be empty';
+      serviceNameError = "Service name can't be empty";
       status = false;
     } else if (serviceNameController.text.trim().length < 2) {
       serviceNameError = 'Enter a valid Service name';
@@ -905,7 +905,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     }
 
     if (laborDescriptionController.text.trim().isEmpty) {
-      laborDescriptionError = 'Notes cannot be empty';
+      laborDescriptionError = "'Notes can't be empty";
       status = false;
     } else if (laborDescriptionController.text.trim().length < 2) {
       laborDescriptionError = 'Notes should be greater than 2 characters';
@@ -915,13 +915,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     }
 
     if (rateController.text.trim().isEmpty) {
-      rateError = 'Rate cannot be empty';
+      rateError = "'Rate can't be empty";
       status = false;
     } else {
       rateError = '';
     }
     if (taxController.text.trim().isEmpty) {
-      taxError = 'Tax Cannot be empty';
+      taxError = "Tax can't be empty";
       status = false;
     } else {
       taxError = '';
@@ -1051,25 +1051,25 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addMaterialValidation(StateSetter setState) {
       bool status = true;
       if (addMaterialNameController.text.trim().isEmpty) {
-        adddMaterialNameErrorStatus = 'Material name cannot be empty';
+        adddMaterialNameErrorStatus = "Material name can't be empty";
         status = false;
       } else {
         adddMaterialNameErrorStatus = '';
       }
       if (addMaterialDescriptionController.text.trim().isEmpty) {
-        addMaterialDescriptionErrorStatus = 'Description cannot be empty';
+        addMaterialDescriptionErrorStatus = "'Description can't be empty";
         status = false;
       } else {
         addMaterialDescriptionErrorStatus = '';
       }
       if (addMaterialPriceController.text.trim().isEmpty) {
-        addMaterialPriceErrorStatus = 'Price cannot be empty';
+        addMaterialPriceErrorStatus = "'Price can't be empty";
         status = false;
       } else {
         addMaterialPriceErrorStatus = '';
       }
       if (addMaterialDiscountController.text.trim().isEmpty) {
-        addMaterialDiscountErrorStatus = 'Discount cannot be empty';
+        addMaterialDiscountErrorStatus = "'Discount can't be empty";
         status = false;
       } else if (subTotal < 0) {
         addMaterialDiscountErrorStatus = 'Discount should be less than price';
@@ -1078,7 +1078,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addMaterialDiscountErrorStatus = '';
       }
       if (addMaterialBatchController.text.trim().isEmpty) {
-        adddMaterialBatchErrorStatus = 'Part/Batch Number cannot be empty';
+        adddMaterialBatchErrorStatus = "Part Batch Number can't be empty";
         status = false;
       } else {
         adddMaterialBatchErrorStatus = '';
@@ -1376,31 +1376,31 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addPartValidation(StateSetter setState) {
       bool status = true;
       if (addPartNameController.text.trim().isEmpty) {
-        addPartNameErrorStatus = 'Part name cannot be empty';
+        addPartNameErrorStatus = "Part name can't be empty";
         status = false;
       } else {
         addPartNameErrorStatus = '';
       }
       if (addPartDescriptionController.text.trim().isEmpty) {
-        addPartDescriptionErrorStatus = 'Description cannot be empty';
+        addPartDescriptionErrorStatus = "'Description can't be empty";
         status = false;
       } else {
         addPartDescriptionErrorStatus = '';
       }
       if (addPartPriceController.text.trim().isEmpty) {
-        addPartPriceErrorStatus = 'Price cannot be empty';
+        addPartPriceErrorStatus = "'Price can't be empty";
         status = false;
       } else {
         addPartPriceErrorStatus = '';
       }
       if (addPartDiscountController.text.trim().isEmpty) {
-        addPartDiscountErrorStatus = 'Discount cannot be empty';
+        addPartDiscountErrorStatus = "'Discount can't be empty";
         status = false;
       } else {
         addPartDiscountErrorStatus = '';
       }
       if (addPartPartNumberController.text.trim().isEmpty) {
-        adddPartPartNumberErrorStatus = 'Part Number cannot be empty';
+        adddPartPartNumberErrorStatus = "Part Number can't be empty";
         status = false;
       } else {
         adddPartPartNumberErrorStatus = '';
@@ -1675,31 +1675,31 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addLaborValidation(StateSetter setState) {
       bool status = true;
       if (addLaborNameController.text.trim().isEmpty) {
-        addLaborNameErrorStatus = 'Labor name cannot be empty';
+        addLaborNameErrorStatus = "Labor name can't be empty";
         status = false;
       } else {
         addLaborNameErrorStatus = '';
       }
       if (addLaborCostController.text.trim().isEmpty) {
-        addLaborCostErrorStatus = 'Cost cannot be empty';
+        addLaborCostErrorStatus = "'Cost can't be empty";
         status = false;
       } else {
         addLaborCostErrorStatus = '';
       }
       if (addLaborHoursController.text.trim().isEmpty) {
-        addLaborHoursErrorStatus = 'Hours cannot be empty';
+        addLaborHoursErrorStatus = "'Hours can't be empty";
         status = false;
       } else {
         addLaborHoursErrorStatus = '';
       }
       if (addLaborDescriptionController.text.trim().isEmpty) {
-        addLaborDescriptionErrorStatus = 'Description cannot be empty';
+        addLaborDescriptionErrorStatus = "'Description can't be empty";
         status = false;
       } else {
         addLaborDescriptionErrorStatus = '';
       }
       if (addLaborDiscountController.text.trim().isEmpty) {
-        addLaborDiscountErrorStatus = 'Discount cannot be empty';
+        addLaborDiscountErrorStatus = "'Discount can't be empty";
         status = false;
       } else {
         addLaborDiscountErrorStatus = '';
@@ -1912,19 +1912,19 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addFeeValidation(StateSetter setState) {
       bool status = true;
       if (addFeeNameController.text.trim().isEmpty) {
-        addFeeNameErrorStatus = 'Fee name cannot be empty';
+        addFeeNameErrorStatus = "Fee name can't be empty";
         status = false;
       } else {
         addFeeNameErrorStatus = '';
       }
       if (addFeePriceController.text.trim().isEmpty) {
-        addFeePriceErrorStatus = 'Price cannot be empty';
+        addFeePriceErrorStatus = "'Price can't be empty";
         status = false;
       } else {
         addFeePriceErrorStatus = '';
       }
       if (addFeeDescriptionController.text.trim().isEmpty) {
-        addFeeDescriptionErrorStatus = 'Description cannot be empty';
+        addFeeDescriptionErrorStatus = "'Description can't be empty";
         status = false;
       } else {
         addFeeDescriptionErrorStatus = '';
@@ -2157,25 +2157,25 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     addSubContractValidation(StateSetter setState) {
       bool status = true;
       if (addSubContractNameController.text.trim().isEmpty) {
-        addSubContractNameErrorStatus = 'Sub Contract name cannot be empty';
+        addSubContractNameErrorStatus = "Sub Contract name can't be empty";
         status = false;
       } else {
         addSubContractNameErrorStatus = '';
       }
       if (addSubContractPriceController.text.trim().isEmpty) {
-        addSubContractPriceErrorStatus = 'Price cannot be empty';
+        addSubContractPriceErrorStatus = "'Price can't be empty";
         status = false;
       } else {
         addSubContractPriceErrorStatus = '';
       }
       if (addSubContractDescriptionController.text.trim().isEmpty) {
-        addSubContractDescriptionErrorStatus = 'Description cannot be empty';
+        addSubContractDescriptionErrorStatus = "'Description can't be empty";
         status = false;
       } else {
         addSubContractDescriptionErrorStatus = '';
       }
       if (addSubContractDiscountController.text.trim().isEmpty) {
-        addSubContractDiscountErrorStatus = 'Discount cannot be empty';
+        addSubContractDiscountErrorStatus = "'Discount can't be empty";
         status = false;
       } else {
         addSubContractDiscountErrorStatus = '';
@@ -2289,9 +2289,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      // mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Checkbox(
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
+                            splashRadius: 0,
+                            visualDensity: VisualDensity.compact,
                             value: isTax,
                             onChanged: (value) {
                               newSetState(() {

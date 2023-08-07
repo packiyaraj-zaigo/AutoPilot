@@ -172,7 +172,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                         return customerList.isEmpty
                             ? const Center(
                                 child: Text(
-                                'No user found',
+                                'No Customer Found',
                                 style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,

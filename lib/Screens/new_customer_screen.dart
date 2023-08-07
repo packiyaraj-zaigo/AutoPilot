@@ -516,9 +516,9 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             child: TextField(
               controller: controller,
               maxLength: 5,
-              keyboardType: TextInputType.phone,
+              keyboardType: TextInputType.number,
               inputFormatters: [
-                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                FilteringTextInputFormatter.digitsOnly,
               ],
               decoration: InputDecoration(
                   hintText: placeHolder,
