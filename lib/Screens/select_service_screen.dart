@@ -34,6 +34,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
   List<Datum> serviceList = [];
 
   final _debouncer = Debouncer();
+  final searchController = TextEditingController();
 
   @override
   void initState() {
@@ -110,6 +111,24 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                       height: 50,
                       child: CupertinoTextField(
                         textAlignVertical: TextAlignVertical.bottom,
+                        controller: searchController,
+                        suffix: Padding(
+                          padding: const EdgeInsets.only(right: 12.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (searchController.text.isNotEmpty) {
+                                searchController.clear();
+                                BlocProvider.of<ServiceBloc>(
+                                        scaffoldKey.currentContext!)
+                                    .add(GetAllServicess(query: ""));
+                              }
+                            },
+                            child: Icon(
+                              Icons.close,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ),
                         padding: const EdgeInsets.only(
                             top: 14, bottom: 14, left: 16),
                         onChanged: (value) {

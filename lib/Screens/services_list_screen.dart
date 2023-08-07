@@ -28,6 +28,7 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
   // final List<Employee> servicesList = [];
   List<Datum> serviceList = [];
   final _debouncer = Debouncer();
+  final searchController = TextEditingController();
 
   @override
   void initState() {
@@ -138,6 +139,24 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                           ),
                           placeholder: 'Search Services',
                           maxLines: 1,
+                          controller: searchController,
+                          suffix: Padding(
+                            padding: const EdgeInsets.only(right: 12.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (searchController.text.isNotEmpty) {
+                                  searchController.clear();
+                                  BlocProvider.of<ServiceBloc>(
+                                          scaffoldKey.currentContext!)
+                                      .add(GetAllServicess(query: ""));
+                                }
+                              },
+                              child: const Icon(
+                                Icons.close,
+                                color: AppColors.primaryColors,
+                              ),
+                            ),
+                          ),
                           placeholderStyle: const TextStyle(
                             color: Color(0xFF7F808C),
                           ),

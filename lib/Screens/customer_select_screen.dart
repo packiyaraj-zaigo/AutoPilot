@@ -219,9 +219,14 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                                             ),
                                             child: InkWell(
                                               onTap: () {
-                                                //  Navigator.of(context).pop(item);
-                                                //open dialog
-                                                showDialog(context, "", item);
+                                                if (widget.navigation ==
+                                                    "appointment") {
+                                                  Navigator.of(context)
+                                                      .pop(item);
+                                                } else {
+                                                  //open dialog
+                                                  showDialog(context, "", item);
+                                                }
                                               },
                                               child: ListTile(
                                                 title: Text(item.firstName),

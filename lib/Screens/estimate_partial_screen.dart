@@ -521,7 +521,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             : Padding(
                                 padding: const EdgeInsets.only(top: 16.0),
                                 child: textBox(
-                                    "Select Exsisting",
+                                    "Select Existing",
                                     vehicleController,
                                     "Vehicle",
                                     vehicleErrorStatus),
