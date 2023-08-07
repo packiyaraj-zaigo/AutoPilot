@@ -99,7 +99,7 @@ class Datum {
   int id;
   int clientId;
   String serviceName;
-  ServiceNote? serviceNote;
+  String? serviceNote;
 
   String servicePrice;
 
@@ -146,9 +146,7 @@ class Datum {
         id: json["id"],
         clientId: json["client_id"],
         serviceName: json["service_name"],
-        serviceNote: json["service_note"] != null
-            ? serviceNoteValues.map[json["service_note"]]
-            : null,
+        serviceNote: json["service_note"],
         servicePrice: json["service_price"],
         discount: json["discount"],
         serviceEpa: json["service_epa"],
