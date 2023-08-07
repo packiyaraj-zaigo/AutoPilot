@@ -59,10 +59,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
     pages = [
       DashBoardScreen(),
-      // WorkFlowScreen(tabController: workFlowTabController),
-      DummyScreen(name: "Work flow Screen"),
-      DummyScreen(name: "Calendar Screen"),
-      //  CalendarScreen(),
+      WorkFlowScreen(tabController: workFlowTabController),
+      //  DummyScreen(name: "Work flow Screen"),
+      // DummyScreen(name: "Calendar Screen"),
+      CalendarScreen(),
       EstimateScreen(
         tabController: estimateTabController,
       )
@@ -569,10 +569,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
               bottomSheetTile(
                   "New Appointment",
                   "assets/images/appointment_icon.svg",
-                  DummyScreen(
-                    name: "New Appointment Screen",
-                  )),
-              //  CreateAppointmentScreen()),
+                  // DummyScreen(
+                  //   name: "New Appointment Screen",
+                  // )),
+                  CreateAppointmentScreen()),
               bottomSheetTile(
                   "Scanner",
                   "assets/images/scanner_icon.svg",

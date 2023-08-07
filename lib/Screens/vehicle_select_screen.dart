@@ -210,7 +210,12 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                                             GestureDetector(
                                               behavior: HitTestBehavior.opaque,
                                               onTap: () {
-                                                showDialog(context, "", item);
+                                                if (widget.navigation ==
+                                                    "appointment") {
+                                                  Navigator.pop(context, item);
+                                                } else {
+                                                  showDialog(context, "", item);
+                                                }
                                               },
                                               child: Container(
                                                 height: 77,
