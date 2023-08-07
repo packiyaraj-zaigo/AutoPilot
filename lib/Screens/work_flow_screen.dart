@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/create_workflow.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -135,9 +137,15 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              Icon(
-                Icons.more_horiz,
-                color: AppColors.primaryColors,
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => CreateWorkflowScreen()));
+                },
+                child: Icon(
+                  Icons.more_horiz,
+                  color: AppColors.primaryColors,
+                ),
               ),
             ],
           ),
