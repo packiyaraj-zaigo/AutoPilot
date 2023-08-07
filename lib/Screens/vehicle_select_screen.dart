@@ -93,6 +93,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -144,9 +145,9 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 16),
                   ],
                 ),
-                const SizedBox(height: 16),
                 BlocListener<VechileBloc, VechileState>(
                   listener: (context, state) {
                     if (state is VechileDetailsSuccessStates) {
@@ -167,7 +168,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                         return vechile.isEmpty
                             ? const Center(
                                 child: Text(
-                                'No Vehicle found',
+                                'No Vehicle Found',
                                 style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
@@ -335,6 +336,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                     },
                   ),
                 ),
+                SizedBox(),
               ],
             ),
           )),
