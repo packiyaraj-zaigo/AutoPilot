@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
+import 'package:auto_pilot/Screens/time_card_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -80,7 +81,11 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
           if (state is CreateTimeCardErrorState) {
             CommonWidgets().showDialog(context, state.message);
           } else if (state is CreateTimeCardSucessState) {
-            Navigator.of(context).pop();
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const TimeCardsScreen(),
+                ),
+                (route) => false);
           }
         },
         child: BlocBuilder<TimeCardBloc, TimeCardState>(

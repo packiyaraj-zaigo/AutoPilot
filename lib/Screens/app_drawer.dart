@@ -53,7 +53,10 @@ showDrawer(BuildContext context) {
             //   ), //Text
             // ), //circleAvatar
           ), //UserAccountDrawerHeader
-        ), //DrawerHeader
+        ),
+        const SizedBox(
+          height: 16.5,
+        ),
         drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard",
             context, BottomBarScreen()),
         drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees",
@@ -90,12 +93,11 @@ showDrawer(BuildContext context) {
         drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
             context, BottomBarScreen()),
         drawerTileWidget(
-            "assets/images/time_card_drawer_icon.svg",
-            "Time Cards",
-            context,
-            DummyScreen(
-              name: "Time Card Screen",
-            )),
+          "assets/images/time_card_drawer_icon.svg",
+          "Time Cards",
+          context,
+          TimeCardsScreen(),
+        ),
         const SizedBox(
           height: 52,
         ),
@@ -132,7 +134,7 @@ Widget drawerTileWidget(
       }
     },
     child: Padding(
-      padding: const EdgeInsets.only(left: 33.0, top: 33),
+      padding: const EdgeInsets.only(left: 33.0, top: 16.5, bottom: 16.5),
       child: Row(
         children: [
           SizedBox(

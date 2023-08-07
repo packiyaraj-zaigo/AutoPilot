@@ -149,11 +149,17 @@ class Orders {
         serviceWriterId: json["service_writer_id"],
         shopStart: json["shop_start"],
         shopFinish: json["shop_finish"],
-        customer: Customer.fromJson(json["customer"]),
-        vehicle: Vehicle.fromJson(json["vehicle"]),
-        servicewriter: Servicewriter.fromJson(json["servicewriter"]),
-        workOrderNotes:
-            List<dynamic>.from(json["work_order_notes"].map((x) => x)),
+        customer: json["customer"] == null
+            ? null
+            : Customer.fromJson(json["customer"]),
+        vehicle:
+            json["vehicle"] == null ? null : Vehicle.fromJson(json["vehicle"]),
+        servicewriter: json["servicewriter"] == null
+            ? null
+            : Servicewriter.fromJson(json["servicewriter"]),
+        workOrderNotes: json["work_order_notes"] == null
+            ? null
+            : List<dynamic>.from(json["work_order_notes"].map((x) => x)),
       );
 
   Map<String, dynamic> toJson() => {
