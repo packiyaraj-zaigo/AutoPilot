@@ -6,6 +6,7 @@ import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_strings.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -43,6 +44,13 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
     bloc.add(customerDetails(query: ''));
   }
 
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,12 +69,14 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
         actions: [
           IconButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NewCustomerScreen(),
-                ),
-              );
+              networkCheck().then((value) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NewCustomerScreen(),
+                  ),
+                );
+              });
             },
             icon: Icon(
               Icons.add,
@@ -316,16 +326,19 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
-                        if (widget.navigation == "new") {
-                          context.read<EstimateBloc>().add(CreateEstimateEvent(
-                              id: item.id.toString(), which: "customer"));
-                        } else {
-                          context.read<EstimateBloc>().add(EditEstimateEvent(
-                              id: item.id.toString(),
-                              orderId: widget.orderId ?? "",
-                              which: "customer",
-                              customerId: item.id.toString()));
-                        }
+                        networkCheck().then((value) {
+                          if (widget.navigation == "new") {
+                            context.read<EstimateBloc>().add(
+                                CreateEstimateEvent(
+                                    id: item.id.toString(), which: "customer"));
+                          } else {
+                            context.read<EstimateBloc>().add(EditEstimateEvent(
+                                id: item.id.toString(),
+                                orderId: widget.orderId ?? "",
+                                which: "customer",
+                                customerId: item.id.toString()));
+                          }
+                        });
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),
@@ -337,22 +350,6 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class Debouncer {
-  int? milliseconds;
-  VoidCallback? action;
-  Timer? timer;
-
-  run(VoidCallback action) {
-    if (null != timer) {
-      timer!.cancel();
-    }
-    timer = Timer(
-      const Duration(milliseconds: Duration.millisecondsPerSecond),
-      action,
     );
   }
 }

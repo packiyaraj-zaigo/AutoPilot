@@ -5,6 +5,7 @@ import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:auto_pilot/Screens/customers_screen.dart' as cs;
 import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -116,7 +117,22 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
       body: BlocListener<CustomerBloc, CustomerState>(
         listener: (context, state) {
           if (state is CustomerError) {
-          } else if (state is CustomerLoading) {}
+          } else if (state is DeleteCustomer) {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) {
+                return const cs.CustomersScreen();
+              },
+            ));
+          } else if (state is DeleteCustomerErrorState) {
+            Navigator.of(context).pop();
+            CommonWidgets().showDialog(context, state.errorMsg);
+          } else if (state is DeleteCustomerLoading) {
+            showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => CupertinoActivityIndicator(),
+            );
+          }
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
           builder: (context, state) {
@@ -762,11 +778,36 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                   ],
                                 ),
                                 onPressed: () async {
-                                  BlocProvider.of<CustomerBloc>(context).add(
-                                      DeleteCustomerEvent(
-                                          customerId:
-                                              widget.customerData.id.toString(),
-                                          context: context));
+                                  Navigator.of(context).pop(true);
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => CupertinoAlertDialog(
+                                      title: const Text("Delete customer?"),
+                                      content: const Text(
+                                          'Do you really want to delete this customer?'),
+                                      actions: [
+                                        CupertinoButton(
+                                          child: const Text('Yes'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(true);
+                                            BlocProvider.of<CustomerBloc>(
+                                                    context)
+                                                .add(DeleteCustomerEvent(
+                                                    customerId: widget
+                                                        .customerData.id
+                                                        .toString(),
+                                                    context: context));
+                                          },
+                                        ),
+                                        CupertinoButton(
+                                          child: const Text('No'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 })),
                       ],
                     ),

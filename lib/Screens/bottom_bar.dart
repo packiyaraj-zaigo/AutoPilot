@@ -2,18 +2,15 @@
 
 import 'dart:developer';
 
-import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
-import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
 import 'package:auto_pilot/Screens/new_appointment_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
-import 'package:auto_pilot/Screens/notification_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -21,7 +18,6 @@ import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -58,31 +54,25 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     );
 
     pages = [
-      DashBoardScreen(),
+      const DashBoardScreen(),
       WorkFlowScreen(tabController: workFlowTabController),
       //  DummyScreen(name: "Work flow Screen"),
       // DummyScreen(name: "Calendar Screen"),
-      CalendarScreen(),
+      const CalendarScreen(),
       EstimateScreen(
         tabController: estimateTabController,
       )
 
       // DummyScreen(name: "Estimate screen")
     ];
-    // TODO: implement initState
     super.initState();
-    // networkCheck();
-    // pageController.jumpToPage(widget.currentIndex);
-    networkCheck().then((value) {
-      // if (!network) {
-      setState(() {});
-    });
   }
 
-  bool network = false;
+  bool network = true;
 
   Future<bool> networkCheck() async {
     final value = await AppUtils.getConnectivity().then((value) {
+      log('value: $value');
       return value;
     });
     return value;
@@ -116,14 +106,13 @@ class _BottomBarScreenState extends State<BottomBarScreen>
             if (state is GetProfileDetailsState) {
               AppUtils.setUserName(state.userProfile.user[0].firstName);
               getUserName();
-              print(userName);
+              log(userName);
             }
-            // TODO: implement listener
           },
           child: BlocBuilder<DashboardBloc, DashboardState>(
             builder: (context, state) {
               return Scaffold(
-                backgroundColor: Color(0xffFAFAFA),
+                backgroundColor: const Color(0xffFAFAFA),
                 key: scaffoldKey,
 
                 floatingActionButtonLocation:
@@ -144,7 +133,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                       ),
                     );
                   },
-                  child: Icon(Icons.add),
+                  child: const Icon(Icons.add),
                 ),
                 appBar: AppBar(
                     leading: IconButton(
@@ -210,7 +199,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                 TabBar(
                                   controller: estimateTabController,
                                   enableFeedback: false,
-                                  labelPadding: EdgeInsets.all(0),
+                                  labelPadding: const EdgeInsets.all(0),
                                   indicatorColor: AppColors.primaryColors,
                                   unselectedLabelColor: const Color(0xFF9A9A9A),
                                   labelColor: AppColors.primaryColors,
@@ -407,11 +396,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                     height: 25,
                                     width: 25,
                                     child: SvgPicture.asset(
-                                        "assets/images/calender_icon.svg",
-                                        color: widget.currentIndex == 2
-                                            ? AppColors.primaryColors
-                                            : const Color.fromARGB(
-                                                255, 81, 51, 51)),
+                                      "assets/images/calender_icon.svg",
+                                      color: widget.currentIndex == 2
+                                          ? AppColors.primaryColors
+                                          : const Color(0xff9A9A9A),
+                                    ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 5.0),
@@ -444,7 +433,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                       "assets/images/estimate_icon.svg",
                                       color: widget.currentIndex == 3
                                           ? AppColors.primaryColors
-                                          : Color(0xff9A9A9A),
+                                          : const Color(0xff9A9A9A),
                                     ),
                                   ),
                                   Padding(
@@ -454,7 +443,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                                       style: TextStyle(
                                           color: widget.currentIndex == 3
                                               ? AppColors.primaryColors
-                                              : Color(0xff9A9A9A),
+                                              : const Color(0xff9A9A9A),
                                           fontWeight: widget.currentIndex == 3
                                               ? FontWeight.w600
                                               : FontWeight.w400),
@@ -551,14 +540,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   // DummyScreen(
                   //   name: "Create estimate screen",
                   // )),
-                  CreateEstimateScreen()),
+                  const CreateEstimateScreen()),
               bottomSheetTile(
                   "New Customer",
                   "assets/images/customer_icon.svg",
-                  DummyScreen(
-                    name: "New Customer Screen",
-                  )),
-              //  NewCustomerScreen()),
+                  // DummyScreen(
+                  //   name: "New Customer Screen",
+                  // )),
+                  NewCustomerScreen()),
               bottomSheetTile(
                   "New Vehicle",
                   "assets/images/vehicle_icon.svg",
@@ -572,14 +561,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                   // DummyScreen(
                   //   name: "New Appointment Screen",
                   // )),
-                  CreateAppointmentScreen()),
+                  const CreateAppointmentScreen()),
               bottomSheetTile(
                   "Scanner",
                   "assets/images/scanner_icon.svg",
                   // DummyScreen(
                   //   name: "Scanner Screen",
                   // )),
-                  ScannerScreen()),
+                  const ScannerScreen()),
               Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: GestureDetector(
@@ -615,6 +604,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       padding: const EdgeInsets.only(top: 16.0),
       child: GestureDetector(
         onTap: () async {
+          Navigator.pop(context);
           Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => constructor,
           ));
@@ -624,7 +614,7 @@ class _BottomBarScreenState extends State<BottomBarScreen>
           height: 56,
           width: MediaQuery.of(context).size.width,
           decoration: BoxDecoration(
-              color: Color(0xffF6F6F6),
+              color: const Color(0xffF6F6F6),
               borderRadius: BorderRadius.circular(12)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -1,21 +1,19 @@
-import 'dart:async';
+import 'dart:developer';
 
 import 'package:auto_pilot/Models/customer_model.dart';
-import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 
-import 'package:auto_pilot/Screens/estimate_details_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 
-import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -81,6 +79,13 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
       vehicleController.text =
           '${widget.vehicle!.vehicleYear} ${widget.vehicle!.vehicleModel}';
     }
+  }
+
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
   }
 
   @override
@@ -195,8 +200,8 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     halfTextBox("Select Time", startTimeController,
-                        "Start time", startTimeErrorStatus),
-                    halfTextBox("Select Time", endTimeController, "End time",
+                        "Start Time", startTimeErrorStatus),
+                    halfTextBox("Select Time", endTimeController, "End Time",
                         endTimeErrorStatus)
                   ],
                 ),
@@ -369,7 +374,8 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                         value: value,
                         child: Text(
                           value,
-                          style: TextStyle(overflow: TextOverflow.ellipsis),
+                          style:
+                              const TextStyle(overflow: TextOverflow.ellipsis),
                         ),
                       );
                     }).toList(),
@@ -416,25 +422,38 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
             label == "Customer" || label == "Vehicle" || label == "Services"
                 ? GestureDetector(
                     onTap: () {
-                      if (label == "Customer") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return NewCustomerScreen(
-                                navigation: "estimate_screen",
-                              );
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
-                      } else if (label == "Vehicle") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return CreateVehicleScreen();
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
-                      }
+                      networkCheck().then((value) {
+                        if (!value &&
+                            (label == "Customer" ||
+                                label == "Vehicle" ||
+                                label == "Services")) {
+                          CommonWidgets().showDialog(context,
+                              'Please check your internet connection and try again');
+                        } else if (label == "Customer") {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return const NewCustomerScreen(
+                                  navigation: "estimate_screen",
+                                );
+                              },
+                              isScrollControlled: true,
+                              useSafeArea: true);
+                        } else if (label == "Vehicle") {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return const CreateVehicleScreen(
+                                  navigation: 'estimate_screen',
+                                );
+                              },
+                              isScrollControlled: true,
+                              useSafeArea: true);
+                        } else if (label == "Services") {
+                          CommonWidgets().showDialog(context,
+                              "Please create an Estimate by selecting a customer or vehicle");
+                        }
+                      });
                     },
                     child: const Row(
                       children: [
@@ -464,57 +483,65 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
               controller: controller,
               readOnly: true,
               onTap: () async {
-                if (label == 'Date') {
-                  // showCupertinoModalPopup(
-                  //   context: context,
-                  //   builder: (context) {
-                  //     return datePicker("");
-                  //   },
-                  // );
-                  CommonWidgets().showDialog(context,
-                      "Please create an Estimate by selecting a customer or vehicle");
-                } else if (label == "Customer") {
-                  // showModalBottomSheet(
-                  //     context: context,
-                  //     builder: (context) {
-                  //       return customerBottomSheet();
-                  //     },
-                  //     backgroundColor: Colors.transparent);
+                networkCheck().then((value) async {
+                  if (!value &&
+                      (label == 'Date' ||
+                          label == 'Customer' ||
+                          label == 'Vehicle')) {
+                    CommonWidgets().showDialog(context,
+                        'Please check your internet connection and try again');
+                  } else if (label == 'Date') {
+                    // showCupertinoModalPopup(
+                    //   context: context,
+                    //   builder: (context) {
+                    //     return datePicker("");
+                    //   },
+                    // );
+                    CommonWidgets().showDialog(context,
+                        "Please create an Estimate by selecting a customer or vehicle");
+                  } else if (label == "Customer") {
+                    // showModalBottomSheet(
+                    //     context: context,
+                    //     builder: (context) {
+                    //       return customerBottomSheet();
+                    //     },
+                    //     backgroundColor: Colors.transparent);
 
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return SelectCustomerScreen(
-                        navigation: "new",
-                      );
-                    },
-                  ));
-                } else if (label == 'Vehicle') {
-                  // showModalBottomSheet(
-                  //   context: context,
-                  //   isScrollControlled: true,
-                  //   useSafeArea: true,
-                  //   builder: (context) {
-                  //     return SelectVehiclesScreen();
-                  //   },
-                  // );
-                  await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return SelectVehiclesScreen(
-                        navigation: "new",
-                      );
-                    },
-                  )).then((value) {
-                    selectedVehicleDetails = value;
-                    print(selectedVehicleDetails);
-                    // setState(() {
-                    //   vehicleController.text =
-                    //       "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
-                    // });
-                  });
-                } else {
-                  CommonWidgets().showDialog(context,
-                      "Please create an Estimate by selecting a customer or vehicle");
-                }
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return const SelectCustomerScreen(
+                          navigation: "new",
+                        );
+                      },
+                    ));
+                  } else if (label == 'Vehicle') {
+                    // showModalBottomSheet(
+                    //   context: context,
+                    //   isScrollControlled: true,
+                    //   useSafeArea: true,
+                    //   builder: (context) {
+                    //     return SelectVehiclesScreen();
+                    //   },
+                    // );
+                    await Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return const SelectVehiclesScreen(
+                          navigation: "new",
+                        );
+                      },
+                    )).then((value) {
+                      selectedVehicleDetails = value;
+                      log(selectedVehicleDetails.toString());
+                      // setState(() {
+                      //   vehicleController.text =
+                      //       "${selectedVehicleDetails?.vehicleYear ?? ""} ${selectedVehicleDetails?.vehicleMake ?? ""} ${selectedVehicleDetails?.vehicleModel ?? ""}";
+                      // });
+                    });
+                  } else {
+                    CommonWidgets().showDialog(context,
+                        "Please create an Estimate by selecting a customer or vehicle");
+                  }
+                });
               },
               keyboardType:
                   label == 'Phone Number' ? TextInputType.number : null,
@@ -538,20 +565,20 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD)))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
         ),
@@ -602,20 +629,20 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD)))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
         ),
@@ -651,8 +678,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   setState(() {
                     // initialTimer = changeTimer;
 
-                    print(
-                        '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
+                    log('${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
                   });
                 },
               ),
@@ -687,7 +713,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                   initialDateTime: DateTime.now(),
                   onDateTimeChanged: (DateTime newdate) {},
                   use24hFormat: true,
-                  maximumDate: new DateTime(2030, 12, 30),
+                  maximumDate: DateTime(2030, 12, 30),
                   minimumYear: 2009,
                   maximumYear: 2030,
                   minuteInterval: 1,
@@ -740,15 +766,15 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
 
   Widget customerBottomSheet() {
     return BlocProvider(
-      create: (context) => CustomerBloc()..add(customerDetails(query: "")),
+      create: (context) =>
+          CustomerBloc()..add(const customerDetails(query: "")),
       child: BlocListener<CustomerBloc, CustomerState>(
         listener: (context, state) {
           if (state is CustomerReady) {
             //    customerModel = state.customer;
             customerDataList.addAll(state.customer.data);
-            print(customerDataList.length.toString() + "cus length");
+            log("${customerDataList.toString().length}cus length");
           }
-          // TODO: implement listener
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
           builder: (context, state) {
@@ -874,7 +900,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                                   .isPaginationLoading = true;
                                               BlocProvider.of<CustomerBloc>(
                                                       context)
-                                                  .add(customerDetails(
+                                                  .add(const customerDetails(
                                                       query: ''));
                                             });
                                           }
@@ -903,8 +929,6 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
           if (state is VechileDetailsSuccessStates) {
             vehicleDataList.addAll(state.vechile.data.data);
           }
-
-          // TODO: implement listener
         },
         child: BlocBuilder<VechileBloc, VechileState>(
           builder: (context, state) {
@@ -1016,7 +1040,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                                       });
                                     }
                                   }),
-                                physics: ClampingScrollPhysics(),
+                                physics: const ClampingScrollPhysics(),
                               ),
                             ),
                           )
