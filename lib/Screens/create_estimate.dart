@@ -462,7 +462,7 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                           color: AppColors.primaryColors,
                         ),
                         Text(
-                          "Add new",
+                          "Add New",
                           style: TextStyle(
                               color: AppColors.primaryColors,
                               fontSize: 14,

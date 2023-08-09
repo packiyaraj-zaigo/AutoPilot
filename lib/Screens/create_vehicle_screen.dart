@@ -165,7 +165,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Vehicle created successfully'),
+                        content: Text('Vehicle Created Successfully'),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -181,7 +181,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Vehicle created successfully'),
+                        content: Text('Vehicle Created Successfully'),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -660,7 +660,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   }
 
   Widget vechiledropDown() {
-    return typeController.text.isNotEmpty
+    return widget.vehicle != null
         ? textBox('Type', typeController, 'Type', false, true)
         : Padding(
             padding: const EdgeInsets.only(top: 12.0),
@@ -700,8 +700,11 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                               child: Text(value.vehicleTypeName),
                             );
                           }).toList(),
-                          hint: const Text(
-                            "Select Type",
+                          hint: Text(
+                            widget.editVehicle == null ||
+                                    widget.editVehicle!.vehicleType.isEmpty
+                                ? "Select Type"
+                                : widget.editVehicle!.vehicleType.toString(),
                             style: TextStyle(
                                 color: Color(0xff6A7187),
                                 fontSize: 16,

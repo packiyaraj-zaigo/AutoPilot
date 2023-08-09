@@ -125,7 +125,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
               ));
 
               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Service deletion succefull"),
+                  content: Text("Service Deleted Successfully"),
                   backgroundColor: Colors.green));
             }
             if (state is DeleteCannedServiceErrorState) {

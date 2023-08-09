@@ -81,7 +81,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             ));
 
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Employee deletion succefull"),
+                content: Text("Employee Deleted Succefully"),
                 backgroundColor: Colors.green));
           }
           if (state is DeleteEmployeeErrorState) {

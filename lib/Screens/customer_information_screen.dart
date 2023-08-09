@@ -288,6 +288,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         height: 20,
                                       ),
                                       Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
@@ -350,7 +352,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                               width: 18,
                                               child: SvgPicture.asset(
                                                 'assets/images/mail_icons.svg',
-                                                height: 23,
+                                                height: 27,
                                                 color: AppColors.primaryColors,
                                               ),
                                             ),
@@ -430,27 +432,6 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                       const SizedBox(
                                         height: 14,
                                       ),
-                                      const Text(
-                                        "Address",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryGrayColors),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        widget.customerData.addressLine1 == null
-                                            ? ''
-                                            : widget.customerData.addressLine1
-                                                .toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryTitleColor),
-                                      ),
-                                      AppUtils.verticalDivider(),
                                     ],
                                   ),
                                 )),
