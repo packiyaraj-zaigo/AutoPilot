@@ -1224,13 +1224,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               appointmentLabelwithValue(
-                  "Start date",
+                  "Start Date",
                   appointmentDetailsModel?.data.data != null &&
                           appointmentDetailsModel?.data.data != []
                       ? "${appointmentDetailsModel?.data.data[0].startOn.month}/${appointmentDetailsModel?.data.data[0].startOn.day}/${appointmentDetailsModel?.data.data[0].startOn.year}"
                       : ""),
               appointmentLabelwithValue(
-                  "Completion date",
+                  "Completion Date",
                   appointmentDetailsModel?.data.data != null &&
                           appointmentDetailsModel?.data.data != []
                       ? "${appointmentDetailsModel?.data.data[0].endOn.month}/${appointmentDetailsModel?.data.data[0].endOn.day}/${appointmentDetailsModel?.data.data[0].endOn.year}"
@@ -2424,13 +2424,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
-              child: GestureDetector(
+              child:  GestureDetector(
                 onTap: () {
+
+                  if(widget.estimateDetails.data.vehicle!=null){
+
                   setState(() {
                     isVehicleEdit = true;
                   });
 
                   Navigator.pop(context);
+                  }
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -2442,13 +2446,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg",
+                      color: widget.estimateDetails.data.vehicle != null
+                              ? AppColors.primaryColors
+                              : Colors.grey,),
+                       Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
                           "Edit Vehicle",
                           style: TextStyle(
-                              color: AppColors.primaryColors,
+                              color:widget.estimateDetails.data.vehicle!=null? AppColors.primaryColors:Colors.grey,
                               fontSize: 18,
                               fontWeight: FontWeight.w600),
                         ),
@@ -2456,7 +2463,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     ],
                   ),
                 ),
-              ),
+              )
             ),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
