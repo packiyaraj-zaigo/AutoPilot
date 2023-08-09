@@ -65,47 +65,48 @@ class _VechileInformationState extends State<VechileInformation> {
             color: AppColors.primaryColors,
             icon: Icon(Icons.arrow_back),
           ),
-          title: const Center(
-            child: Text(
-              "Vehicle's Information",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryBlackColors),
-            ),
+          title: Text(
+            "Vehicle's Information",
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: AppColors.primaryBlackColors),
           ),
-          actions: [
-            BlocListener<VechileBloc, VechileState>(
-              listener: (context, state) {
-                if (state is DeleteVechileDetailsSuccessState) {
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => const VehiclesScreen(),
-                      ),
-                      (route) => false);
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Vehicle deleted successfully'),
-                    backgroundColor: Colors.green,
-                  ));
-                } else if (state is DeleteVechileDetailsErrorState) {
-                  Navigator.pop(context);
-                  CommonWidgets().showDialog(context, state.message);
-                } else if (state is DeleteVechileDetailsLoadingState) {
-                  showCupertinoModalPopup(
-                      context: context,
-                      builder: (context) =>
-                          Center(child: CupertinoActivityIndicator()));
-                }
-              },
-              child: IconButton(
-                onPressed: () {
-                  showBottomSheet(scaffoldKey.currentContext!);
-                },
-                icon: Icon(Icons.more_horiz),
-                color: AppColors.primaryColors,
-              ),
-            )
-          ],
+          centerTitle: true,
+          actions: widget.vechile.vehicleYear == ''
+              ? null
+              : [
+                  BlocListener<VechileBloc, VechileState>(
+                    listener: (context, state) {
+                      if (state is DeleteVechileDetailsSuccessState) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                              builder: (context) => const VehiclesScreen(),
+                            ),
+                            (route) => false);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Vehicle deleted successfully'),
+                          backgroundColor: Colors.green,
+                        ));
+                      } else if (state is DeleteVechileDetailsErrorState) {
+                        Navigator.pop(context);
+                        CommonWidgets().showDialog(context, state.message);
+                      } else if (state is DeleteVechileDetailsLoadingState) {
+                        showCupertinoModalPopup(
+                            context: context,
+                            builder: (context) =>
+                                Center(child: CupertinoActivityIndicator()));
+                      }
+                    },
+                    child: IconButton(
+                      onPressed: () {
+                        showBottomSheet(scaffoldKey.currentContext!);
+                      },
+                      icon: Icon(Icons.more_horiz),
+                      color: AppColors.primaryColors,
+                    ),
+                  )
+                ],
         ),
         body: Padding(
           padding: const EdgeInsets.only(left: 24, right: 24),
