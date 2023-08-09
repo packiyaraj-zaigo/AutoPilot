@@ -72,7 +72,6 @@ class _CalendarScreenState extends State<CalendarScreen>
                         _selectedDate = DateTime(_selectedDate.year,
                             _selectedDate.month, _selectedDate.day - 1);
                         setState(() {});
-                        print('kkkkk${_selectedDate}');
                         _tabController.index == 0
                             ? context.read<CalendarBloc>().add(CalendarDetails(
                                   selectedDate: _selectedDate,
@@ -89,22 +88,21 @@ class _CalendarScreenState extends State<CalendarScreen>
                         color: AppColors.primaryColors,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 15,
                     ),
                     Text(
                       inputFormat.format(_selectedDate),
                       style: AppUtils.boldStyle(),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 15,
                     ),
                     InkWell(
                         onTap: () {
                           _selectedDate = DateTime(_selectedDate.year,
                               _selectedDate.month, _selectedDate.day + 1);
-                          print(inputFormat.format(_selectedDate));
-                          print('kkkkk${_selectedDate}');
+
                           setState(() {});
                           // context.read<CalendarBloc>().add(CalendarDetails(
                           //       selectedDate: _selectedDate,
@@ -157,19 +155,19 @@ class _CalendarScreenState extends State<CalendarScreen>
                                   _selectedDate;
                               setState(() {});
                               _tabController.index == 0
+                                  // ignore: use_build_context_synchronously
                                   ? context
                                       .read<CalendarBloc>()
                                       .add(CalendarDetails(
                                         selectedDate: _selectedDate,
                                       ))
+                                  // ignore: use_build_context_synchronously
                                   : context
                                       .read<CalendarBloc>()
                                       .add(CalendarWeekDetails(
                                         startDate: _selectedDate,
                                         endDate: _selectedDate,
                                       ));
-                              print(
-                                  'kkkllkl${DateTime(_selectedDate.year, _selectedDate.month, _selectedDate.day + 1)}');
                             },
                             icon: const Icon(
                               Icons.calendar_month_sharp,
@@ -194,7 +192,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                   controller: _tabController,
                   labelColor: AppColors.primaryColors,
                   unselectedLabelColor: Colors.grey,
-                  tabs: [
+                  tabs: const [
                     Tab(
                       text: 'Day',
                     ),
@@ -214,7 +212,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                             BlocBuilder<CalendarBloc, CalendarState>(
                                 builder: (context, state) {
                               if (state is CalendarLoading) {
-                                return Center(
+                                return const Center(
                                     child: CupertinoActivityIndicator());
                               } else if (state is CalendarReady) {
                                 return state.calendarModel.data.isNotEmpty
@@ -256,9 +254,11 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(
-                                                                '${state.calendarModel.data[rowIndex].title}'),
-                                                            SizedBox(
+                                                            Text(state
+                                                                .calendarModel
+                                                                .data[rowIndex]
+                                                                .title),
+                                                            const SizedBox(
                                                               height: 10,
                                                             ),
                                                             Container(
@@ -302,9 +302,15 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                           .spaceEvenly,
                                                                   children: [
                                                                     Text(
-                                                                      '${state.calendarModel.data[rowIndex].data[colIndex].text}',
+                                                                      state
+                                                                          .calendarModel
+                                                                          .data[
+                                                                              rowIndex]
+                                                                          .data[
+                                                                              colIndex]
+                                                                          .text,
                                                                       style:
-                                                                          TextStyle(
+                                                                          const TextStyle(
                                                                         color: Color(
                                                                             0xFF9A9A9A),
                                                                         fontSize:
@@ -319,9 +325,15 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                               .ellipsis,
                                                                     ),
                                                                     Text(
-                                                                      '${state.calendarModel.data[rowIndex].data[colIndex].text2}',
+                                                                      state
+                                                                          .calendarModel
+                                                                          .data[
+                                                                              rowIndex]
+                                                                          .data[
+                                                                              colIndex]
+                                                                          .text2,
                                                                       style:
-                                                                          TextStyle(
+                                                                          const TextStyle(
                                                                         fontWeight:
                                                                             FontWeight.w600,
                                                                         color: AppColors
@@ -340,7 +352,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                           : '${state.calendarModel.data[rowIndex].data[colIndex].text3}' ??
                                                                               '',
                                                                       style:
-                                                                          TextStyle(
+                                                                          const TextStyle(
                                                                         fontWeight:
                                                                             FontWeight.w400,
                                                                         color: Color(
@@ -358,7 +370,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                           ? 'no data'
                                                                           : '${state.calendarModel.data[rowIndex].data[colIndex].text4}',
                                                                       style:
-                                                                          TextStyle(
+                                                                          const TextStyle(
                                                                         fontWeight:
                                                                             FontWeight.w400,
                                                                         color: Color(
@@ -414,7 +426,16 @@ class _CalendarScreenState extends State<CalendarScreen>
                                           ),
                                         ),
                                       )
-                                    : Center(child: Text('No Events Found'));
+                                    : const Center(
+                                        child: Text(
+                                          'No Events Found',
+                                          style: TextStyle(
+                                            color: AppColors.greyText,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      );
                               } else {
                                 return Container();
                               }
@@ -422,7 +443,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                             BlocBuilder<CalendarBloc, CalendarState>(
                                 builder: (context, state) {
                               if (state is CalendarWeekLoading) {
-                                return Center(
+                                return const Center(
                                     child: CupertinoActivityIndicator());
                               } else if (state is CalendarWeekReady) {
                                 return state.calendarWeekModel.data.isNotEmpty
@@ -449,7 +470,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                       .calendarWeekModel
                                                       .data[index]
                                                       .date),
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                     color: Color(0xFF9A9A9A),
                                                     fontSize: 12,
                                                     fontWeight: FontWeight.w500,
@@ -497,7 +518,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                 child: Text(
                                                                   '${state.calendarWeekModel.data[index].eventCount}',
                                                                   style:
-                                                                      TextStyle(
+                                                                      const TextStyle(
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w400,
@@ -515,7 +536,7 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                 child: Text(
                                                                   '${state.calendarWeekModel.data[index].eventCount}',
                                                                   style:
-                                                                      TextStyle(
+                                                                      const TextStyle(
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w400,
@@ -539,10 +560,9 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                 MainAxisAlignment
                                                                     .spaceBetween,
                                                             children: [
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 width: 93,
-                                                                child:
-                                                                    const Text(
+                                                                child: Text(
                                                                   'Appointment',
                                                                   style:
                                                                       TextStyle(
@@ -558,13 +578,12 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                                           .ellipsis,
                                                                 ),
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 width: 5,
                                                               ),
-                                                              SizedBox(
+                                                              const SizedBox(
                                                                 width: 93,
-                                                                child:
-                                                                    const Text(
+                                                                child: Text(
                                                                   'staff',
                                                                   style:
                                                                       TextStyle(
@@ -709,7 +728,8 @@ class _CalendarScreenState extends State<CalendarScreen>
                                           },
                                         ),
                                       )
-                                    : Center(child: Text('No Events Found'));
+                                    : const Center(
+                                        child: Text('No Events Found'));
                               } else {
                                 return Container();
                               }

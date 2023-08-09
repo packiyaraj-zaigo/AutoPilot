@@ -838,7 +838,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price '
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : [],
-              maxLength: 50,
+              maxLength: 25,
               decoration: InputDecoration(
                 suffixIcon: label == 'Discount' || label.contains("Labor Rate")
                     ? const Icon(
@@ -1382,19 +1382,22 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addPartNameErrorStatus = '';
       }
       if (addPartDescriptionController.text.trim().isEmpty) {
-        addPartDescriptionErrorStatus = "'Description can't be empty";
+        addPartDescriptionErrorStatus = "Description can't be empty";
         status = false;
       } else {
         addPartDescriptionErrorStatus = '';
       }
       if (addPartPriceController.text.trim().isEmpty) {
-        addPartPriceErrorStatus = "'Price can't be empty";
+        addPartPriceErrorStatus = "Price can't be empty";
         status = false;
       } else {
         addPartPriceErrorStatus = '';
       }
       if (addPartDiscountController.text.trim().isEmpty) {
-        addPartDiscountErrorStatus = "'Discount can't be empty";
+        addPartDiscountErrorStatus = "Discount can't be empty";
+        status = false;
+      } else if (subTotal < 0) {
+        addPartDiscountErrorStatus = "Discount cannot be greater than price";
         status = false;
       } else {
         addPartDiscountErrorStatus = '';
@@ -1700,6 +1703,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       }
       if (addLaborDiscountController.text.trim().isEmpty) {
         addLaborDiscountErrorStatus = "'Discount can't be empty";
+        status = false;
+      } else if (subTotal < 0) {
+        addLaborDiscountErrorStatus = "Discount cannot be greater than price";
         status = false;
       } else {
         addLaborDiscountErrorStatus = '';
@@ -2176,6 +2182,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       }
       if (addSubContractDiscountController.text.trim().isEmpty) {
         addSubContractDiscountErrorStatus = "'Discount can't be empty";
+        status = false;
+      } else if (subTotal < 0) {
+        addSubContractDiscountErrorStatus =
+            "Discount cannot be greater than price";
         status = false;
       } else {
         addSubContractDiscountErrorStatus = '';

@@ -113,25 +113,23 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           event.pinCode,
           event.stateId);
       var unloadData = _decoder.convert(loadedResponse.body);
-      print('nnnnnnnnnnnnnnnnnnnnnnnnnn');
-
-      print(unloadData.toString());
+      log(unloadData.toString());
       if (loadedResponse.statusCode == 200 ||
           loadedResponse.statusCode == 201) {
-        print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
-
-        emit(CreateCustomerState());
-
-        // Navigator.of(event.context).pushAndRemoveUntil(
-        //   MaterialPageRoute(
-        //     builder: (context) => CustomersScreen(),
-        //   ),
-        //   (route) => false,
-        // );
+        emit(CreateCustomerState(id: unloadData['created_id'].toString()));
+      } else {
+        if (unloadData.containsKey('message')) {
+          emit(AddCustomerError(message: unloadData['message']));
+        } else if (unloadData.containsKey('error')) {
+          emit(AddCustomerError(message: unloadData['error']));
+        } else {
+          emit(AddCustomerError(
+              message: unloadData[unloadData.keys.first][0].toString()));
+        }
       }
     } catch (e) {
       showLoading = 0;
-      emit(AddCustomerError(message: e.toString()));
+      emit(AddCustomerError(message: "Something went wrong"));
     }
   }
 
@@ -392,22 +390,18 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           await _apiRepository.deleteCustomer(token, event.customerId);
       var unloadData = _decoder.convert(loadedResponse.body);
       if (loadedResponse.statusCode == 200) {
-        Navigator.of(event.context).pushReplacement(MaterialPageRoute(
-          builder: (context) {
-            return CustomersScreen();
-          },
-        ));
-        print('lllllllllll');
-        final responseBody = jsonDecode(loadedResponse.body);
         emit(
-          DeleteCustomer(
-            customer: Data.fromJson(
-              responseBody['data'],
-            ),
-          ),
+          DeleteCustomer(),
         );
+      } else {
+        if (unloadData.containsKey('message')) {
+          emit(DeleteCustomerErrorState(errorMsg: unloadData['message']));
+        } else if (unloadData.containsKey('error')) {
+          emit(DeleteCustomerErrorState(errorMsg: unloadData['error']));
+        } else {
+          throw '';
+        }
       }
-      print('ccccccccc${loadedResponse.body}ccccccc');
     } catch (e) {
       showLoading = 0;
       emit(DeleteCustomerErrorState(errorMsg: "Something went wrong"));

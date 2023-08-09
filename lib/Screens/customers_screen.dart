@@ -226,7 +226,7 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                                   title: Text(
                                                       '${item.firstName ?? ''}'),
                                                   subtitle: Text(
-                                                      '${item.companyName ?? ''}'),
+                                                      '${item.phone ?? ''}'),
                                                   // trailing: Icon(Icons.add),
                                                   trailing: Row(
                                                     mainAxisSize:

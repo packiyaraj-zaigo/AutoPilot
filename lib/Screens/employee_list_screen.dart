@@ -31,7 +31,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
   final List<Employee> employeeList = [];
   final _debouncer = Debouncer();
 
-  bool network = false;
+  bool network = true;
 
   Future<bool> networkCheck() async {
     final value = await AppUtils.getConnectivity().then((value) {
@@ -45,11 +45,6 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
     super.initState();
     bloc = BlocProvider.of<EmployeeBloc>(context);
     bloc.currentPage = 1;
-    // bloc.add(GetAllEmployees());
-    networkCheck().then((value) {
-      // if (!network) {
-      setState(() {});
-    });
   }
 
   @override
@@ -60,6 +55,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           setState(() {
             network = value;
           });
+        } else if (network) {
           bloc.add(GetAllEmployees());
         }
       });
@@ -75,6 +71,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
       },
       child: Scaffold(
         key: scaffoldKey,
+        backgroundColor: !network ? Colors.white : null,
         drawer: showDrawer(context),
         appBar: AppBar(
           leading: IconButton(
@@ -86,7 +83,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
               scaffoldKey.currentState!.openDrawer();
             },
           ),
-          backgroundColor: const Color(0xFFFAFAFA),
+          backgroundColor: Colors.transparent,
           elevation: 0,
           title: const Text(
             'Autopilot',
@@ -95,12 +92,17 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           centerTitle: true,
           actions: [
             GestureDetector(
-              onTap: () async {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) =>
-                      const CreateEmployeeScreen(navigation: "add_employee"),
-                ));
-              },
+              onTap: !network
+                  ? () {
+                      CommonWidgets().showDialog(context,
+                          'Please check your internet connection and try again');
+                    }
+                  : () async {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                        builder: (context) => const CreateEmployeeScreen(
+                            navigation: "add_employee"),
+                      ));
+                    },
               child: const Icon(
                 Icons.add,
                 color: AppColors.primaryColors,

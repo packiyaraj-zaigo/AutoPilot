@@ -1,23 +1,25 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
+import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../Models/province_model.dart';
-import '../api_provider/api_repository.dart';
 import '../bloc/customer_bloc/customer_bloc.dart';
 import '../utils/app_colors.dart';
 import '../utils/app_strings.dart';
 
 class NewCustomerScreen extends StatefulWidget {
-  Datum? customerEdit;
-  String? navigation;
-  NewCustomerScreen({Key? key, this.customerEdit, this.navigation})
+  final Datum? customerEdit;
+  final String? navigation;
+  const NewCustomerScreen({Key? key, this.customerEdit, this.navigation})
       : super(key: key);
 
   @override
@@ -81,6 +83,13 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
     super.initState();
   }
 
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,14 +110,10 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              icon: Icon(
+              icon: const Icon(
                 Icons.close_rounded,
-                size: AppStrings.fontSize20,
-                color: AppColors.primaryBlackColors,
+                color: AppColors.primaryColors,
               )),
-          const SizedBox(
-            width: 20,
-          )
         ],
       ),
       body: BlocProvider(
@@ -116,26 +121,29 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         child: BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is AddCustomerError) {
-              if (state.message.containsKey('email')) {
-                emailErrorStatus = true;
-                emailErrorMsg = state.message['email'];
-              }
-              ScaffoldMessenger.of((context)).showSnackBar(SnackBar(
-                content: Text('${state.message}'),
-                backgroundColor: Colors.red,
-              ));
+              CommonWidgets().showDialog(context, state.message);
 
               '==========================errrrrrrrrorrrrrrrrr';
             } else if (state is CreateCustomerState) {
               if (widget.navigation != null) {
                 Navigator.pop(context);
               } else {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => CustomersScreen(),
-                  ),
-                  (route) => false,
-                );
+                if (check) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          DummyCustomerScreen(customerId: state.id),
+                    ),
+                    (route) => false,
+                  );
+                } else {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => const CustomersScreen(),
+                    ),
+                    (route) => false,
+                  );
+                }
               }
             } else if (state is AddCustomerLoading) {
               const Center(
@@ -322,19 +330,21 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           ),
                         ],
                       ),
-                      CheckboxListTile(
-                        fillColor: const MaterialStatePropertyAll(
-                            AppColors.primaryGrayColors),
-                        controlAffinity: ListTileControlAffinity.leading,
-                        title: const Text(
-                            "Create new estimate using this customer"),
-                        value: check,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            check = value!;
-                          });
-                        },
-                      ),
+                      widget.navigation == "estimate_screen"
+                          ? const SizedBox()
+                          : CheckboxListTile(
+                              fillColor: const MaterialStatePropertyAll(
+                                  AppColors.primaryGrayColors),
+                              controlAffinity: ListTileControlAffinity.leading,
+                              title: const Text(
+                                  "Create new estimate using this customer"),
+                              value: check,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  check = value!;
+                                });
+                              },
+                            ),
                       GestureDetector(
                         onTap: () {
                           setState(() {
@@ -499,7 +509,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
-            Text(
+            const Text(
               "*",
               style: TextStyle(
                   fontSize: 14,
@@ -573,7 +583,6 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             selectedCountry = code;
           });
         }
-        ;
       },
       child: Container(
         width: 90,
@@ -635,9 +644,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           if (state is GetProvinceState) {
             proviceList.addAll(state.provinceList.data.data);
 
-            print(proviceList);
+            log(proviceList.toString());
           }
-          // TODO: implement listener
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
           builder: (context, state) {
@@ -684,8 +692,6 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               padding: const EdgeInsets.only(top: 12.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  print("heyy");
-
                                   provinceController.text =
                                       proviceList[index].provinceName;
                                   provinceId = proviceList[index].id;
@@ -943,34 +949,28 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       });
     }
 
-    if (widget.customerEdit != null) {
-      context.read<CustomerBloc>().add(EditCustomerDetails(
-          context: context,
-          firstName: firstNameController.text,
-          lastName: lastNameController.text,
-          email: emailController.text,
-          mobileNo: phoneNumberController.text
-              .trim()
-              .replaceAll(RegExp(r'[^\w\s]+'), '')
-              .replaceAll(" ", ""),
-          customerNotes: customerNotesController.text,
-          address: addressController.text,
-          city: cityController.text,
-          state: provinceController.text,
-          stateId: provinceId == null
-              ? widget.customerEdit!.provinceId.toString()
-              : provinceId.toString(),
-          pinCode: zipCodeController.text,
-          id: widget.customerEdit!.id.toString()));
-    } else {
-      if (!firstNameErrorStatus &&
+    networkCheck().then((value) {
+      if (!value &&
+          !firstNameErrorStatus &&
           !lastNameErrorStatus &&
           !emailErrorStatus &&
           !phoneNumberErrorStatus &&
           !addressErrorStatus &&
           !cityErrorStatus &&
           !zipCodeErrorStatus) {
-        context.read<CustomerBloc>().add(AddCustomerDetails(
+        CommonWidgets().showDialog(
+            context, 'Please check your internet connection and try again');
+        return;
+      }
+      if (widget.customerEdit != null &&
+          !firstNameErrorStatus &&
+          !lastNameErrorStatus &&
+          !emailErrorStatus &&
+          !phoneNumberErrorStatus &&
+          !addressErrorStatus &&
+          !cityErrorStatus &&
+          !zipCodeErrorStatus) {
+        context.read<CustomerBloc>().add(EditCustomerDetails(
             context: context,
             firstName: firstNameController.text,
             lastName: lastNameController.text,
@@ -983,10 +983,36 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             address: addressController.text,
             city: cityController.text,
             state: provinceController.text,
-            stateId: provinceId.toString(),
-            pinCode: zipCodeController.text));
-        print('hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+            stateId: provinceId == null
+                ? widget.customerEdit!.provinceId.toString()
+                : provinceId.toString(),
+            pinCode: zipCodeController.text,
+            id: widget.customerEdit!.id.toString()));
+      } else {
+        if (!firstNameErrorStatus &&
+            !lastNameErrorStatus &&
+            !emailErrorStatus &&
+            !phoneNumberErrorStatus &&
+            !addressErrorStatus &&
+            !cityErrorStatus &&
+            !zipCodeErrorStatus) {
+          context.read<CustomerBloc>().add(AddCustomerDetails(
+              context: context,
+              firstName: firstNameController.text,
+              lastName: lastNameController.text,
+              email: emailController.text,
+              mobileNo: phoneNumberController.text
+                  .trim()
+                  .replaceAll(RegExp(r'[^\w\s]+'), '')
+                  .replaceAll(" ", ""),
+              customerNotes: customerNotesController.text,
+              address: addressController.text,
+              city: cityController.text,
+              state: provinceController.text,
+              stateId: provinceId.toString(),
+              pinCode: zipCodeController.text));
+        }
       }
-    }
+    });
   }
 }

@@ -54,7 +54,10 @@ class EditCustomerError extends CustomerState {
   List<Object> get props => [message];
 }
 
-class CreateCustomerState extends CustomerState {}
+class CreateCustomerState extends CustomerState {
+  final String id;
+  const CreateCustomerState({required this.id});
+}
 
 class GetCustomerMessageState extends CustomerState {
   final cm.CustomerMessageModel messageModel;
@@ -99,12 +102,7 @@ class GetCustomerMessagePaginationState extends CustomerState {
 
 class GetCustomerMessagePaginationLoadingState extends CustomerState {}
 
-class DeleteCustomer extends CustomerState {
-  final Data customer;
-  DeleteCustomer({required this.customer});
-  @override
-  List<Object> get props => [customer];
-}
+class DeleteCustomer extends CustomerState {}
 
 class DeleteCustomerErrorState extends CustomerState {
   final String errorMsg;

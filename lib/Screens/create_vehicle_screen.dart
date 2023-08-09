@@ -4,21 +4,20 @@ import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vin_global_response.dart';
 import 'package:auto_pilot/Screens/dummy_vehcile_screen.dart';
-import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/svg.dart';
 
 class CreateVehicleScreen extends StatefulWidget {
-  CreateVehicleScreen(
+  const CreateVehicleScreen(
       {super.key,
       this.vehicle,
       this.vin = '',
@@ -27,7 +26,7 @@ class CreateVehicleScreen extends StatefulWidget {
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
   final Datum? editVehicle;
-  String? navigation;
+  final String? navigation;
 
   @override
   State<CreateVehicleScreen> createState() => _CreateVehicleScreenState();
@@ -47,8 +46,6 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   final TextEditingController licController = TextEditingController();
   final TextEditingController makeController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
-
-  final ScrollController Listcontroller = ScrollController();
 
   bool yearErrorStaus = false;
   bool modelErrorStatus = false;
@@ -112,13 +109,21 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     }
   }
 
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if (widget.navigation != null) {
+        if (widget.navigation != null &&
+            widget.navigation != "estimate_screen") {
           Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => VehiclesScreen()));
+              MaterialPageRoute(builder: (context) => const VehiclesScreen()));
           return false;
         } else {
           Navigator.pop(context);
@@ -135,14 +140,18 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
               if (state is CreateVehicleErrorState) {
                 CommonWidgets().showDialog(context, state.message);
               } else if (state is CreateVehicleSuccessState) {
-                if (widget.navigation != null && !isChecked) {
+                if (widget.navigation != null &&
+                    !isChecked &&
+                    widget.navigation != "estimate_screen") {
                   log('here');
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                         builder: (context) => const VehiclesScreen()),
                     (route) => false,
                   );
-                } else if (widget.navigation != null && isChecked) {
+                } else if (widget.navigation != null &&
+                    isChecked &&
+                    widget.navigation != "estimate_screen") {
                   Navigator.pushReplacement(context, MaterialPageRoute(
                     builder: (context) {
                       return DummyVehicleScreen(
@@ -153,8 +162,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                 } else {
                   Navigator.pop(context, vinController.text);
                 }
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Vehicle Added Successfully')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Vehicle Added Successfully')));
               } else if (state is EditVehicleErrorState) {
                 CommonWidgets().showDialog(context, state.message);
               } else if (state is EditVehicleSuccessState) {
@@ -165,8 +174,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                   (route) => false,
                 );
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Vehicle Added Successfully')));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text('Vehicle Added Successfully')));
               } else if (state is DropdownVechileDetailsSuccessState) {
                 dropdownData.addAll(state.dropdownData.data.data);
               }
@@ -185,7 +194,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                         backgroundColor: Colors.transparent,
                         automaticallyImplyLeading: false,
                         elevation: 0,
-                        title: Text(
+                        title: const Text(
                           "New Vehicle",
                           style: TextStyle(
                               fontSize: 16,
@@ -195,11 +204,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                         actions: [
                           IconButton(
                               onPressed: () {
-                                if (widget.navigation != null) {
+                                if (widget.navigation != null &&
+                                    widget.navigation != 'estimate_screen') {
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              VehiclesScreen()));
+                                              const VehiclesScreen()));
                                 } else {
                                   Navigator.pop(context);
                                 }
@@ -217,14 +227,14 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   "Basic Details",
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                       color: AppColors.primaryTitleColor),
                                 ),
-                                SizedBox(height: 16),
+                                const SizedBox(height: 16),
                                 // textBox("Enter name...", nameController,
                                 //     "Owner", nameErrorStatus),
                                 textBox(
@@ -275,7 +285,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                         ),
                                       ),
                                     )),
-                                SizedBox(
+                                const SizedBox(
                                   height: 15,
                                 ),
                                 textBox(
@@ -292,7 +302,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                           const EdgeInsets.only(bottom: 8.0),
                                       child: Text(
                                         modelErrorMsg,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
                                           color: Color(
@@ -312,8 +322,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                   data: Theme.of(context).copyWith(
                                       dividerColor: Colors.transparent),
                                   child: ExpansionTile(
-                                    tilePadding: EdgeInsets.all(0),
-                                    childrenPadding: EdgeInsets.all(0),
+                                    tilePadding: const EdgeInsets.all(0),
+                                    childrenPadding: const EdgeInsets.all(0),
                                     title: const Text(
                                       'Additional Fields',
                                       style: TextStyle(
@@ -323,7 +333,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                     ),
                                     children: <Widget>[
                                       ListTile(
-                                          contentPadding: EdgeInsets.all(0),
+                                          contentPadding:
+                                              const EdgeInsets.all(0),
                                           title: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -360,8 +371,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                                   "LIC",
                                                   licErrorStatus),
                                               typeController.text.isNotEmpty
-                                                  ? SizedBox()
-                                                  : Text(
+                                                  ? const SizedBox()
+                                                  : const Text(
                                                       "Type",
                                                       style: TextStyle(
                                                           fontSize: 14,
@@ -401,55 +412,46 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                     ],
                                   ),
                                 ),
-                                Center(
-                                  child: Row(
-                                    children: <Widget>[
-                                      const SizedBox(
-                                        height: 30,
+                                widget.navigation == "estimate_screen"
+                                    ? const SizedBox(height: 16)
+                                    : Center(
+                                        child: Row(
+                                          children: <Widget>[
+                                            const SizedBox(
+                                              height: 30,
+                                            ),
+                                            Checkbox(
+                                              checkColor: Colors.white,
+                                              value: isChecked,
+                                              onChanged: (bool? value) {
+                                                stateUpdate(() {
+                                                  isChecked = value!;
+                                                });
+                                              },
+                                            ),
+                                            const Text(
+                                              "Create new estimate using this vehicle",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w500,
+                                                  fontSize: 14,
+                                                  color: AppColors
+                                                      .primaryTitleColor),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      Checkbox(
-                                        checkColor: Colors.white,
-                                        value: isChecked,
-                                        onChanged: (bool? value) {
-                                          stateUpdate(() {
-                                            isChecked = value!;
-                                          });
-                                        },
-                                      ),
-                                      Text(
-                                        "Create new estimate using this vehicle",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 14,
-                                            color: AppColors.primaryTitleColor),
-                                      )
-                                    ],
-                                  ),
-                                ),
                                 SizedBox(
                                   width: double.infinity,
                                   height: 50,
                                   child: ElevatedButton(
                                     onPressed: () {
-                                      validateVechile(
-                                        yearController.text,
-                                        modelController.text,
-                                        typeController.text,
-                                        context,
-                                        stateUpdate,
-                                      );
-                                      print("${yearController.text}");
-                                      // Navigator.push(
-                                      //     context,
-                                      //     MaterialPageRoute(
-                                      //         builder: (context) =>
-                                      //             VechileInformation()));
+                                      validateVechile();
                                     },
                                     style: ElevatedButton.styleFrom(
-                                      primary: AppColors.primaryColors,
-                                      shape: new RoundedRectangleBorder(
+                                      backgroundColor: AppColors.primaryColors,
+                                      shape: RoundedRectangleBorder(
                                         borderRadius:
-                                            new BorderRadius.circular(10.0),
+                                            BorderRadius.circular(10.0),
                                       ),
                                     ),
                                     child:
@@ -457,7 +459,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                             ? const CupertinoActivityIndicator(
                                                 color: Colors.white,
                                               )
-                                            : Text(
+                                            : const Text(
                                                 'Confirm',
                                                 style: TextStyle(fontSize: 15),
                                               ),
@@ -477,102 +479,83 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     );
   }
 
-  validateVechile(
-    String VechileYear,
-    String VechileModel,
-    String VechileType,
-    BuildContext context,
-    StateSetter stateUpdate,
-  ) {
-    if (VechileYear.isEmpty) {
-      setState(() {
-        yearErrorMsg = "Year can't be empty.";
+  validateVechile() {
+    if (yearController.text.trim().isEmpty) {
+      yearErrorMsg = "Year can't be empty.";
+      yearErrorStaus = true;
+    } else {
+      if (yearController.text.trim().length < 4) {
+        yearErrorMsg = "Please enter a valid year";
         yearErrorStaus = true;
-      });
-    } else {
-      if (VechileYear.length < 4) {
-        setState(() {
-          yearErrorMsg = "Please enter a valid year";
-          yearErrorStaus = true;
-        });
       } else {
-        setState(() {
-          yearErrorStaus = false;
-        });
+        yearErrorStaus = false;
       }
     }
-    if (VechileModel.isEmpty) {
-      setState(() {
-        modelErrorMsg = "Model can't be empty.";
+    if (modelController.text.trim().isEmpty) {
+      modelErrorMsg = "Model can't be empty.";
+      modelErrorStatus = true;
+    } else {
+      if (modelController.text.trim().length < 2) {
+        modelErrorMsg = "Please enter a valid model";
         modelErrorStatus = true;
-      });
-    } else {
-      if (VechileModel.length < 2) {
-        setState(() {
-          modelErrorMsg = "Please enter a valid model";
-          modelErrorStatus = true;
-        });
       } else {
-        setState(() {
-          modelErrorStatus = false;
-        });
+        modelErrorStatus = false;
       }
     }
-    if (VechileType.isEmpty) {
-      stateUpdate(() {
-        typeErrorMsg = "Type can't be empty.";
-        typeErrorStatus = true;
-      });
+    if (typeController.text.trim().isEmpty) {
+      typeErrorMsg = "Type can't be empty.";
+      typeErrorStatus = true;
     } else {
       typeErrorStatus = false;
     }
     if (makeController.text.isEmpty) {
-      setState(() {
-        makeErrorStatus = true;
-        makeErrorMsg = "Make can't be empty";
-      });
+      makeErrorStatus = true;
+      makeErrorMsg = "Make can't be empty";
     } else {
       if (makeController.text.length < 2) {
-        setState(() {
-          makeErrorStatus = true;
-          makeErrorMsg = "Please enter a valid make";
-        });
+        makeErrorStatus = true;
+        makeErrorMsg = "Please enter a valid make";
       } else {
-        setState(() {
-          makeErrorStatus = false;
-        });
+        makeErrorStatus = false;
       }
     }
-    if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
-      if (widget.editVehicle != null) {
-        context.read<VechileBloc>().add(EditVehicleEvent(
-              id: widget.editVehicle!.id.toString(),
-              email: nameController.text,
-              year: yearController.text,
-              model: modelController.text,
-              submodel: subModelController.text,
-              engine: engineController.text,
-              color: colorController.text,
-              vinNumber: vinController.text,
-              licNumber: licController.text,
-              make: makeController.text,
-              type: typeController.text,
-            ));
-      } else {
-        context.read<VechileBloc>().add(AddVechile(
-              email: nameController.text,
-              year: yearController.text,
-              model: modelController.text,
-              submodel: subModelController.text,
-              engine: engineController.text,
-              color: colorController.text,
-              vinNumber: vinController.text,
-              licNumber: licController.text,
-              make: makeController.text,
-              type: typeController.text,
-            ));
+    setState(() {});
+    networkCheck().then((value) {
+      if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus && !value) {
+        CommonWidgets().showDialog(
+            context, 'Please check your internet connection and try again');
       }
-    }
+      if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
+        if (widget.editVehicle != null) {
+          context.read<VechileBloc>().add(EditVehicleEvent(
+                id: widget.editVehicle!.id.toString(),
+                email: nameController.text,
+                year: yearController.text,
+                model: modelController.text,
+                submodel: subModelController.text,
+                engine: engineController.text,
+                color: colorController.text,
+                vinNumber: vinController.text,
+                licNumber: licController.text,
+                make: makeController.text,
+                type: typeController.text,
+              ));
+        } else {
+          context.read<VechileBloc>().add(AddVechile(
+                email: nameController.text,
+                year: yearController.text,
+                model: modelController.text,
+                submodel: subModelController.text,
+                engine: engineController.text,
+                color: colorController.text,
+                vinNumber: vinController.text,
+                licNumber: licController.text,
+                make: makeController.text,
+                type: typeController.text,
+              ));
+        }
+      }
+    });
   }
 
   Widget textBox(String placeHolder, TextEditingController controller,
@@ -633,20 +616,20 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD))),
                   focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
                           color: errorStatus == true
-                              ? Color(0xffD80027)
-                              : Color(0xffC1C4CD)))),
+                              ? const Color(0xffD80027)
+                              : const Color(0xffC1C4CD)))),
             ),
           ),
         ),

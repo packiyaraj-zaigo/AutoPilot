@@ -482,7 +482,6 @@ class ApiProvider {
       var request = http.MultipartRequest("DELETE", url)
         ..headers['Authorization'] = "Bearer $token";
       var response = await request.send();
-      print('hggggggggggggg${response.statusCode.toString()}');
       return http.Response.fromStream(response);
     } catch (e) {
       print("errroor draft found ${e.toString()}");

@@ -68,6 +68,13 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     }
   }
 
+  Future<bool> networkCheck() async {
+    final value = await AppUtils.getConnectivity().then((value) {
+      return value;
+    });
+    return value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -345,97 +352,57 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           )),
                     ),
                     const SizedBox(height: 77),
-                    // GestureDetector(
-                    //   onTap: () async {
-                    //     final validate = validation();
-                    //     if (validate) {
-                    //       final clientId = await AppUtils.getUserID();
-                    //       print(phoneController.text
-                    //           .trim()
-                    //           .replaceAll(RegExp(r'[^\w\s]+'), '')
-                    //           .replaceAll(" ", ""));
-                    //       bloc.add(
-                    //         CreateEmployee(
-                    //           model: EmployeeCreationModel(
-                    //             clientId: int.parse(clientId),
-                    //             email: emailController.text.trim(),
-                    //             firstName: firstNameController.text.trim(),
-                    //             lastName: lastNameController.text.trim(),
-                    //             phone: phoneController.text
-                    //                 .trim()
-                    //                 .replaceAll(RegExp(r'[^\w\s]+'), ''),
-                    //             role: dropdownValue,
-                    //           ),
-                    //         ),
-                    //       );
-                    //       log(clientId.toString() +
-                    //           ":::::::::::::::Client id:::::::::::");
-                    //     }
-                    //   },
-                    //   child: Container(
-                    //     height: 56,
-                    //     alignment: Alignment.center,
-                    //     width: MediaQuery.of(context).size.width,
-                    //     decoration: BoxDecoration(
-                    //       borderRadius: BorderRadius.circular(12),
-                    //       color: AppColors.primaryColors,
-                    //     ),
-                    //     child: const Text(
-                    //       "Confirm",
-                    //       style: TextStyle(
-                    //           fontSize: 16,
-                    //           fontWeight: FontWeight.w500,
-                    //           color: Colors.white),
-                    //     ),
-                    //   ),
-                    // ),
-
                     ElevatedButton(
                       onPressed: () async {
                         final validate = validation();
-                        if (validate) {
-                          final clientId = await AppUtils.getUserID();
-                          print(phoneController.text
-                              .trim()
-                              .replaceAll(RegExp(r'[^\w\s]+'), '')
-                              .replaceAll(" ", ""));
-                          if (widget.employee == null) {
-                            bloc.add(
-                              CreateEmployee(
-                                model: EmployeeCreationModel(
-                                  clientId: int.parse(clientId),
-                                  email: emailController.text.trim(),
-                                  firstName: firstNameController.text.trim(),
-                                  lastName: lastNameController.text.trim(),
-                                  phone: phoneController.text
-                                      .trim()
-                                      .replaceAll(RegExp(r'[^\w\s]+'), '')
-                                      .replaceAll(" ", ""),
-                                  role: dropdownValue,
+
+                        networkCheck().then((value) async {
+                          if (!validate) {
+                          } else if (value) {
+                            final clientId = await AppUtils.getUserID();
+                            print(phoneController.text
+                                .trim()
+                                .replaceAll(RegExp(r'[^\w\s]+'), '')
+                                .replaceAll(" ", ""));
+                            if (widget.employee == null) {
+                              bloc.add(
+                                CreateEmployee(
+                                  model: EmployeeCreationModel(
+                                    clientId: int.parse(clientId),
+                                    email: emailController.text.trim(),
+                                    firstName: firstNameController.text.trim(),
+                                    lastName: lastNameController.text.trim(),
+                                    phone: phoneController.text
+                                        .trim()
+                                        .replaceAll(RegExp(r'[^\w\s]+'), '')
+                                        .replaceAll(" ", ""),
+                                    role: dropdownValue,
+                                  ),
                                 ),
-                              ),
-                            );
-                          } else {
-                            bloc.add(
-                              EditEmployee(
-                                id: widget.employee!.id!,
-                                employee: EmployeeCreationModel(
-                                  clientId: int.parse(clientId),
-                                  email: emailController.text.trim(),
-                                  firstName: firstNameController.text.trim(),
-                                  lastName: lastNameController.text.trim(),
-                                  phone: phoneController.text
-                                      .trim()
-                                      .replaceAll(RegExp(r'[^\w\s]+'), '')
-                                      .replaceAll(" ", ""),
-                                  role: dropdownValue,
+                              );
+                            } else {
+                              bloc.add(
+                                EditEmployee(
+                                  id: widget.employee!.id!,
+                                  employee: EmployeeCreationModel(
+                                    clientId: int.parse(clientId),
+                                    email: emailController.text.trim(),
+                                    firstName: firstNameController.text.trim(),
+                                    lastName: lastNameController.text.trim(),
+                                    phone: phoneController.text
+                                        .trim()
+                                        .replaceAll(RegExp(r'[^\w\s]+'), '')
+                                        .replaceAll(" ", ""),
+                                    role: dropdownValue,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            }
+                          } else if (!value) {
+                            CommonWidgets().showDialog(context,
+                                'Please check your internet connection and try again');
                           }
-                          log(clientId.toString() +
-                              ":::::::::::::::Client id:::::::::::");
-                        }
+                        });
                       },
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
