@@ -459,7 +459,8 @@ class ApiRepository {
       String discount,
       String discountType,
       String position,
-      String subTotal) {
+      String subTotal,
+      String tax) {
     return apiProvider.createOrderServiceItem(
         token,
         cannedServiceId,
@@ -470,7 +471,8 @@ class ApiRepository {
         discount,
         discountType,
         position,
-        subTotal);
+        subTotal,
+        tax);
   }
 
   Future deleteCannedService(String token, String serviceId) {
