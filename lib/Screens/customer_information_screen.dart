@@ -145,8 +145,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Mike Stevenson',
+                    Text(
+                      '${widget.customerData.firstName} ${widget.customerData.lastName}',
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -217,7 +217,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                                 height: 5,
                                               ),
                                               Text(
-                                                widget.customerData.phone
+                                                '(${widget.customerData.phone.substring(0, 3)}) ${widget.customerData.phone.substring(3, 6)}-${widget.customerData.phone.substring(6)}'
                                                     .toString(),
                                                 style: const TextStyle(
                                                     fontSize: 16,
@@ -385,27 +385,27 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                       const SizedBox(
                                         height: 14,
                                       ),
-                                      const Text(
-                                        "License Number",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryGrayColors),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      const Text(
-                                        "Need to change",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryTitleColor),
-                                      ),
-                                      AppUtils.verticalDivider(),
-                                      const SizedBox(
-                                        height: 14,
-                                      ),
+                                      // const Text(
+                                      //   "License Number",
+                                      //   style: TextStyle(
+                                      //       fontSize: 14,
+                                      //       fontWeight: FontWeight.w400,
+                                      //       color: AppColors.primaryGrayColors),
+                                      // ),
+                                      // const SizedBox(
+                                      //   height: 5,
+                                      // ),
+                                      // const Text(
+                                      //   "Need to change",
+                                      //   style: TextStyle(
+                                      //       fontSize: 16,
+                                      //       fontWeight: FontWeight.w500,
+                                      //       color: AppColors.primaryTitleColor),
+                                      // ),
+                                      // AppUtils.verticalDivider(),
+                                      // const SizedBox(
+                                      //   height: 14,
+                                      // ),
                                       const Text(
                                         "Customer Created",
                                         style: TextStyle(
@@ -417,7 +417,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         height: 5,
                                       ),
                                       Text(
-                                        widget.customerData.createdAt
+                                        AppUtils.getFormattedForInformationScreen(
+                                                widget.customerData.createdAt
+                                                    .toString())
                                             .toString(),
                                         style: const TextStyle(
                                             fontSize: 16,

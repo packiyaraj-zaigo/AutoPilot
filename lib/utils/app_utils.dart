@@ -188,6 +188,15 @@ class AppUtils {
     return outputDate;
   }
 
+  static getFormattedForInformationScreen(String date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(date);
+
+    var outputFormat = DateFormat('yyyy/MM/dd  hh:mm a');
+    var outputDate = outputFormat.format(inputDate);
+    return outputDate;
+  }
+
   static getFormattedForApi(String date) {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);

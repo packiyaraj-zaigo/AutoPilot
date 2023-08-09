@@ -163,8 +163,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                     } else {
                       Navigator.pop(context, vinController.text);
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Vehicle Added Successfully')));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vehicle created successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
                   } else if (state is EditVehicleErrorState) {
                     CommonWidgets().showDialog(context, state.message);
                   } else if (state is EditVehicleSuccessState) {
@@ -175,8 +179,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                       (route) => false,
                     );
 
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text('Vehicle Added Successfully')));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Vehicle created successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
                   } else if (state is DropdownVechileDetailsSuccessState) {
                     dropdownData.addAll(state.dropdownData.data.data);
                   }
@@ -195,9 +203,11 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                             backgroundColor: Colors.transparent,
                             automaticallyImplyLeading: false,
                             elevation: 0,
-                            title: const Text(
-                              "New Vehicle",
-                              style: TextStyle(
+                            title: Text(
+                              widget.editVehicle != null
+                                  ? "Edit Vehicle"
+                                  : "New Vehicle",
+                              style: const TextStyle(
                                   fontSize: 16,
                                   color: AppColors.primaryBlackColors,
                                   fontWeight: FontWeight.w500),
@@ -421,7 +431,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                     ),
                                     widget.navigation == "estimate_screen" ||
                                             widget.navigation ==
-                                                "partial_estimate"
+                                                "partial_estimate" ||
+                                            widget.editVehicle != null
                                         ? const SizedBox(height: 16)
                                         : Center(
                                             child: Row(

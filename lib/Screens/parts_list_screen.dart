@@ -204,14 +204,16 @@ class _PartsScreenState extends State<PartsScreen> {
                       return const Center(child: CupertinoActivityIndicator());
                     } else {
                       return parts.isEmpty
-                          ? const Center(
-                              child: Text(
-                              'No Parts found',
-                              style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryTextColors),
-                            ))
+                          ? const Expanded(
+                              child: const Center(
+                                  child: Text(
+                                'No Parts Found',
+                                style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primaryTextColors),
+                              )),
+                            )
                           : Expanded(
                               child: Padding(
                                 padding: const EdgeInsets.only(top: 16.0),

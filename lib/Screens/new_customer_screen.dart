@@ -71,7 +71,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
       firstNameController.text = widget.customerEdit?.firstName ?? "";
       lastNameController.text = widget.customerEdit?.lastName ?? '';
       emailController.text = widget.customerEdit?.email ?? '';
-      phoneNumberController.text = widget.customerEdit?.phone ?? '';
+      phoneNumberController.text =
+          '(${widget.customerEdit!.phone.substring(0, 3)}) ${widget.customerEdit!.phone.substring(3, 6)}-${widget.customerEdit!.phone.substring(6)}';
       customerNotesController.text = widget.customerEdit?.notes ?? '';
       addressController.text = widget.customerEdit?.addressLine1 ?? '';
       cityController.text = widget.customerEdit?.townCity ?? '';
@@ -179,6 +180,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
+                      const SizedBox(height: 15),
                       textBox("Enter Last Name", lastNameController,
                           "Last Name", lastNameErrorStatus),
                       Visibility(
@@ -193,6 +195,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
+                      const SizedBox(height: 15),
                       textBox("Enter Email", emailController, "Email",
                           emailErrorStatus),
                       Visibility(
@@ -207,6 +210,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
+                      const SizedBox(height: 15),
                       textBox("Ex. (555) 555-5555", phoneNumberController,
                           "Phone", phoneNumberErrorStatus),
                       Visibility(
@@ -221,6 +225,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
+                      const SizedBox(height: 15),
                       textBox("Enter Notes", customerNotesController,
                           "Customer Notes", customerErrorStatus),
                       Visibility(
@@ -235,6 +240,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
+                      const SizedBox(height: 15),
                       textBox("Enter Address", addressController, "Address",
                           addressErrorStatus),
                       Visibility(
@@ -249,6 +255,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                               ),
                             ),
                           )),
+                      const SizedBox(height: 15),
                       textBox("Enter City", cityController, "City",
                           cityErrorStatus),
                       Visibility(
@@ -265,6 +272,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           )),
                       // textBox("Enter Zipcode...", zipCodeController, "Zip",
                       //     zipCodeErrorStatus),
+                      const SizedBox(height: 15),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -331,7 +339,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                         ],
                       ),
                       widget.navigation == "estimate_screen" ||
-                              widget.navigation == "partial_estimate"
+                              widget.navigation == "partial_estimate" ||
+                              widget.customerEdit == null
                           ? const SizedBox()
                           : CheckboxListTile(
                               fillColor: const MaterialStatePropertyAll(
@@ -446,7 +455,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           ],
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 6.0, bottom: 15),
+          padding: const EdgeInsets.only(top: 6.0, bottom: 2),
           child: SizedBox(
             height: 56,
             width: MediaQuery.of(context).size.width,
@@ -886,7 +895,11 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         phoneErrorMsg = "Phone number can't be empty";
         phoneNumberErrorStatus = true;
       });
-    } else if (phoneNumber.length < 10) {
+    } else if (phoneNumber
+            .replaceAll(RegExp(r'[^\w\s]+'), '')
+            .replaceAll(" ", "")
+            .length <
+        10) {
       setState(() {
         phoneErrorMsg = "Enter a valid phone number";
         phoneNumberErrorStatus = true;
