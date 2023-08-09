@@ -97,6 +97,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   double discountAmount = 0;
   double totalAmount = 0;
   double balanceDueAmount = 0;
+  double feeAmount = 0;
+  double subContractAmount = 0;
+  double partAmount = 0;
 
   //Payment popup variables
   final paymentAmountController = TextEditingController();
@@ -262,8 +265,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       padding: const EdgeInsets.only(right: 12.0),
                       child: GestureDetector(
                         onTap: () {
+
                           bool validateDurations(String firstDurationStr,
                               String secondDurationStr) {
+                                 if (firstDurationStr.isEmpty &&
+                                secondDurationStr.isEmpty) {
+                              return true;
+                            }
                             // Parse the durations into hours and minutes
                             List<String> firstParts =
                                 firstDurationStr.split(':');
@@ -817,13 +825,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         Padding(
                           padding: const EdgeInsets.only(top: 15.0),
                           child: taxDetailsWidget(
-                              "Material", "\$ ${materialAmount}"),
+                              "Material", "\$ ${materialAmount.toStringAsFixed(2)}"),
                         ),
-                        taxDetailsWidget("Labor", "\$ ${laborAmount}"),
-                        taxDetailsWidget("Tax", "\$ ${taxAmount}"),
-                        taxDetailsWidget("Discount", "\$ ${discountAmount}"),
-                        taxDetailsWidget("Total", "\$ ${totalAmount}"),
-                        taxDetailsWidget("Balance due", "\$ ${totalAmount}"),
+                        taxDetailsWidget("Part", "\$ ${partAmount.toStringAsFixed(2)}"),
+
+                        taxDetailsWidget("Labor", "\$ ${laborAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget(
+                            "Sub Contract", "\$ ${subContractAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Fee", "\$ ${feeAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget(
+                            "Tax", "\$ ${taxAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Discount", "\$ ${discountAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Balance due", "\$ ${totalAmount.toStringAsFixed(2)}"),
                         Padding(
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
@@ -1521,7 +1535,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return CreateVehicleScreen(navigation: "partial_estimate",);
+                              return CreateVehicleScreen(
+                                navigation: "partial_estimate",
+                              );
                             },
                             isScrollControlled: true,
                             useSafeArea: true);
@@ -1580,7 +1596,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       return datePicker("payment");
                     },
                   );
-                } else if (label == "Customer") {
+                }else if (label == "Date") {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) {
+                      return datePicker("appointment");
+                    },
+                  );
+                } 
+                 else if (label == "Customer") {
                   // showModalBottomSheet(
                   //     context: context,
                   //     builder: (context) {
@@ -2119,24 +2143,46 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
           setState(() {
-            materialAmount = materialAmount + double.parse(element2.subTotal);
+            materialAmount = materialAmount + double.parse(element2.unitPrice);
           });
         }
         if (element2.itemType.toLowerCase() == "labor") {
           setState(() {
-            laborAmount = laborAmount + double.parse(element2.subTotal);
+            laborAmount = laborAmount + double.parse(element2.unitPrice);
           });
+        }
+        if (element2.itemType.toLowerCase() == "subcontract") {
+          setState(() {
+            subContractAmount =
+                subContractAmount + double.parse(element2.unitPrice);
+          });
+        }
+        if (element2.itemType.toLowerCase() == "fee") {
+          setState(() {
+            feeAmount = feeAmount + double.parse(element2.unitPrice);
+          });
+          
+        }
+         if (element2.itemType.toLowerCase() == "part") {
+          setState(() {
+            partAmount = partAmount + double.parse(element2.unitPrice);
+          });
+          
         }
 
         setState(() {
-          taxAmount = taxAmount + double.parse(element2.tax);
+          double tempPrice = double.parse(element2.unitPrice) -
+              double.parse(element2.discount);
+
+          taxAmount =
+              taxAmount + (double.parse(element2.tax) * tempPrice / 100);
           discountAmount = discountAmount + double.parse(element2.discount);
         });
       });
     });
 
     setState(() {
-      totalAmount = (materialAmount + laborAmount + taxAmount) - discountAmount;
+      totalAmount = (materialAmount + laborAmount + taxAmount+partAmount+subContractAmount+feeAmount) - discountAmount;
     });
   }
 
