@@ -133,7 +133,8 @@ class CreateOrderServiceItemEvent extends EstimateEvent {
       discount,
       discountType,
       position,
-      subTotal;
+      subTotal,
+      tax;
 
   CreateOrderServiceItemEvent(
       {required this.cannedServiceId,
@@ -144,7 +145,8 @@ class CreateOrderServiceItemEvent extends EstimateEvent {
       required this.position,
       required this.quantityHours,
       required this.subTotal,
-      required this.unitPrice});
+      required this.unitPrice,
+      required this.tax});
 }
 
 class DeleteOrderServiceEvent extends EstimateEvent {

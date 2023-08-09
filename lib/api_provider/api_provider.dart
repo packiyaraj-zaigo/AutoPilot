@@ -1556,7 +1556,8 @@ class ApiProvider {
       String discount,
       String discountType,
       String position,
-      String subTotal) async {
+      String subTotal,
+      String tax) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -1571,7 +1572,8 @@ class ApiProvider {
         ..fields['discount'] = discount
         ..fields['discount_type'] = discountType
         ..fields['position'] = position
-        ..fields['sub_total'] = subTotal;
+        ..fields['sub_total'] = subTotal
+        ..fields['tax'] = tax;
 
       request.headers.addAll(getHeader(token));
       inspect(request);
