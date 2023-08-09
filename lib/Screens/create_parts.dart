@@ -13,9 +13,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 
 class CreatePartsScreen extends StatefulWidget {
-  const CreatePartsScreen({super.key, this.part});
+  const CreatePartsScreen({super.key, this.part, this.navigation});
 
   final PartsDatum? part;
+  final String? navigation;
 
   @override
   State<CreatePartsScreen> createState() => _CreatePartsScreenState();
@@ -77,9 +78,9 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          "New Item",
-          style: TextStyle(
+        title: Text(
+          widget.navigation == "edit" ? "New Item" : "Edit Item",
+          style: const TextStyle(
               fontSize: 16,
               color: AppColors.primaryBlackColors,
               fontWeight: FontWeight.w500),
@@ -143,7 +144,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                             "Serial Number", serialnumberErrorStatus, true),
                         errorMessageWidget(
                             serialnumberErrorMsg, serialnumberErrorStatus),
-                        textBox("Enter Quanity Number", quantityController,
+                        textBox("Enter Quantity Number", quantityController,
                             "Quantity", quantityErrorStatus, true),
                         errorMessageWidget(
                             quantityErrorMsg, quantityErrorStatus),
@@ -239,7 +240,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
       itemnameErrorStaus = false;
     }
     if (serialnumberController.text.isEmpty) {
-      serialnumberErrorMsg = "Item name can't be empty.";
+      serialnumberErrorMsg = "Serial number can't be empty.";
       serialnumberErrorStatus = true;
       status = false;
     } else {
@@ -308,6 +309,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
           child: SizedBox(
             height: 56,
             child: TextField(
+              textCapitalization: TextCapitalization.sentences,
               keyboardType:
                   label == 'Fee' || label == "Quantity" || label == "Cost"
                       ? TextInputType.number
