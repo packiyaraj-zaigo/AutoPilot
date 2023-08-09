@@ -262,49 +262,34 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       padding: const EdgeInsets.only(right: 12.0),
                       child: GestureDetector(
                         onTap: () {
-                          bool isError = false;
-                          if (estimateNoteController.text.isNotEmpty) {
-                            if (!isEstimateNoteEdit) {
-                              context.read<EstimateBloc>().add(
-                                  AddEstimateNoteEvent(
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
-                                      comment: estimateNoteController.text));
-                            } else {
-                              context.read<EstimateBloc>().add(
-                                  EditEstimateNoteEvent(
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
-                                      comment: estimateNoteController.text,
-                                      id: estimateNoteEditId));
-                            }
+                          bool validateDurations(String firstDurationStr,
+                              String secondDurationStr) {
+                            // Parse the durations into hours and minutes
+                            List<String> firstParts =
+                                firstDurationStr.split(':');
+                            List<String> secondParts =
+                                secondDurationStr.split(':');
+                            int firstHours = int.parse(firstParts[0]);
+                            int firstMinutes = int.parse(firstParts[1]);
+                            int secondHours = int.parse(secondParts[0]);
+                            int secondMinutes = int.parse(secondParts[1]);
+
+                            // Convert the durations to total minutes for comparison
+                            int firstTotalMinutes =
+                                firstHours * 60 + firstMinutes;
+                            int secondTotalMinutes =
+                                secondHours * 60 + secondMinutes;
+
+                            // Compare the durations and return the result
+                            return firstTotalMinutes < secondTotalMinutes;
                           }
+
+                          bool isError = false;
+
                           if (startTimeController.text.isNotEmpty &&
                               endTimeController.text.isNotEmpty &&
                               dateController.text.isNotEmpty &&
                               appointmentController.text.isNotEmpty) {
-                            bool validateDurations(String firstDurationStr,
-                                String secondDurationStr) {
-                              // Parse the durations into hours and minutes
-                              List<String> firstParts =
-                                  firstDurationStr.split(':');
-                              List<String> secondParts =
-                                  secondDurationStr.split(':');
-                              int firstHours = int.parse(firstParts[0]);
-                              int firstMinutes = int.parse(firstParts[1]);
-                              int secondHours = int.parse(secondParts[0]);
-                              int secondMinutes = int.parse(secondParts[1]);
-
-                              // Convert the durations to total minutes for comparison
-                              int firstTotalMinutes =
-                                  firstHours * 60 + firstMinutes;
-                              int secondTotalMinutes =
-                                  secondHours * 60 + secondMinutes;
-
-                              // Compare the durations and return the result
-                              return firstTotalMinutes < secondTotalMinutes;
-                            }
-
                             final validate = validateDurations(
                                 startTimeController.text.trim(),
                                 endTimeController.text.trim());
@@ -402,6 +387,28 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .toString() ??
                                           "",
                                       dropScedule: dateController.text));
+                            }
+                          }
+
+                          final validate = validateDurations(
+                              startTimeController.text.trim(),
+                              endTimeController.text.trim());
+
+                          if (estimateNoteController.text.isNotEmpty &&
+                              validate) {
+                            if (!isEstimateNoteEdit) {
+                              context.read<EstimateBloc>().add(
+                                  AddEstimateNoteEvent(
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      comment: estimateNoteController.text));
+                            } else {
+                              context.read<EstimateBloc>().add(
+                                  EditEstimateNoteEvent(
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      comment: estimateNoteController.text,
+                                      id: estimateNoteEditId));
                             }
                           }
                           //  }
@@ -1504,7 +1511,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return NewCustomerScreen();
+                              return NewCustomerScreen(
+                                navigation: "partial_estimate",
+                              );
                             },
                             isScrollControlled: true,
                             useSafeArea: true);
@@ -1512,7 +1521,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return CreateVehicleScreen();
+                              return CreateVehicleScreen(navigation: "partial_estimate",);
                             },
                             isScrollControlled: true,
                             useSafeArea: true);
@@ -2423,48 +2432,50 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 18.0),
-              child:  GestureDetector(
-                onTap: () {
+                padding: const EdgeInsets.only(top: 18.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if (widget.estimateDetails.data.vehicle != null) {
+                      setState(() {
+                        isVehicleEdit = true;
+                      });
 
-                  if(widget.estimateDetails.data.vehicle!=null){
-
-                  setState(() {
-                    isVehicleEdit = true;
-                  });
-
-                  Navigator.pop(context);
-                  }
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  height: 56,
-                  decoration: BoxDecoration(
-                      color: const Color(0xffF6F6F6),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset("assets/images/edit_pen_icon.svg",
-                      color: widget.estimateDetails.data.vehicle != null
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width,
+                    height: 56,
+                    decoration: BoxDecoration(
+                        color: const Color(0xffF6F6F6),
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/images/edit_pen_icon.svg",
+                          color: widget.estimateDetails.data.vehicle != null
                               ? AppColors.primaryColors
-                              : Colors.grey,),
-                       Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Edit Vehicle",
-                          style: TextStyle(
-                              color:widget.estimateDetails.data.vehicle!=null? AppColors.primaryColors:Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
+                              : Colors.grey,
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            "Edit Vehicle",
+                            style: TextStyle(
+                                color:
+                                    widget.estimateDetails.data.vehicle != null
+                                        ? AppColors.primaryColors
+                                        : Colors.grey,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ),
+                )),
             Padding(
               padding: const EdgeInsets.only(top: 18.0),
               child: GestureDetector(

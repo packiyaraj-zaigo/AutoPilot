@@ -330,7 +330,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                           ),
                         ],
                       ),
-                      widget.navigation == "estimate_screen"
+                      widget.navigation == "estimate_screen" ||
+                              widget.navigation == "partial_estimate"
                           ? const SizedBox()
                           : CheckboxListTile(
                               fillColor: const MaterialStatePropertyAll(
