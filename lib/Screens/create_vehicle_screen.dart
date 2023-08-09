@@ -130,332 +130,343 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
           return false;
         }
       },
-      child: Scaffold(
-          body: SafeArea(
-        child: BlocProvider(
-          create: (context) => VechileBloc()..add(DropDownVechile()),
-          child: BlocListener<VechileBloc, VechileState>(
-            listener: (context, state) {
-              log(state.toString());
-              if (state is CreateVehicleErrorState) {
-                CommonWidgets().showDialog(context, state.message);
-              } else if (state is CreateVehicleSuccessState) {
-                if (widget.navigation != null &&
-                    !isChecked &&
-                    widget.navigation != "estimate_screen") {
-                  log('here');
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                        builder: (context) => const VehiclesScreen()),
-                    (route) => false,
-                  );
-                } else if (widget.navigation != null &&
-                    isChecked &&
-                    widget.navigation != "estimate_screen") {
-                  Navigator.pushReplacement(context, MaterialPageRoute(
-                    builder: (context) {
-                      return DummyVehicleScreen(
-                        vehicleId: state.createdId.toString(),
+      child: BlocProvider(
+        create: (context) => VechileBloc()..add(DropDownVechile()),
+        child: Scaffold(
+            key: scaffoldKey,
+            body: SafeArea(
+              child: BlocListener<VechileBloc, VechileState>(
+                listener: (context, state) {
+                  log(state.toString());
+                  if (state is CreateVehicleErrorState) {
+                    CommonWidgets().showDialog(context, state.message);
+                  } else if (state is CreateVehicleSuccessState) {
+                    if (widget.navigation != null &&
+                        !isChecked &&
+                        widget.navigation != "estimate_screen") {
+                      log('here');
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const VehiclesScreen()),
+                        (route) => false,
                       );
-                    },
-                  ));
-                } else {
-                  Navigator.pop(context, vinController.text);
-                }
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Vehicle Added Successfully')));
-              } else if (state is EditVehicleErrorState) {
-                CommonWidgets().showDialog(context, state.message);
-              } else if (state is EditVehicleSuccessState) {
-                log('here');
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (context) => const VehiclesScreen()),
-                  (route) => false,
-                );
+                    } else if (widget.navigation != null &&
+                        isChecked &&
+                        widget.navigation != "estimate_screen") {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) {
+                          return DummyVehicleScreen(
+                            vehicleId: state.createdId.toString(),
+                          );
+                        },
+                      ));
+                    } else {
+                      Navigator.pop(context, vinController.text);
+                    }
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Vehicle Added Successfully')));
+                  } else if (state is EditVehicleErrorState) {
+                    CommonWidgets().showDialog(context, state.message);
+                  } else if (state is EditVehicleSuccessState) {
+                    log('here');
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => const VehiclesScreen()),
+                      (route) => false,
+                    );
 
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Vehicle Added Successfully')));
-              } else if (state is DropdownVechileDetailsSuccessState) {
-                dropdownData.addAll(state.dropdownData.data.data);
-              }
-            },
-            child: BlocBuilder<VechileBloc, VechileState>(
-                builder: (context, state) {
-              return StatefulBuilder(
-                  builder: (BuildContext context, StateSetter stateUpdate) {
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppBar(
-                        centerTitle: true,
-                        backgroundColor: Colors.transparent,
-                        automaticallyImplyLeading: false,
-                        elevation: 0,
-                        title: const Text(
-                          "New Vehicle",
-                          style: TextStyle(
-                              fontSize: 16,
-                              color: AppColors.primaryBlackColors,
-                              fontWeight: FontWeight.w500),
-                        ),
-                        actions: [
-                          IconButton(
-                              onPressed: () {
-                                if (widget.navigation != null &&
-                                    widget.navigation != 'estimate_screen') {
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const VehiclesScreen()));
-                                } else {
-                                  Navigator.pop(context);
-                                }
-                              },
-                              icon: const Icon(
-                                CupertinoIcons.clear,
-                                color: AppColors.primaryColors,
-                              ))
-                        ],
-                      ),
-                      Expanded(
-                          child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 24.0, right: 24),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Basic Details",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryTitleColor),
-                                ),
-                                const SizedBox(height: 16),
-                                // textBox("Enter name...", nameController,
-                                //     "Owner", nameErrorStatus),
-                                textBox(
-                                    "Enter Year",
-                                    yearController,
-                                    "Year",
-                                    yearErrorStaus,
-                                    widget.vehicle != null &&
-                                        widget.vehicle!.modelYear!.isNotEmpty),
-                                Visibility(
-                                    visible: yearErrorStaus,
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 6.0),
-                                      child: Text(
-                                        yearErrorMsg,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(
-                                            0xffD80027,
-                                          ),
-                                        ),
-                                      ),
-                                    )),
-
-                                textBox(
-                                    "Enter Make",
-                                    makeController,
-                                    "Make",
-                                    makeErrorStatus,
-                                    widget.vehicle != null &&
-                                        widget.vehicle!.make!.isNotEmpty),
-
-                                Visibility(
-                                    visible: makeErrorStatus,
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 6.0),
-                                      child: Text(
-                                        makeErrorMsg,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(
-                                            0xffD80027,
-                                          ),
-                                        ),
-                                      ),
-                                    )),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                textBox(
-                                    "Enter Model",
-                                    modelController,
-                                    "Model",
-                                    modelErrorStatus,
-                                    widget.vehicle != null &&
-                                        widget.vehicle!.model!.isNotEmpty),
-                                Visibility(
-                                    visible: modelErrorStatus,
-                                    child: Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: Text(
-                                        modelErrorMsg,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Color(
-                                            0xffD80027,
-                                          ),
-                                        ),
-                                      ),
-                                    )),
-                                textBox(
-                                    "Enter Number",
-                                    vinController,
-                                    "VIN",
-                                    vinErrorStatus,
-                                    widget.vehicle != null &&
-                                        widget.vin.isNotEmpty),
-                                Theme(
-                                  data: Theme.of(context).copyWith(
-                                      dividerColor: Colors.transparent),
-                                  child: ExpansionTile(
-                                    tilePadding: const EdgeInsets.all(0),
-                                    childrenPadding: const EdgeInsets.all(0),
-                                    title: const Text(
-                                      'Additional Fields',
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Vehicle Added Successfully')));
+                  } else if (state is DropdownVechileDetailsSuccessState) {
+                    dropdownData.addAll(state.dropdownData.data.data);
+                  }
+                },
+                child: BlocBuilder<VechileBloc, VechileState>(
+                    builder: (context, state) {
+                  return StatefulBuilder(
+                      builder: (BuildContext context, StateSetter stateUpdate) {
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          AppBar(
+                            centerTitle: true,
+                            backgroundColor: Colors.transparent,
+                            automaticallyImplyLeading: false,
+                            elevation: 0,
+                            title: const Text(
+                              "New Vehicle",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors.primaryBlackColors,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            actions: [
+                              IconButton(
+                                  onPressed: () {
+                                    if (widget.navigation != null &&
+                                        widget.navigation !=
+                                            'estimate_screen') {
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const VehiclesScreen()));
+                                    } else {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  icon: const Icon(
+                                    CupertinoIcons.clear,
+                                    color: AppColors.primaryColors,
+                                  ))
+                            ],
+                          ),
+                          Expanded(
+                              child: SingleChildScrollView(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 24.0, right: 24),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Basic Details",
                                       style: TextStyle(
-                                          fontSize: 20,
-                                          color: AppColors.primaryTitleColor,
-                                          fontWeight: FontWeight.w600),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primaryTitleColor),
                                     ),
-                                    children: <Widget>[
-                                      ListTile(
-                                          contentPadding:
-                                              const EdgeInsets.all(0),
-                                          title: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              textBox(
-                                                  "Enter Sub-Model",
-                                                  subModelController,
-                                                  "Sub-Model",
-                                                  subModelErrorStatus),
-                                              textBox(
-                                                  "Enter Engine",
-                                                  engineController,
-                                                  "Engine",
-                                                  engineErrorStatus,
-                                                  widget.vehicle != null &&
-                                                      widget
-                                                          .vehicle!
-                                                          .displacementCc!
-                                                          .isNotEmpty),
-                                              // textBox(
-                                              //     "Enter make...",
-                                              //     makeController,
-                                              //     "Make",
-                                              //     makeErrorStatus),
-                                              textBox(
-                                                "Enter Color",
-                                                colorController,
-                                                "Color",
-                                                colorErrorStatus,
+                                    const SizedBox(height: 16),
+                                    // textBox("Enter name...", nameController,
+                                    //     "Owner", nameErrorStatus),
+                                    textBox(
+                                        "Enter Year",
+                                        yearController,
+                                        "Year",
+                                        yearErrorStaus,
+                                        widget.vehicle != null &&
+                                            widget.vehicle!.modelYear!
+                                                .isNotEmpty),
+                                    Visibility(
+                                        visible: yearErrorStaus,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 6.0),
+                                          child: Text(
+                                            yearErrorMsg,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(
+                                                0xffD80027,
                                               ),
-                                              textBox(
-                                                  "Enter Number",
-                                                  licController,
-                                                  "LIC",
-                                                  licErrorStatus),
-                                              typeController.text.isNotEmpty
-                                                  ? const SizedBox()
-                                                  : const Text(
-                                                      "Type",
-                                                      style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: AppColors
-                                                              .greyText),
-                                                    ),
-                                              vechiledropDown(),
-                                              // SizedBox(
-                                              //   height: 50,
-                                              //   child: CupertinoTextField(
-                                              //     controller: typeController,
-                                              //     readOnly: false,
-                                              //     placeholder: 'Select',
-                                              //     style: TextStyle(
-                                              //         fontSize: 15,
-                                              //         fontWeight:
-                                              //             FontWeight.w400,
-                                              //         color: AppColors
-                                              //             .primaryBlackColors),
-                                              //     suffix: Icon(Icons
-                                              //         .arrow_drop_down_outlined),
-                                              //     decoration: BoxDecoration(
-                                              //       borderRadius:
-                                              //           BorderRadius.all(
-                                              //               Radius.circular(
-                                              //                   10)),
-                                              //       border: Border.all(
-                                              //           color: AppColors
-                                              //               .greyText),
-                                              //     ),
-                                              //   ),
-                                              // ),
-                                            ],
-                                          )),
-                                    ],
-                                  ),
-                                ),
-                                widget.navigation == "estimate_screen"
-                                    ? const SizedBox(height: 16)
-                                    : Center(
-                                        child: Row(
-                                          children: <Widget>[
-                                            const SizedBox(
-                                              height: 30,
                                             ),
-                                            Checkbox(
-                                              checkColor: Colors.white,
-                                              value: isChecked,
-                                              onChanged: (bool? value) {
-                                                stateUpdate(() {
-                                                  isChecked = value!;
-                                                });
-                                              },
+                                          ),
+                                        )),
+
+                                    textBox(
+                                        "Enter Make",
+                                        makeController,
+                                        "Make",
+                                        makeErrorStatus,
+                                        widget.vehicle != null &&
+                                            widget.vehicle!.make!.isNotEmpty),
+
+                                    Visibility(
+                                        visible: makeErrorStatus,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 6.0),
+                                          child: Text(
+                                            makeErrorMsg,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(
+                                                0xffD80027,
+                                              ),
                                             ),
-                                            const Text(
-                                              "Create new estimate using this vehicle",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontSize: 14,
-                                                  color: AppColors
-                                                      .primaryTitleColor),
-                                            )
-                                          ],
+                                          ),
+                                        )),
+                                    const SizedBox(
+                                      height: 15,
+                                    ),
+                                    textBox(
+                                        "Enter Model",
+                                        modelController,
+                                        "Model",
+                                        modelErrorStatus,
+                                        widget.vehicle != null &&
+                                            widget.vehicle!.model!.isNotEmpty),
+                                    Visibility(
+                                        visible: modelErrorStatus,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 8.0),
+                                          child: Text(
+                                            modelErrorMsg,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Color(
+                                                0xffD80027,
+                                              ),
+                                            ),
+                                          ),
+                                        )),
+                                    textBox(
+                                        "Enter Number",
+                                        vinController,
+                                        "VIN",
+                                        vinErrorStatus,
+                                        widget.vehicle != null &&
+                                            widget.vin.isNotEmpty),
+                                    Theme(
+                                      data: Theme.of(context).copyWith(
+                                          dividerColor: Colors.transparent),
+                                      child: ExpansionTile(
+                                        tilePadding: const EdgeInsets.all(0),
+                                        childrenPadding:
+                                            const EdgeInsets.all(0),
+                                        title: const Text(
+                                          'Additional Fields',
+                                          style: TextStyle(
+                                              fontSize: 20,
+                                              color:
+                                                  AppColors.primaryTitleColor,
+                                              fontWeight: FontWeight.w600),
                                         ),
-                                      ),
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 50,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      validateVechile();
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primaryColors,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(10.0),
+                                        children: <Widget>[
+                                          ListTile(
+                                              contentPadding:
+                                                  const EdgeInsets.all(0),
+                                              title: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  textBox(
+                                                      "Enter Sub-Model",
+                                                      subModelController,
+                                                      "Sub-Model",
+                                                      subModelErrorStatus),
+                                                  textBox(
+                                                      "Enter Engine",
+                                                      engineController,
+                                                      "Engine",
+                                                      engineErrorStatus,
+                                                      widget.vehicle != null &&
+                                                          widget
+                                                              .vehicle!
+                                                              .displacementCc!
+                                                              .isNotEmpty),
+                                                  // textBox(
+                                                  //     "Enter make...",
+                                                  //     makeController,
+                                                  //     "Make",
+                                                  //     makeErrorStatus),
+                                                  textBox(
+                                                    "Enter Color",
+                                                    colorController,
+                                                    "Color",
+                                                    colorErrorStatus,
+                                                  ),
+                                                  textBox(
+                                                      "Enter Number",
+                                                      licController,
+                                                      "LIC",
+                                                      licErrorStatus),
+                                                  typeController.text.isNotEmpty
+                                                      ? const SizedBox()
+                                                      : const Text(
+                                                          "Type",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                              color: AppColors
+                                                                  .greyText),
+                                                        ),
+                                                  vechiledropDown(),
+                                                  // SizedBox(
+                                                  //   height: 50,
+                                                  //   child: CupertinoTextField(
+                                                  //     controller: typeController,
+                                                  //     readOnly: false,
+                                                  //     placeholder: 'Select',
+                                                  //     style: TextStyle(
+                                                  //         fontSize: 15,
+                                                  //         fontWeight:
+                                                  //             FontWeight.w400,
+                                                  //         color: AppColors
+                                                  //             .primaryBlackColors),
+                                                  //     suffix: Icon(Icons
+                                                  //         .arrow_drop_down_outlined),
+                                                  //     decoration: BoxDecoration(
+                                                  //       borderRadius:
+                                                  //           BorderRadius.all(
+                                                  //               Radius.circular(
+                                                  //                   10)),
+                                                  //       border: Border.all(
+                                                  //           color: AppColors
+                                                  //               .greyText),
+                                                  //     ),
+                                                  //   ),
+                                                  // ),
+                                                ],
+                                              )),
+                                        ],
                                       ),
                                     ),
-                                    child:
-                                        state is AddVechileDetailsLoadingState
+                                    widget.navigation == "estimate_screen" ||
+                                            widget.navigation ==
+                                                "partial_estimate"
+                                        ? const SizedBox(height: 16)
+                                        : Center(
+                                            child: Row(
+                                              children: <Widget>[
+                                                const SizedBox(
+                                                  height: 30,
+                                                ),
+                                                Checkbox(
+                                                  checkColor: Colors.white,
+                                                  value: isChecked,
+                                                  onChanged: (bool? value) {
+                                                    stateUpdate(() {
+                                                      isChecked = value!;
+                                                    });
+                                                  },
+                                                ),
+                                                const Text(
+                                                  "Create new estimate using this vehicle",
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize: 14,
+                                                      color: AppColors
+                                                          .primaryTitleColor),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 50,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          validateVechile();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              AppColors.primaryColors,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
+                                          ),
+                                        ),
+                                        child: state
+                                                is AddVechileDetailsLoadingState
                                             ? const CupertinoActivityIndicator(
                                                 color: Colors.white,
                                               )
@@ -463,19 +474,19 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                                 'Confirm',
                                                 style: TextStyle(fontSize: 15),
                                               ),
-                                  ),
-                                ),
-                              ]),
-                        ),
-                      ))
-                    ],
-                  ),
-                );
-              });
-            }),
-          ),
-        ),
-      )),
+                                      ),
+                                    ),
+                                  ]),
+                            ),
+                          ))
+                        ],
+                      ),
+                    );
+                  });
+                }),
+              ),
+            )),
+      ),
     );
   }
 
@@ -527,7 +538,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
       }
       if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
         if (widget.editVehicle != null) {
-          context.read<VechileBloc>().add(EditVehicleEvent(
+          scaffoldKey.currentContext!.read<VechileBloc>().add(EditVehicleEvent(
                 id: widget.editVehicle!.id.toString(),
                 email: nameController.text,
                 year: yearController.text,
@@ -541,7 +552,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                 type: typeController.text,
               ));
         } else {
-          context.read<VechileBloc>().add(AddVechile(
+          scaffoldKey.currentContext!.read<VechileBloc>().add(AddVechile(
                 email: nameController.text,
                 year: yearController.text,
                 model: modelController.text,
