@@ -134,3 +134,13 @@ class CollectPaymentEstimateErrorState extends EstimateState {
   final String errorMessage;
   CollectPaymentEstimateErrorState({required this.errorMessage});
 }
+
+class DeleteEstimateState extends EstimateState {}
+
+class DeleteEstimateLoadingState extends EstimateState {}
+
+class DeleteEstimateErrorState extends EstimateState {
+  final String errorMessage;
+
+  DeleteEstimateErrorState({required this.errorMessage});
+}
