@@ -581,7 +581,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     ? [PhoneInputFormatter()]
                     : label == "Number of Employees" ||
                             label == 'Zip' ||
-                            label == "Labor Tax Rate"
+                            label == "Labor Tax Rate" ||
+                            label == "Labor Tax Rate" ||
+                            label == "Parts Tax Rate" ||
+                            label == "Material Tax Rate"
                         ? [
                             FilteringTextInputFormatter.digitsOnly,
                           ]
@@ -595,7 +598,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         label == "Number of Employees" ||
                         label == "Shop Hourly Labor Rate" ||
                         label == "Labor Tax Rate" ||
-                        label == 'Zip'
+                        label == 'Zip' ||
+                        label == "Labor Tax Rate" ||
+                        label == "Parts Tax Rate" ||
+                        label == "Material Tax Rate"
                     ? TextInputType.number
                     : null,
                 readOnly: readOnlyFun(label),

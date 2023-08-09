@@ -244,31 +244,31 @@ class _PartsInformationState extends State<PartsInformation> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              widget.parts.partName,
+                              widget.parts.itemServiceNote,
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.primaryTitleColor),
                             ),
-                            AppUtils.verticalDivider(),
-                            const SizedBox(
-                              height: 14,
-                            ),
-                            const Text(
-                              "Type",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.greyText),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.parts.itemName,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryTitleColor),
-                            ),
+                            // AppUtils.verticalDivider(),
+                            // const SizedBox(
+                            //   height: 14,
+                            // ),
+                            // const Text(
+                            //   "Type",
+                            //   style: TextStyle(
+                            //       fontSize: 14,
+                            //       fontWeight: FontWeight.w500,
+                            //       color: AppColors.greyText),
+                            // ),
+                            // const SizedBox(height: 8),
+                            // Text(
+                            //   widget.parts.itemName,
+                            //   style: const TextStyle(
+                            //       fontSize: 16,
+                            //       fontWeight: FontWeight.w400,
+                            //       color: AppColors.primaryTitleColor),
+                            // ),
                             const SizedBox(
                               height: 12,
                             ),
@@ -353,9 +353,9 @@ class _PartsInformationState extends State<PartsInformation> {
                                   color: AppColors.primaryGrayColors),
                             ),
                             const SizedBox(height: 8),
-                            Text(
-                              widget.parts.subTotal,
-                              style: const TextStyle(
+                            const Text(
+                              "0.00",
+                              style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                   color: AppColors.primaryTitleColor),
@@ -376,7 +376,7 @@ class _PartsInformationState extends State<PartsInformation> {
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              widget.parts.taxRate,
+                              widget.parts.subTotal,
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -422,7 +422,7 @@ class _PartsInformationState extends State<PartsInformation> {
               bottomSheetTile(
                 'Edit',
                 Icons.edit,
-                CreatePartsScreen(part: widget.parts),
+                CreatePartsScreen(part: widget.parts, navigation: "edit"),
               ),
               bottomSheetTile(
                 'Delete',
