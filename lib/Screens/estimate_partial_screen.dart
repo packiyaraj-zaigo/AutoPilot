@@ -265,10 +265,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       padding: const EdgeInsets.only(right: 12.0),
                       child: GestureDetector(
                         onTap: () {
-
                           bool validateDurations(String firstDurationStr,
                               String secondDurationStr) {
-                                 if (firstDurationStr.isEmpty &&
+                            if (firstDurationStr.isEmpty &&
                                 secondDurationStr.isEmpty) {
                               return true;
                             }
@@ -824,20 +823,26 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                         Padding(
                           padding: const EdgeInsets.only(top: 15.0),
-                          child: taxDetailsWidget(
-                              "Material", "\$ ${materialAmount.toStringAsFixed(2)}"),
+                          child: taxDetailsWidget("Material",
+                              "\$ ${materialAmount.toStringAsFixed(2)}"),
                         ),
-                        taxDetailsWidget("Part", "\$ ${partAmount.toStringAsFixed(2)}"),
-
-                        taxDetailsWidget("Labor", "\$ ${laborAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget(
-                            "Sub Contract", "\$ ${subContractAmount.toStringAsFixed(2)}"),
-                        taxDetailsWidget("Fee", "\$ ${feeAmount.toStringAsFixed(2)}"),
+                            "Part", "\$ ${partAmount.toStringAsFixed(2)}"),
+
+                        taxDetailsWidget(
+                            "Labor", "\$ ${laborAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Sub Contract",
+                            "\$ ${subContractAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget(
+                            "Fee", "\$ ${feeAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget(
                             "Tax", "\$ ${taxAmount.toStringAsFixed(2)}"),
-                        taxDetailsWidget("Discount", "\$ ${discountAmount.toStringAsFixed(2)}"),
-                        taxDetailsWidget("Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
-                        taxDetailsWidget("Balance due", "\$ ${totalAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Discount",
+                            "\$ ${discountAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget(
+                            "Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Balance due",
+                            "\$ ${totalAmount.toStringAsFixed(2)}"),
                         Padding(
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
@@ -1560,7 +1565,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           color: AppColors.primaryColors,
                         ),
                         Text(
-                          "Add new",
+                          "Add New",
                           style: TextStyle(
                               color: AppColors.primaryColors,
                               fontSize: 14,
@@ -1596,15 +1601,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       return datePicker("payment");
                     },
                   );
-                }else if (label == "Date") {
+                } else if (label == "Date") {
                   showCupertinoModalPopup(
                     context: context,
                     builder: (context) {
                       return datePicker("appointment");
                     },
                   );
-                } 
-                 else if (label == "Customer") {
+                } else if (label == "Customer") {
                   // showModalBottomSheet(
                   //     context: context,
                   //     builder: (context) {
@@ -2161,13 +2165,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           setState(() {
             feeAmount = feeAmount + double.parse(element2.unitPrice);
           });
-          
         }
-         if (element2.itemType.toLowerCase() == "part") {
+        if (element2.itemType.toLowerCase() == "part") {
           setState(() {
             partAmount = partAmount + double.parse(element2.unitPrice);
           });
-          
         }
 
         setState(() {
@@ -2182,7 +2184,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     });
 
     setState(() {
-      totalAmount = (materialAmount + laborAmount + taxAmount+partAmount+subContractAmount+feeAmount) - discountAmount;
+      totalAmount = (materialAmount +
+              laborAmount +
+              taxAmount +
+              partAmount +
+              subContractAmount +
+              feeAmount) -
+          discountAmount;
     });
   }
 
@@ -2887,7 +2895,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             position: e.position,
                             quanityHours: e.quanityHours,
                             tax: e.tax,
-                            vendorId: e.vendorId));
+                            vendorId: e.vendorId,),);
                       } else if (e.itemType.toLowerCase() == "part") {
                         partAddModel.add(CannedServiceAddModel(
                             cannedServiceId: e.orderServiceId,

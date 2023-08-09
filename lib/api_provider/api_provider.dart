@@ -1578,6 +1578,7 @@ class ApiProvider {
       request.headers.addAll(getHeader(token));
       inspect(request);
       var response = await request.send();
+      log(request.fields.toString());
       inspect(response);
       print(response.statusCode.toString() + "provider status code");
       print(response.toString() + "provider response");

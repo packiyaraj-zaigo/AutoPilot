@@ -85,7 +85,7 @@ class _VechileInformationState extends State<VechileInformation> {
                             ),
                             (route) => false);
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Vehicle deleted successfully'),
+                          content: Text('Vehicle Deleted Successfully'),
                           backgroundColor: Colors.green,
                         ));
                       } else if (state is DeleteVechileDetailsErrorState) {
