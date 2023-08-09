@@ -1768,4 +1768,14 @@ class ApiProvider {
       log(e.toString() + "send to customer provider  error");
     }
   }
+
+  Future<dynamic> deleteEstimate(String token, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/orders/$id');
+      final response = await http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Delete provider error");
+    }
+  }
 }

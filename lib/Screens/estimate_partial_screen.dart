@@ -3318,6 +3318,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           child: GestureDetector(
                             onTap: () {
                               Navigator.pop(context);
+                              deleteEstimatePopup(context, "");
+
+                              //  Navigator.pop(context);
 
                               // Navigator.pop(context);
                             },
@@ -3348,39 +3351,37 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             ),
                           ),
                         ),
-
-
-                         Padding(
-              padding: const EdgeInsets.only(top: 18.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  height: 56,
-                  decoration: BoxDecoration(
-                      color: const Color(0xffF6F6F6),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Cancel",
-                          style: TextStyle(
-                              color: AppColors.primaryTitleColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
+                        Padding(
+                          padding: const EdgeInsets.only(top: 18.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: MediaQuery.of(context).size.width,
+                              height: 56,
+                              decoration: BoxDecoration(
+                                  color: const Color(0xffF6F6F6),
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 8.0),
+                                    child: Text(
+                                      "Cancel",
+                                      style: TextStyle(
+                                          color: AppColors.primaryTitleColor,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
@@ -3503,6 +3504,50 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Future deleteEstimatePopup(BuildContext context, message) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is DeleteEstimateState) {
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                builder: (context) {
+                  return BottomBarScreen(
+                    currentIndex: 3,
+                  );
+                },
+              ), (route) => false);
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Estimate?"),
+                content:
+                    const Text("Do you really want to remove this estimate?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context.read<EstimateBloc>().add(DeleteEstimateEvent(
+                            id: widget.estimateDetails.data.id.toString()));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

@@ -173,3 +173,8 @@ class CollectPaymentEstimateEvent extends EstimateEvent {
       required this.date,
       required this.note});
 }
+
+class DeleteEstimateEvent extends EstimateEvent {
+  final String id;
+  DeleteEstimateEvent({required this.id});
+}

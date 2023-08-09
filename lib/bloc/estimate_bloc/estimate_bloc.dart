@@ -50,6 +50,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<SendEstimateToCustomerEvent>(sendEstimateToCustomerBloc);
     on<DeleteAppointmentEstimateEvent>(deleteAppointmentBloc);
     on<CollectPaymentEstimateEvent>(collectPaymentBloc);
+    on<DeleteEstimateEvent>(deleteEstimateBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -744,6 +745,35 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       print(s);
 
       print("hereee");
+    }
+  }
+
+  Future<void> deleteEstimateBloc(
+    DeleteEstimateEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      emit(DeleteEstimateLoadingState());
+
+      Response deleteEstimateRes =
+          await _apiRepository.deleteEstimate(token, event.id);
+
+      log("res${deleteEstimateRes.body}");
+
+      if (deleteEstimateRes.statusCode == 200) {
+        emit(DeleteEstimateState());
+      } else {
+        emit(DeleteEstimateErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(DeleteEstimateErrorState(errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
     }
   }
 }

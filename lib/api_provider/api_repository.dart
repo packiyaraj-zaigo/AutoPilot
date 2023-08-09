@@ -525,6 +525,10 @@ class ApiRepository {
     return apiProvider.collectPayment(
         token, customerId, orderId, paymentMode, amount, date, notes);
   }
+
+  Future<dynamic> deleteEstimate(dynamic token, String id) async {
+    return apiProvider.deleteEstimate(token, id);
+  }
 }
 
 class NetworkError extends Error {}
