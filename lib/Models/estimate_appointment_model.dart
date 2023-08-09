@@ -86,7 +86,7 @@ class Datum {
   DateTime createdAt;
   DateTime updatedAt;
   List<dynamic> appointmentRepeats;
-  CreatedBy customer;
+  CreatedBy? customer;
   Vehicle? vehicle;
 
   Datum({
@@ -138,7 +138,9 @@ class Datum {
         updatedAt: DateTime.parse(json["updated_at"]),
         appointmentRepeats:
             List<dynamic>.from(json["appointment_repeats"].map((x) => x)),
-        customer: CreatedBy.fromJson(json["customer"]),
+        customer: json["customer"] == null
+            ? null
+            : CreatedBy.fromJson(json["customer"]),
         vehicle:
             json["vehicle"] != null ? Vehicle.fromJson(json["vehicle"]) : null,
       );
@@ -166,7 +168,7 @@ class Datum {
         "updated_at": updatedAt.toIso8601String(),
         "appointment_repeats":
             List<dynamic>.from(appointmentRepeats.map((x) => x)),
-        "customer": customer.toJson(),
+        "customer": customer?.toJson(),
         "vehicle": vehicle!.toJson(),
       };
 }
