@@ -84,7 +84,7 @@ class _VechileInformationState extends State<VechileInformation> {
                       ),
                       (route) => false);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Vehicle Deletion successfull'),
+                    content: Text('Vehicle deleted successfully'),
                     backgroundColor: Colors.green,
                   ));
                 } else if (state is DeleteVechileDetailsErrorState) {
@@ -506,7 +506,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                 size: 16,
                               ),
                               Text(
-                                'Edit Vechile',
+                                'Edit Vehicle',
                                 style: TextStyle(
                                     color: AppColors.primaryColors,
                                     fontWeight: FontWeight.w500,
@@ -546,7 +546,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                 size: 16,
                               ),
                               Text(
-                                'Delete Vechile',
+                                'Delete Vehicle',
                                 style: TextStyle(
                                     color: AppColors.primaryColors,
                                     fontFamily: '.SF Pro Text',
@@ -556,10 +556,34 @@ class _VechileInformationState extends State<VechileInformation> {
                             ],
                           ),
                           onPressed: () {
-                            BlocProvider.of<VechileBloc>(
-                                    scaffoldKey.currentContext!)
-                                .add(DeleteVechile(
-                                    id: widget.vechile.id.toString()));
+                            Navigator.of(context).pop(true);
+                            showDialog(
+                              context: context,
+                              builder: (context) => CupertinoAlertDialog(
+                                title: const Text("Delete vehicle?"),
+                                content: const Text(
+                                    'Do you really want to delete this vehicle?'),
+                                actions: [
+                                  CupertinoButton(
+                                    child: const Text('Yes'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                      BlocProvider.of<VechileBloc>(
+                                              scaffoldKey.currentContext!)
+                                          .add(DeleteVechile(
+                                              id: widget.vechile.id
+                                                  .toString()));
+                                    },
+                                  ),
+                                  CupertinoButton(
+                                    child: const Text('No'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
                       ),
@@ -571,7 +595,9 @@ class _VechileInformationState extends State<VechileInformation> {
                 ),
                 Center(
                   child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                       child: Text(
                         "Cancel",
                         style: TextStyle(

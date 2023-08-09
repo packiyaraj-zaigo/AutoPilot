@@ -69,7 +69,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       isPagenationLoading = false;
     } catch (e) {
       print(e.toString() + "catch error");
-      emit(VechileDetailsErrorState(message: e.toString()));
+      emit(VechileDetailsErrorState(message: "Something went wrong"));
       isVechileLoading = false;
       isPagenationLoading = false;
     }
@@ -135,7 +135,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         );
       }
     } catch (e) {
-      emit(VechileDetailsErrorState(message: e.toString()));
+      emit(VechileDetailsErrorState(message: "Something went wrong"));
       isVechileLoading = false;
     }
   }
@@ -155,7 +155,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         );
       }
     } catch (e) {
-      emit(DeleteVechileDetailsErrorState(message: e.toString()));
+      emit(DeleteVechileDetailsErrorState(message: "Something went wrong"));
       isVechileLoading = false;
     }
   }
