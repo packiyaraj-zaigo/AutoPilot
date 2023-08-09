@@ -149,7 +149,17 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                           widget.operationDetailsMap['time_zone'], "operation"),
                       dividerLine(),
                       detailsWidget(
-                          "Tax Rate",
+                          "Material Tax Rate",
+                          "${widget.operationDetailsMap['material_tax_rate']} %",
+                          "operation"),
+                      dividerLine(),
+                      detailsWidget(
+                          "Labor Tax Rate",
+                          "${widget.operationDetailsMap['labor_tax_rate']} %",
+                          "operation"),
+                      dividerLine(),
+                      detailsWidget(
+                          "Parts Tax Rate",
                           "${widget.operationDetailsMap['sales_tax_rate']} %",
                           "operation"),
                       dividerLine(),

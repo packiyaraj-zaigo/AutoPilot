@@ -1609,9 +1609,10 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "employee_count": numberOfEmployeeController.text,
         "time_zone": timeZoneString,
         "base_labor_cost": labourRateController.text,
-        "sales_tax_rate": partsTaxRateController.text,
-        "labor_tax_rate": laborTaxRateController.text,
-        "material_tax_rate": materialTaxRateController.text,
+        "sales_tax_rate": isTaxPartRate ? partsTaxRateController.text : "0",
+        "labor_tax_rate": isTaxLaborRate ? laborTaxRateController.text : "0",
+        "material_tax_rate":
+            isTaxMaterialRate ? materialTaxRateController.text : "0",
         "tax_on_parts": isTaxPartRate ? "Y" : "N",
         "tax_on_material": isTaxMaterialRate ? "Y" : "N",
         "tax_on_labors": isTaxLaborRate ? "Y" : "N"

@@ -70,6 +70,7 @@ class _PartsScreenState extends State<PartsScreen> {
   List<String> states = [];
   List<DropdownDatum> dropdownData = [];
   dynamic _currentSelectedTypeValue;
+  final searchController = TextEditingController();
 
   @override
   void initState() {
@@ -166,7 +167,28 @@ class _PartsScreenState extends State<PartsScreen> {
                         ],
                       ),
                       height: 50,
-                      child: CupertinoSearchTextField(
+                      child: CupertinoTextField(
+                        controller: searchController,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        suffix: Padding(
+                          padding: const EdgeInsets.only(right: 12.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (searchController.text.isNotEmpty) {
+                                searchController.clear();
+                                _bloc?.add(GetAllParts(query: ""));
+                                _bloc?.currentPage = 1;
+                              }
+                            },
+                            child: const Icon(
+                              Icons.close,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ),
                         onChanged: (value) {
                           _debouncer.run(() {
                             parts.clear();
@@ -174,9 +196,9 @@ class _PartsScreenState extends State<PartsScreen> {
                             _bloc?.add(GetAllParts(query: value));
                           });
                         },
-                        backgroundColor: Colors.white,
-                        placeholder: 'Search Inventory...',
-                        prefixIcon: const Padding(
+                        // backgroundColor: Colors.white,
+                        placeholder: 'Search Item Name',
+                        prefix: const Padding(
                           padding: EdgeInsets.only(left: 24, right: 16),
                           child: Icon(
                             CupertinoIcons.search,

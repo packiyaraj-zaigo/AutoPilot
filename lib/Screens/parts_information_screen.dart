@@ -92,318 +92,335 @@ class _PartsInformationState extends State<PartsInformation> {
               builder: (context) => const CupertinoActivityIndicator());
         }
       },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
+      child: WillPopScope(
+        onWillPop: () async {
+          Navigator.pushReplacement(context, MaterialPageRoute(
+            builder: (context) {
+              return PartsScreen();
             },
-            color: AppColors.primaryColors,
-            icon: const Icon(Icons.arrow_back),
-          ),
-          centerTitle: true,
-          title: const Text(
-            "Parts Information",
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primaryBlackColors),
-          ),
-          actions: [
-            IconButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                      context: context,
-                      builder: (context) => moreOptionsSheet());
-                },
-                icon: const Icon(
-                  Icons.more_horiz,
-                  color: AppColors.primaryColors,
-                ))
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.parts.itemName,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: AppColors.primaryTitleColor),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: CupertinoSlidingSegmentedControl(
-                  onValueChanged: (value) {
-                    setState(() {
-                      selectedIndex = value ?? 0;
-                    });
+          ));
+
+          return false;
+        },
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.white,
+            leading: IconButton(
+              onPressed: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return PartsScreen();
                   },
-                  backgroundColor: AppColors.primarySegmentColors,
-                  groupValue: selectedIndex,
-                  children: {
-                    for (int i = 0; i < _segmentTitles.length; i++)
-                      i: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 65),
-                        child: _segmentTitles[i],
-                      )
+                ));
+              },
+              color: AppColors.primaryColors,
+              icon: const Icon(Icons.arrow_back),
+            ),
+            centerTitle: true,
+            title: const Text(
+              "Parts Information",
+              style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryBlackColors),
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () {
+                    showModalBottomSheet(
+                        context: context,
+                        builder: (context) => moreOptionsSheet());
                   },
+                  icon: const Icon(
+                    Icons.more_horiz,
+                    color: AppColors.primaryColors,
+                  ))
+            ],
+          ),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.parts.itemName,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      color: AppColors.primaryTitleColor),
                 ),
-              ),
-              const SizedBox(height: 20),
-              Expanded(
-                  child: selectedIndex == 1
-                      ? Column(
-                          children: [
-                            SizedBox(
-                              width: double.infinity,
-                              height: 50,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  print("object");
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.buttonColors,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.add_circle_outline,
-                                      color: AppColors.primaryColors,
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  child: CupertinoSlidingSegmentedControl(
+                    onValueChanged: (value) {
+                      setState(() {
+                        selectedIndex = value ?? 0;
+                      });
+                    },
+                    backgroundColor: AppColors.primarySegmentColors,
+                    groupValue: selectedIndex,
+                    children: {
+                      for (int i = 0; i < _segmentTitles.length; i++)
+                        i: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 65),
+                          child: _segmentTitles[i],
+                        )
+                    },
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Expanded(
+                    child: selectedIndex == 1
+                        ? Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                height: 50,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    print("object");
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.buttonColors,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
                                     ),
-                                    Text(
-                                      'Add New Note',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
+                                  ),
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.add_circle_outline,
                                         color: AppColors.primaryColors,
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 32),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      spreadRadius: 1,
-                                      blurRadius: 5,
-                                      offset: const Offset(
-                                          0, 7), // changes position of shadow
-                                    ),
-                                  ],
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    '${widget.parts.createdAt}',
-                                    style: const TextStyle(
-                                        color: AppColors.greyText,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
-                                  ),
-                                  subtitle: Text(
-                                    widget.parts.itemServiceNote,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16,
-                                        color: AppColors.primaryTitleColor),
-                                  ),
-                                  // trailing: Icon(Icons.add),),
-                                ),
-                              ),
-                            )
-                          ],
-                        )
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Serial Number",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.greyText),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.parts.itemServiceNote,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryTitleColor),
-                            ),
-                            // AppUtils.verticalDivider(),
-                            // const SizedBox(
-                            //   height: 14,
-                            // ),
-                            // const Text(
-                            //   "Type",
-                            //   style: TextStyle(
-                            //       fontSize: 14,
-                            //       fontWeight: FontWeight.w500,
-                            //       color: AppColors.greyText),
-                            // ),
-                            // const SizedBox(height: 8),
-                            // Text(
-                            //   widget.parts.itemName,
-                            //   style: const TextStyle(
-                            //       fontSize: 16,
-                            //       fontWeight: FontWeight.w400,
-                            //       color: AppColors.primaryTitleColor),
-                            // ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            AppUtils.verticalDivider(),
-                            const SizedBox(
-                              height: 14,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      "Quantity",
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: AppColors.greyText),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      '$_counter'.padLeft(2, '0'),
-                                      style: const TextStyle(
+                                      Text(
+                                        'Add New Note',
+                                        style: TextStyle(
                                           fontSize: 16,
-                                          fontWeight: FontWeight.w400,
+                                          fontWeight: FontWeight.w600,
+                                          color: AppColors.primaryColors,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 32),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        spreadRadius: 1,
+                                        blurRadius: 5,
+                                        offset: const Offset(
+                                            0, 7), // changes position of shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      '${widget.parts.createdAt}',
+                                      style: const TextStyle(
+                                          color: AppColors.greyText,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                    subtitle: Text(
+                                      widget.parts.itemServiceNote,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
                                           color: AppColors.primaryTitleColor),
                                     ),
-                                  ],
+                                    // trailing: Icon(Icons.add),),
+                                  ),
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    GestureDetector(
-                                      onTap: () {
-                                        _decrementCounter();
-                                      },
-                                      child: const CircleAvatar(
-                                        radius: 11,
-                                        child: Center(
-                                            child: Icon(
-                                          CupertinoIcons.minus,
-                                          size: 15,
-                                        )),
+                              )
+                            ],
+                          )
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Serial Number",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.greyText),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                widget.parts.itemServiceNote,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              // AppUtils.verticalDivider(),
+                              // const SizedBox(
+                              //   height: 14,
+                              // ),
+                              // const Text(
+                              //   "Type",
+                              //   style: TextStyle(
+                              //       fontSize: 14,
+                              //       fontWeight: FontWeight.w500,
+                              //       color: AppColors.greyText),
+                              // ),
+                              // const SizedBox(height: 8),
+                              // Text(
+                              //   widget.parts.itemName,
+                              //   style: const TextStyle(
+                              //       fontSize: 16,
+                              //       fontWeight: FontWeight.w400,
+                              //       color: AppColors.primaryTitleColor),
+                              // ),
+                              const SizedBox(
+                                height: 12,
+                              ),
+                              AppUtils.verticalDivider(),
+                              const SizedBox(
+                                height: 14,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        "Quantity",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: AppColors.greyText),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 35,
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        _incrementCounter();
-                                      },
-                                      child: const CircleAvatar(
-                                        radius: 11,
-                                        child: Center(
-                                            child: Icon(
-                                          CupertinoIcons.add,
-                                          size: 15,
-                                        )),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        '$_counter'.padLeft(2, '0'),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: AppColors.primaryTitleColor),
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      width: 12,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            AppUtils.verticalDivider(),
-                            const SizedBox(
-                              height: 14,
-                            ),
-                            const Text(
-                              "Fee",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryGrayColors),
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              "0.00",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryTitleColor),
-                            ),
-                            const SizedBox(
-                              height: 12,
-                            ),
-                            AppUtils.verticalDivider(),
-                            const SizedBox(
-                              height: 14,
-                            ),
-                            const Text(
-                              "Cost",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.greyText),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              widget.parts.subTotal,
-                              style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: AppColors.primaryTitleColor),
-                            ),
-                            const SizedBox(height: 20),
-                          ],
-                        )
-                  // : SingleChildScrollView(
-                  //     child: Column(
-                  //       children: [
-                  //         ListView.builder(
-                  //           itemBuilder: (context, index) {
-                  //             return Column(
-                  //               children: [Text("data")],
-                  //             );
-                  //           },
-                  //           // itemCount: equipmentFormList.length,
-                  //           shrinkWrap: true,
-                  //           padding: const EdgeInsets.all(0),
-                  //           physics: const ClampingScrollPhysics(),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  ),
-            ],
+                                    ],
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      GestureDetector(
+                                        onTap: () {
+                                          _decrementCounter();
+                                        },
+                                        child: const CircleAvatar(
+                                          radius: 11,
+                                          child: Center(
+                                              child: Icon(
+                                            CupertinoIcons.minus,
+                                            size: 15,
+                                          )),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 35,
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          _incrementCounter();
+                                        },
+                                        child: const CircleAvatar(
+                                          radius: 11,
+                                          child: Center(
+                                              child: Icon(
+                                            CupertinoIcons.add,
+                                            size: 15,
+                                          )),
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 12,
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 12,
+                              ),
+                              AppUtils.verticalDivider(),
+                              const SizedBox(
+                                height: 14,
+                              ),
+                              const Text(
+                                "Fee",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.primaryGrayColors),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                "0.00",
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              const SizedBox(
+                                height: 12,
+                              ),
+                              AppUtils.verticalDivider(),
+                              const SizedBox(
+                                height: 14,
+                              ),
+                              const Text(
+                                "Cost",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.greyText),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                widget.parts.subTotal,
+                                style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          )
+                    // : SingleChildScrollView(
+                    //     child: Column(
+                    //       children: [
+                    //         ListView.builder(
+                    //           itemBuilder: (context, index) {
+                    //             return Column(
+                    //               children: [Text("data")],
+                    //             );
+                    //           },
+                    //           // itemCount: equipmentFormList.length,
+                    //           shrinkWrap: true,
+                    //           padding: const EdgeInsets.all(0),
+                    //           physics: const ClampingScrollPhysics(),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    ),
+              ],
+            ),
           ),
         ),
       ),

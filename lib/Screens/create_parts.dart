@@ -79,7 +79,7 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          widget.navigation == "edit" ? "New Item" : "Edit Item",
+          widget.navigation == "edit" ? "Edit Item" : "New Item",
           style: const TextStyle(
               fontSize: 16,
               color: AppColors.primaryBlackColors,

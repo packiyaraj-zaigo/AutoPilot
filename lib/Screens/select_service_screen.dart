@@ -32,9 +32,9 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
   final ScrollController controller = ScrollController();
   // final List<Employee> servicesList = [];
   List<Datum> serviceList = [];
-  String materialTax = "";
-  String partTax = "";
-  String laborTax = "";
+  String materialTax = "0";
+  String partTax = "0";
+  String laborTax = "0";
 
   final _debouncer = Debouncer();
   final searchController = TextEditingController();
