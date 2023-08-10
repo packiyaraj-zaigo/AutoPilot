@@ -201,7 +201,7 @@ class AppUtils {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('MMy/dd/yyyy - hh:mm a');
+    var outputFormat = DateFormat('MM/dd/yyyy - hh:mm a');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
