@@ -2765,6 +2765,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
       child: BlocListener<ServiceBloc, ServiceState>(
         listener: (context, state) {
           if (state is GetTechnicianState) {
+            technicianData.clear();
             technicianData.addAll(state.technicianModel.data);
 
             print(technicianData);
