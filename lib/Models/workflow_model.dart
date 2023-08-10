@@ -39,7 +39,7 @@ class WorkflowModel {
         updatedBy: json["updated_by"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        orders: Orders.fromJson(json["orders"]),
+        orders: json['orders'] == null ? null : Orders.fromJson(json["orders"]),
         bucketName: BucketName.fromJson(json["bucket_name"]),
       );
 

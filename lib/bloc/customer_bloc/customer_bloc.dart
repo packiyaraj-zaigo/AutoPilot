@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/customer_note_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 
 import 'package:auto_pilot/Screens/customers_screen.dart';
@@ -46,7 +47,85 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<GetCustomerMessagePaginationEvent>(getCustomerMessagePaginationBloc);
     on<DeleteCustomerEvent>(deleteCustomer);
     on<EditCustomerDetails>(editCustomerEvent);
+    on<CreateCustomerNoteEvent>(createCustomerNotes);
+    on<DeleteCustomerNoteEvent>(deleteCustomerNotes);
+    on<GetAllCustomerNotesEvent>(getAllCustomerNotes);
   }
+
+  Future<void> getAllCustomerNotes(
+    GetAllCustomerNotesEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      emit(GetCustomerNotesLoadingState());
+      final token = await AppUtils.getToken();
+
+      final response =
+          await _apiRepository.getAllCustomerNotes(token, event.id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final body = await json.decode(response.body);
+        final List<CustomerNoteModel> notes = [];
+        if (body['data'] != null && body['data'].isNotEmpty) {
+          body['data'].forEach((note) {
+            notes.add(CustomerNoteModel.fromJson(note));
+          });
+        }
+        emit(GetCustomerNotesSuccessState(notes: notes));
+      } else {
+        emit(const GetCustomerNotesErrorState(
+            message: 'Unable to delete the note'));
+      }
+    } catch (e) {
+      log("$e Delete note bloc error");
+      emit(const GetCustomerNotesErrorState(message: "Something went wrong"));
+    }
+  }
+
+  Future<void> createCustomerNotes(
+    CreateCustomerNoteEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      emit(CreateCustomerNoteLoadingState());
+      final token = await AppUtils.getToken();
+      final clientId = await AppUtils.getUserID();
+
+      final response = await _apiRepository.createCustomerNotes(
+          token, event.notes, event.customerId, clientId);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(CreateCustomerNoteSuccessState());
+      } else {
+        emit(const CreateCustomerNoteErrorState(
+            message: 'Unable to create the note'));
+      }
+    } catch (e) {
+      log("$e Create note bloc error");
+      emit(const CreateCustomerNoteErrorState(message: "Something went wrong"));
+    }
+  }
+
+  Future<void> deleteCustomerNotes(
+    DeleteCustomerNoteEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      emit(DeleteCustomerNoteLoadingState());
+      final token = await AppUtils.getToken();
+
+      final response =
+          await _apiRepository.deleteCustomerNotes(token, event.id);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(DeleteCustomerNoteSuccessState());
+      } else {
+        emit(const DeleteCustomerNoteErrorState(
+            message: 'Unable to delete the note'));
+      }
+    } catch (e) {
+      log("$e Delete note bloc error");
+      emit(const DeleteCustomerNoteErrorState(message: "Something went wrong"));
+    }
+  }
+
   Future<void> CustomerEvent(
     customerDetails event,
     Emitter<CustomerState> emit,
@@ -77,7 +156,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           currentPage++;
         }
         // emit(CustomerReady(data: customerModelFromJson(loadedResponse.body)));
-        log(loadedResponse.body.toString() + "preivew api call");
+        log("${loadedResponse.body}preivew api call");
       } else {
         final body = jsonDecode(loadedResponse.body);
         emit(CustomerError(message: body['message']));
@@ -162,6 +241,12 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           loadedResponse.statusCode == 201) {
         print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
 
+        ScaffoldMessenger.of(event.context).showSnackBar(
+          SnackBar(
+            content: Text("Customer Edited Successfully"),
+            backgroundColor: Colors.green,
+          ),
+        );
         Navigator.of(event.context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => CustomersScreen(),
@@ -338,13 +423,13 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     Emitter<CustomerState> emit,
   ) async {
     try {
-      print(messageCurrentPage.toString() + "currrent paggee");
+      print("${messageCurrentPage}currrent paggee");
       // emit(GetCustomerMessagePaginationLoadingState());
 
       final token = await AppUtils.getToken();
       final clientId = await AppUtils.getUserID();
       cm.CustomerMessageModel messageModel;
-      log(messageCurrentPage.toString() + ":::::::::::::::::");
+      log("$messageCurrentPage:::::::::::::::::");
       if (messageCurrentPage < 1) {
         return;
       }
@@ -372,7 +457,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
       isPaginationLoading = false;
     } catch (e) {
       showLoading = 0;
-      print(e.toString() + "Catch error");
+      print("${e}Catch error");
       emit(GetCustomerMessageErrorState(errorMsg: "Something went wrong"));
       isEmployeesLoading = false;
       isPaginationLoading = false;

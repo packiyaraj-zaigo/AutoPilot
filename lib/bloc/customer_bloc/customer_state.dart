@@ -110,3 +110,33 @@ class DeleteCustomerErrorState extends CustomerState {
   @override
   List<Object> get props => [errorMsg];
 }
+
+class CreateCustomerNoteLoadingState extends CustomerState {}
+
+class CreateCustomerNoteErrorState extends CustomerState {
+  final String message;
+  const CreateCustomerNoteErrorState({required this.message});
+}
+
+class CreateCustomerNoteSuccessState extends CustomerState {}
+
+class DeleteCustomerNoteLoadingState extends CustomerState {}
+
+class DeleteCustomerNoteErrorState extends CustomerState {
+  final String message;
+  const DeleteCustomerNoteErrorState({required this.message});
+}
+
+class DeleteCustomerNoteSuccessState extends CustomerState {}
+
+class GetCustomerNotesLoadingState extends CustomerState {}
+
+class GetCustomerNotesErrorState extends CustomerState {
+  final String message;
+  const GetCustomerNotesErrorState({required this.message});
+}
+
+class GetCustomerNotesSuccessState extends CustomerState {
+  final List<CustomerNoteModel> notes;
+  const GetCustomerNotesSuccessState({required this.notes});
+}

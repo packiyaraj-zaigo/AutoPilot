@@ -359,6 +359,7 @@ class ApiProvider {
       map['sub_model'] = submodel;
       map['engine_size'] = engine;
       map['licence_plate'] = licNumber;
+      map['kilometers'] = '0';
 
       var response =
           await http.put(url, body: jsonEncode(map), headers: getHeader(token));
@@ -1739,6 +1740,46 @@ class ApiProvider {
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> createCustomerNotes(
+      String token, String notes, String customerId, String clientId) async {
+    try {
+      final url = Uri.parse("${BASE_URL}api/customer_notes");
+      final map = {
+        "client_id": clientId,
+        "customer_id": customerId,
+        "notes": notes,
+      };
+      final response =
+          http.post(url, headers: getHeader(token), body: jsonEncode(map));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create notes api error");
+    }
+  }
+
+  Future<dynamic> getAllCustomerNotes(String token, String customerId) async {
+    try {
+      final url = Uri.parse(
+          "${BASE_URL}api/customer_notes?customer_id=$customerId&order_by=id&sort=DESC");
+
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create notes api error");
+    }
+  }
+
+  Future<dynamic> deleteCustomerNotes(String token, String id) async {
+    try {
+      final url = Uri.parse("${BASE_URL}api/customer_notes/$id");
+
+      final response = http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Delete notes api error");
     }
   }
 

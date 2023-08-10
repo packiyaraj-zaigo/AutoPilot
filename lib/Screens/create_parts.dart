@@ -214,12 +214,15 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                                 ? const CupertinoActivityIndicator(
                                     color: Colors.white,
                                   )
-                                : const Text(
-                                    'Confirm',
+                                : Text(
+                                    widget.part == null ? 'Confirm' : "Update",
                                     style: TextStyle(fontSize: 15),
                                   ),
                           ),
                         ),
+                        SizedBox(
+                          height: 24,
+                        )
                       ]),
                 ),
               );
