@@ -622,12 +622,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                       errorWidget(error: rateError),
 
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Enter Tax", taxController, "Tax",
-                            taxError.isNotEmpty, context, true),
-                      ),
-                      errorWidget(error: taxError),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 16.0),
+                      //   child: textBox("Enter Tax", taxController, "Tax",
+                      //       taxError.isNotEmpty, context, true),
+                      // ),
+                      // errorWidget(error: taxError),
 
                       const SizedBox(height: 16),
                       const SizedBox(height: 16),
@@ -665,7 +665,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 servicePrice: rateController.text,
                                 serviceNote: laborDescriptionController.text,
                                 discount: '0',
-                                tax: taxController.text,
+                                tax: '0',
                                 subTotal: subT.toStringAsFixed(2),
                               );
                               log(subT.toString());
@@ -920,12 +920,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     } else {
       rateError = '';
     }
-    if (taxController.text.trim().isEmpty) {
-      taxError = "Tax can't be empty";
-      status = false;
-    } else {
-      taxError = '';
-    }
+    // if (taxController.text.trim().isEmpty) {
+    //   taxError = "Tax can't be empty";
+    //   status = false;
+    // } else {
+    //   taxError = '';
+    // }
 
     setState(() {});
     return status;
