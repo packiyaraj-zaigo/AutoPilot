@@ -475,174 +475,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                         : Container(),
                     selectedIndex == 1
                         ? Expanded(
-                            child: Column(
-                              mainAxisAlignment:
-                                  state is GetCustomerNotesLoadingState
-                                      ? MainAxisAlignment.center
-                                      : MainAxisAlignment.start,
-                              children: state is GetCustomerNotesLoadingState
-                                  ? [
-                                      const Center(
-                                          child: CupertinoActivityIndicator()),
-                                    ]
-                                  : [
-                                      GestureDetector(
-                                        onTap: () {
-                                          addNotePopup();
-                                        },
-                                        behavior: HitTestBehavior.translucent,
-                                        child: Container(
-                                          height: 56,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: AppColors.buttonColors),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              const Icon(
-                                                Icons
-                                                    .add_circle_outline_rounded,
-                                                color: AppColors.primaryColors,
-                                              ),
-                                              const SizedBox(
-                                                width: 10,
-                                              ),
-                                              Text(
-                                                'Add New Note',
-                                                style: AppUtils.cardStyle(),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Expanded(
-                                        child: notes.isEmpty
-                                            ? const Center(
-                                                child: Text('No Notes Found',
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        color: AppColors
-                                                            .greyText)))
-                                            : ScrollConfiguration(
-                                                behavior:
-                                                    const ScrollBehavior(),
-                                                child: ListView.builder(
-                                                  shrinkWrap: true,
-                                                  itemCount: notes.length,
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              bottom: 16.0),
-                                                      child: Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        12),
-                                                            boxShadow: [
-                                                              BoxShadow(
-                                                                color: Colors
-                                                                    .black
-                                                                    .withOpacity(
-                                                                        0.07),
-                                                                offset:
-                                                                    const Offset(
-                                                                        0, 4),
-                                                                blurRadius: 10,
-                                                              )
-                                                            ],
-                                                          ),
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                        .symmetric(
-                                                                    horizontal:
-                                                                        16.0,
-                                                                    vertical:
-                                                                        12),
-                                                            child: Column(
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceBetween,
-                                                                  children: [
-                                                                    Text(
-                                                                      AppUtils.getFormattedForNotesScreen(notes[
-                                                                              index]
-                                                                          .createdAt
-                                                                          .toString()),
-                                                                      style:
-                                                                          const TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                        color: AppColors
-                                                                            .greyText,
-                                                                      ),
-                                                                    ),
-                                                                    GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        showNoteDeleteDialog(notes[index]
-                                                                            .id
-                                                                            .toString());
-                                                                      },
-                                                                      child:
-                                                                          const Icon(
-                                                                        CupertinoIcons
-                                                                            .clear,
-                                                                        size:
-                                                                            18,
-                                                                        color: AppColors
-                                                                            .primaryColors,
-                                                                      ),
-                                                                    )
-                                                                  ],
-                                                                ),
-                                                                const SizedBox(
-                                                                    height: 5),
-                                                                Text(
-                                                                  notes[index]
-                                                                      .notes,
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    height: 1.5,
-                                                                    color: AppColors
-                                                                        .primaryTitleColor,
-                                                                  ),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          )),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
-                                      )
-                                    ],
-                            ),
+                            child: notesWidget(state),
                           )
                         : Container(),
                     selectedIndex == 2 ? chatWidget(context) : Container(),
@@ -698,6 +531,134 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
               );
             }
           },
+        ),
+      ),
+    );
+  }
+
+  Column notesWidget(CustomerState state) {
+    return Column(
+      mainAxisAlignment: state is GetCustomerNotesLoadingState
+          ? MainAxisAlignment.center
+          : MainAxisAlignment.start,
+      children: state is GetCustomerNotesLoadingState
+          ? [
+              const Center(child: CupertinoActivityIndicator()),
+            ]
+          : [
+              addNoteButton(),
+              const SizedBox(
+                height: 20,
+              ),
+              Expanded(
+                child: notes.isEmpty
+                    ? const Center(
+                        child: Text('No Notes Found',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.greyText)))
+                    : ScrollConfiguration(
+                        behavior: const ScrollBehavior(),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: notes.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return noteCard(notes[index]);
+                          },
+                        ),
+                      ),
+              )
+            ],
+    );
+  }
+
+  Padding noteCard(CustomerNoteModel note) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                offset: const Offset(0, 4),
+                blurRadius: 10,
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      AppUtils.getFormattedForNotesScreen(
+                          note.createdAt.toString()),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.greyText,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        showNoteDeleteDialog(note.id.toString());
+                      },
+                      child: const Icon(
+                        CupertinoIcons.clear,
+                        size: 18,
+                        color: AppColors.primaryColors,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  note.notes,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
+                    color: AppColors.primaryTitleColor,
+                  ),
+                )
+              ],
+            ),
+          )),
+    );
+  }
+
+  GestureDetector addNoteButton() {
+    return GestureDetector(
+      onTap: () {
+        addNotePopup();
+      },
+      behavior: HitTestBehavior.translucent,
+      child: Container(
+        height: 56,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: AppColors.buttonColors),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.add_circle_outline_rounded,
+              color: AppColors.primaryColors,
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Text(
+              'Add New Note',
+              style: AppUtils.cardStyle(),
+            )
+          ],
         ),
       ),
     );
@@ -1268,81 +1229,145 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
   addNotePopup() {
     final TextEditingController addNoteController = TextEditingController();
+    String addNoteErrorStatus = '';
+
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Add Note"),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child:
-                      const Icon(Icons.close, color: AppColors.primaryColors))
-            ],
-          ),
-          insetPadding:
-              EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
-          content: SizedBox(
-            height: 240,
-            width: MediaQuery.of(context).size.width - 32,
-            child: Column(
+        return StatefulBuilder(builder: (context, setDialog) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                TextField(
-                  maxLines: 6,
-                  controller: addNoteController,
-                  decoration: InputDecoration(
-                      hintText: "Enter Note",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey))),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 24.0),
-                  child: BlocBuilder<CustomerBloc, CustomerState>(
-                    builder: (context, state) {
-                      if (state is CreateCustomerNoteLoadingState) {
-                        return const Padding(
-                          padding: EdgeInsets.only(top: 24.0),
-                          child: Center(child: CupertinoActivityIndicator()),
-                        );
-                      }
-                      return GestureDetector(
-                        onTap: () {
-                          BlocProvider.of<CustomerBloc>(context).add(
-                              CreateCustomerNoteEvent(
-                                  customerId: widget.customerData.id.toString(),
-                                  notes: addNoteController.text.trim()));
-                        },
-                        child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: 56,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: AppColors.primaryColors),
-                          child: const Text(
-                            "Confirm",
-                            style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white),
-                          ),
-                        ),
-                      );
+                const Text("Add Note"),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
                     },
-                  ),
-                )
+                    child:
+                        const Icon(Icons.close, color: AppColors.primaryColors))
               ],
             ),
-          ),
-        );
+            insetPadding:
+                const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+            content: SizedBox(
+              height: addNoteErrorStatus.isNotEmpty ? 290 : 270,
+              width: MediaQuery.of(context).size.width - 32,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  notesTextBox(addNoteController, addNoteErrorStatus),
+                  errorWidget(addNoteErrorStatus),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 24.0),
+                    child: BlocBuilder<CustomerBloc, CustomerState>(
+                      builder: (context, state) {
+                        if (state is CreateCustomerNoteLoadingState) {
+                          return const Padding(
+                            padding: EdgeInsets.only(top: 24.0),
+                            child: Center(child: CupertinoActivityIndicator()),
+                          );
+                        }
+                        return GestureDetector(
+                          onTap: () {
+                            if (addNoteController.text.isEmpty) {
+                              addNoteErrorStatus = "Note can't be empty";
+                            } else {
+                              addNoteErrorStatus = '';
+                              BlocProvider.of<CustomerBloc>(context).add(
+                                  CreateCustomerNoteEvent(
+                                      customerId:
+                                          widget.customerData.id.toString(),
+                                      notes: addNoteController.text.trim()));
+                            }
+                            setDialog(() {});
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: 56,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: AppColors.primaryColors),
+                            child: const Text(
+                              "Confirm",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        });
       },
+    );
+  }
+
+  Padding errorWidget(String errorString) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Visibility(
+          visible: errorString.isNotEmpty,
+          child: Text(
+            errorString,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(
+                0xffD80027,
+              ),
+            ),
+          )),
+    );
+  }
+
+  notesTextBox(
+      TextEditingController addNoteController, String addNoteErrorStatus) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 6.0),
+      child: TextField(
+        controller: addNoteController,
+        minLines: 7,
+        maxLines: 7,
+        decoration: InputDecoration(
+          hintText: "Enter Notes",
+          hintStyle: const TextStyle(fontSize: 16),
+          counterText: "",
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: addNoteErrorStatus.isNotEmpty
+                  ? const Color(0xffD80027)
+                  : const Color(0xffC1C4CD),
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: addNoteErrorStatus.isNotEmpty
+                  ? const Color(0xffD80027)
+                  : const Color(0xffC1C4CD),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(
+              color: addNoteErrorStatus.isNotEmpty
+                  ? const Color(0xffD80027)
+                  : const Color(0xffC1C4CD),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
