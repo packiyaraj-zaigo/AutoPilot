@@ -83,3 +83,13 @@ class GetVehicleNoteEvent extends VechileEvent {
   final String vehicleId;
   GetVehicleNoteEvent({required this.vehicleId});
 }
+
+class AddVehicleNoteEvent extends VechileEvent {
+  final String vehicleId, notes;
+  AddVehicleNoteEvent({required this.notes, required this.vehicleId});
+}
+
+class DeleteVehicleNotesEvent extends VechileEvent {
+  final String vehicleId;
+  DeleteVehicleNotesEvent({required this.vehicleId});
+}

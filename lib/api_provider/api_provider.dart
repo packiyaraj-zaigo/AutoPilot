@@ -1840,10 +1840,10 @@ class ApiProvider {
     try {
       final body = {
         "vehicle_id": vehicleId,
-        "note": notes,
+        "notes": notes,
       };
       final url = Uri.parse('${BASE_URL}api/vehicle_notes?$vehicleId');
-      final response = await http.put(
+      final response = await http.post(
         url,
         headers: getHeader(token),
         body: json.encode(body),
@@ -1852,6 +1852,18 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + " create appointment api error");
+    }
+  }
+
+  Future<dynamic> deleteVehicleNotes(String id, String token) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${BASE_URL}api/vehicle_notes/$id'),
+        headers: getHeader(token),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
     }
   }
 }

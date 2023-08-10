@@ -50,6 +50,9 @@ class _VechileInformationState extends State<VechileInformation> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   int selectedIndex = 0;
   final addNoteController = TextEditingController();
+
+  String addNoteErrorMessage = "";
+
   List<vn.Datum> noteList = [];
 
   @override
@@ -79,6 +82,12 @@ class _VechileInformationState extends State<VechileInformation> {
           } else if (state is GetVehicleNoteState) {
             noteList.clear();
             noteList.addAll(state.vehicleModel.data);
+          } else if (state is AddVehicleNoteState) {
+            print("listner worked");
+            context.read<VechileBloc>().add(
+                GetVehicleNoteEvent(vehicleId: widget.vechile.id.toString()));
+
+            Navigator.pop(context);
           }
           // TODO: implement listener
         },
@@ -235,7 +244,11 @@ class _VechileInformationState extends State<VechileInformation> {
                                                                       .notes,
                                                                   noteList[
                                                                           index]
-                                                                      .createdAt);
+                                                                      .createdAt,
+                                                                  noteList[
+                                                                          index]
+                                                                      .id
+                                                                      .toString());
                                                             },
                                                             itemCount:
                                                                 noteList.length,
@@ -654,100 +667,228 @@ class _VechileInformationState extends State<VechileInformation> {
     );
   }
 
-  noteTileWidget(String note, DateTime date) {
+  noteTileWidget(String note, DateTime date, String noteId) {
     return Padding(
-      padding: const EdgeInsets.only(top: 22.0),
+      padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: Offset(0, 4), // changes position of shadow
-            ),
-          ],
-        ),
-        child: ListTile(
-          title: Text(
-            "${DateFormat('mm/dd/yyyy').format(date)} - ${DateFormat('HH:mm').format(date)}",
-            style: TextStyle(
-                color: AppColors.greyText,
-                fontSize: 16,
-                fontWeight: FontWeight.w500),
-          ),
-          subtitle: Text(
-            note,
-            style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 16,
-                color: AppColors.primaryTitleColor),
-          ),
-          // trailing: Icon(Icons.add),),
-        ),
-      ),
-    );
-  }
-
-  addNotePopup(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Add Note"),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child:
-                      const Icon(Icons.close, color: AppColors.primaryColors))
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                offset: const Offset(0, 4),
+                blurRadius: 10,
+              )
             ],
           ),
-          insetPadding:
-              const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
-          content: SizedBox(
-            height: 240,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                TextField(
-                  maxLines: 6,
-                  controller: addNoteController,
-                  decoration: InputDecoration(
-                      hintText: "Enter Note",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey))),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 24.0),
-                  child: Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: 56,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: AppColors.primaryColors),
-                    child: const Text(
-                      "Confirm",
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${DateFormat("mm/dd/yyyy").format(date)} - ${DateFormat("HH:mm").format(date)}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.greyText,
+                      ),
                     ),
+                    GestureDetector(
+                      onTap: () {
+                        deleteVehicleNotePopup(context, "", noteId);
+                        // showNoteDeleteDialog(notes[index].id.toString());
+                      },
+                      child: const Icon(
+                        CupertinoIcons.clear,
+                        size: 18,
+                        color: AppColors.primaryColors,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  note,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
+                    color: AppColors.primaryTitleColor,
                   ),
                 )
               ],
             ),
+          )),
+    );
+  }
+
+  addNotePopup(BuildContext context) {
+    bool addNoteErrorStatus = false;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return BlocProvider(
+          create: (context) => VechileBloc(),
+          child: BlocListener<VechileBloc, VechileState>(
+            listener: (context, state) {
+              if (state is AddVehicleNoteState) {
+                print("listner worked");
+
+                scaffoldKey.currentContext!.read<VechileBloc>().add(
+                    GetVehicleNoteEvent(
+                        vehicleId: widget.vechile.id.toString()));
+
+                Navigator.pop(context);
+                addNoteController.clear();
+              }
+
+              // TODO: implement listener
+            },
+            child: BlocBuilder<VechileBloc, VechileState>(
+              builder: (context, state) {
+                return StatefulBuilder(builder: (context, newSetState) {
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Add Note"),
+                        GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Icon(Icons.close,
+                                color: AppColors.primaryColors))
+                      ],
+                    ),
+                    insetPadding: const EdgeInsets.only(
+                        top: 16, left: 16, right: 16, bottom: 16),
+                    content: SizedBox(
+                      height: 260,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          TextField(
+                            maxLines: 6,
+                            controller: addNoteController,
+                            decoration: InputDecoration(
+                                hintText: "Enter Note",
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey))),
+                          ),
+                          Visibility(
+                              visible: addNoteErrorStatus,
+                              child: Text(addNoteErrorMessage,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(
+                                      0xffD80027,
+                                    ),
+                                  ))),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 24.0),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (addNoteController.text.isEmpty) {
+                                  newSetState(() {
+                                    addNoteErrorStatus = true;
+                                    addNoteErrorMessage = "Note can't be empty";
+                                  });
+                                } else {
+                                  newSetState(() {
+                                    addNoteErrorStatus = false;
+                                  });
+                                }
+
+                                if (!addNoteErrorStatus) {
+                                  context.read<VechileBloc>().add(
+                                      AddVehicleNoteEvent(
+                                          notes: addNoteController.text,
+                                          vehicleId:
+                                              widget.vechile.id.toString()));
+                                }
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 56,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.primaryColors),
+                                child: state is AddVehicleNoteLoadingState
+                                    ? const Center(
+                                        child: CupertinoActivityIndicator(),
+                                      )
+                                    : const Text(
+                                        "Confirm",
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.white),
+                                      ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                });
+              },
+            ),
           ),
         );
       },
+    );
+  }
+
+  Future deleteVehicleNotePopup(BuildContext context, message, String noteId) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => VechileBloc(),
+        child: BlocListener<VechileBloc, VechileState>(
+          listener: (context, state) {
+            if (state is DeleteVehicleNoteState) {
+              scaffoldKey.currentContext!.read<VechileBloc>().add(
+                  GetVehicleNoteEvent(vehicleId: widget.vechile.id.toString()));
+
+              Navigator.pop(context);
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<VechileBloc, VechileState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Note?"),
+                content: Text("Do you really want to remove this note?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context
+                            .read<VechileBloc>()
+                            .add(DeleteVehicleNotesEvent(vehicleId: noteId));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }
