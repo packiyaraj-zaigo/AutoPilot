@@ -142,3 +142,12 @@ class AddVehicleNoteErrorState extends VechileState {
   final String errorMessage;
   AddVehicleNoteErrorState({required this.errorMessage});
 }
+
+class DeleteVehicleNoteState extends VechileState {}
+
+class DeleteVehicleNoteLoadingState extends VechileState {}
+
+class DeleteVehicleNoteErrorState extends VechileState {
+  final String errorMessage;
+  DeleteVehicleNoteErrorState({required this.errorMessage});
+}

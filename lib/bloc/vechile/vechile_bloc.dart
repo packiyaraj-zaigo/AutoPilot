@@ -29,6 +29,8 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     on<DeleteVechile>(deleteVechile);
     on<EditVehicleEvent>(editVehicle);
     on<GetVehicleNoteEvent>(getVehicleNoteBloc);
+    on<AddVehicleNoteEvent>(addVehicleNoteBloc);
+    on<DeleteVehicleNotesEvent>(deleteVehicleNoteBloc);
   }
   getAllVechile(
     GetAllVechile event,
@@ -242,6 +244,28 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     } catch (e) {
       log(e.toString() + " Edit bloc error");
       emit(AddVehicleNoteErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  deleteVehicleNoteBloc(
+    DeleteVehicleNotesEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      emit(DeleteVehicleNoteLoadingState());
+      final token = await AppUtils.getToken();
+      Response response =
+          await apiRepo.deleteVehicleNotes(token, event.vehicleId);
+      //  final body = await jsonDecode(response.body);
+      log(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(DeleteVehicleNoteState());
+      } else {
+        emit(DeleteVehicleNoteErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      log(e.toString() + " Edit bloc error");
+      emit(DeleteVehicleNoteErrorState(errorMessage: "Something went wrong"));
     }
   }
 }

@@ -553,6 +553,10 @@ class ApiRepository {
       dynamic token, String vehicleId, String notes) async {
     return apiProvider.addVehicleNote(token, vehicleId, notes);
   }
+
+  Future<dynamic> deleteVehicleNotes(dynamic token, String vehicleId) async {
+    return apiProvider.deleteVehicleNotes(vehicleId, token);
+  }
 }
 
 class NetworkError extends Error {}
