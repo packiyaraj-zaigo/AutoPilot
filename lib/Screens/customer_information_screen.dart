@@ -523,103 +523,123 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         height: 20,
                                       ),
                                       Expanded(
-                                        child: ScrollConfiguration(
-                                          behavior: const ScrollBehavior(),
-                                          child: ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: notes.length,
-                                            itemBuilder: (BuildContext context,
-                                                int index) {
-                                              return Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 16.0),
-                                                child: Container(
-                                                    height: 100,
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.black
-                                                              .withOpacity(
-                                                                  0.07),
-                                                          offset: const Offset(
-                                                              0, 4),
-                                                          blurRadius: 10,
-                                                        )
-                                                      ],
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets
-                                                              .symmetric(
-                                                          horizontal: 16.0,
-                                                          vertical: 12),
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              Text(
-                                                                AppUtils.getFormattedForNotesScreen(
-                                                                    notes[index]
-                                                                        .createdAt
-                                                                        .toString()),
-                                                                style:
-                                                                    const TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                  color: AppColors
-                                                                      .greyText,
-                                                                ),
-                                                              ),
-                                                              GestureDetector(
-                                                                onTap: () {
-                                                                  showNoteDeleteDialog(
-                                                                      notes[index]
-                                                                          .id
-                                                                          .toString());
-                                                                },
-                                                                child:
-                                                                    const Icon(
-                                                                  CupertinoIcons
-                                                                      .clear,
-                                                                  size: 18,
-                                                                  color: AppColors
-                                                                      .primaryColors,
-                                                                ),
+                                        child: notes.isEmpty
+                                            ? const Center(
+                                                child: Text('No Notes Found',
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: AppColors
+                                                            .greyText)))
+                                            : ScrollConfiguration(
+                                                behavior:
+                                                    const ScrollBehavior(),
+                                                child: ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: notes.length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              bottom: 16.0),
+                                                      child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors.white,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        12),
+                                                            boxShadow: [
+                                                              BoxShadow(
+                                                                color: Colors
+                                                                    .black
+                                                                    .withOpacity(
+                                                                        0.07),
+                                                                offset:
+                                                                    const Offset(
+                                                                        0, 4),
+                                                                blurRadius: 10,
                                                               )
                                                             ],
                                                           ),
-                                                          const SizedBox(
-                                                              height: 5),
-                                                          Text(
-                                                            notes[index].notes,
-                                                            style:
-                                                                const TextStyle(
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                              height: 1.5,
-                                                              color: AppColors
-                                                                  .primaryTitleColor,
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                        .symmetric(
+                                                                    horizontal:
+                                                                        16.0,
+                                                                    vertical:
+                                                                        12),
+                                                            child: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .spaceBetween,
+                                                                  children: [
+                                                                    Text(
+                                                                      AppUtils.getFormattedForNotesScreen(notes[
+                                                                              index]
+                                                                          .createdAt
+                                                                          .toString()),
+                                                                      style:
+                                                                          const TextStyle(
+                                                                        fontWeight:
+                                                                            FontWeight.w500,
+                                                                        color: AppColors
+                                                                            .greyText,
+                                                                      ),
+                                                                    ),
+                                                                    GestureDetector(
+                                                                      onTap:
+                                                                          () {
+                                                                        showNoteDeleteDialog(notes[index]
+                                                                            .id
+                                                                            .toString());
+                                                                      },
+                                                                      child:
+                                                                          const Icon(
+                                                                        CupertinoIcons
+                                                                            .clear,
+                                                                        size:
+                                                                            18,
+                                                                        color: AppColors
+                                                                            .primaryColors,
+                                                                      ),
+                                                                    )
+                                                                  ],
+                                                                ),
+                                                                const SizedBox(
+                                                                    height: 5),
+                                                                Text(
+                                                                  notes[index]
+                                                                      .notes,
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                    height: 1.5,
+                                                                    color: AppColors
+                                                                        .primaryTitleColor,
+                                                                  ),
+                                                                )
+                                                              ],
                                                             ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    )),
-                                              );
-                                            },
-                                          ),
-                                        ),
+                                                          )),
+                                                    );
+                                                  },
+                                                ),
+                                              ),
                                       )
                                     ],
                             ),
