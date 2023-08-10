@@ -78,3 +78,8 @@ class DeleteVechile extends VechileEvent {
   final String id;
   const DeleteVechile({required this.id});
 }
+
+class GetVehicleNoteEvent extends VechileEvent {
+  final String vehicleId;
+  GetVehicleNoteEvent({required this.vehicleId});
+}

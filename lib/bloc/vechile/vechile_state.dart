@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
+import 'package:auto_pilot/Models/vehicle_notes_model.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../Models/vechile_model.dart';
@@ -116,4 +117,19 @@ class CreateVehicleSuccessState extends VechileState {
 
   @override
   List<Object> get props => [createdId];
+}
+
+class GetVehicleNoteState extends VechileState {
+  final VehicleNoteModel vehicleModel;
+  GetVehicleNoteState({required this.vehicleModel});
+
+  @override
+  List<Object> get props => [vehicleModel];
+}
+
+class GetVehicleNoteLoadingState extends VechileState {}
+
+class GetVehicleNoteErrorState extends VechileState {
+  final String errorMessage;
+  GetVehicleNoteErrorState({required this.errorMessage});
 }

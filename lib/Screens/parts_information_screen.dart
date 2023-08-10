@@ -120,7 +120,7 @@ class _PartsInformationState extends State<PartsInformation> {
             ),
             centerTitle: true,
             title: const Text(
-              "Parts Information",
+              "Part's Information",
               style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,

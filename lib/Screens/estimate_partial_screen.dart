@@ -1272,14 +1272,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     "Start Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('hh:mm a').format(
+                        ? DateFormat('HH:mm').format(
                             appointmentDetailsModel!.data.data[0].startOn)
                         : ""),
                 appointmentLabelwithValue(
                     "End Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('hh:mm a')
+                        ? DateFormat('HH:mm')
                             .format(appointmentDetailsModel!.data.data[0].endOn)
                         : "")
               ],
@@ -2143,6 +2143,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   calculateAmount() {
+    materialAmount = 0;
+    partAmount = 0;
+    laborAmount = 0;
+    subContractAmount = 0;
+    feeAmount = 0;
+    taxAmount = 0;
+    discountAmount = 0;
+    totalAmount = 0;
+    balanceDueAmount = 0;
     widget.estimateDetails.data.orderService?.forEach((element) {
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
@@ -2192,6 +2201,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               feeAmount) -
           discountAmount;
     });
+    setState(() {});
   }
 
   paymentPopUp() {
@@ -2713,11 +2723,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 onTap: () {
                   setState(() {
                     isAppointmentEdit = true;
-                    startTimeController.text = DateFormat('hh:mm')
+                    startTimeController.text = DateFormat('HH:mm')
                         .format(appointmentDetails.startOn)
                         .toString();
 
-                    endTimeController.text = DateFormat('hh:mm')
+                    endTimeController.text = DateFormat('HH:mm')
                         .format(appointmentDetails.endOn)
                         .toString();
 
@@ -2881,7 +2891,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                       if (e.itemType == "Material") {
                         print("map in if");
-                        materialAddModel.add(CannedServiceAddModel(
+                        materialAddModel.add(
+                          CannedServiceAddModel(
                             cannedServiceId: e.orderServiceId,
                             itemName: e.itemName,
                             unitPrice: e.unitPrice,
@@ -2895,7 +2906,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             position: e.position,
                             quanityHours: e.quanityHours,
                             tax: e.tax,
-                            vendorId: e.vendorId,),);
+                            vendorId: e.vendorId,
+                          ),
+                        );
                       } else if (e.itemType.toLowerCase() == "part") {
                         partAddModel.add(CannedServiceAddModel(
                             cannedServiceId: e.orderServiceId,
@@ -3217,7 +3230,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             if (state is DeleteOrderServiceState) {
               log(state.toString() + "popppupp");
               widget.estimateDetails.data.orderService!.removeAt(index);
-              setState(() {});
+              calculateAmount();
+
+              //here calculation
 
               Navigator.pop(context);
             }
