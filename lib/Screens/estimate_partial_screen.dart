@@ -1272,14 +1272,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     "Start Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('hh:mm a').format(
+                        ? DateFormat('HH:mm').format(
                             appointmentDetailsModel!.data.data[0].startOn)
                         : ""),
                 appointmentLabelwithValue(
                     "End Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('hh:mm a')
+                        ? DateFormat('HH:mm')
                             .format(appointmentDetailsModel!.data.data[0].endOn)
                         : "")
               ],
@@ -2713,11 +2713,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 onTap: () {
                   setState(() {
                     isAppointmentEdit = true;
-                    startTimeController.text = DateFormat('hh:mm')
+                    startTimeController.text = DateFormat('HH:mm')
                         .format(appointmentDetails.startOn)
                         .toString();
 
-                    endTimeController.text = DateFormat('hh:mm')
+                    endTimeController.text = DateFormat('HH:mm')
                         .format(appointmentDetails.endOn)
                         .toString();
 
