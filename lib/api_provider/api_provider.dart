@@ -601,6 +601,19 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getVehicleNotes(String token, String vehicleId) async {
+    try {
+      print(vehicleId);
+      final url =
+          Uri.parse('${BASE_URL}api/vehicle_notes?vehicle_id=$vehicleId');
+      final response = http.get(url, headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
   Future<dynamic> getEstimate(
       String token, String orderStatus, int currentPage) async {
     print("into provider");
@@ -1778,6 +1791,26 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + " Delete provider error");
+    }
+  }
+
+  Future<dynamic> addVehicleNote(
+      dynamic token, String vehicleId, String notes) async {
+    try {
+      final body = {
+        "vehicle_id": vehicleId,
+        "note": notes,
+      };
+      final url = Uri.parse('${BASE_URL}api/vehicle_notes?$vehicleId');
+      final response = await http.put(
+        url,
+        headers: getHeader(token),
+        body: json.encode(body),
+      );
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + " create appointment api error");
     }
   }
 }

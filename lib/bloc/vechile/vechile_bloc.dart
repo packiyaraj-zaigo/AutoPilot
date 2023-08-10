@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
+import 'package:auto_pilot/Models/vehicle_notes_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
@@ -27,6 +28,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     on<DropDownVechile>(dropdownVechile);
     on<DeleteVechile>(deleteVechile);
     on<EditVehicleEvent>(editVehicle);
+    on<GetVehicleNoteEvent>(getVehicleNoteBloc);
   }
   getAllVechile(
     GetAllVechile event,
@@ -196,6 +198,28 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     } catch (e) {
       log(e.toString() + " Edit bloc error");
       emit(EditVehicleErrorState(message: "Something went wrong"));
+    }
+  }
+
+  getVehicleNoteBloc(
+    GetVehicleNoteEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      VehicleNoteModel vehicleNoteModel;
+      final token = await AppUtils.getToken();
+      Response response = await apiRepo.getVehicleNotes(token, event.vehicleId);
+      //  final body = await jsonDecode(response.body);
+      log(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        vehicleNoteModel = vehicleNoteModelFromJson(response.body);
+        emit(GetVehicleNoteState(vehicleModel: vehicleNoteModel));
+      } else {
+        emit(GetVehicleNoteErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      log(e.toString() + " Edit bloc error");
+      emit(GetVehicleNoteErrorState(errorMessage: "Something went wrong"));
     }
   }
 }

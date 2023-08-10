@@ -531,6 +531,10 @@ class ApiRepository {
   Future<dynamic> deleteEstimate(dynamic token, String id) async {
     return apiProvider.deleteEstimate(token, id);
   }
+
+  Future<dynamic> getVehicleNotes(dynamic token, String vehicleId) async {
+    return apiProvider.getVehicleNotes(token, vehicleId);
+  }
 }
 
 class NetworkError extends Error {}
