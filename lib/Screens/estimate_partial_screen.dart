@@ -2998,6 +2998,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             id: widget
                                 .estimateDetails.data.orderService![index].id,
                             clientId: widget.estimateDetails.data.clientId,
+                            serviceNote: widget.estimateDetails.data
+                                .orderService![index].serviceNote,
                             serviceName: widget.estimateDetails.data
                                 .orderService![index].serviceName,
                             servicePrice: widget.estimateDetails.data
