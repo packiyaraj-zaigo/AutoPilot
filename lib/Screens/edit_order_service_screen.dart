@@ -775,8 +775,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                             borderRadius: BorderRadius.circular(12),
                             color: AppColors.primaryColors,
                           ),
-                          child: const Text(
-                            "Confirm",
+                          child: Text(
+                            widget.service != null ? 'Update' : "Confirm",
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,

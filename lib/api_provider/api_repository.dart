@@ -532,6 +532,19 @@ class ApiRepository {
     return apiProvider.deleteEstimate(token, id);
   }
 
+  Future<dynamic> createCustomerNotes(
+      String token, String notes, String customerId, String clientId) async {
+    return apiProvider.createCustomerNotes(token, notes, customerId, clientId);
+  }
+
+  Future<dynamic> deleteCustomerNotes(String token, String id) async {
+    return apiProvider.deleteCustomerNotes(token, id);
+  }
+
+  Future<dynamic> getAllCustomerNotes(String token, String customerId) async {
+    return apiProvider.getAllCustomerNotes(token, customerId);
+  }
+
   Future<dynamic> getVehicleNotes(dynamic token, String vehicleId) async {
     return apiProvider.getVehicleNotes(token, vehicleId);
   }

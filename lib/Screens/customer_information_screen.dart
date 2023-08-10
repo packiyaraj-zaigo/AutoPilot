@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/customer_model.dart';
+import 'package:auto_pilot/Models/customer_note_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:auto_pilot/Screens/customers_screen.dart' as cs;
 import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
@@ -29,6 +30,7 @@ class CustomerInformationScreen extends StatefulWidget {
 }
 
 class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
+  final List<CustomerNoteModel> notes = [];
   final List _segmentTitles = [
     SvgPicture.asset(
       "assets/images/info.svg",
@@ -76,6 +78,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.primaryBackgroundColors,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -132,6 +135,34 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
               context: context,
               builder: (context) => CupertinoActivityIndicator(),
             );
+          } else if (state is CreateCustomerNoteSuccessState) {
+            BlocProvider.of<CustomerBloc>(context).add(GetAllCustomerNotesEvent(
+                id: widget.customerData.id.toString()));
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Note Created Successfully"),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state is CreateCustomerNoteErrorState) {
+            CommonWidgets().showDialog(context, state.message);
+          } else if (state is DeleteCustomerNoteSuccessState) {
+            BlocProvider.of<CustomerBloc>(context).add(GetAllCustomerNotesEvent(
+                id: widget.customerData.id.toString()));
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("Note Deleted Successfully"),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } else if (state is DeleteCustomerNoteErrorState) {
+            CommonWidgets().showDialog(context, state.message);
+          } else if (state is GetCustomerNotesSuccessState) {
+            notes.clear();
+            notes.addAll(state.notes);
+          } else if (state is GetCustomerNotesErrorState) {
+            CommonWidgets().showDialog(context, state.message);
           }
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
@@ -161,7 +192,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           selectedIndex = value ?? 0;
                           customerMessageList.clear();
                         });
-                        if (value == 2) {
+                        if (value == 1) {
+                          BlocProvider.of<CustomerBloc>(context).add(
+                              GetAllCustomerNotesEvent(
+                                  id: widget.customerData.id.toString()));
+                        } else if (value == 2) {
                           BlocProvider.of<CustomerBloc>(context)
                               .messageCurrentPage = 1;
                           BlocProvider.of<CustomerBloc>(context)
@@ -295,7 +330,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                         children: [
                                           Column(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                                MainAxisAlignment.center,
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
@@ -347,8 +382,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
                                               launchUrl(emailLaunchUri);
                                             },
-                                            icon: SizedBox(
-                                              height: 27,
+                                            icon: Container(
+                                              // color: Colors.red,
+                                              height: 18,
                                               width: 18,
                                               child: SvgPicture.asset(
                                                 'assets/images/mail_icons.svg',
@@ -438,91 +474,155 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           )
                         : Container(),
                     selectedIndex == 1
-                        ? Column(
-                            children: [
-                              SizedBox(
-                                height: 56,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      backgroundColor: AppColors.buttonColors),
-                                  onPressed: () {},
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                        Icons.add_circle_outline_rounded,
-                                        color: AppColors.primaryColors,
+                        ? Expanded(
+                            child: Column(
+                              mainAxisAlignment:
+                                  state is GetCustomerNotesLoadingState
+                                      ? MainAxisAlignment.center
+                                      : MainAxisAlignment.start,
+                              children: state is GetCustomerNotesLoadingState
+                                  ? [
+                                      const Center(
+                                          child: CupertinoActivityIndicator()),
+                                    ]
+                                  : [
+                                      GestureDetector(
+                                        onTap: () {
+                                          addNotePopup();
+                                        },
+                                        behavior: HitTestBehavior.translucent,
+                                        child: Container(
+                                          height: 56,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: AppColors.buttonColors),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              const Icon(
+                                                Icons
+                                                    .add_circle_outline_rounded,
+                                                color: AppColors.primaryColors,
+                                              ),
+                                              const SizedBox(
+                                                width: 10,
+                                              ),
+                                              Text(
+                                                'Add New Note',
+                                                style: AppUtils.cardStyle(),
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(
-                                        width: 10,
+                                        height: 20,
                                       ),
-                                      Text(
-                                        'Add New Note',
-                                        style: AppUtils.cardStyle(),
+                                      Expanded(
+                                        child: ScrollConfiguration(
+                                          behavior: const ScrollBehavior(),
+                                          child: ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: notes.length,
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              return Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 16.0),
+                                                child: Container(
+                                                    height: 100,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              12),
+                                                      boxShadow: [
+                                                        BoxShadow(
+                                                          color: Colors.black
+                                                              .withOpacity(
+                                                                  0.07),
+                                                          offset: const Offset(
+                                                              0, 4),
+                                                          blurRadius: 10,
+                                                        )
+                                                      ],
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                              .symmetric(
+                                                          horizontal: 16.0,
+                                                          vertical: 12),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                AppUtils.getFormattedForNotesScreen(
+                                                                    notes[index]
+                                                                        .createdAt
+                                                                        .toString()),
+                                                                style:
+                                                                    const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                  color: AppColors
+                                                                      .greyText,
+                                                                ),
+                                                              ),
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  showNoteDeleteDialog(
+                                                                      notes[index]
+                                                                          .id
+                                                                          .toString());
+                                                                },
+                                                                child:
+                                                                    const Icon(
+                                                                  CupertinoIcons
+                                                                      .clear,
+                                                                  size: 18,
+                                                                  color: AppColors
+                                                                      .primaryColors,
+                                                                ),
+                                                              )
+                                                            ],
+                                                          ),
+                                                          const SizedBox(
+                                                              height: 5),
+                                                          Text(
+                                                            notes[index].notes,
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 16,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              height: 1.5,
+                                                              color: AppColors
+                                                                  .primaryTitleColor,
+                                                            ),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    )),
+                                              );
+                                            },
+                                          ),
+                                        ),
                                       )
                                     ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              // ListView.builder(
-                              //   shrinkWrap: true,
-                              //   itemCount: widget.customerData.clientId
-                              //       .toString()
-                              //       .length,
-                              //   itemBuilder:
-                              //       (BuildContext context, int index) {
-                              //     return
-                              Container(
-                                decoration: const BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(20))),
-                                width: double.infinity,
-                                child: Card(
-                                  elevation: 5,
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 18,
-                                      top: 2,
-                                      bottom: 10,
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '${widget.customerData.createdAt}',
-                                          style: AppUtils.requiredStyle(),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                        Text(
-                                          widget.customerData.notes == null
-                                              ? ''
-                                              : '${widget.customerData.notes}',
-                                          style: AppUtils.summaryStyle(),
-                                        ),
-                                        const SizedBox(
-                                          height: 5,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                //   );
-                                // },
-                              )
-                            ],
+                            ),
                           )
                         : Container(),
                     selectedIndex == 2 ? chatWidget(context) : Container(),
@@ -579,6 +679,35 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             }
           },
         ),
+      ),
+    );
+  }
+
+  showNoteDeleteDialog(String id) {
+    showDialog(
+      context: context,
+      builder: (context) => CupertinoAlertDialog(
+        title: const Text("Delete note?"),
+        content: const Text('Do you really want to delete this note?'),
+        actions: [
+          CupertinoButton(
+            child: const Text('Yes'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+              BlocProvider.of<CustomerBloc>(context).add(
+                DeleteCustomerNoteEvent(
+                  id: id,
+                ),
+              );
+            },
+          ),
+          CupertinoButton(
+            child: const Text('No'),
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -1114,6 +1243,86 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           //  ),
         ],
       ),
+    );
+  }
+
+  addNotePopup() {
+    final TextEditingController addNoteController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Add Note"),
+              GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child:
+                      const Icon(Icons.close, color: AppColors.primaryColors))
+            ],
+          ),
+          insetPadding:
+              EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+          content: SizedBox(
+            height: 240,
+            width: MediaQuery.of(context).size.width - 32,
+            child: Column(
+              children: [
+                TextField(
+                  maxLines: 6,
+                  controller: addNoteController,
+                  decoration: InputDecoration(
+                      hintText: "Enter Note",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey))),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: BlocBuilder<CustomerBloc, CustomerState>(
+                    builder: (context, state) {
+                      if (state is CreateCustomerNoteLoadingState) {
+                        return const Padding(
+                          padding: EdgeInsets.only(top: 24.0),
+                          child: Center(child: CupertinoActivityIndicator()),
+                        );
+                      }
+                      return GestureDetector(
+                        onTap: () {
+                          BlocProvider.of<CustomerBloc>(context).add(
+                              CreateCustomerNoteEvent(
+                                  customerId: widget.customerData.id.toString(),
+                                  notes: addNoteController.text.trim()));
+                        },
+                        child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 56,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: AppColors.primaryColors),
+                          child: const Text(
+                            "Confirm",
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

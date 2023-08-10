@@ -73,7 +73,6 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
   Future<bool> networkCheck() async {
     final value = await AppUtils.getConnectivity().then((value) {
-      log('value: $value');
       return value;
     });
     return value;

@@ -2,14 +2,14 @@ part of 'customer_bloc.dart';
 
 abstract class CustomerEvent extends Equatable {
   const CustomerEvent();
+
+  @override
+  List<Object?> get props => [];
 }
 
 class customerDetails extends CustomerEvent {
   final String query;
   const customerDetails({required this.query});
-
-  @override
-  List<Object?> get props => [];
 }
 
 class AddCustomerDetails extends CustomerEvent {
@@ -37,9 +37,6 @@ class AddCustomerDetails extends CustomerEvent {
       required this.city,
       required this.pinCode,
       required this.stateId});
-
-  @override
-  List<Object?> get props => [];
 }
 
 class EditCustomerDetails extends CustomerEvent {
@@ -69,35 +66,20 @@ class EditCustomerDetails extends CustomerEvent {
       required this.pinCode,
       required this.stateId,
       required this.id});
-
-  @override
-  List<Object?> get props => [];
 }
 
-class GetProvinceEvent extends CustomerEvent {
-  @override
-  List<Object?> get props => [];
-}
+class GetProvinceEvent extends CustomerEvent {}
 
-class GetCustomerMessageEvent extends CustomerEvent {
-  @override
-  List<Object?> get props => [];
-}
+class GetCustomerMessageEvent extends CustomerEvent {}
 
 class SendCustomerMessageEvent extends CustomerEvent {
   final String customerId, messageBody;
   const SendCustomerMessageEvent(
       {required this.customerId, required this.messageBody});
-
-  @override
-  List<Object?> get props => [];
 }
 
 class GetCustomerMessagePaginationEvent extends CustomerEvent {
   const GetCustomerMessagePaginationEvent();
-
-  @override
-  List<Object?> get props => [];
 }
 
 class DeleteCustomerEvent extends CustomerEvent {
@@ -107,6 +89,25 @@ class DeleteCustomerEvent extends CustomerEvent {
     required this.customerId,
     required this.context,
   });
-  @override
-  List<Object?> get props => [customerId];
+}
+
+class CreateCustomerNoteEvent extends CustomerEvent {
+  final String customerId;
+  final String notes;
+  const CreateCustomerNoteEvent({
+    required this.customerId,
+    required this.notes,
+  });
+}
+
+class DeleteCustomerNoteEvent extends CustomerEvent {
+  final String id;
+  const DeleteCustomerNoteEvent({
+    required this.id,
+  });
+}
+
+class GetAllCustomerNotesEvent extends CustomerEvent {
+  final String id;
+  const GetAllCustomerNotesEvent({required this.id});
 }

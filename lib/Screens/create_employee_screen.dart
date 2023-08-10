@@ -411,8 +411,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                         fixedSize: Size(MediaQuery.of(context).size.width, 56),
                         primary: AppColors.primaryColors,
                       ),
-                      child: const Text(
-                        "Confirm",
+                      child: Text(
+                        widget.employee != null ? "Update" : "Confirm",
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,

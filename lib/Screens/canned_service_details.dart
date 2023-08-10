@@ -276,22 +276,22 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                             thickness: 1.5,
                             color: Color(0xFFE8EAED),
                           ),
-                          const SizedBox(height: 14),
-                          const Text(
-                            'Sub Total',
-                            style: TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 14,
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            '${widget.service.subTotal}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
+                          // const SizedBox(height: 14),
+                          // const Text(
+                          //   'Sub Total',
+                          //   style: TextStyle(
+                          //     fontWeight: FontWeight.w500,
+                          //     fontSize: 14,
+                          //   ),
+                          // ),
+                          // const SizedBox(height: 5),
+                          // Text(
+                          //   '${widget.service.subTotal}',
+                          //   style: const TextStyle(
+                          //     fontSize: 16,
+                          //     fontWeight: FontWeight.w400,
+                          //   ),
+                          // ),
                           const SizedBox(height: 14),
                           const Divider(
                             thickness: 1.5,
@@ -364,6 +364,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                   children: [
                     const SizedBox(height: 8),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
                           child: Text(item.itemName,

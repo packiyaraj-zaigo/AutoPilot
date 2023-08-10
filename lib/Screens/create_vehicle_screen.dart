@@ -181,7 +181,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Vehicle Created Successfully'),
+                        content: Text('Vehicle Updated Successfully'),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -481,8 +481,10 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                             ? const CupertinoActivityIndicator(
                                                 color: Colors.white,
                                               )
-                                            : const Text(
-                                                'Confirm',
+                                            : Text(
+                                                widget.editVehicle != null
+                                                    ? 'Update'
+                                                    : 'Confirm',
                                                 style: TextStyle(fontSize: 15),
                                               ),
                                       ),
