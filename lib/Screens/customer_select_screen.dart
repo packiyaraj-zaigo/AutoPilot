@@ -66,26 +66,26 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
               fontWeight: FontWeight.w500),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            onPressed: () {
-              networkCheck().then((value) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NewCustomerScreen(),
-                  ),
-                );
-              });
-            },
-            icon: Icon(
-              Icons.add,
-              size: AppStrings.fontSize20,
-              color: AppColors.primaryColors,
-            ),
-          ),
-          const SizedBox(width: 10)
-        ],
+        // actions: [
+        //   IconButton(
+        //     onPressed: () {
+        //       networkCheck().then((value) {
+        //         Navigator.push(
+        //           context,
+        //           MaterialPageRoute(
+        //             builder: (context) => NewCustomerScreen(),
+        //           ),
+        //         );
+        //       });
+        //     },
+        //     icon: Icon(
+        //       Icons.add,
+        //       size: AppStrings.fontSize20,
+        //       color: AppColors.primaryColors,
+        //     ),
+        //   ),
+        //   const SizedBox(width: 10)
+        // ],
 
         // backgroundColor: Colors.transparent,
         elevation: 0,
