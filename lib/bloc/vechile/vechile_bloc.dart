@@ -222,4 +222,26 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       emit(GetVehicleNoteErrorState(errorMessage: "Something went wrong"));
     }
   }
+
+  addVehicleNoteBloc(
+    AddVehicleNoteEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      emit(AddVehicleNoteLoadingState());
+      final token = await AppUtils.getToken();
+      Response response =
+          await apiRepo.addVehicleNotes(token, event.vehicleId, event.notes);
+      //  final body = await jsonDecode(response.body);
+      log(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(AddVehicleNoteState());
+      } else {
+        emit(AddVehicleNoteErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      log(e.toString() + " Edit bloc error");
+      emit(AddVehicleNoteErrorState(errorMessage: "Something went wrong"));
+    }
+  }
 }

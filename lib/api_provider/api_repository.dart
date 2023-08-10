@@ -548,6 +548,11 @@ class ApiRepository {
   Future<dynamic> getVehicleNotes(dynamic token, String vehicleId) async {
     return apiProvider.getVehicleNotes(token, vehicleId);
   }
+
+  Future<dynamic> addVehicleNotes(
+      dynamic token, String vehicleId, String notes) async {
+    return apiProvider.addVehicleNote(token, vehicleId, notes);
+  }
 }
 
 class NetworkError extends Error {}

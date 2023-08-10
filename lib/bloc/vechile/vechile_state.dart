@@ -133,3 +133,12 @@ class GetVehicleNoteErrorState extends VechileState {
   final String errorMessage;
   GetVehicleNoteErrorState({required this.errorMessage});
 }
+
+class AddVehicleNoteState extends VechileState {}
+
+class AddVehicleNoteLoadingState extends VechileState {}
+
+class AddVehicleNoteErrorState extends VechileState {
+  final String errorMessage;
+  AddVehicleNoteErrorState({required this.errorMessage});
+}
