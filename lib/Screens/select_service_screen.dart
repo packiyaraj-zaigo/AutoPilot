@@ -19,8 +19,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SelectServiceScreen extends StatefulWidget {
-  const SelectServiceScreen({super.key, required this.orderId});
+  const SelectServiceScreen(
+      {super.key, required this.orderId, this.navigation});
   final String orderId;
+  final String? navigation;
 
   @override
   State<SelectServiceScreen> createState() => _SelectServiceScreenState();
@@ -543,7 +545,9 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
               Navigator.pushAndRemoveUntil(ctx, MaterialPageRoute(
                 builder: (context) {
                   return EstimatePartialScreen(
-                      estimateDetails: state.createEstimateModel);
+                    estimateDetails: state.createEstimateModel,
+                    navigation: widget.navigation,
+                  );
                 },
               ), (route) => count-- == 0);
             }

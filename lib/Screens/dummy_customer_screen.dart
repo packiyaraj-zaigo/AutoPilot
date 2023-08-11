@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DummyCustomerScreen extends StatefulWidget {
-  const DummyCustomerScreen({super.key, required this.customerId});
+  const DummyCustomerScreen(
+      {super.key, required this.customerId, this.navigation});
   final String customerId;
+  final String? navigation;
 
   @override
   State<DummyCustomerScreen> createState() => _DummyCustomerScreenState();
@@ -25,7 +27,9 @@ class _DummyCustomerScreenState extends State<DummyCustomerScreen> {
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel);
+                  estimateDetails: state.createEstimateModel,
+                  navigation: widget.navigation,
+                );
               },
             ));
           }

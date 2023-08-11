@@ -1047,6 +1047,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String adddMaterialBatchErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
@@ -1100,6 +1101,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       0) -
                   (double.tryParse(addMaterialDiscountController.text) ?? 0));
             }
+            total = subTotal;
           } else {
             final tax =
                 (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
@@ -1109,6 +1111,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   (double.tryParse(addMaterialPriceController.text) ?? 0) *
                           tax +
                       (double.tryParse(addMaterialPriceController.text) ?? 0);
+              total = (double.tryParse(addMaterialPriceController.text) ?? 0);
             } else {
               subTotal = ((double.tryParse(addMaterialPriceController.text) ??
                               0) -
@@ -1119,6 +1122,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   ((double.tryParse(addMaterialPriceController.text) ?? 0) -
                       (double.tryParse(addMaterialDiscountController.text) ??
                           0));
+              total = ((double.tryParse(addMaterialPriceController.text) ?? 0) -
+                  (double.tryParse(addMaterialDiscountController.text) ?? 0));
             }
           }
         }
@@ -1290,6 +1295,50 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
+                              "Total :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${total.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Tax :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${(subTotal - total).toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
                               "Sub Total :",
                               style: TextStyle(
                                   fontSize: 16,
@@ -1372,6 +1421,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String adddPartPartNumberErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
@@ -1422,12 +1472,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
                 (double.tryParse(addPartDiscountController.text) ?? 0));
           }
+          total = subTotal;
         } else {
           final tax = (double.tryParse(client?.salesTaxRate ?? '') ?? 0) / 100;
           if (addPartDiscountController.text.isEmpty) {
             subTotal =
                 (double.tryParse(addPartPriceController.text) ?? 0) * tax +
                     (double.tryParse(addPartPriceController.text) ?? 0);
+            total = (double.tryParse(addPartPriceController.text) ?? 0);
           } else {
             subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
                         (double.tryParse(addPartDiscountController.text) ??
@@ -1435,6 +1487,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     tax +
                 ((double.tryParse(addPartPriceController.text) ?? 0) -
                     (double.tryParse(addPartDiscountController.text) ?? 0));
+            total = ((double.tryParse(addPartPriceController.text) ?? 0) -
+                (double.tryParse(addPartDiscountController.text) ?? 0));
           }
         }
       }
@@ -1595,6 +1649,50 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Sub Total :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -1674,6 +1772,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String addLaborHoursErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
@@ -1724,6 +1823,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
                 (double.tryParse(addLaborDiscountController.text) ?? 0));
           }
+          total = subTotal;
         } else {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
@@ -1732,6 +1832,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     tax +
                 ((double.tryParse(addLaborHoursController.text) ?? 1) *
                     (double.tryParse(addLaborCostController.text) ?? 0));
+            total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
+                (double.tryParse(addLaborCostController.text) ?? 0));
           } else {
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
                             (double.tryParse(addLaborCostController.text) ??
@@ -1742,6 +1844,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
                         (double.tryParse(addLaborCostController.text) ?? 0)) -
                     (double.tryParse(addLaborDiscountController.text) ?? 0));
+            total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
+                    (double.tryParse(addLaborCostController.text) ?? 0)) -
+                (double.tryParse(addLaborDiscountController.text) ?? 0));
           }
         }
       }
@@ -1835,6 +1940,50 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Sub Total :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -1914,6 +2063,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String addFeeCostErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addFeeValidation(StateSetter setState) {
       bool status = true;
@@ -1950,6 +2100,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           subTotal = (double.tryParse(addFeePriceController.text) ?? 0) * tax +
               (double.tryParse(addFeePriceController.text) ?? 0);
         }
+        total = (double.tryParse(addFeePriceController.text) ?? 0);
       }
       return Column(
         children: [
@@ -2078,6 +2229,50 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Sub Total :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -2159,6 +2354,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String addSubContractVendorErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
@@ -2206,6 +2402,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     0) -
                 (double.tryParse(addSubContractDiscountController.text) ?? 0));
           }
+          total = subTotal;
         } else {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
 
@@ -2214,6 +2411,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 (double.tryParse(addSubContractPriceController.text) ?? 0) *
                         tax +
                     (double.tryParse(addSubContractPriceController.text) ?? 0);
+            total = (double.tryParse(addSubContractPriceController.text) ?? 0);
           } else {
             subTotal = ((double.tryParse(addSubContractPriceController.text) ??
                             0) -
@@ -2224,6 +2422,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ((double.tryParse(addSubContractPriceController.text) ?? 0) -
                     (double.tryParse(addSubContractDiscountController.text) ??
                         0));
+            total = ((double.tryParse(addSubContractPriceController.text) ??
+                    0) -
+                (double.tryParse(addSubContractDiscountController.text) ?? 0));
           }
         }
       }
@@ -2394,6 +2595,50 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractVendorErrorStatus),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
