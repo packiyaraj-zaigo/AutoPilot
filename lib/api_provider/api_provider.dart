@@ -651,6 +651,29 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getEstimateFromVehicle(
+      String token, int currentPage, String vehicleId) async {
+    print("into provider");
+
+    try {
+      // final clientId = await AppUtils.getUserID();
+
+      var url = Uri.parse(
+          "${BASE_URL}api/orders?vehicle_id=$vehicleId&page=$currentPage");
+
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
   Future<dynamic> getNotifications(
       String token, String clientId, int page) async {
     try {

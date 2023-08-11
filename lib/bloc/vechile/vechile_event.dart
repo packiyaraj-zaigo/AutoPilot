@@ -97,3 +97,8 @@ class DeleteVehicleNotesEvent extends VechileEvent {
   final String vehicleId;
   DeleteVehicleNotesEvent({required this.vehicleId});
 }
+
+class GetEstimateFromVehicleEvent extends VechileEvent {
+  final String vehicleId;
+  GetEstimateFromVehicleEvent({required this.vehicleId});
+}

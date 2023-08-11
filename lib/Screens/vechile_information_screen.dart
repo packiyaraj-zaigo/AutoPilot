@@ -16,6 +16,8 @@ import '../Models/vechile_model.dart';
 import '../utils/app_utils.dart';
 import 'create_vehicle_screen.dart';
 
+import 'package:auto_pilot/Models/estimate_model.dart' as em;
+
 class VechileInformation extends StatefulWidget {
   VechileInformation({
     Key? key,
@@ -50,6 +52,8 @@ class _VechileInformationState extends State<VechileInformation> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   int selectedIndex = 0;
   final addNoteController = TextEditingController();
+  final scrollController = ScrollController();
+  List<em.Datum> estimateData = [];
 
   String addNoteErrorMessage = "";
 
@@ -88,6 +92,10 @@ class _VechileInformationState extends State<VechileInformation> {
                 GetVehicleNoteEvent(vehicleId: widget.vechile.id.toString()));
 
             Navigator.pop(context);
+          } else if (state is GetEstimateFromVehicleState) {
+            estimateData.addAll(state.estimateData.data.data);
+          } else if (state is GetEstimateFromVehicleLoadingState) {
+            estimateData.clear();
           }
           // TODO: implement listener
         },
@@ -150,6 +158,11 @@ class _VechileInformationState extends State<VechileInformation> {
                           if (value == 1) {
                             context.read<VechileBloc>().add(GetVehicleNoteEvent(
                                 vehicleId: widget.vechile.id.toString()));
+                          } else if (value == 2) {
+                            estimateData.clear();
+                            context.read<VechileBloc>().add(
+                                GetEstimateFromVehicleEvent(
+                                    vehicleId: widget.vechile.id.toString()));
                           }
                         },
                         groupValue: selectedIndex,
@@ -167,9 +180,76 @@ class _VechileInformationState extends State<VechileInformation> {
                     SizedBox(height: 16),
                     Expanded(
                       child: selectedIndex == 2
-                          ? Column(
-                              children: [Text("dateeeeeeeeeeeeeeeea")],
-                            )
+                          ? state is GetEstimateFromVehicleLoadingState
+                              ? const Center(
+                                  child: CupertinoActivityIndicator(),
+                                )
+                              : estimateData.isNotEmpty
+                                  ? ListView.builder(
+                                      itemBuilder: (context, index) {
+                                        if (index == estimateData.length) {
+                                          return BlocProvider.of<VechileBloc>(
+                                                              context)
+                                                          .estimateCurrentPage <=
+                                                      BlocProvider.of<
+                                                                  VechileBloc>(
+                                                              context)
+                                                          .estimateTotalPage &&
+                                                  BlocProvider.of<VechileBloc>(
+                                                              context)
+                                                          .estimateCurrentPage !=
+                                                      0
+                                              ? const SizedBox(
+                                                  height: 40,
+                                                  child:
+                                                      CupertinoActivityIndicator(
+                                                    color:
+                                                        AppColors.primaryColors,
+                                                  ))
+                                              : Container();
+                                        }
+                                        return estimateTileWidget(
+                                            estimateData[index].orderStatus,
+                                            estimateData[index].orderNumber,
+                                            estimateData[index]
+                                                    .customer
+                                                    ?.firstName ??
+                                                "",
+                                            "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
+                                            "",
+                                            estimateData[index].dropSchedule ??
+                                                "");
+                                      },
+                                      itemCount: estimateData.length + 1,
+                                      shrinkWrap: true,
+                                      controller: scrollController
+                                        ..addListener(() {
+                                          if ((BlocProvider.of<VechileBloc>(
+                                                          context)
+                                                      .estimateCurrentPage <=
+                                                  BlocProvider.of<VechileBloc>(
+                                                          context)
+                                                      .estimateTotalPage) &&
+                                              scrollController.offset ==
+                                                  scrollController.position
+                                                      .maxScrollExtent &&
+                                              BlocProvider.of<VechileBloc>(
+                                                          context)
+                                                      .estimateCurrentPage !=
+                                                  0 &&
+                                              !BlocProvider.of<VechileBloc>(
+                                                      context)
+                                                  .isEstimateFetching) {
+                                            context.read<VechileBloc>()
+                                              ..isEstimateFetching = true
+                                              ..add(GetEstimateFromVehicleEvent(
+                                                  vehicleId: widget.vechile.id
+                                                      .toString()));
+                                          }
+                                        }),
+                                    )
+                                  : const Center(
+                                      child: Text("No Estimate Found"))
                           : selectedIndex == 1
                               ? Padding(
                                   padding: const EdgeInsets.only(top: 24),
@@ -729,8 +809,10 @@ class _VechileInformationState extends State<VechileInformation> {
   addNotePopup(BuildContext context) {
     bool addNoteErrorStatus = false;
 
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
       builder: (context) {
         return BlocProvider(
           create: (context) => VechileBloc(),
@@ -752,93 +834,134 @@ class _VechileInformationState extends State<VechileInformation> {
             child: BlocBuilder<VechileBloc, VechileState>(
               builder: (context, state) {
                 return StatefulBuilder(builder: (context, newSetState) {
-                  return AlertDialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14)),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text("Add Note"),
-                        GestureDetector(
-                            onTap: () {
+                  return Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: AppColors.primaryTitleColor,
+                      centerTitle: true,
+                      automaticallyImplyLeading: false,
+                      elevation: 0,
+                      title: const Text(
+                        "Add Vehicle Note",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Icon(Icons.close,
-                                color: AppColors.primaryColors))
+                            icon: const Icon(
+                              Icons.close,
+                              color: AppColors.primaryColors,
+                            ))
                       ],
                     ),
-                    insetPadding: const EdgeInsets.only(
-                        top: 16, left: 16, right: 16, bottom: 16),
-                    content: SizedBox(
-                      height: 260,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          TextField(
-                            maxLines: 6,
-                            controller: addNoteController,
-                            decoration: InputDecoration(
-                                hintText: "Enter Note",
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide:
-                                        BorderSide(color: Colors.grey))),
-                          ),
-                          Visibility(
-                              visible: addNoteErrorStatus,
-                              child: Text(addNoteErrorMessage,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Color(
-                                      0xffD80027,
-                                    ),
-                                  ))),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 24.0),
-                            child: GestureDetector(
-                              onTap: () {
-                                if (addNoteController.text.isEmpty) {
-                                  newSetState(() {
-                                    addNoteErrorStatus = true;
-                                    addNoteErrorMessage = "Note can't be empty";
-                                  });
-                                } else {
-                                  newSetState(() {
-                                    addNoteErrorStatus = false;
-                                  });
-                                }
-
-                                if (!addNoteErrorStatus) {
-                                  context.read<VechileBloc>().add(
-                                      AddVehicleNoteEvent(
-                                          notes: addNoteController.text,
-                                          vehicleId:
-                                              widget.vechile.id.toString()));
-                                }
-                              },
-                              child: Container(
+                    body: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Text("Description"),
+                                Text(
+                                  " *",
+                                  style: TextStyle(
+                                      color: const Color(
+                                    0xffD80027,
+                                  )),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: SizedBox(
                                 width: MediaQuery.of(context).size.width,
-                                height: 56,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: AppColors.primaryColors),
-                                child: state is AddVehicleNoteLoadingState
-                                    ? const Center(
-                                        child: CupertinoActivityIndicator(),
-                                      )
-                                    : const Text(
-                                        "Confirm",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white),
-                                      ),
+                                height: MediaQuery.of(context).size.height -
+                                    kToolbarHeight -
+                                    220,
+                                child: TextField(
+                                  textAlignVertical: TextAlignVertical.top,
+                                  maxLines: null,
+                                  expands: true,
+                                  controller: addNoteController,
+                                  decoration: InputDecoration(
+                                      hintText: "Enter Notes",
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: addNoteErrorStatus
+                                                  ? const Color(
+                                                      0xffD80027,
+                                                    )
+                                                  : Colors.grey))),
+                                ),
                               ),
                             ),
-                          )
-                        ],
+                            Visibility(
+                                visible: addNoteErrorStatus,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(addNoteErrorMessage,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(
+                                          0xffD80027,
+                                        ),
+                                      )),
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 24.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (addNoteController.text.isEmpty) {
+                                    newSetState(() {
+                                      addNoteErrorStatus = true;
+                                      addNoteErrorMessage =
+                                          "Note can't be empty";
+                                    });
+                                  } else {
+                                    newSetState(() {
+                                      addNoteErrorStatus = false;
+                                    });
+                                  }
+
+                                  if (!addNoteErrorStatus) {
+                                    context.read<VechileBloc>().add(
+                                        AddVehicleNoteEvent(
+                                            notes: addNoteController.text,
+                                            vehicleId:
+                                                widget.vechile.id.toString()));
+                                  }
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 56,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: AppColors.primaryColors),
+                                  child: state is AddVehicleNoteLoadingState
+                                      ? const Center(
+                                          child: CupertinoActivityIndicator(),
+                                        )
+                                      : const Text(
+                                          "Confirm",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white),
+                                        ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   );
@@ -886,6 +1009,97 @@ class _VechileInformationState extends State<VechileInformation> {
                 ],
               );
             },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget estimateTileWidget(
+      String estimateName,
+      estimateId,
+      String customerName,
+      String carModel,
+      String serviceName,
+      String dropSchedule) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                offset: Offset(0, 1),
+                spreadRadius: 1,
+                blurRadius: 6,
+                color: Color.fromRGBO(88, 88, 88, 0.178),
+              )
+            ]),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              dropSchedule != ""
+                  ? Row(
+                      children: [
+                        SvgPicture.asset(
+                            "assets/images/calendar_estimate_icon.svg"),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            // dropSchedule.substring(0, 10),
+                            dropSchedule,
+                            style: const TextStyle(
+                                color: AppColors.greyText,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        // SvgPicture.asset("assets/images/calendar_estimate_icon.svg"),
+                        // const Text(
+                        //   " 3/7/23 9:00 Am",
+                        //   style: TextStyle(
+                        //       color: AppColors.greyText,
+                        //       fontSize: 12,
+                        //       fontWeight: FontWeight.w400),
+                        // )
+                      ],
+                    )
+                  : const SizedBox(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "${estimateName} #${estimateId} - ${serviceName}",
+                  style: const TextStyle(
+                      color: AppColors.primaryColors,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  customerName,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Text(
+                  carModel,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400),
+                ),
+              )
+            ],
           ),
         ),
       ),
