@@ -1,14 +1,18 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/customer_note_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:auto_pilot/Models/estimate_model.dart' as em;
+import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart' as cs;
 import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
 import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/Screens/vechile_information_screen.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -72,9 +76,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   List<Widget> messageChatWidgetList = [];
   List<cm.Datum> customerMessageList = [];
   List<em.Datum> estimateData = [];
+  List<vm.Datum> vehicles = [];
   final messageController = TextEditingController();
   final chatScrollController = ScrollController();
   final estimateScrollController = ScrollController();
+  final vehicleScrollController = ScrollController();
   int newIndex = 0;
   @override
   void initState() {
@@ -85,6 +91,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primaryBackgroundColors,
@@ -177,6 +184,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             CommonWidgets().showDialog(context, state.message);
           }
           if (state is GetCustomerEstimatesSuccessState) {
+            log('here');
             estimateData.addAll(state.estimateData.data.data);
           } else if (state is GetCustomerEstimatesLoadingState) {
             estimateData.clear();
@@ -200,6 +208,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             widget.customerData.email = state.customer.email;
             widget.customerData.phone = state.customer.phone;
             log(state.customer.toJson().toString());
+          } else if (state is GetCustomerVehiclesSuccessState) {
+            vehicles = state.vehicles.data.data;
           }
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
@@ -257,12 +267,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           BlocProvider.of<CustomerBloc>(context)
                               .add(GetCustomerMessageEvent());
                         } else if (value == 3) {
-                          // BlocProvider.of<CustomerBloc>(context).add(
-                          //     GetAllCustomerVehicles(
-                          //         id: widget.customerData.id.toString()));
+                          BlocProvider.of<CustomerBloc>(context).currentPage =
+                              1;
+                          BlocProvider.of<CustomerBloc>(context).add(
+                              GetCustomerVehiclesEvent(
+                                  id: widget.customerData.id.toString()));
                         } else if (value == 4) {
-                          BlocProvider.of<CustomerBloc>(context)
-                              .estimateCurrentPage = 1;
+                          BlocProvider.of<CustomerBloc>(context).currentPage =
+                              1;
                           estimateData.clear();
                           BlocProvider.of<CustomerBloc>(context).add(
                               GetCustomerEstimatesEvent(
@@ -292,7 +304,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             : selectedIndex == 2
                                 ? chatWidget(context)
                                 : selectedIndex == 3
-                                    ? Container()
+                                    ? vehiclesWidget(state)
                                     : estimateWidget(state, context)
                   ],
                 ),
@@ -302,6 +314,147 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         ),
       ),
     );
+  }
+
+  Widget vehiclesWidget(state) {
+    if (state is GetCustomerVehiclesLoadingState) {
+      return const Expanded(
+        child: Center(
+          child: CupertinoActivityIndicator(),
+        ),
+      );
+    }
+    return vehicles.isEmpty
+        ? Center(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height - 280,
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'No Vehicle Found',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryTextColors),
+                  ),
+                ],
+              ),
+            ),
+          )
+        : Expanded(
+            child: ScrollConfiguration(
+              behavior: const ScrollBehavior(),
+              child: ListView.separated(
+                  shrinkWrap: true,
+                  controller: vehicleScrollController
+                    ..addListener(() {
+                      print('object');
+                      if (vehicleScrollController.offset ==
+                              vehicleScrollController
+                                  .position.maxScrollExtent &&
+                          !BlocProvider.of<CustomerBloc>(context)
+                              .isPagenationLoading &&
+                          BlocProvider.of<CustomerBloc>(context).currentPage <=
+                              BlocProvider.of<CustomerBloc>(context)
+                                  .totalPages) {
+                        BlocProvider.of<CustomerBloc>(context)
+                            .isPagenationLoading = true;
+                        BlocProvider.of<CustomerBloc>(context).add(
+                            GetCustomerVehiclesEvent(
+                                id: widget.customerData.id.toString()));
+                      }
+                    }),
+                  itemBuilder: (context, index) {
+                    final item = vehicles[index];
+                    return Column(
+                      children: [
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => VechileInformation(
+                                  vechile: item,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            height: 77,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.07),
+                                  offset: const Offset(0, 4),
+                                  blurRadius: 10,
+                                ),
+                              ],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16.0),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${item.vehicleYear} ${item.vehicleModel}',
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: AppColors.primaryTitleColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Text(
+                                      (item.firstName ?? "") +
+                                          " " +
+                                          (item.lastName ?? ''),
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        color: AppColors.greyText,
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        BlocProvider.of<CustomerBloc>(context).currentPage <=
+                                    BlocProvider.of<CustomerBloc>(context)
+                                        .totalPages &&
+                                index == vehicles.length - 1
+                            ? const Column(
+                                children: [
+                                  SizedBox(height: 24),
+                                  Center(
+                                    child: CupertinoActivityIndicator(),
+                                  ),
+                                  SizedBox(height: 24),
+                                ],
+                              )
+                            : const SizedBox(),
+                        index == vehicles.length - 1
+                            ? const SizedBox(height: 24)
+                            : const SizedBox(),
+                      ],
+                    );
+                  },
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 16),
+                  itemCount: vehicles.length),
+            ),
+          );
   }
 
   Expanded detailsWidget(BuildContext context, state) {
@@ -436,7 +589,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
                             final Uri emailLaunchUri = Uri(
                               scheme: 'mailto',
-                              path: widget.customerData.email ?? '',
+                              path: widget.customerData.email,
                               query: encodeQueryParameters(<String, String>{
                                 'subject': ' ',
                               }),
@@ -1077,8 +1230,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                   setState(() {
                     if (title == "New Vehicle") {
                       selectedIndex = 3;
-                      BlocProvider.of<CustomerBloc>(context)
-                          .estimateCurrentPage = 1;
+                      BlocProvider.of<CustomerBloc>(context).currentPage = 1;
                     }
                   });
                 });

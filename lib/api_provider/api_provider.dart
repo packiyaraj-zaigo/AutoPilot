@@ -247,11 +247,16 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getVechile(String token, int page, String query) async {
+  Future<dynamic> getVechile(
+      String token, int page, String query, String? customerId) async {
     try {
       final clientId = await AppUtils.getUserID();
-      String url =
-          '${BASE_URL}api/vehicles?client_id=$clientId&orderby=id&sort=DESC';
+      String url = '';
+      url = '${BASE_URL}api/vehicles?client_id=$clientId&orderby=id&sort=DESC';
+      if (customerId != null) {
+        url =
+            '${BASE_URL}api/vehicles?customer_id=$customerId&orderby=id&sort=DESC';
+      }
       if (page != 1) {
         url = '$url&page=$page';
       }
@@ -628,7 +633,7 @@ class ApiProvider {
 
       var url = Uri.parse(
         customerId != null
-            ? "${BASE_URL}api/orders?customer_id=$customerId"
+            ? "${BASE_URL}api/orders?customer_id=$customerId&page=$currentPage&order_by=id&sort=DESC"
             : orderStatus == ""
                 ? "${BASE_URL}api/orders?client_id=$clientId"
                 : orderStatus == "Estimate"

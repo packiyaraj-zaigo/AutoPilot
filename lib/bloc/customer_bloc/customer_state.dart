@@ -154,6 +154,9 @@ class GetCustomerEstimatesErrorState extends CustomerState {
 class GetCustomerEstimatesSuccessState extends CustomerState {
   final em.EstimateModel estimateData;
   const GetCustomerEstimatesSuccessState({required this.estimateData});
+
+  @override
+  List<Object> get props => [estimateData];
 }
 
 class GetSingleEstimateState extends CustomerState {
@@ -171,4 +174,16 @@ class GetSingleCustomerErrorState extends CustomerState {
 class GetSingleCustomerSuccessState extends CustomerState {
   final Datum customer;
   const GetSingleCustomerSuccessState({required this.customer});
+}
+
+class GetCustomerVehiclesLoadingState extends CustomerState {}
+
+class GetCustomerVehiclesErrorState extends CustomerState {
+  final String message;
+  const GetCustomerVehiclesErrorState({required this.message});
+}
+
+class GetCustomerVehiclesSuccessState extends CustomerState {
+  final vm.VechileResponse vehicles;
+  const GetCustomerVehiclesSuccessState({required this.vehicles});
 }

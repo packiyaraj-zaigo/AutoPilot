@@ -126,3 +126,8 @@ class GetSingleCustomerEvent extends CustomerEvent {
   final String id;
   const GetSingleCustomerEvent({required this.id});
 }
+
+class GetCustomerVehiclesEvent extends CustomerEvent {
+  final String id;
+  const GetCustomerVehiclesEvent({required this.id});
+}

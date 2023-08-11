@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vin_global_response.dart';
+import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/dummy_vehcile_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
@@ -49,6 +50,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   final TextEditingController licController = TextEditingController();
   final TextEditingController makeController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
+  final TextEditingController customerController = TextEditingController();
 
   bool yearErrorStaus = false;
   bool modelErrorStatus = false;
@@ -60,6 +62,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   bool nameErrorStatus = false;
   bool typeErrorStatus = false;
   bool makeErrorStatus = false;
+  bool customerErrorStatus = false;
   bool isChecked = false;
 
   bool isVechileLoading = false;
@@ -73,12 +76,15 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   String submodelErrorMsg = '';
   String licErrorMsg = '';
   String engineErrorMsg = '';
+  String customerErrorMsg = '';
 
   final List<Datum> vechile = [];
 
   List<String> states = [];
   List<DropdownDatum> dropdownData = [];
   dynamic _currentSelectedTypeValue;
+
+  int customerId = 0;
 
   addDataToFields() {
     // nameController.text = widget.vehicle!.
@@ -99,6 +105,13 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     licController.text = widget.editVehicle!.licencePlate ?? "";
     typeController.text = widget.editVehicle!.vehicleType;
     vinController.text = widget.editVehicle!.vin ?? '';
+    customerController.text =
+        ((widget.editVehicle!.customer?['first_name'] ?? '') +
+                " " +
+                (widget.editVehicle!.customer?['last_name'] ?? ''))
+            .trim();
+    customerId = widget.editVehicle!.customerId ?? 0;
+    log(customerId.toString());
   }
 
   @override
@@ -335,6 +348,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                         vinErrorStatus,
                                         widget.vehicle != null &&
                                             widget.vin.isNotEmpty),
+                                    textBox(
+                                        "Select Customer",
+                                        customerController,
+                                        "Customer",
+                                        customerErrorStatus,
+                                        true),
                                     Theme(
                                       data: Theme.of(context).copyWith(
                                           dividerColor: Colors.transparent),
@@ -572,7 +591,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                     licNumber: licController.text,
                     make: makeController.text,
                     type: typeController.text,
-                    customerId: widget.editVehicle!.customerId.toString(),
+                    customerId: customerId.toString(),
                   ),
                 );
           } else {
@@ -588,7 +607,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                     licNumber: licController.text,
                     make: makeController.text,
                     type: typeController.text,
-                    customerId: widget.customerId ?? '0',
+                    customerId: customerId.toString(),
                   ),
                 );
           }
@@ -635,6 +654,25 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
               readOnly: readOnly,
               textCapitalization: TextCapitalization.sentences,
               controller: controller,
+              onTap: label == "Customer"
+                  ? () async {
+                      await Navigator.of(context)
+                          .push(
+                        MaterialPageRoute(
+                          builder: (context) => SelectCustomerScreen(
+                              navigation: 'create_vehicle'),
+                        ),
+                      )
+                          .then((value) {
+                        if (value != null) {
+                          customerController.text = (value.firstName ?? '') +
+                              " " +
+                              (value.lastName ?? '');
+                          customerId = value.id ?? 0;
+                        }
+                      });
+                    }
+                  : null,
               inputFormatters: label == "Year"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : null,
@@ -649,6 +687,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                               ? 20
                               : 100,
               decoration: InputDecoration(
+                  suffixIcon: label != "Customer"
+                      ? null
+                      : const Icon(
+                          CupertinoIcons.chevron_down,
+                          color: AppColors.primaryColors,
+                        ),
                   counterText: '',
                   hintText: placeHolder,
                   border: OutlineInputBorder(

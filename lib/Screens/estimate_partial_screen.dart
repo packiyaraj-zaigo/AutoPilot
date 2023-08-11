@@ -17,6 +17,7 @@ import 'package:auto_pilot/Screens/edit_order_service_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/payment_list_screen.dart';
 import 'package:auto_pilot/Screens/select_service_screen.dart';
+import 'package:auto_pilot/Screens/vechile_information_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
@@ -37,10 +38,12 @@ class EstimatePartialScreen extends StatefulWidget {
       {super.key,
       required this.estimateDetails,
       this.navigation,
-      this.controllerIndex});
+      this.controllerIndex,
+      this.customerId});
   final CreateEstimateModel estimateDetails;
   final String? navigation;
   final int? controllerIndex;
+  final int? customerId;
 
   @override
   State<EstimatePartialScreen> createState() => _EstimatePartialScreenState();
@@ -234,9 +237,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         customerData: cm.Datum(
                           id: estimate.customerId,
                           clientId: estimate.clientId,
-                          email: estimate.customer!.email,
-                          firstName: estimate.customer!.firstName,
-                          lastName: estimate.customer!.lastName,
+                          email: estimate.customer?.email ?? '',
+                          firstName: estimate.customer?.firstName ?? '',
+                          lastName: estimate.customer?.lastName ?? '',
                           notes: "",
                           companyName: "",
                           referralSource: "",
@@ -297,13 +300,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                               builder: (context) => CustomerInformationScreen(
-                                id: estimate.customerId.toString(),
+                                id: widget.customerId!.toString(),
                                 customerData: cm.Datum(
-                                  id: estimate.customerId,
+                                  id: widget.customerId!,
                                   clientId: estimate.clientId,
-                                  email: estimate.customer!.email,
-                                  firstName: estimate.customer!.firstName,
-                                  lastName: estimate.customer!.lastName,
+                                  email: estimate.customer?.email ?? '',
+                                  firstName: estimate.customer?.firstName ?? '',
+                                  lastName: estimate.customer?.lastName ?? '',
                                   notes: "",
                                   companyName: "",
                                   referralSource: "",
@@ -333,6 +336,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               ),
                             ),
                           );
+                        } else if (widget.navigation == "vehicle_info") {
+                          Navigator.pushReplacement(context, MaterialPageRoute(
+                            builder: (context) {
+                              return VechileInformation(
+                                vehicleId: widget
+                                        .estimateDetails.data.vehicle?.id
+                                        .toString() ??
+                                    "",
+                              );
+                            },
+                          ));
                         } else {
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(
@@ -538,9 +552,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                     customerData: cm.Datum(
                                       id: estimate.customerId,
                                       clientId: estimate.clientId,
-                                      email: estimate.customer!.email,
-                                      firstName: estimate.customer!.firstName,
-                                      lastName: estimate.customer!.lastName,
+                                      email: estimate.customer?.email ?? '',
+                                      firstName:
+                                          estimate.customer?.firstName ?? '',
+                                      lastName:
+                                          estimate.customer?.lastName ?? '',
                                       notes: "",
                                       companyName: "",
                                       referralSource: "",
@@ -3461,9 +3477,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     customerData: cm.Datum(
                       id: estimate.customerId,
                       clientId: estimate.clientId,
-                      email: estimate.customer!.email,
-                      firstName: estimate.customer!.firstName,
-                      lastName: estimate.customer!.lastName,
+                      email: estimate.customer?.email ?? '',
+                      firstName: estimate.customer?.firstName ?? '',
+                      lastName: estimate.customer?.lastName ?? '',
                       notes: "",
                       companyName: "",
                       referralSource: "",
@@ -3835,9 +3851,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       customerData: cm.Datum(
                         id: estimate.customerId,
                         clientId: estimate.clientId,
-                        email: estimate.customer!.email,
-                        firstName: estimate.customer!.firstName,
-                        lastName: estimate.customer!.lastName,
+                        email: estimate.customer?.email ?? '',
+                        firstName: estimate.customer?.firstName ?? '',
+                        lastName: estimate.customer?.lastName ?? '',
                         notes: "",
                         companyName: "",
                         referralSource: "",

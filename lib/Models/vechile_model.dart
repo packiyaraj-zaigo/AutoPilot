@@ -33,16 +33,16 @@ class VechileResponse {
 class Data {
   int currentPage;
   List<Datum> data;
-  String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
+  String? firstPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
   dynamic nextPageUrl;
   String path;
   String perPage;
   dynamic prevPageUrl;
-  int to;
-  int total;
+  int? to;
+  int? total;
 
   Data({
     required this.currentPage,
