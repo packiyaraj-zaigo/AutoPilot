@@ -307,6 +307,7 @@ class ApiProvider {
     String licNumber,
     String type,
     String make,
+    String customerId,
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
@@ -321,7 +322,8 @@ class ApiProvider {
         ..fields['vin'] = vinNumber
         ..fields['sub_model'] = submodel
         ..fields['engine_size'] = engine
-        ..fields['licence_plate'] = licNumber;
+        ..fields['licence_plate'] = licNumber
+        ..fields['customer_id'] = customerId;
 
       // final map = {};
       var response = await request.send();
@@ -345,6 +347,7 @@ class ApiProvider {
     String licNumber,
     String type,
     String make,
+    String customerId,
   ) async {
     try {
       var url = Uri.parse("${BASE_URL}api/vehicles/$id");
@@ -359,6 +362,7 @@ class ApiProvider {
       map['sub_model'] = submodel;
       map['engine_size'] = engine;
       map['licence_plate'] = licNumber;
+      map['customer_id'] = customerId;
       map['kilometers'] = '0';
 
       var response =
@@ -615,22 +619,25 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getEstimate(
-      String token, String orderStatus, int currentPage) async {
+  Future<dynamic> getEstimate(String token, String orderStatus, int currentPage,
+      [String? customerId]) async {
     print("into provider");
 
     try {
       final clientId = await AppUtils.getUserID();
 
       var url = Uri.parse(
-        orderStatus == ""
-            ? "${BASE_URL}api/orders?client_id=$clientId"
-            : orderStatus == "Estimate"
-                ? "${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}&client_id=$clientId"
-                : orderStatus == "Orders"
-                    ? "${BASE_URL}api/orders?order_status=Order&page=${currentPage}&client_id=$clientId"
-                    : "${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}&client_id=$clientId",
+        customerId != null
+            ? "${BASE_URL}api/orders?customer_id=$customerId"
+            : orderStatus == ""
+                ? "${BASE_URL}api/orders?client_id=$clientId"
+                : orderStatus == "Estimate"
+                    ? "${BASE_URL}api/orders?order_status=Estimate&page=${currentPage}&client_id=$clientId"
+                    : orderStatus == "Orders"
+                        ? "${BASE_URL}api/orders?order_status=Order&page=${currentPage}&client_id=$clientId"
+                        : "${BASE_URL}api/orders?order_status=Invoice&page=${currentPage}&client_id=$clientId",
       );
+
       var request = http.MultipartRequest("GET", url);
 
       request.headers.addAll(getHeader(token));

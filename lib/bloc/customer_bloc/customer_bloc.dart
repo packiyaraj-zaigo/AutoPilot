@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/create_estimate_model.dart' as ce;
 import 'package:auto_pilot/Models/customer_note_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
+import 'package:auto_pilot/Models/estimate_model.dart' as em;
 
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:bloc/bloc.dart';
@@ -33,6 +35,8 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
   bool isFetching = false;
   int currentPage = 1;
   int totalPages = 1;
+  int estimateTotalPages = 1;
+  int estimateCurrentPage = 1;
   int? newMessageCurrentPage;
   final _apiRepository = ApiRepository();
   int showLoading = 0;
@@ -50,6 +54,77 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<CreateCustomerNoteEvent>(createCustomerNotes);
     on<DeleteCustomerNoteEvent>(deleteCustomerNotes);
     on<GetAllCustomerNotesEvent>(getAllCustomerNotes);
+    on<GetCustomerEstimatesEvent>(getCustomerEstimates);
+    on<GetSingleEstimateEvent>(getSingleEstimate);
+  }
+
+  Future<void> getCustomerEstimates(
+    GetCustomerEstimatesEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      em.EstimateModel estimateModel;
+
+      if (currentPage == 1) {
+        emit(GetCustomerEstimatesLoadingState());
+      }
+
+      Response getEstimateRes = await _apiRepository.getEstimate(
+          token, "", currentPage, event.customerId);
+
+      log("res${getEstimateRes.body}");
+
+      if (getEstimateRes.statusCode == 200) {
+        estimateModel = em.estimateModelFromJson(getEstimateRes.body);
+        totalPages = estimateModel.data.lastPage ?? 1;
+        isFetching = false;
+        emit(GetCustomerEstimatesSuccessState(estimateData: estimateModel));
+
+        if (totalPages > currentPage && currentPage != 0) {
+          currentPage += 1;
+        } else {
+          currentPage = 0;
+        }
+      } else {
+        emit(const GetCustomerEstimatesErrorState(
+            message: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(const GetCustomerEstimatesErrorState(
+          message: "Something went wrong"));
+      log("$e Get estimates bloc error");
+    }
+  }
+
+  Future<void> getSingleEstimate(
+    GetSingleEstimateEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      ce.CreateEstimateModel createEstimateModel;
+
+      Response singleEstimate =
+          await _apiRepository.getSingleEstimate(token!, event.orderId);
+
+      log("res${singleEstimate.body}");
+
+      if (singleEstimate.statusCode == 200) {
+        createEstimateModel =
+            ce.createEstimateModelFromJson(singleEstimate.body);
+        emit(GetSingleEstimateState(createEstimateModel: createEstimateModel));
+      } else {
+        emit(const GetCustomerEstimatesErrorState(
+            message: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(const GetCustomerEstimatesErrorState(
+          message: "Something went wrong"));
+      log(e.toString() + "Get single estimate error customer");
+    }
   }
 
   Future<void> getAllCustomerNotes(

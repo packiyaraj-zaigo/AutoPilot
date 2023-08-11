@@ -3,8 +3,11 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Models/customer_note_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
+import 'package:auto_pilot/Models/estimate_model.dart' as em;
+import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart' as cs;
 import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -66,8 +69,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   int? selectedIndex = 0;
   List<Widget> messageChatWidgetList = [];
   List<cm.Datum> customerMessageList = [];
+  List<em.Datum> estimateData = [];
   final messageController = TextEditingController();
   final chatScrollController = ScrollController();
+  final estimateScrollController = ScrollController();
   int newIndex = 0;
   final _debouncer = Debouncer();
   @override
@@ -164,6 +169,20 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           } else if (state is GetCustomerNotesErrorState) {
             CommonWidgets().showDialog(context, state.message);
           }
+          if (state is GetCustomerEstimatesSuccessState) {
+            estimateData.addAll(state.estimateData.data.data);
+          } else if (state is GetCustomerEstimatesLoadingState) {
+            estimateData.clear();
+          } else if (state is GetSingleEstimateState) {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return EstimatePartialScreen(
+                  estimateDetails: state.createEstimateModel,
+                  navigation: 'customer_navigation',
+                );
+              },
+            ));
+          }
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
           builder: (context, state) {
@@ -203,6 +222,15 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               .messageTotalPage = 1;
                           BlocProvider.of<CustomerBloc>(context)
                               .add(GetCustomerMessageEvent());
+                        } else if (value == 3) {
+                          // BlocProvider.of<CustomerBloc>(context).add(
+                          //     GetAllCustomerVehicles(
+                          //         id: widget.customerData.id.toString()));
+                        } else if (value == 4) {
+                          BlocProvider.of<CustomerBloc>(context).add(
+                              GetCustomerEstimatesEvent(
+                                  customerId:
+                                      widget.customerData.id.toString()));
                         }
                       },
                       groupValue: selectedIndex,
@@ -219,318 +247,403 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                       height: 20,
                     ),
                     selectedIndex == 0
-                        ? Expanded(
-                            child: Container(
-                                height: MediaQuery.of(context).size.height,
-                                color: const Color(0xffF9F9F9),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 24, right: 24),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Text(
-                                                "Phone",
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: AppColors
-                                                        .primaryGrayColors),
-                                              ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                '(${widget.customerData.phone.substring(0, 3)}) ${widget.customerData.phone.substring(3, 6)}-${widget.customerData.phone.substring(6)}'
-                                                    .toString(),
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColors
-                                                        .primaryTitleColor),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              IconButton(
-                                                onPressed: () {
-                                                  final Uri smsLaunchUri = Uri(
-                                                    scheme: 'sms',
-                                                    path: widget
-                                                        .customerData.phone,
-                                                    queryParameters: <String,
-                                                        String>{
-                                                      'body':
-                                                          Uri.encodeComponent(
-                                                              ' '),
-                                                    },
-                                                  );
-                                                  launchUrl(smsLaunchUri);
-                                                },
-                                                icon: SizedBox(
-                                                  height: 27,
-                                                  width: 18,
-                                                  child: SvgPicture.asset(
-                                                    'assets/images/sms_icons.svg',
-                                                    height: 27,
-                                                    color:
-                                                        AppColors.primaryColors,
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(width: 15),
-                                              IconButton(
-                                                onPressed: () {
-                                                  final Uri emailLaunchUri =
-                                                      Uri(
-                                                    scheme: 'tel',
-                                                    path: widget.customerData
-                                                            .phone ??
-                                                        '',
-                                                  );
-
-                                                  launchUrl(emailLaunchUri);
-                                                },
-                                                icon: SizedBox(
-                                                  height: 27,
-                                                  width: 18,
-                                                  child: SvgPicture.asset(
-                                                    'assets/images/phone_icon.svg',
-                                                    height: 27,
-                                                    color:
-                                                        AppColors.primaryColors,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      AppUtils.verticalDivider(),
-                                      const SizedBox(
-                                        height: 20,
-                                      ),
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              const Text(
-                                                "Email",
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: AppColors
-                                                        .primaryGrayColors),
-                                              ),
-                                              const SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                widget.customerData.email
-                                                    .toString(),
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w500,
-                                                    color: AppColors
-                                                        .primaryTitleColor),
-                                              ),
-                                            ],
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              String? encodeQueryParameters(
-                                                  Map<String, String> params) {
-                                                return params.entries
-                                                    .map((MapEntry<String,
-                                                                String>
-                                                            e) =>
-                                                        '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-                                                    .join('&');
-                                              }
-
-                                              final Uri emailLaunchUri = Uri(
-                                                scheme: 'mailto',
-                                                path:
-                                                    widget.customerData.email ??
-                                                        '',
-                                                query:
-                                                    encodeQueryParameters(<String,
-                                                        String>{
-                                                  'subject': ' ',
-                                                }),
-                                              );
-
-                                              launchUrl(emailLaunchUri);
-                                            },
-                                            icon: Container(
-                                              // color: Colors.red,
-                                              height: 18,
-                                              width: 18,
-                                              child: SvgPicture.asset(
-                                                'assets/images/mail_icons.svg',
-                                                height: 27,
-                                                color: AppColors.primaryColors,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      AppUtils.verticalDivider(),
-                                      const SizedBox(
-                                        height: 14,
-                                      ),
-                                      const Text(
-                                        "Address",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryGrayColors),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        widget.customerData.addressLine1 == null
-                                            ? ''
-                                            : widget.customerData.addressLine1
-                                                .toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryTitleColor),
-                                      ),
-                                      AppUtils.verticalDivider(),
-                                      const SizedBox(
-                                        height: 14,
-                                      ),
-                                      // const Text(
-                                      //   "License Number",
-                                      //   style: TextStyle(
-                                      //       fontSize: 14,
-                                      //       fontWeight: FontWeight.w400,
-                                      //       color: AppColors.primaryGrayColors),
-                                      // ),
-                                      // const SizedBox(
-                                      //   height: 5,
-                                      // ),
-                                      // const Text(
-                                      //   "Need to change",
-                                      //   style: TextStyle(
-                                      //       fontSize: 16,
-                                      //       fontWeight: FontWeight.w500,
-                                      //       color: AppColors.primaryTitleColor),
-                                      // ),
-                                      // AppUtils.verticalDivider(),
-                                      // const SizedBox(
-                                      //   height: 14,
-                                      // ),
-                                      const Text(
-                                        "Customer Created",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: AppColors.primaryGrayColors),
-                                      ),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      Text(
-                                        AppUtils.getFormattedForInformationScreen(
-                                                widget.customerData.createdAt
-                                                    .toString())
-                                            .toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: AppColors.primaryTitleColor),
-                                      ),
-                                      AppUtils.verticalDivider(),
-                                      const SizedBox(
-                                        height: 14,
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                          )
-                        : Container(),
-                    selectedIndex == 1
-                        ? Expanded(
-                            child: notesWidget(state),
-                          )
-                        : Container(),
-                    selectedIndex == 2 ? chatWidget(context) : Container(),
-                    selectedIndex == 3
-                        ? Container(
-                            decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20))),
-                            width: double.infinity,
-                            child: Card(
-                              elevation: 5,
-                              child: Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 18,
-                                  top: 2,
-                                  bottom: 10,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      '${widget.customerData.createdAt}',
-                                      style: AppUtils.requiredStyle(),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    Text(
-                                      widget.customerData.notes == null
-                                          ? ''
-                                          : '${widget.customerData.notes}',
-                                      style: AppUtils.summaryStyle(),
-                                    ),
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            //   );
-                            // },
-                          )
-                        : Container(),
-                    selectedIndex == 4
-                        ? const Center(
-                            child: Text('Coming Soon'),
-                          )
-                        : Container()
+                        ? detailsWidget(context)
+                        : selectedIndex == 1
+                            ? Expanded(
+                                child: notesWidget(state),
+                              )
+                            : selectedIndex == 2
+                                ? chatWidget(context)
+                                : selectedIndex == 3
+                                    ? Container()
+                                    : estimateWidget(state, context)
                   ],
                 ),
               );
             }
           },
+        ),
+      ),
+    );
+  }
+
+  Expanded detailsWidget(BuildContext context) {
+    return Expanded(
+      child: Container(
+          height: MediaQuery.of(context).size.height,
+          color: const Color(0xffF9F9F9),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24, right: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Phone",
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.primaryGrayColors),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          '(${widget.customerData.phone.substring(0, 3)}) ${widget.customerData.phone.substring(3, 6)}-${widget.customerData.phone.substring(6)}'
+                              .toString(),
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryTitleColor),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            final Uri smsLaunchUri = Uri(
+                              scheme: 'sms',
+                              path: widget.customerData.phone,
+                              queryParameters: <String, String>{
+                                'body': Uri.encodeComponent(' '),
+                              },
+                            );
+                            launchUrl(smsLaunchUri);
+                          },
+                          icon: SizedBox(
+                            height: 27,
+                            width: 18,
+                            child: SvgPicture.asset(
+                              'assets/images/sms_icons.svg',
+                              height: 27,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 15),
+                        IconButton(
+                          onPressed: () {
+                            final Uri emailLaunchUri = Uri(
+                              scheme: 'tel',
+                              path: widget.customerData.phone ?? '',
+                            );
+
+                            launchUrl(emailLaunchUri);
+                          },
+                          icon: SizedBox(
+                            height: 27,
+                            width: 18,
+                            child: SvgPicture.asset(
+                              'assets/images/phone_icon.svg',
+                              height: 27,
+                              color: AppColors.primaryColors,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                AppUtils.verticalDivider(),
+                const SizedBox(
+                  height: 20,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Email",
+                          style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                              color: AppColors.primaryGrayColors),
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Text(
+                          widget.customerData.email.toString(),
+                          style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryTitleColor),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        String? encodeQueryParameters(
+                            Map<String, String> params) {
+                          return params.entries
+                              .map((MapEntry<String, String> e) =>
+                                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                              .join('&');
+                        }
+
+                        final Uri emailLaunchUri = Uri(
+                          scheme: 'mailto',
+                          path: widget.customerData.email ?? '',
+                          query: encodeQueryParameters(<String, String>{
+                            'subject': ' ',
+                          }),
+                        );
+
+                        launchUrl(emailLaunchUri);
+                      },
+                      icon: Container(
+                        // color: Colors.red,
+                        height: 18,
+                        width: 18,
+                        child: SvgPicture.asset(
+                          'assets/images/mail_icons.svg',
+                          height: 27,
+                          color: AppColors.primaryColors,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                AppUtils.verticalDivider(),
+                const SizedBox(
+                  height: 14,
+                ),
+                const Text(
+                  "Address",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.primaryGrayColors),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  widget.customerData.addressLine1 == null
+                      ? ''
+                      : widget.customerData.addressLine1.toString(),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryTitleColor),
+                ),
+                AppUtils.verticalDivider(),
+                const SizedBox(
+                  height: 14,
+                ),
+                // const Text(
+                //   "License Number",
+                //   style: TextStyle(
+                //       fontSize: 14,
+                //       fontWeight: FontWeight.w400,
+                //       color: AppColors.primaryGrayColors),
+                // ),
+                // const SizedBox(
+                //   height: 5,
+                // ),
+                // const Text(
+                //   "Need to change",
+                //   style: TextStyle(
+                //       fontSize: 16,
+                //       fontWeight: FontWeight.w500,
+                //       color: AppColors.primaryTitleColor),
+                // ),
+                // AppUtils.verticalDivider(),
+                // const SizedBox(
+                //   height: 14,
+                // ),
+                const Text(
+                  "Customer Created",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      color: AppColors.primaryGrayColors),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                Text(
+                  AppUtils.getFormattedForInformationScreen(
+                          widget.customerData.createdAt.toString())
+                      .toString(),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryTitleColor),
+                ),
+                AppUtils.verticalDivider(),
+                const SizedBox(
+                  height: 14,
+                ),
+              ],
+            ),
+          )),
+    );
+  }
+
+  Expanded estimateWidget(CustomerState state, BuildContext context) {
+    return Expanded(
+      child: state is GetCustomerEstimatesSuccessState
+          ? estimateData.isEmpty
+              ? const Center(
+                  child: Text(
+                    "No Estimate Found!",
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
+                )
+              : ListView.builder(
+                  itemBuilder: (context, index) {
+                    if (index == estimateData.length) {
+                      return BlocProvider.of<CustomerBloc>(context)
+                                      .currentPage <=
+                                  BlocProvider.of<CustomerBloc>(context)
+                                      .totalPages &&
+                              BlocProvider.of<CustomerBloc>(context)
+                                      .currentPage !=
+                                  0
+                          ? const SizedBox(
+                              height: 40,
+                              child: CupertinoActivityIndicator(
+                                color: AppColors.primaryColors,
+                              ))
+                          : Container();
+                    }
+
+                    return BlocProvider(
+                      create: (context) => CustomerBloc(),
+                      child: GestureDetector(
+                        onTap: () {
+                          context.read<CustomerBloc>().add(
+                              GetSingleEstimateEvent(
+                                  orderId: estimateData[index].id.toString()));
+                        },
+                        child: tileWidget(
+                          estimateData[index].orderStatus,
+                          estimateData[index].orderNumber ?? "",
+                          estimateData[index].customer?.firstName ?? "",
+                          "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleMake ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
+                          estimateData[index].estimationName ?? "",
+                          estimateData[index].dropSchedule ?? "",
+                        ),
+                      ),
+                    );
+                  },
+                  controller: estimateScrollController
+                    ..addListener(() {
+                      if ((BlocProvider.of<CustomerBloc>(context).currentPage <=
+                              BlocProvider.of<CustomerBloc>(context)
+                                  .totalPages) &&
+                          estimateScrollController.offset ==
+                              estimateScrollController
+                                  .position.maxScrollExtent &&
+                          BlocProvider.of<CustomerBloc>(context).currentPage !=
+                              0 &&
+                          !BlocProvider.of<CustomerBloc>(context).isFetching) {
+                        context.read<CustomerBloc>()
+                          ..isFetching = true
+                          ..add(GetCustomerEstimatesEvent(
+                              customerId: widget.customerData.id.toString()));
+                      }
+                    }),
+                  itemCount: estimateData.length + 1,
+                )
+          : const Center(
+              child: CupertinoActivityIndicator(),
+            ),
+    );
+  }
+
+  Widget tileWidget(String estimateName, estimateId, String customerName,
+      String carModel, String serviceName, String dropSchedule) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.white,
+            boxShadow: const [
+              BoxShadow(
+                offset: Offset(0, 1),
+                spreadRadius: 1,
+                blurRadius: 6,
+                color: Color.fromRGBO(88, 88, 88, 0.178),
+              )
+            ]),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              dropSchedule != ""
+                  ? Row(
+                      children: [
+                        SvgPicture.asset(
+                            "assets/images/calendar_estimate_icon.svg"),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 4.0),
+                          child: Text(
+                            dropSchedule.substring(0, 10),
+                            style: const TextStyle(
+                                color: AppColors.greyText,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        // SvgPicture.asset("assets/images/calendar_estimate_icon.svg"),
+                        // const Text(
+                        //   " 3/7/23 9:00 Am",
+                        //   style: TextStyle(
+                        //       color: AppColors.greyText,
+                        //       fontSize: 12,
+                        //       fontWeight: FontWeight.w400),
+                        // )
+                      ],
+                    )
+                  : const SizedBox(),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  "${estimateName} #${estimateId} - ${serviceName}",
+                  style: const TextStyle(
+                      color: AppColors.primaryColors,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  customerName,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(top: 8.0),
+                child: Text(
+                  carModel,
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -703,7 +816,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
       ),
       builder: (BuildContext context) {
         return SizedBox(
-          height: MediaQuery.of(context).size.height / 2.3,
+          height: MediaQuery.of(context).size.height / 2,
           child: Center(
             child: SingleChildScrollView(
               child: Column(
@@ -746,162 +859,40 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                     padding: const EdgeInsets.only(left: 18.0, right: 18),
                     child: Column(
                       children: [
-                        SizedBox(
-                          height: 57,
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: AppColors.buttonColors,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                  size: 16,
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  'New Estimate',
-                                  style: TextStyle(
-                                      color: AppColors.primaryColors,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: '.SF Pro Text',
-                                      fontSize: 16),
-                                ),
-                              ],
-                            ),
-                            onPressed: () =>
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (context) => DummyCustomerScreen(
-                                        customerId:
-                                            widget.customerData.id.toString(),
-                                      ),
-                                    ),
-                                    (route) => false),
+                        estimatePopUpTile(
+                          context,
+                          Icons.add,
+                          "New Vehicle",
+                          CreateVehicleScreen(
+                            customerId: widget.customerData.id.toString(),
                           ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                          height: 57,
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: AppColors.buttonColors,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.edit,
-                                  color: AppColors.primaryColors,
-                                  size: 16,
-                                ),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Text(
-                                  'Edit Customer',
-                                  style: TextStyle(
-                                      color: AppColors.primaryColors,
-                                      fontWeight: FontWeight.w500,
-                                      fontFamily: '.SF Pro Text',
-                                      fontSize: 16),
-                                ),
-                              ],
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context);
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => NewCustomerScreen(
-                                          customerEdit: widget.customerData)));
-                            },
+                        estimatePopUpTile(
+                          context,
+                          Icons.add,
+                          "New Estimate",
+                          DummyCustomerScreen(
+                            customerId: widget.customerData.id.toString(),
                           ),
                         ),
                         const SizedBox(
                           height: 10,
                         ),
-                        SizedBox(
-                            height: 57,
-                            width: double.infinity,
-                            child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: AppColors.buttonColors,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10.0),
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.delete,
-                                      color: AppColors.primaryColors,
-                                      size: 16,
-                                    ),
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-                                    Text(
-                                      'Delete Customer',
-                                      style: TextStyle(
-                                          color: AppColors.primaryColors,
-                                          fontFamily: '.SF Pro Text',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                                onPressed: () async {
-                                  Navigator.of(context).pop(true);
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) => CupertinoAlertDialog(
-                                      title: const Text("Delete customer?"),
-                                      content: const Text(
-                                          'Do you really want to delete this customer?'),
-                                      actions: [
-                                        CupertinoButton(
-                                          child: const Text('Yes'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop(true);
-                                            BlocProvider.of<CustomerBloc>(
-                                                    context)
-                                                .add(DeleteCustomerEvent(
-                                                    customerId: widget
-                                                        .customerData.id
-                                                        .toString(),
-                                                    context: context));
-                                          },
-                                        ),
-                                        CupertinoButton(
-                                          child: const Text('No'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                })),
+                        estimatePopUpTile(
+                          context,
+                          Icons.edit,
+                          "Edit Customer",
+                          NewCustomerScreen(
+                            customerEdit: widget.customerData,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        deleteCustomerWidget(context),
                       ],
                     ),
                   ),
@@ -928,6 +919,126 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           ),
         );
       },
+    );
+  }
+
+  SizedBox deleteCustomerWidget(BuildContext context) {
+    return SizedBox(
+        height: 57,
+        width: double.infinity,
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: AppColors.buttonColors,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+            ),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.delete,
+                  color: AppColors.primaryColors,
+                  size: 16,
+                ),
+                SizedBox(
+                  width: 8,
+                ),
+                Text(
+                  'Delete Customer',
+                  style: TextStyle(
+                      color: AppColors.primaryColors,
+                      fontFamily: '.SF Pro Text',
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16),
+                ),
+              ],
+            ),
+            onPressed: () async {
+              Navigator.of(context).pop(true);
+              showDialog(
+                context: context,
+                builder: (context) => CupertinoAlertDialog(
+                  title: const Text("Delete customer?"),
+                  content:
+                      const Text('Do you really want to delete this customer?'),
+                  actions: [
+                    CupertinoButton(
+                      child: const Text('Yes'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                        BlocProvider.of<CustomerBloc>(context).add(
+                            DeleteCustomerEvent(
+                                customerId: widget.customerData.id.toString(),
+                                context: context));
+                      },
+                    ),
+                    CupertinoButton(
+                      child: const Text('No'),
+                      onPressed: () {
+                        Navigator.of(context).pop(true);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }));
+  }
+
+  SizedBox estimatePopUpTile(
+      BuildContext context, IconData icon, String title, constructor) {
+    return SizedBox(
+      height: 57,
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          primary: AppColors.buttonColors,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: AppColors.primaryColors,
+              size: 16,
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            Text(
+              title,
+              style: const TextStyle(
+                  color: AppColors.primaryColors,
+                  fontWeight: FontWeight.w500,
+                  fontFamily: '.SF Pro Text',
+                  fontSize: 16),
+            ),
+          ],
+        ),
+        onPressed: title == "New Vehicle"
+            ? () async {
+                Navigator.pop(context);
+                await Navigator.of(context)
+                    .push(
+                  MaterialPageRoute(builder: (context) => constructor),
+                )
+                    .then((value) {
+                  log('here');
+
+                  setState(() {
+                    selectedIndex = 3;
+                  });
+                });
+              }
+            : () => Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => constructor),
+                (route) => false),
+      ),
     );
   }
 
@@ -1230,86 +1341,200 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   addNotePopup() {
     final TextEditingController addNoteController = TextEditingController();
     String addNoteErrorStatus = '';
-
-    showDialog(
+    showModalBottomSheet(
       context: context,
       builder: (context) {
-        return StatefulBuilder(builder: (context, setDialog) {
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text("Add Note"),
-                GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child:
-                        const Icon(Icons.close, color: AppColors.primaryColors))
-              ],
-            ),
-            insetPadding:
-                const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
-            content: SizedBox(
-              height: addNoteErrorStatus.isNotEmpty ? 290 : 270,
-              width: MediaQuery.of(context).size.width - 32,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  notesTextBox(addNoteController, addNoteErrorStatus),
-                  errorWidget(addNoteErrorStatus),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 24.0),
-                    child: BlocBuilder<CustomerBloc, CustomerState>(
-                      builder: (context, state) {
-                        if (state is CreateCustomerNoteLoadingState) {
-                          return const Padding(
-                            padding: EdgeInsets.only(top: 24.0),
-                            child: Center(child: CupertinoActivityIndicator()),
-                          );
-                        }
-                        return GestureDetector(
-                          onTap: () {
-                            if (addNoteController.text.isEmpty) {
-                              addNoteErrorStatus = "Note can't be empty";
-                            } else {
-                              addNoteErrorStatus = '';
-                              BlocProvider.of<CustomerBloc>(context).add(
-                                  CreateCustomerNoteEvent(
-                                      customerId:
-                                          widget.customerData.id.toString(),
-                                      notes: addNoteController.text.trim()));
-                            }
-                            setDialog(() {});
-                          },
-                          child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: 56,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: AppColors.primaryColors),
-                            child: const Text(
-                              "Confirm",
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white),
+        return Scaffold(
+          appBar: AppBar(
+            elevation: 0,
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            title: const Text("New Customer Note",
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primaryTitleColor,
+                    height: 1.7,
+                    letterSpacing: 0.3)),
+            actions: [
+              IconButton(
+                icon: const Icon(
+                  CupertinoIcons.clear,
+                  size: 18,
+                  color: AppColors.primaryColors,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          ),
+          body: StatefulBuilder(builder: (context, setDialog) {
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          "Description",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Color(0xff6A7187),
+                          ),
+                        ),
+                        Text(
+                          " *",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Color(
+                              0xffD80027,
                             ),
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
-                  )
-                ],
+                    notesTextBox(addNoteController, addNoteErrorStatus),
+                    errorWidget(addNoteErrorStatus),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 24.0),
+                      child: BlocBuilder<CustomerBloc, CustomerState>(
+                        builder: (context, state) {
+                          if (state is CreateCustomerNoteLoadingState) {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 24.0),
+                              child:
+                                  Center(child: CupertinoActivityIndicator()),
+                            );
+                          }
+                          return GestureDetector(
+                            onTap: () {
+                              if (addNoteController.text.isEmpty) {
+                                addNoteErrorStatus = "Note can't be empty";
+                              } else {
+                                addNoteErrorStatus = '';
+                                BlocProvider.of<CustomerBloc>(context).add(
+                                    CreateCustomerNoteEvent(
+                                        customerId:
+                                            widget.customerData.id.toString(),
+                                        notes: addNoteController.text.trim()));
+                              }
+                              setDialog(() {});
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width,
+                              height: 56,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: AppColors.primaryColors),
+                              child: const Text(
+                                "Confirm",
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          );
-        });
+            );
+          }),
+        );
       },
+      isScrollControlled: true,
+      useSafeArea: true,
     );
+
+    // showDialog(
+    //   context: context,
+    //   builder: (context) {
+    //     return StatefulBuilder(builder: (context, setDialog) {
+    //       return AlertDialog(
+    //         shape:
+    //             RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+    //         title: Row(
+    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //           children: [
+    //             const Text("Add Note"),
+    //             GestureDetector(
+    //                 onTap: () {
+    //                   Navigator.pop(context);
+    //                 },
+    //                 child:
+    //                     const Icon(Icons.close, color: AppColors.primaryColors))
+    //           ],
+    //         ),
+    //         insetPadding:
+    //             const EdgeInsets.only(top: 16, left: 16, right: 16, bottom: 16),
+    //         content: SizedBox(
+    //           height: addNoteErrorStatus.isNotEmpty ? 290 : 270,
+    //           width: MediaQuery.of(context).size.width - 32,
+    //           child: Column(
+    //             crossAxisAlignment: CrossAxisAlignment.start,
+    //             children: [
+    //               notesTextBox(addNoteController, addNoteErrorStatus),
+    //               errorWidget(addNoteErrorStatus),
+    //               Padding(
+    //                 padding: const EdgeInsets.only(top: 24.0),
+    //                 child: BlocBuilder<CustomerBloc, CustomerState>(
+    //                   builder: (context, state) {
+    //                     if (state is CreateCustomerNoteLoadingState) {
+    //                       return const Padding(
+    //                         padding: EdgeInsets.only(top: 24.0),
+    //                         child: Center(child: CupertinoActivityIndicator()),
+    //                       );
+    //                     }
+    //                     return GestureDetector(
+    //                       onTap: () {
+    //                         if (addNoteController.text.isEmpty) {
+    //                           addNoteErrorStatus = "Note can't be empty";
+    //                         } else {
+    //                           addNoteErrorStatus = '';
+    //                           BlocProvider.of<CustomerBloc>(context).add(
+    //                               CreateCustomerNoteEvent(
+    //                                   customerId:
+    //                                       widget.customerData.id.toString(),
+    //                                   notes: addNoteController.text.trim()));
+    //                         }
+    //                         setDialog(() {});
+    //                       },
+    //                       child: Container(
+    //                         width: MediaQuery.of(context).size.width,
+    //                         height: 56,
+    //                         alignment: Alignment.center,
+    //                         decoration: BoxDecoration(
+    //                             borderRadius: BorderRadius.circular(12),
+    //                             color: AppColors.primaryColors),
+    //                         child: const Text(
+    //                           "Confirm",
+    //                           style: TextStyle(
+    //                               fontSize: 14,
+    //                               fontWeight: FontWeight.w500,
+    //                               color: Colors.white),
+    //                         ),
+    //                       ),
+    //                     );
+    //                   },
+    //                 ),
+    //               )
+    //             ],
+    //           ),
+    //         ),
+    //       );
+    //     });
+    //   },
+    // );
   }
 
   Padding errorWidget(String errorString) {
@@ -1332,38 +1557,42 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
   notesTextBox(
       TextEditingController addNoteController, String addNoteErrorStatus) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 6.0),
-      child: TextField(
-        controller: addNoteController,
-        minLines: 7,
-        maxLines: 7,
-        decoration: InputDecoration(
-          hintText: "Enter Notes",
-          hintStyle: const TextStyle(fontSize: 16),
-          counterText: "",
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: addNoteErrorStatus.isNotEmpty
-                  ? const Color(0xffD80027)
-                  : const Color(0xffC1C4CD),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - kToolbarHeight - 150,
+      child: Padding(
+        padding: const EdgeInsets.only(top: 6.0),
+        child: TextField(
+          controller: addNoteController,
+          maxLines: null,
+          expands: true,
+          textAlignVertical: TextAlignVertical.top,
+          decoration: InputDecoration(
+            hintText: "Enter Notes",
+            hintStyle: const TextStyle(fontSize: 16),
+            counterText: "",
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: addNoteErrorStatus.isNotEmpty
+                    ? const Color(0xffD80027)
+                    : const Color(0xffC1C4CD),
+              ),
             ),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: addNoteErrorStatus.isNotEmpty
-                  ? const Color(0xffD80027)
-                  : const Color(0xffC1C4CD),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: addNoteErrorStatus.isNotEmpty
+                    ? const Color(0xffD80027)
+                    : const Color(0xffC1C4CD),
+              ),
             ),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(
-              color: addNoteErrorStatus.isNotEmpty
-                  ? const Color(0xffD80027)
-                  : const Color(0xffC1C4CD),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: addNoteErrorStatus.isNotEmpty
+                    ? const Color(0xffD80027)
+                    : const Color(0xffC1C4CD),
+              ),
             ),
           ),
         ),

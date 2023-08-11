@@ -140,3 +140,20 @@ class GetCustomerNotesSuccessState extends CustomerState {
   final List<CustomerNoteModel> notes;
   const GetCustomerNotesSuccessState({required this.notes});
 }
+
+class GetCustomerEstimatesLoadingState extends CustomerState {}
+
+class GetCustomerEstimatesErrorState extends CustomerState {
+  final String message;
+  const GetCustomerEstimatesErrorState({required this.message});
+}
+
+class GetCustomerEstimatesSuccessState extends CustomerState {
+  final em.EstimateModel estimateData;
+  const GetCustomerEstimatesSuccessState({required this.estimateData});
+}
+
+class GetSingleEstimateState extends CustomerState {
+  final ce.CreateEstimateModel createEstimateModel;
+  GetSingleEstimateState({required this.createEstimateModel});
+}

@@ -111,3 +111,13 @@ class GetAllCustomerNotesEvent extends CustomerEvent {
   final String id;
   const GetAllCustomerNotesEvent({required this.id});
 }
+
+class GetCustomerEstimatesEvent extends CustomerEvent {
+  final String customerId;
+  const GetCustomerEstimatesEvent({required this.customerId});
+}
+
+class GetSingleEstimateEvent extends CustomerEvent {
+  final String orderId;
+  const GetSingleEstimateEvent({required this.orderId});
+}
