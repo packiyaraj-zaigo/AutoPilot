@@ -100,6 +100,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         event.licNumber,
         event.type,
         event.make,
+        event.customerId,
       );
       var vechileAdd = _decoder.convert(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -183,6 +184,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         event.licNumber,
         event.type,
         event.make,
+        event.customerId,
       );
       final body = await jsonDecode(response.body);
       log(body[body.keys.first][0].toString());

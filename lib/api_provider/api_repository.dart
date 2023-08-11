@@ -156,6 +156,7 @@ class ApiRepository {
     String licNumber,
     String type,
     String make,
+    String customerId,
   ) {
     return apiProvider.addVechile(
       token,
@@ -169,6 +170,7 @@ class ApiRepository {
       licNumber,
       type,
       make,
+      customerId,
     );
   }
 
@@ -185,6 +187,7 @@ class ApiRepository {
     String licNumber,
     String type,
     String make,
+    String customerId,
   ) {
     return apiProvider.editVechile(
       token,
@@ -199,6 +202,7 @@ class ApiRepository {
       licNumber,
       type,
       make,
+      customerId,
     );
   }
 
@@ -222,8 +226,9 @@ class ApiRepository {
     return apiProvider.getVehicleEstimates(token, vehicleId, page);
   }
 
-  Future getEstimate(dynamic token, String orderStatus, int currentPage) {
-    return apiProvider.getEstimate(token, orderStatus, currentPage);
+  Future getEstimate(dynamic token, String orderStatus, int currentPage,
+      [String? customerId]) {
+    return apiProvider.getEstimate(token, orderStatus, currentPage, customerId);
   }
 
   Future getNotifications(String token, String clientId, int page) {

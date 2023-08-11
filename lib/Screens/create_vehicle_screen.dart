@@ -17,16 +17,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateVehicleScreen extends StatefulWidget {
-  const CreateVehicleScreen(
-      {super.key,
-      this.vehicle,
-      this.vin = '',
-      this.editVehicle,
-      this.navigation});
+  const CreateVehicleScreen({
+    super.key,
+    this.vehicle,
+    this.vin = '',
+    this.editVehicle,
+    this.navigation,
+    this.customerId,
+  });
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
   final Datum? editVehicle;
   final String? navigation;
+  final String? customerId;
 
   @override
   State<CreateVehicleScreen> createState() => _CreateVehicleScreenState();
@@ -544,42 +547,53 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
       }
     }
     setState(() {});
-    networkCheck().then((value) {
-      if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus && !value) {
-        CommonWidgets().showDialog(
-            context, 'Please check your internet connection and try again');
-      }
-      if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
-        if (widget.editVehicle != null) {
-          scaffoldKey.currentContext!.read<VechileBloc>().add(EditVehicleEvent(
-                id: widget.editVehicle!.id.toString(),
-                email: nameController.text,
-                year: yearController.text,
-                model: modelController.text,
-                submodel: subModelController.text,
-                engine: engineController.text,
-                color: colorController.text,
-                vinNumber: vinController.text,
-                licNumber: licController.text,
-                make: makeController.text,
-                type: typeController.text,
-              ));
-        } else {
-          scaffoldKey.currentContext!.read<VechileBloc>().add(AddVechile(
-                email: nameController.text,
-                year: yearController.text,
-                model: modelController.text,
-                submodel: subModelController.text,
-                engine: engineController.text,
-                color: colorController.text,
-                vinNumber: vinController.text,
-                licNumber: licController.text,
-                make: makeController.text,
-                type: typeController.text,
-              ));
+    networkCheck().then(
+      (value) {
+        if (!yearErrorStaus &&
+            !modelErrorStatus &&
+            !makeErrorStatus &&
+            !value) {
+          CommonWidgets().showDialog(
+              context, 'Please check your internet connection and try again');
         }
-      }
-    });
+        if (!yearErrorStaus && !modelErrorStatus && !makeErrorStatus) {
+          if (widget.editVehicle != null) {
+            scaffoldKey.currentContext!.read<VechileBloc>().add(
+                  EditVehicleEvent(
+                    id: widget.editVehicle!.id.toString(),
+                    email: nameController.text,
+                    year: yearController.text,
+                    model: modelController.text,
+                    submodel: subModelController.text,
+                    engine: engineController.text,
+                    color: colorController.text,
+                    vinNumber: vinController.text,
+                    licNumber: licController.text,
+                    make: makeController.text,
+                    type: typeController.text,
+                    customerId: widget.editVehicle!.customerId.toString(),
+                  ),
+                );
+          } else {
+            scaffoldKey.currentContext!.read<VechileBloc>().add(
+                  AddVechile(
+                    email: nameController.text,
+                    year: yearController.text,
+                    model: modelController.text,
+                    submodel: subModelController.text,
+                    engine: engineController.text,
+                    color: colorController.text,
+                    vinNumber: vinController.text,
+                    licNumber: licController.text,
+                    make: makeController.text,
+                    type: typeController.text,
+                    customerId: widget.customerId ?? '0',
+                  ),
+                );
+          }
+        }
+      },
+    );
   }
 
   Widget textBox(String placeHolder, TextEditingController controller,

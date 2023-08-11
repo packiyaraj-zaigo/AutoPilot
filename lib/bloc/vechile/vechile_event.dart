@@ -30,7 +30,8 @@ class AddVechile extends VechileEvent {
       vinNumber,
       licNumber,
       type,
-      make;
+      make,
+      customerId;
   AddVechile({
     required this.email,
     required this.year,
@@ -42,6 +43,7 @@ class AddVechile extends VechileEvent {
     required this.licNumber,
     required this.type,
     required this.make,
+    required this.customerId,
   });
 }
 
@@ -58,7 +60,8 @@ class EditVehicleEvent extends VechileEvent {
       vinNumber,
       licNumber,
       type,
-      make;
+      make,
+      customerId;
   const EditVehicleEvent({
     required this.id,
     required this.email,
@@ -71,6 +74,7 @@ class EditVehicleEvent extends VechileEvent {
     required this.licNumber,
     required this.type,
     required this.make,
+    required this.customerId,
   });
 }
 

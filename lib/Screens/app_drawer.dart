@@ -90,8 +90,8 @@ showDrawer(BuildContext context) {
             // name: "Service Screen",
             // )),
             ServicesListScreen()),
-        drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
-            context, BottomBarScreen()),
+        // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
+        //     context, BottomBarScreen()),
         drawerTileWidget(
           "assets/images/time_card_drawer_icon.svg",
           "Time Cards",
