@@ -13,6 +13,7 @@ import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/edit_order_service_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
+import 'package:auto_pilot/Screens/payment_list_screen.dart';
 import 'package:auto_pilot/Screens/select_service_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -842,7 +843,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         taxDetailsWidget(
                             "Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget("Balance due",
-                            "\$ ${totalAmount.toStringAsFixed(2)}"),
+                            "\$ ${balanceDueAmount.toStringAsFixed(2)}"),
                         Padding(
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
@@ -892,18 +893,26 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               //     );
                               //   },
                               // );
-                              if (widget.estimateDetails.data.orderService !=
-                                      null &&
-                                  widget.estimateDetails.data.orderService!
-                                      .isNotEmpty) {
-                                showModalBottomSheet(
-                                  context: context,
-                                  backgroundColor: Colors.transparent,
-                                  isScrollControlled: true,
+                              if (balanceDueAmount <= 0) {
+                                Navigator.push(context, MaterialPageRoute(
                                   builder: (context) {
-                                    return paymentPopUp();
+                                    return PaymentListScreen(orderId: widget.estimateDetails.data.id.toString(),);
                                   },
-                                );
+                                ));
+                              } else {
+                                if (widget.estimateDetails.data.orderService !=
+                                        null &&
+                                    widget.estimateDetails.data.orderService!
+                                        .isNotEmpty) {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    backgroundColor: Colors.transparent,
+                                    isScrollControlled: true,
+                                    builder: (context) {
+                                      return paymentPopUp();
+                                    },
+                                  );
+                                }
                               }
                             },
                             child: Container(
@@ -912,10 +921,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  color: AppColors.primaryColors),
-                              child: const Text(
-                                "Collect Payment",
-                                style: TextStyle(
+                                  color: balanceDueAmount <= 0
+                                      ? const Color(0xff12A58C)
+                                      : AppColors.primaryColors),
+                              child: Text(
+                                balanceDueAmount <= 0
+                                    ? "Paid In Full"
+                                    : "Collect Payment",
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
@@ -2200,6 +2213,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               subContractAmount +
               feeAmount) -
           discountAmount;
+
+      balanceDueAmount =
+          totalAmount - double.parse(widget.estimateDetails.data.paidAmount);
+
+      log(widget.estimateDetails.data.paidAmount);
+      log(totalAmount.toString());
+      log(balanceDueAmount.toString());
     });
     setState(() {});
   }
@@ -2212,10 +2232,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           // TODO: implement listener
 
           if (state is CollectPaymentEstimateState) {
-            isPaidFull = true;
+            widget.estimateDetails.data.paidAmount =
+                (double.parse(widget.estimateDetails.data.paidAmount) +
+                        double.parse(paymentAmountController.text))
+                    .toString();
+
+            calculateAmount();
             paymentAmountController.clear();
             cashDateController.clear();
             cashNoteController.clear();
+
             Navigator.pop(context);
           }
         },
@@ -2265,7 +2291,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   ),
                                 ),
                                 Text(
-                                  "\$ ${totalAmount}",
+                                  "\$ ${balanceDueAmount.toStringAsFixed(2)}",
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

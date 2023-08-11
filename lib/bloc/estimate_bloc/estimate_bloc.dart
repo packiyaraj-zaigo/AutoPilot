@@ -8,6 +8,7 @@ import 'package:auto_pilot/Models/estimate_appointment_model.dart';
 import 'package:auto_pilot/Models/estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_note_model.dart';
 import 'package:auto_pilot/Models/order_image_model.dart';
+import 'package:auto_pilot/Models/payment_history_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
@@ -25,6 +26,10 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
   int currentPage = 1;
   int totalPages = 0;
   bool isFetching = false;
+
+  int paymentCurrentPage = 1;
+  int paymentTotalPage = 0;
+  bool paymentIsFetching = false;
   EstimateBloc({
     required ApiRepository apiRepository,
   })  : _apiRepository = apiRepository,
@@ -51,6 +56,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<DeleteAppointmentEstimateEvent>(deleteAppointmentBloc);
     on<CollectPaymentEstimateEvent>(collectPaymentBloc);
     on<DeleteEstimateEvent>(deleteEstimateBloc);
+    on<GetPaymentHistoryEvent>(getPaymentHistoryBloc);
   }
 
   Future<void> getEstimateBloc(
@@ -770,6 +776,49 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       }
     } catch (e, s) {
       emit(DeleteEstimateErrorState(errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> getPaymentHistoryBloc(
+    GetPaymentHistoryEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      PaymentHistoryModel paymentHistoryModel;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      if (paymentCurrentPage == 1) {
+        emit(GetPaymentHistoryLoadingState());
+      }
+
+      Response getPaymentResponse = await _apiRepository.getPaymentHistory(
+          token, event.orderId, paymentCurrentPage);
+
+      log("res${getPaymentResponse.body}");
+
+      if (getPaymentResponse.statusCode == 200) {
+        paymentHistoryModel =
+            paymentHistoryModelFromJson(getPaymentResponse.body);
+
+        paymentTotalPage = paymentHistoryModel.data.lastPage ?? 1;
+        isFetching = false;
+        emit(GetPaymentHistoryState(paymentHistoryModel: paymentHistoryModel));
+
+        if (paymentTotalPage > paymentCurrentPage && paymentCurrentPage != 0) {
+          paymentCurrentPage += 1;
+        } else {
+          paymentCurrentPage = 0;
+        }
+      } else {
+        emit(GetPaymentHistoryErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(GetPaymentHistoryErrorState(errorMessage: "Something went wrong"));
 
       print(e.toString());
       print(s);

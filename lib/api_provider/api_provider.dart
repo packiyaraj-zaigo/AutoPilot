@@ -1866,4 +1866,18 @@ class ApiProvider {
       log(e.toString() + 'Delete part provider error');
     }
   }
+
+  Future<dynamic> getPaymentHistroy(
+      String orderId, String token, int currentPage) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            '${BASE_URL}api/payments?order_id=$orderId &page=$currentPage'),
+        headers: getHeader(token),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
+    }
+  }
 }
