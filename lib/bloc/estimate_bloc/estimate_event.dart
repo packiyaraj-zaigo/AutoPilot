@@ -180,3 +180,8 @@ class DeleteEstimateEvent extends EstimateEvent {
   final String id;
   DeleteEstimateEvent({required this.id});
 }
+
+class GetPaymentHistoryEvent extends EstimateEvent {
+  final String orderId;
+  GetPaymentHistoryEvent({required this.orderId});
+}

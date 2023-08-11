@@ -557,6 +557,11 @@ class ApiRepository {
   Future<dynamic> deleteVehicleNotes(dynamic token, String vehicleId) async {
     return apiProvider.deleteVehicleNotes(vehicleId, token);
   }
+
+  Future<dynamic> getPaymentHistory(
+      dynamic token, String orderId, int currentPage) async {
+    return apiProvider.getPaymentHistroy(orderId, token, currentPage);
+  }
 }
 
 class NetworkError extends Error {}

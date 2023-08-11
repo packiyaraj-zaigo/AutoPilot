@@ -144,3 +144,18 @@ class DeleteEstimateErrorState extends EstimateState {
 
   DeleteEstimateErrorState({required this.errorMessage});
 }
+
+class GetPaymentHistoryState extends EstimateState {
+  final PaymentHistoryModel paymentHistoryModel;
+  GetPaymentHistoryState({required this.paymentHistoryModel});
+
+  @override
+  List<Object> get props => [paymentHistoryModel];
+}
+
+class GetPaymentHistoryLoadingState extends EstimateState {}
+
+class GetPaymentHistoryErrorState extends EstimateState {
+  final String errorMessage;
+  GetPaymentHistoryErrorState({required this.errorMessage});
+}
