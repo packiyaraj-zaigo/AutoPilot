@@ -502,7 +502,8 @@ class _ScannerScreenState extends State<ScannerScreen>
         : GestureDetector(
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => VechileInformation(vechile: vehicle)));
+                  builder: (context) =>
+                      VechileInformation(vehicleId: vehicle.id.toString())));
             },
             child: Container(
               width: double.infinity,

@@ -245,7 +245,8 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                                                     MaterialPageRoute(
                                                       builder: (context) =>
                                                           VechileInformation(
-                                                        vechile: item,
+                                                        vehicleId:
+                                                            item.id.toString(),
                                                       ),
                                                     ),
                                                   );

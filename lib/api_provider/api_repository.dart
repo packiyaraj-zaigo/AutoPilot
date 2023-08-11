@@ -576,6 +576,10 @@ class ApiRepository {
       dynamic token, int currentPage, String vehicleId) async {
     return apiProvider.getEstimateFromVehicle(token, currentPage, vehicleId);
   }
+
+  Future<dynamic> getVehicleInfo(dynamic token, String vehicleId) async {
+    return apiProvider.getVehicleInfo(token, vehicleId);
+  }
 }
 
 class NetworkError extends Error {}
