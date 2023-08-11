@@ -6,6 +6,7 @@ import 'package:auto_pilot/Models/create_estimate_model.dart' as ce;
 import 'package:auto_pilot/Models/customer_note_model.dart';
 import 'package:auto_pilot/Models/cutomer_message_model.dart' as cm;
 import 'package:auto_pilot/Models/estimate_model.dart' as em;
+import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:bloc/bloc.dart';
@@ -35,9 +36,9 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
   bool isFetching = false;
   int currentPage = 1;
   int totalPages = 1;
-  int estimateTotalPages = 1;
-  int estimateCurrentPage = 1;
   int? newMessageCurrentPage;
+  bool isVechileLoading = false;
+  bool isPagenationLoading = false;
   final _apiRepository = ApiRepository();
   int showLoading = 0;
   final JsonDecoder _decoder = const JsonDecoder();
@@ -56,7 +57,55 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<GetAllCustomerNotesEvent>(getAllCustomerNotes);
     on<GetCustomerEstimatesEvent>(getCustomerEstimates);
     on<GetSingleEstimateEvent>(getSingleEstimate);
+    on<GetCustomerVehiclesEvent>(getCustomerVehicles);
     on<GetSingleCustomerEvent>(getSingleCustomer);
+  }
+
+  getCustomerVehicles(
+    GetCustomerVehiclesEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      emit(GetCustomerVehiclesLoadingState());
+      if (currentPage == 1) {
+        isVechileLoading = true;
+      }
+
+      final token = await AppUtils.getToken();
+      Response response =
+          await _apiRepository.getVechile(token, currentPage, "", event.id);
+      if (response.statusCode == 200) {
+        print(response.body);
+        final responseBody = jsonDecode(response.body);
+        emit(
+          GetCustomerVehiclesSuccessState(
+            vehicles: vm.VechileResponse.fromJson(
+              responseBody,
+            ),
+          ),
+        );
+        final data = responseBody['data'];
+        currentPage = data['current_page'] ?? 1;
+
+        totalPages = data['last_page'] ?? 1;
+        print(totalPages.toString() + ':::::::::::::::');
+        if (currentPage <= totalPages) {
+          currentPage++;
+        }
+        print(response.body.toString());
+      } else {
+        log(response.body.toString());
+        final body = jsonDecode(response.body);
+        emit(GetCustomerVehiclesErrorState(message: body['message']));
+      }
+      isVechileLoading = false;
+      isPagenationLoading = false;
+    } catch (e, s) {
+      log(s.toString() + " Get customer vehicles bloc error");
+      emit(GetCustomerVehiclesErrorState(message: "Something went wrong"));
+      isVechileLoading = false;
+      isPagenationLoading = false;
+    }
   }
 
   Future<void> getSingleCustomer(

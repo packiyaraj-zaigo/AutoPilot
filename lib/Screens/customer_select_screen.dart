@@ -231,7 +231,9 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                                             child: InkWell(
                                               onTap: () {
                                                 if (widget.navigation ==
-                                                    "appointment") {
+                                                        "appointment" ||
+                                                    widget.navigation ==
+                                                        'create_vehicle') {
                                                   Navigator.of(context)
                                                       .pop(item);
                                                 } else {
@@ -240,7 +242,8 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                                                 }
                                               },
                                               child: ListTile(
-                                                title: Text(item.firstName),
+                                                title: Text(
+                                                    "${item.firstName} ${item.lastName}"),
                                                 subtitle: Text(
                                                     '${item.companyName ?? ''}'),
                                                 trailing: const Icon(Icons.add,

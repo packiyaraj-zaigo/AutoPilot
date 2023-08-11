@@ -140,8 +140,9 @@ class ApiRepository {
     return apiProvider.calendarWeekLoad(token, selectedDate);
   }
 
-  Future getVechile(String token, int currentPage, String query) {
-    return apiProvider.getVechile(token, currentPage, query);
+  Future getVechile(String token, int currentPage, String query,
+      [String? customerId]) {
+    return apiProvider.getVechile(token, currentPage, query, customerId);
   }
 
   Future addVechile(
