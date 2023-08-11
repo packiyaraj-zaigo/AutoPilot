@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_model.dart';
+import 'package:auto_pilot/Models/single_vehicle_info_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vehicle_notes_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -39,6 +41,8 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     on<AddVehicleNoteEvent>(addVehicleNoteBloc);
     on<DeleteVehicleNotesEvent>(deleteVehicleNoteBloc);
     on<GetEstimateFromVehicleEvent>(getEstimateFromVehicleBloc);
+    on<GetSingleEstimateFromVehicleEvent>(getSingleEstimateFromVehicleBloc);
+    on<GetVehicleInfoEvent>(getSingleVehicleInfoBloc);
   }
   getAllVechile(
     GetAllVechile event,
@@ -316,6 +320,71 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     } catch (e, s) {
       emit(GetEstimateFromVehicleErrorState(
           errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> getSingleEstimateFromVehicleBloc(
+    GetSingleEstimateFromVehicleEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      CreateEstimateModel createEstimateModel;
+
+      Response singleEstimate =
+          await apiRepo.getSingleEstimate(token!, event.orderId);
+
+      log("res${singleEstimate.body}");
+
+      if (singleEstimate.statusCode == 200) {
+        createEstimateModel = createEstimateModelFromJson(singleEstimate.body);
+        emit(GetSingleEstimateFromVehicleState(
+            createEstimateModel: createEstimateModel));
+      } else {
+        emit(GetSingleEstimateFromVehicleErrorState(
+            errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(GetSingleEstimateFromVehicleErrorState(
+          errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> getSingleVehicleInfoBloc(
+    GetVehicleInfoEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      emit(GetVehicleInfoLoadingState());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      SingleVehicleInfoModel singleVehicleInfoModel;
+
+      Response vehicleInfoRes =
+          await apiRepo.getVehicleInfo(token, event.vehicleId);
+
+      log("res${vehicleInfoRes.body}");
+
+      if (vehicleInfoRes.statusCode == 200) {
+        singleVehicleInfoModel =
+            singleVehicleInfoModelFromJson(vehicleInfoRes.body);
+        emit(GetVehicleInfoState(vehicleInfo: singleVehicleInfoModel));
+      } else {
+        emit(GetVehicleInfoErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(GetVehicleInfoErrorState(errorMessage: "Something went wrong"));
 
       print(e.toString());
       print(s);

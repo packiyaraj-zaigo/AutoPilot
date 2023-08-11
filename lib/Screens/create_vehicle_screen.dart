@@ -160,6 +160,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                         builder: (context) {
                           return DummyVehicleScreen(
                             vehicleId: state.createdId.toString(),
+                            navigation: "vehicle_info",
                           );
                         },
                       ));

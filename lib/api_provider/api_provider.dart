@@ -1922,4 +1922,14 @@ class ApiProvider {
       log(e.toString() + 'Delete part provider error');
     }
   }
+
+  Future<dynamic> getVehicleInfo(String token, String vehicleId) async {
+    try {
+      final url = Uri.parse("${BASE_URL}api/vehicles/$vehicleId");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "Notification API error");
+    }
+  }
 }

@@ -102,3 +102,13 @@ class GetEstimateFromVehicleEvent extends VechileEvent {
   final String vehicleId;
   GetEstimateFromVehicleEvent({required this.vehicleId});
 }
+
+class GetSingleEstimateFromVehicleEvent extends VechileEvent {
+  final String orderId;
+  GetSingleEstimateFromVehicleEvent({required this.orderId});
+}
+
+class GetVehicleInfoEvent extends VechileEvent {
+  final String vehicleId;
+  GetVehicleInfoEvent({required this.vehicleId});
+}

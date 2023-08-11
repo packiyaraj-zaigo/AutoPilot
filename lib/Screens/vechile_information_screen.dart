@@ -1,4 +1,6 @@
+import 'package:auto_pilot/Models/single_vehicle_info_model.dart';
 import 'package:auto_pilot/Screens/dummy_vehcile_screen.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
@@ -19,11 +21,13 @@ import 'create_vehicle_screen.dart';
 import 'package:auto_pilot/Models/estimate_model.dart' as em;
 
 class VechileInformation extends StatefulWidget {
-  VechileInformation({
-    Key? key,
-    required this.vechile,
-  }) : super(key: key);
-  final Datum vechile;
+  VechileInformation(
+      {Key? key,
+      // required this.vechile,
+      required this.vehicleId})
+      : super(key: key);
+  // final Datum vechile;
+  final String vehicleId;
   @override
   State<VechileInformation> createState() => _VechileInformationState();
 }
@@ -54,6 +58,7 @@ class _VechileInformationState extends State<VechileInformation> {
   final addNoteController = TextEditingController();
   final scrollController = ScrollController();
   List<em.Datum> estimateData = [];
+  Vehicle? vechile;
 
   String addNoteErrorMessage = "";
 
@@ -62,7 +67,8 @@ class _VechileInformationState extends State<VechileInformation> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => VechileBloc(),
+      create: (context) =>
+          VechileBloc()..add(GetVehicleInfoEvent(vehicleId: widget.vehicleId)),
       child: BlocListener<VechileBloc, VechileState>(
         listener: (context, state) {
           if (state is DeleteVechileDetailsSuccessState) {
@@ -88,14 +94,30 @@ class _VechileInformationState extends State<VechileInformation> {
             noteList.addAll(state.vehicleModel.data);
           } else if (state is AddVehicleNoteState) {
             print("listner worked");
-            context.read<VechileBloc>().add(
-                GetVehicleNoteEvent(vehicleId: widget.vechile.id.toString()));
+            context
+                .read<VechileBloc>()
+                .add(GetVehicleNoteEvent(vehicleId: widget.vehicleId));
 
             Navigator.pop(context);
           } else if (state is GetEstimateFromVehicleState) {
             estimateData.addAll(state.estimateData.data.data);
           } else if (state is GetEstimateFromVehicleLoadingState) {
             estimateData.clear();
+          } else if (state is GetSingleEstimateFromVehicleState) {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return EstimatePartialScreen(
+                  estimateDetails: state.createEstimateModel,
+                  navigation: "vehicle_info",
+                );
+              },
+            )).then((value) {
+              estimateData.clear();
+              context.read<VechileBloc>().add(
+                  GetEstimateFromVehicleEvent(vehicleId: widget.vehicleId));
+            });
+          } else if (state is GetVehicleInfoState) {
+            vechile = state.vehicleInfo.vehicle;
           }
           // TODO: implement listener
         },
@@ -114,7 +136,7 @@ class _VechileInformationState extends State<VechileInformation> {
                   color: AppColors.primaryColors,
                   icon: Icon(Icons.arrow_back),
                 ),
-                title: Text(
+                title: const Text(
                   "Vehicle's Information",
                   style: TextStyle(
                       fontSize: 16,
@@ -122,7 +144,7 @@ class _VechileInformationState extends State<VechileInformation> {
                       color: AppColors.primaryBlackColors),
                 ),
                 centerTitle: true,
-                actions: widget.vechile.vehicleYear == ''
+                actions: vechile?.vehicleYear == ''
                     ? null
                     : [
                         IconButton(
@@ -140,7 +162,7 @@ class _VechileInformationState extends State<VechileInformation> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${widget.vechile.vehicleYear} ${widget.vechile.vehicleMake} ${widget.vechile.vehicleModel}",
+                      "${vechile?.vehicleYear ?? ""} ${vechile?.vehicleMake ?? ""} ${vechile?.vehicleModel ?? ""}",
                       style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
@@ -157,12 +179,15 @@ class _VechileInformationState extends State<VechileInformation> {
 
                           if (value == 1) {
                             context.read<VechileBloc>().add(GetVehicleNoteEvent(
-                                vehicleId: widget.vechile.id.toString()));
+                                vehicleId: widget.vehicleId));
                           } else if (value == 2) {
                             estimateData.clear();
                             context.read<VechileBloc>().add(
                                 GetEstimateFromVehicleEvent(
-                                    vehicleId: widget.vechile.id.toString()));
+                                    vehicleId: widget.vehicleId));
+                          } else if (value == 0) {
+                            context.read<VechileBloc>().add(GetVehicleInfoEvent(
+                                vehicleId: widget.vehicleId));
                           }
                         },
                         groupValue: selectedIndex,
@@ -208,17 +233,27 @@ class _VechileInformationState extends State<VechileInformation> {
                                                   ))
                                               : Container();
                                         }
-                                        return estimateTileWidget(
-                                            estimateData[index].orderStatus,
-                                            estimateData[index].orderNumber,
-                                            estimateData[index]
-                                                    .customer
-                                                    ?.firstName ??
-                                                "",
-                                            "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
-                                            "",
-                                            estimateData[index].dropSchedule ??
-                                                "");
+                                        return GestureDetector(
+                                          onTap: () {
+                                            context.read<VechileBloc>().add(
+                                                GetSingleEstimateFromVehicleEvent(
+                                                    orderId: estimateData[index]
+                                                        .id
+                                                        .toString()));
+                                          },
+                                          child: estimateTileWidget(
+                                              estimateData[index].orderStatus,
+                                              estimateData[index].orderNumber,
+                                              estimateData[index]
+                                                      .customer
+                                                      ?.firstName ??
+                                                  "",
+                                              "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
+                                              "",
+                                              estimateData[index]
+                                                      .dropSchedule ??
+                                                  ""),
+                                        );
                                       },
                                       itemCount: estimateData.length + 1,
                                       shrinkWrap: true,
@@ -243,8 +278,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                             context.read<VechileBloc>()
                                               ..isEstimateFetching = true
                                               ..add(GetEstimateFromVehicleEvent(
-                                                  vehicleId: widget.vechile.id
-                                                      .toString()));
+                                                  vehicleId: widget.vehicleId));
                                           }
                                         }),
                                     )
@@ -341,153 +375,158 @@ class _VechileInformationState extends State<VechileInformation> {
                                       )),
                                 )
                               : selectedIndex == 0
-                                  ? Container(
-                                      height:
-                                          MediaQuery.of(context).size.height,
-                                      // color: const Color(0xffF9F9F9),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          const Text(
-                                            "Owner",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.firstName ?? '-'}",
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                          const SizedBox(
-                                            height: 20,
-                                          ),
-                                          const Text(
-                                            "Sub-Model",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.subModel ?? ""}",
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                          const SizedBox(
-                                            height: 14,
-                                          ),
-                                          const Text(
-                                            "Engine",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.engineSize ?? ""}",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                          SizedBox(
-                                            height: 14,
-                                          ),
-                                          Text(
-                                            "Color",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.vehicleColor ?? ""}",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                          SizedBox(
-                                            height: 14,
-                                          ),
-                                          Text(
-                                            "VIN",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.vin?.toUpperCase() ?? ""}",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                          SizedBox(
-                                            height: 14,
-                                          ),
-                                          Text(
-                                            "LIC",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.licencePlate ?? ""}",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                          SizedBox(
-                                            height: 14,
-                                          ),
-                                          Text(
-                                            "Type",
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w400,
-                                                color: AppColors
-                                                    .primaryGrayColors),
-                                          ),
-                                          Text(
-                                            "${widget.vechile.vehicleType}",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors
-                                                    .primaryTitleColor),
-                                          ),
-                                          AppUtils.verticalDivider(),
-                                        ],
-                                      ))
+                                  ? state is GetVehicleInfoLoadingState
+                                      ? const Center(
+                                          child: CupertinoActivityIndicator(),
+                                        )
+                                      : SizedBox(
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height,
+                                          // color: const Color(0xffF9F9F9),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              const Text(
+                                                "Owner",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              // Text(
+                                              //   "${vechile?.firstName ?? '-'}",
+                                              //   style: const TextStyle(
+                                              //       fontSize: 16,
+                                              //       fontWeight: FontWeight.w500,
+                                              //       color: AppColors
+                                              //           .primaryTitleColor),
+                                              // ),
+                                              AppUtils.verticalDivider(),
+                                              const SizedBox(
+                                                height: 20,
+                                              ),
+                                              const Text(
+                                                "Sub-Model",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              Text(
+                                                "${vechile?.subModel ?? ""}",
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
+                                              AppUtils.verticalDivider(),
+                                              const SizedBox(
+                                                height: 14,
+                                              ),
+                                              const Text(
+                                                "Engine",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              Text(
+                                                "${vechile?.engineSize ?? ""}",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
+                                              AppUtils.verticalDivider(),
+                                              SizedBox(
+                                                height: 14,
+                                              ),
+                                              Text(
+                                                "Color",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              Text(
+                                                "${vechile?.vehicleColor ?? ""}",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
+                                              AppUtils.verticalDivider(),
+                                              SizedBox(
+                                                height: 14,
+                                              ),
+                                              Text(
+                                                "VIN",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              Text(
+                                                "${vechile?.vin?.toUpperCase() ?? ""}",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
+                                              AppUtils.verticalDivider(),
+                                              SizedBox(
+                                                height: 14,
+                                              ),
+                                              Text(
+                                                "LIC",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              Text(
+                                                "${vechile?.licencePlate ?? ""}",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
+                                              AppUtils.verticalDivider(),
+                                              SizedBox(
+                                                height: 14,
+                                              ),
+                                              Text(
+                                                "Type",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: AppColors
+                                                        .primaryGrayColors),
+                                              ),
+                                              Text(
+                                                "${vechile?.vehicleType}",
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
+                                              AppUtils.verticalDivider(),
+                                            ],
+                                          ))
                                   : SingleChildScrollView(
                                       child: Column(
                                         children: [
@@ -601,8 +640,7 @@ class _VechileInformationState extends State<VechileInformation> {
                           onPressed: () => Navigator.of(context)
                               .pushReplacement(MaterialPageRoute(
                                   builder: (context) => DummyVehicleScreen(
-                                      vehicleId:
-                                          widget.vechile.id.toString()))),
+                                      vehicleId: widget.vehicleId))),
                         ),
                       ),
                       SizedBox(
@@ -622,38 +660,39 @@ class _VechileInformationState extends State<VechileInformation> {
                         height: 57,
                         width: double.infinity,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: AppColors.primaryButtonColors,
-                            elevation: 0,
-                            shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(10.0),
+                            style: ElevatedButton.styleFrom(
+                              primary: AppColors.primaryButtonColors,
+                              elevation: 0,
+                              shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(10.0),
+                              ),
                             ),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.edit,
-                                color: AppColors.primaryColors,
-                                size: 16,
-                              ),
-                              Text(
-                                'Edit Vehicle',
-                                style: TextStyle(
-                                    color: AppColors.primaryColors,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: '.SF Pro Text',
-                                    fontSize: 16),
-                              ),
-                            ],
-                          ),
-                          onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateVehicleScreen(
-                                        editVehicle: widget.vechile,
-                                      ))),
-                        ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.edit,
+                                  color: AppColors.primaryColors,
+                                  size: 16,
+                                ),
+                                Text(
+                                  'Edit Vehicle',
+                                  style: TextStyle(
+                                      color: AppColors.primaryColors,
+                                      fontWeight: FontWeight.w500,
+                                      fontFamily: '.SF Pro Text',
+                                      fontSize: 16),
+                                ),
+                              ],
+                            ),
+                            onPressed: () {
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //         builder: (context) => CreateVehicleScreen(
+                              //               editVehicle: widget.vechile,
+                              //             )));
+                            }),
                       ),
                       SizedBox(
                         height: 10,
@@ -703,8 +742,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                       BlocProvider.of<VechileBloc>(
                                               scaffoldKey.currentContext!)
                                           .add(DeleteVechile(
-                                              id: widget.vechile.id
-                                                  .toString()));
+                                              id: widget.vehicleId));
                                     },
                                   ),
                                   CupertinoButton(
@@ -821,9 +859,9 @@ class _VechileInformationState extends State<VechileInformation> {
               if (state is AddVehicleNoteState) {
                 print("listner worked");
 
-                scaffoldKey.currentContext!.read<VechileBloc>().add(
-                    GetVehicleNoteEvent(
-                        vehicleId: widget.vechile.id.toString()));
+                scaffoldKey.currentContext!
+                    .read<VechileBloc>()
+                    .add(GetVehicleNoteEvent(vehicleId: widget.vehicleId));
 
                 Navigator.pop(context);
                 addNoteController.clear();
@@ -935,8 +973,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                     context.read<VechileBloc>().add(
                                         AddVehicleNoteEvent(
                                             notes: addNoteController.text,
-                                            vehicleId:
-                                                widget.vechile.id.toString()));
+                                            vehicleId: widget.vehicleId));
                                   }
                                 },
                                 child: Container(
@@ -982,8 +1019,9 @@ class _VechileInformationState extends State<VechileInformation> {
         child: BlocListener<VechileBloc, VechileState>(
           listener: (context, state) {
             if (state is DeleteVehicleNoteState) {
-              scaffoldKey.currentContext!.read<VechileBloc>().add(
-                  GetVehicleNoteEvent(vehicleId: widget.vechile.id.toString()));
+              scaffoldKey.currentContext!
+                  .read<VechileBloc>()
+                  .add(GetVehicleNoteEvent(vehicleId: widget.vehicleId));
 
               Navigator.pop(context);
             }

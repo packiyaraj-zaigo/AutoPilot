@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DummyVehicleScreen extends StatefulWidget {
-  const DummyVehicleScreen({super.key, required this.vehicleId});
+  const DummyVehicleScreen(
+      {super.key, required this.vehicleId, this.navigation});
   final String vehicleId;
+  final String? navigation;
 
   @override
   State<DummyVehicleScreen> createState() => _DummyVehicleScreenState();
@@ -25,7 +27,9 @@ class _DummyVehicleScreenState extends State<DummyVehicleScreen> {
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel);
+                  estimateDetails: state.createEstimateModel,
+                  navigation: widget.navigation,
+                );
               },
             ));
           }

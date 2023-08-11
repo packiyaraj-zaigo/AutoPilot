@@ -1,4 +1,6 @@
+import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_model.dart';
+import 'package:auto_pilot/Models/single_vehicle_info_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vehicle_notes_model.dart';
 import 'package:equatable/equatable.dart';
@@ -166,4 +168,29 @@ class GetEstimateFromVehicleLoadingState extends VechileState {}
 class GetEstimateFromVehicleErrorState extends VechileState {
   final String errorMessage;
   GetEstimateFromVehicleErrorState({required this.errorMessage});
+}
+
+class GetSingleEstimateFromVehicleState extends VechileState {
+  final CreateEstimateModel createEstimateModel;
+  GetSingleEstimateFromVehicleState({required this.createEstimateModel});
+
+  @override
+  List<Object> get props => [createEstimateModel];
+}
+
+class GetSingleEstimateFromVehicleErrorState extends VechileState {
+  final String errorMessage;
+  GetSingleEstimateFromVehicleErrorState({required this.errorMessage});
+}
+
+class GetVehicleInfoState extends VechileState {
+  final SingleVehicleInfoModel vehicleInfo;
+  GetVehicleInfoState({required this.vehicleInfo});
+}
+
+class GetVehicleInfoLoadingState extends VechileState {}
+
+class GetVehicleInfoErrorState extends VechileState {
+  final String errorMessage;
+  GetVehicleInfoErrorState({required this.errorMessage});
 }
