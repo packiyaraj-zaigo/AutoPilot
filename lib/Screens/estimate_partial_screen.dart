@@ -1795,7 +1795,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     builder: (context) {
                       return SelectVehiclesScreen(
                         navigation: "partial",
-                        subNavigation: "",
+                        subNavigation: widget.navigation,
                         orderId: widget.estimateDetails.data.id.toString(),
                         customerId:
                             widget.estimateDetails.data.customerId.toString(),
@@ -1813,6 +1813,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         builder: (context) {
                           return SelectServiceScreen(
                             orderId: widget.estimateDetails.data.id.toString(),
+                            navigation: widget.navigation,
                           );
                         },
                       ));
