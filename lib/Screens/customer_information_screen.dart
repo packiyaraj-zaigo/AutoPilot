@@ -375,7 +375,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             Navigator.of(context).push(
                               MaterialPageRoute(
                                 builder: (context) => VechileInformation(
-                                  vechile: item,
+                                  vehicleId: item.id.toString(),
                                 ),
                               ),
                             );
