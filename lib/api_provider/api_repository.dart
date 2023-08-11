@@ -567,6 +567,11 @@ class ApiRepository {
       dynamic token, String orderId, int currentPage) async {
     return apiProvider.getPaymentHistroy(orderId, token, currentPage);
   }
+
+  Future<dynamic> getEstimateFromVehicle(
+      dynamic token, int currentPage, String vehicleId) async {
+    return apiProvider.getEstimateFromVehicle(token, currentPage, vehicleId);
+  }
 }
 
 class NetworkError extends Error {}

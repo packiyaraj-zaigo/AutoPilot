@@ -1,14 +1,17 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:auto_pilot/Models/estimate_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vehicle_notes_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_state.dart';
+import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Models/vechile_model.dart';
 import '../../Screens/vehicles_screen.dart';
@@ -20,6 +23,10 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
 
   int currentPage = 1;
   int totalPages = 1;
+
+  int estimateCurrentPage = 1;
+  int estimateTotalPage = 0;
+  bool isEstimateFetching = false;
   final JsonDecoder _decoder = const JsonDecoder();
   Map errorRes = {};
   VechileBloc() : super(VechileInitial()) {
@@ -31,6 +38,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     on<GetVehicleNoteEvent>(getVehicleNoteBloc);
     on<AddVehicleNoteEvent>(addVehicleNoteBloc);
     on<DeleteVehicleNotesEvent>(deleteVehicleNoteBloc);
+    on<GetEstimateFromVehicleEvent>(getEstimateFromVehicleBloc);
   }
   getAllVechile(
     GetAllVechile event,
@@ -268,6 +276,51 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     } catch (e) {
       log(e.toString() + " Edit bloc error");
       emit(DeleteVehicleNoteErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  Future<void> getEstimateFromVehicleBloc(
+    GetEstimateFromVehicleEvent event,
+    Emitter<VechileState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      EstimateModel estimateModel;
+
+      if (estimateCurrentPage == 1) {
+        emit(GetEstimateFromVehicleLoadingState());
+      }
+
+      Response getEstimateRes = await apiRepo.getEstimateFromVehicle(
+          token, estimateCurrentPage, event.vehicleId);
+
+      log("res${getEstimateRes.body}");
+
+      if (getEstimateRes.statusCode == 200) {
+        estimateModel = estimateModelFromJson(getEstimateRes.body);
+        estimateTotalPage = estimateModel.data.lastPage ?? 1;
+        isEstimateFetching = false;
+        emit(GetEstimateFromVehicleState(estimateData: estimateModel));
+
+        if (estimateTotalPage > estimateCurrentPage &&
+            estimateCurrentPage != 0) {
+          estimateCurrentPage += 1;
+        } else {
+          estimateCurrentPage = 0;
+        }
+      } else {
+        emit(GetEstimateFromVehicleErrorState(
+            errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(GetEstimateFromVehicleErrorState(
+          errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
     }
   }
 }

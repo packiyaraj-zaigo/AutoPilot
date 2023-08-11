@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/estimate_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vehicle_notes_model.dart';
 import 'package:equatable/equatable.dart';
@@ -150,4 +151,19 @@ class DeleteVehicleNoteLoadingState extends VechileState {}
 class DeleteVehicleNoteErrorState extends VechileState {
   final String errorMessage;
   DeleteVehicleNoteErrorState({required this.errorMessage});
+}
+
+class GetEstimateFromVehicleState extends VechileState {
+  final EstimateModel estimateData;
+  const GetEstimateFromVehicleState({required this.estimateData});
+
+  @override
+  List<Object> get props => [estimateData];
+}
+
+class GetEstimateFromVehicleLoadingState extends VechileState {}
+
+class GetEstimateFromVehicleErrorState extends VechileState {
+  final String errorMessage;
+  GetEstimateFromVehicleErrorState({required this.errorMessage});
 }

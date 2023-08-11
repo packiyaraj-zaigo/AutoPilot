@@ -183,5 +183,6 @@ class DeleteEstimateEvent extends EstimateEvent {
 
 class GetPaymentHistoryEvent extends EstimateEvent {
   final String orderId;
+
   GetPaymentHistoryEvent({required this.orderId});
 }
