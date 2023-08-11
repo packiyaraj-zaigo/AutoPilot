@@ -121,3 +121,8 @@ class GetSingleEstimateEvent extends CustomerEvent {
   final String orderId;
   const GetSingleEstimateEvent({required this.orderId});
 }
+
+class GetSingleCustomerEvent extends CustomerEvent {
+  final String id;
+  const GetSingleCustomerEvent({required this.id});
+}

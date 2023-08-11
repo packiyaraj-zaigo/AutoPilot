@@ -20,9 +20,10 @@ import 'new_customer_screen.dart';
 
 class SelectCustomerScreen extends StatefulWidget {
   const SelectCustomerScreen(
-      {super.key, required this.navigation, this.orderId});
+      {super.key, required this.navigation, this.orderId, this.subNavigation});
   final String navigation;
   final String? orderId;
+  final String? subNavigation;
 
   @override
   State<SelectCustomerScreen> createState() => _SelectCustomerScreenState();
@@ -297,6 +298,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                 builder: (context) {
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
+                    navigation: widget.subNavigation,
                   );
                 },
               ));
@@ -305,6 +307,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                 builder: (context) {
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
+                    navigation: widget.subNavigation,
                   );
                 },
               ));

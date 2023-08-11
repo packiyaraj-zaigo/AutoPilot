@@ -1385,6 +1385,18 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getSingleCustomer(String token, String id) async {
+    try {
+      var url = Uri.parse("${BASE_URL}api/customers/$id");
+      var response = http.get(url, headers: getHeader(token));
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + "Get single customer api error");
+    }
+  }
+
   Future<dynamic> getEstimateNote(String token, String orderId) async {
     print("into provider");
 

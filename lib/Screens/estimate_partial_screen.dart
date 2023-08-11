@@ -7,9 +7,11 @@ import 'package:auto_pilot/Models/estimate_appointment_model.dart' as ea;
 import 'package:auto_pilot/Models/estimate_note_model.dart' as en;
 import 'package:auto_pilot/Models/order_image_model.dart' as oi;
 import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
+import 'package:auto_pilot/Models/customer_model.dart' as cm;
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
+import 'package:auto_pilot/Screens/customer_information_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/edit_order_service_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
@@ -223,13 +225,56 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             print(state);
             return WillPopScope(
               onWillPop: () async {
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-                  builder: (context) {
-                    return BottomBarScreen(
-                      currentIndex: 3,
-                    );
-                  },
-                ), (route) => false);
+                if (widget.navigation == "customer_navigation") {
+                  final estimate = widget.estimateDetails.data;
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => CustomerInformationScreen(
+                        id: estimate.customerId.toString(),
+                        customerData: cm.Datum(
+                          id: estimate.customerId,
+                          clientId: estimate.clientId,
+                          email: estimate.customer!.email,
+                          firstName: estimate.customer!.firstName,
+                          lastName: estimate.customer!.lastName,
+                          notes: "",
+                          companyName: "",
+                          referralSource: "",
+                          fleet: "",
+                          addressLine1: "",
+                          addressLine2: "",
+                          townCity: "",
+                          provinceId: 0,
+                          zipcode: "",
+                          phone: "",
+                          labels: "",
+                          isTax: 0,
+                          tax: "",
+                          isDiscount: 0,
+                          discountPercentge: "",
+                          discountType: "",
+                          isLaborMatrix: 0,
+                          laborMatrixId: 0,
+                          pricingMatrixId: 0,
+                          isLaborRate: 0,
+                          laborRate: "",
+                          periodicalMaintenanceNotifications: 0,
+                          provinceName: 0,
+                          pricingMatrix: 0,
+                          laborMatrix: 0,
+                        ),
+                      ),
+                    ),
+                  );
+                } else {
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                    builder: (context) {
+                      return BottomBarScreen(
+                        currentIndex: 3,
+                      );
+                    },
+                  ), (route) => false);
+                }
                 return false;
               },
               child: Scaffold(
@@ -247,14 +292,58 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         //   Navigator.pop(context);
                         // }
 
-                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-                          builder: (context) {
-                            return BottomBarScreen(
-                              currentIndex: 3,
-                              tabControllerIndex: widget.controllerIndex,
-                            );
-                          },
-                        ), (route) => false);
+                        if (widget.navigation == "customer_navigation") {
+                          final estimate = widget.estimateDetails.data;
+                          Navigator.of(context).pushReplacement(
+                            MaterialPageRoute(
+                              builder: (context) => CustomerInformationScreen(
+                                id: estimate.customerId.toString(),
+                                customerData: cm.Datum(
+                                  id: estimate.customerId,
+                                  clientId: estimate.clientId,
+                                  email: estimate.customer!.email,
+                                  firstName: estimate.customer!.firstName,
+                                  lastName: estimate.customer!.lastName,
+                                  notes: "",
+                                  companyName: "",
+                                  referralSource: "",
+                                  fleet: "",
+                                  addressLine1: "",
+                                  addressLine2: "",
+                                  townCity: "",
+                                  provinceId: 0,
+                                  zipcode: "",
+                                  phone: "",
+                                  labels: "",
+                                  isTax: 0,
+                                  tax: "",
+                                  isDiscount: 0,
+                                  discountPercentge: "",
+                                  discountType: "",
+                                  isLaborMatrix: 0,
+                                  laborMatrixId: 0,
+                                  pricingMatrixId: 0,
+                                  isLaborRate: 0,
+                                  laborRate: "",
+                                  periodicalMaintenanceNotifications: 0,
+                                  provinceName: 0,
+                                  pricingMatrix: 0,
+                                  laborMatrix: 0,
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          Navigator.pushAndRemoveUntil(context,
+                              MaterialPageRoute(
+                            builder: (context) {
+                              return BottomBarScreen(
+                                currentIndex: 3,
+                                tabControllerIndex: widget.controllerIndex,
+                              );
+                            },
+                          ), (route) => false);
+                        }
                       },
                       icon: const Icon(
                         Icons.arrow_back,
@@ -438,6 +527,49 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             if (isCustomerEdit) {
                               CommonWidgets().showDialog(
                                   context, "Please select a customer");
+                            } else if (widget.navigation ==
+                                "customer_navigation") {
+                              final estimate = widget.estimateDetails.data;
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      CustomerInformationScreen(
+                                    id: estimate.customerId.toString(),
+                                    customerData: cm.Datum(
+                                      id: estimate.customerId,
+                                      clientId: estimate.clientId,
+                                      email: estimate.customer!.email,
+                                      firstName: estimate.customer!.firstName,
+                                      lastName: estimate.customer!.lastName,
+                                      notes: "",
+                                      companyName: "",
+                                      referralSource: "",
+                                      fleet: "",
+                                      addressLine1: "",
+                                      addressLine2: "",
+                                      townCity: "",
+                                      provinceId: 0,
+                                      zipcode: "",
+                                      phone: "",
+                                      labels: "",
+                                      isTax: 0,
+                                      tax: "",
+                                      isDiscount: 0,
+                                      discountPercentge: "",
+                                      discountType: "",
+                                      isLaborMatrix: 0,
+                                      laborMatrixId: 0,
+                                      pricingMatrixId: 0,
+                                      isLaborRate: 0,
+                                      laborRate: "",
+                                      periodicalMaintenanceNotifications: 0,
+                                      provinceName: 0,
+                                      pricingMatrix: 0,
+                                      laborMatrix: 0,
+                                    ),
+                                  ),
+                                ),
+                              );
                             } else {
                               Navigator.pushAndRemoveUntil(context,
                                   MaterialPageRoute(
@@ -893,10 +1025,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               //     );
                               //   },
                               // );
-                              if (balanceDueAmount <= 0) {
+                              if (balanceDueAmount <= 0 &&
+                                  widget.estimateDetails.data.orderService !=
+                                      null &&
+                                  widget.estimateDetails.data.orderService!
+                                      .isNotEmpty &&
+                                  widget.estimateDetails.data.orderService![0]
+                                          .orderServiceItems !=
+                                      null &&
+                                  widget.estimateDetails.data.orderService![0]
+                                      .orderServiceItems!.isNotEmpty) {
                                 Navigator.push(context, MaterialPageRoute(
                                   builder: (context) {
-                                    return PaymentListScreen(orderId: widget.estimateDetails.data.id.toString(),);
+                                    return PaymentListScreen(
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                    );
                                   },
                                 ));
                               } else {
@@ -1633,6 +1777,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     builder: (context) {
                       return SelectCustomerScreen(
                         navigation: "partial",
+                        subNavigation: widget.navigation,
                         orderId: widget.estimateDetails.data.id.toString(),
                       );
                     },
@@ -1650,6 +1795,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     builder: (context) {
                       return SelectVehiclesScreen(
                         navigation: "partial",
+                        subNavigation: "",
                         orderId: widget.estimateDetails.data.id.toString(),
                         customerId:
                             widget.estimateDetails.data.customerId.toString(),
@@ -1662,13 +1808,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       endTimeController.text.isEmpty &&
                       dateController.text.isEmpty &&
                       appointmentController.text.isEmpty) {
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) {
-                        return SelectServiceScreen(
-                          orderId: widget.estimateDetails.data.id.toString(),
-                        );
-                      },
-                    ));
+                    if (widget.estimateDetails.data.customer != null) {
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return SelectServiceScreen(
+                            orderId: widget.estimateDetails.data.id.toString(),
+                          );
+                        },
+                      ));
+                    } else {
+                      CommonWidgets().showDialog(context,
+                          "Please select a customer before adding a service");
+                    }
                   } else {
                     CommonWidgets().showDialog(context,
                         "Please save the unsaved changes before selecting the service");
@@ -3300,13 +3451,56 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         padding: const EdgeInsets.all(16.0),
         child: GestureDetector(
           onTap: () {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-              builder: (context) {
-                return BottomBarScreen(
-                  currentIndex: 3,
-                );
-              },
-            ), (route) => false);
+            if (widget.navigation == "customer_navigation") {
+              final estimate = widget.estimateDetails.data;
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => CustomerInformationScreen(
+                    id: estimate.customerId.toString(),
+                    customerData: cm.Datum(
+                      id: estimate.customerId,
+                      clientId: estimate.clientId,
+                      email: estimate.customer!.email,
+                      firstName: estimate.customer!.firstName,
+                      lastName: estimate.customer!.lastName,
+                      notes: "",
+                      companyName: "",
+                      referralSource: "",
+                      fleet: "",
+                      addressLine1: "",
+                      addressLine2: "",
+                      townCity: "",
+                      provinceId: 0,
+                      zipcode: "",
+                      phone: "",
+                      labels: "",
+                      isTax: 0,
+                      tax: "",
+                      isDiscount: 0,
+                      discountPercentge: "",
+                      discountType: "",
+                      isLaborMatrix: 0,
+                      laborMatrixId: 0,
+                      pricingMatrixId: 0,
+                      isLaborRate: 0,
+                      laborRate: "",
+                      periodicalMaintenanceNotifications: 0,
+                      provinceName: 0,
+                      pricingMatrix: 0,
+                      laborMatrix: 0,
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                builder: (context) {
+                  return BottomBarScreen(
+                    currentIndex: 3,
+                  );
+                },
+              ), (route) => false);
+            }
           },
           child: Container(
             height: 56,
@@ -3631,13 +3825,56 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         child: BlocListener<EstimateBloc, EstimateState>(
           listener: (context, state) {
             if (state is DeleteEstimateState) {
-              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
-                builder: (context) {
-                  return BottomBarScreen(
-                    currentIndex: 3,
-                  );
-                },
-              ), (route) => false);
+              if (widget.navigation == "customer_navigation") {
+                final estimate = widget.estimateDetails.data;
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(
+                    builder: (context) => CustomerInformationScreen(
+                      id: estimate.customerId.toString(),
+                      customerData: cm.Datum(
+                        id: estimate.customerId,
+                        clientId: estimate.clientId,
+                        email: estimate.customer!.email,
+                        firstName: estimate.customer!.firstName,
+                        lastName: estimate.customer!.lastName,
+                        notes: "",
+                        companyName: "",
+                        referralSource: "",
+                        fleet: "",
+                        addressLine1: "",
+                        addressLine2: "",
+                        townCity: "",
+                        provinceId: 0,
+                        zipcode: "",
+                        phone: "",
+                        labels: "",
+                        isTax: 0,
+                        tax: "",
+                        isDiscount: 0,
+                        discountPercentge: "",
+                        discountType: "",
+                        isLaborMatrix: 0,
+                        laborMatrixId: 0,
+                        pricingMatrixId: 0,
+                        isLaborRate: 0,
+                        laborRate: "",
+                        periodicalMaintenanceNotifications: 0,
+                        provinceName: 0,
+                        pricingMatrix: 0,
+                        laborMatrix: 0,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
+                  builder: (context) {
+                    return BottomBarScreen(
+                      currentIndex: 3,
+                    );
+                  },
+                ), (route) => false);
+              }
             }
             // TODO: implement listener
           },

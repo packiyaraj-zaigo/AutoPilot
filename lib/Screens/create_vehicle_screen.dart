@@ -511,7 +511,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
       yearErrorMsg = "Year can't be empty.";
       yearErrorStaus = true;
     } else {
-      if (yearController.text.trim().length < 4) {
+      if (yearController.text.trim().length < 4 ||
+          int.parse(yearController.text) > DateTime.now().year) {
         yearErrorMsg = "Please enter a valid year";
         yearErrorStaus = true;
       } else {

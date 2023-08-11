@@ -56,6 +56,28 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
     on<GetAllCustomerNotesEvent>(getAllCustomerNotes);
     on<GetCustomerEstimatesEvent>(getCustomerEstimates);
     on<GetSingleEstimateEvent>(getSingleEstimate);
+    on<GetSingleCustomerEvent>(getSingleCustomer);
+  }
+
+  Future<void> getSingleCustomer(
+    GetSingleCustomerEvent event,
+    Emitter<CustomerState> emit,
+  ) async {
+    try {
+      emit(GetSingleCustomerLoadingState());
+
+      final token = await AppUtils.getToken();
+      final response = await _apiRepository.getSingleCustomer(token, event.id);
+      if (response.statusCode == 200) {
+        final body = await json.decode(response.body);
+        emit(GetSingleCustomerSuccessState(
+            customer: Datum.fromJson(body['customer'])));
+      } else {
+        emit(GetSingleCustomerErrorState(message: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(GetSingleCustomerErrorState(message: "Something went wrong"));
+    }
   }
 
   Future<void> getCustomerEstimates(

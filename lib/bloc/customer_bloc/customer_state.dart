@@ -139,6 +139,9 @@ class GetCustomerNotesErrorState extends CustomerState {
 class GetCustomerNotesSuccessState extends CustomerState {
   final List<CustomerNoteModel> notes;
   const GetCustomerNotesSuccessState({required this.notes});
+
+  @override
+  List<Object> get props => [notes];
 }
 
 class GetCustomerEstimatesLoadingState extends CustomerState {}
@@ -156,4 +159,16 @@ class GetCustomerEstimatesSuccessState extends CustomerState {
 class GetSingleEstimateState extends CustomerState {
   final ce.CreateEstimateModel createEstimateModel;
   GetSingleEstimateState({required this.createEstimateModel});
+}
+
+class GetSingleCustomerLoadingState extends CustomerState {}
+
+class GetSingleCustomerErrorState extends CustomerState {
+  final String message;
+  const GetSingleCustomerErrorState({required this.message});
+}
+
+class GetSingleCustomerSuccessState extends CustomerState {
+  final Datum customer;
+  const GetSingleCustomerSuccessState({required this.customer});
 }

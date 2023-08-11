@@ -24,8 +24,10 @@ class CustomerInformationScreen extends StatefulWidget {
   const CustomerInformationScreen({
     Key? key,
     required this.customerData,
+    this.id,
   }) : super(key: key);
   final Datum customerData;
+  final String? id;
 
   @override
   State<CustomerInformationScreen> createState() =>
@@ -74,11 +76,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   final chatScrollController = ScrollController();
   final estimateScrollController = ScrollController();
   int newIndex = 0;
-  final _debouncer = Debouncer();
   @override
   void initState() {
     super.initState();
-    // BlocProvider.of<CustomerBloc>(context).add(customerDetails(query: ''));
+    if (widget.id != null) {
+      BlocProvider.of<CustomerBloc>(context)
+          .add(GetSingleCustomerEvent(id: widget.id!));
+    }
   }
 
   Widget build(BuildContext context) {
@@ -90,7 +94,10 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                    builder: (context) => const cs.CustomersScreen()),
+                (route) => false);
           },
           icon: Icon(
             Icons.arrow_back,
@@ -182,12 +189,34 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                 );
               },
             ));
+          } else if (state is GetSingleCustomerErrorState) {
+            CommonWidgets().showDialog(
+                context, "Something went wrong please try again later");
+          } else if (state is GetSingleCustomerSuccessState) {
+            widget.customerData.addressLine1 = state.customer.addressLine1;
+            widget.customerData.createdAt = state.customer.createdAt;
+            widget.customerData.firstName = state.customer.firstName;
+            widget.customerData.lastName = state.customer.lastName;
+            widget.customerData.email = state.customer.email;
+            widget.customerData.phone = state.customer.phone;
+            log(state.customer.toJson().toString());
           }
         },
         child: BlocBuilder<CustomerBloc, CustomerState>(
           builder: (context, state) {
             if (state is CustomerLoading) {
               return const Center(child: CupertinoActivityIndicator());
+            } else if (state is GetSingleCustomerErrorState) {
+              return const Center(
+                child: Text(
+                  "Something went wrong",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.greyText,
+                  ),
+                ),
+              );
             } else {
               return Padding(
                 padding: const EdgeInsets.only(left: 24, right: 24, top: 22),
@@ -211,6 +240,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           selectedIndex = value ?? 0;
                           customerMessageList.clear();
                         });
+                        if (value == 0) {
+                          BlocProvider.of<CustomerBloc>(context).add(
+                              GetSingleCustomerEvent(
+                                  id: widget.customerData.id.toString()));
+                        }
                         if (value == 1) {
                           BlocProvider.of<CustomerBloc>(context).add(
                               GetAllCustomerNotesEvent(
@@ -227,6 +261,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           //     GetAllCustomerVehicles(
                           //         id: widget.customerData.id.toString()));
                         } else if (value == 4) {
+                          BlocProvider.of<CustomerBloc>(context)
+                              .estimateCurrentPage = 1;
+                          estimateData.clear();
                           BlocProvider.of<CustomerBloc>(context).add(
                               GetCustomerEstimatesEvent(
                                   customerId:
@@ -247,7 +284,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                       height: 20,
                     ),
                     selectedIndex == 0
-                        ? detailsWidget(context)
+                        ? detailsWidget(context, state)
                         : selectedIndex == 1
                             ? Expanded(
                                 child: notesWidget(state),
@@ -267,228 +304,236 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
     );
   }
 
-  Expanded detailsWidget(BuildContext context) {
+  Expanded detailsWidget(BuildContext context, state) {
     return Expanded(
-      child: Container(
-          height: MediaQuery.of(context).size.height,
-          color: const Color(0xffF9F9F9),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: state is GetSingleCustomerLoadingState
+          ? Center(child: CupertinoActivityIndicator())
+          : Container(
+              height: MediaQuery.of(context).size.height,
+              color: const Color(0xffF9F9F9),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 24, right: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Phone",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.primaryGrayColors),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Phone",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.primaryGrayColors),
+                            ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              widget.customerData.phone.isEmpty
+                                  ? ''
+                                  : '(${widget.customerData.phone.substring(0, 3)}) ${widget.customerData.phone.substring(3, 6)}-${widget.customerData.phone.substring(6)}'
+                              // widget.customerData.phone.toString()
+                              ,
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                          ],
                         ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          '(${widget.customerData.phone.substring(0, 3)}) ${widget.customerData.phone.substring(3, 6)}-${widget.customerData.phone.substring(6)}'
-                              .toString(),
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryTitleColor),
-                        ),
+                        Row(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                final Uri smsLaunchUri = Uri(
+                                  scheme: 'sms',
+                                  path: widget.customerData.phone,
+                                  queryParameters: <String, String>{
+                                    'body': Uri.encodeComponent(' '),
+                                  },
+                                );
+                                launchUrl(smsLaunchUri);
+                              },
+                              icon: SizedBox(
+                                height: 27,
+                                width: 18,
+                                child: SvgPicture.asset(
+                                  'assets/images/sms_icons.svg',
+                                  height: 27,
+                                  color: AppColors.primaryColors,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 15),
+                            IconButton(
+                              onPressed: () {
+                                final Uri emailLaunchUri = Uri(
+                                  scheme: 'tel',
+                                  path: widget.customerData.phone ?? '',
+                                );
+
+                                launchUrl(emailLaunchUri);
+                              },
+                              icon: SizedBox(
+                                height: 27,
+                                width: 18,
+                                child: SvgPicture.asset(
+                                  'assets/images/phone_icon.svg',
+                                  height: 27,
+                                  color: AppColors.primaryColors,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
+                    AppUtils.verticalDivider(),
+                    const SizedBox(
+                      height: 20,
+                    ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        IconButton(
-                          onPressed: () {
-                            final Uri smsLaunchUri = Uri(
-                              scheme: 'sms',
-                              path: widget.customerData.phone,
-                              queryParameters: <String, String>{
-                                'body': Uri.encodeComponent(' '),
-                              },
-                            );
-                            launchUrl(smsLaunchUri);
-                          },
-                          icon: SizedBox(
-                            height: 27,
-                            width: 18,
-                            child: SvgPicture.asset(
-                              'assets/images/sms_icons.svg',
-                              height: 27,
-                              color: AppColors.primaryColors,
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Email",
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: AppColors.primaryGrayColors),
                             ),
-                          ),
+                            const SizedBox(
+                              height: 5,
+                            ),
+                            Text(
+                              widget.customerData.email.toString(),
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 15),
                         IconButton(
                           onPressed: () {
+                            String? encodeQueryParameters(
+                                Map<String, String> params) {
+                              return params.entries
+                                  .map((MapEntry<String, String> e) =>
+                                      '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                                  .join('&');
+                            }
+
                             final Uri emailLaunchUri = Uri(
-                              scheme: 'tel',
-                              path: widget.customerData.phone ?? '',
+                              scheme: 'mailto',
+                              path: widget.customerData.email ?? '',
+                              query: encodeQueryParameters(<String, String>{
+                                'subject': ' ',
+                              }),
                             );
 
                             launchUrl(emailLaunchUri);
                           },
-                          icon: SizedBox(
-                            height: 27,
+                          icon: Container(
+                            // color: Colors.red,
+                            height: 18,
                             width: 18,
                             child: SvgPicture.asset(
-                              'assets/images/phone_icon.svg',
+                              'assets/images/mail_icons.svg',
                               height: 27,
                               color: AppColors.primaryColors,
                             ),
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    AppUtils.verticalDivider(),
+                    const SizedBox(
+                      height: 14,
+                    ),
+                    const Text(
+                      "Address",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryGrayColors),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      widget.customerData.addressLine1 == null
+                          ? ''
+                          : widget.customerData.addressLine1.toString(),
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    AppUtils.verticalDivider(),
+                    const SizedBox(
+                      height: 14,
+                    ),
+                    // const Text(
+                    //   "License Number",
+                    //   style: TextStyle(
+                    //       fontSize: 14,
+                    //       fontWeight: FontWeight.w400,
+                    //       color: AppColors.primaryGrayColors),
+                    // ),
+                    // const SizedBox(
+                    //   height: 5,
+                    // ),
+                    // const Text(
+                    //   "Need to change",
+                    //   style: TextStyle(
+                    //       fontSize: 16,
+                    //       fontWeight: FontWeight.w500,
+                    //       color: AppColors.primaryTitleColor),
+                    // ),
+                    // AppUtils.verticalDivider(),
+                    // const SizedBox(
+                    //   height: 14,
+                    // ),
+                    const Text(
+                      "Customer Created",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.primaryGrayColors),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    Text(
+                      widget.customerData.createdAt == null
+                          ? ""
+                          : AppUtils.getFormattedForInformationScreen(
+                                  widget.customerData.createdAt.toString())
+                              .toString(),
+                      // widget.customerData.createdAt.toString(),
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    AppUtils.verticalDivider(),
+                    const SizedBox(
+                      height: 14,
+                    ),
                   ],
                 ),
-                AppUtils.verticalDivider(),
-                const SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Email",
-                          style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: AppColors.primaryGrayColors),
-                        ),
-                        const SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          widget.customerData.email.toString(),
-                          style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryTitleColor),
-                        ),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        String? encodeQueryParameters(
-                            Map<String, String> params) {
-                          return params.entries
-                              .map((MapEntry<String, String> e) =>
-                                  '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-                              .join('&');
-                        }
-
-                        final Uri emailLaunchUri = Uri(
-                          scheme: 'mailto',
-                          path: widget.customerData.email ?? '',
-                          query: encodeQueryParameters(<String, String>{
-                            'subject': ' ',
-                          }),
-                        );
-
-                        launchUrl(emailLaunchUri);
-                      },
-                      icon: Container(
-                        // color: Colors.red,
-                        height: 18,
-                        width: 18,
-                        child: SvgPicture.asset(
-                          'assets/images/mail_icons.svg',
-                          height: 27,
-                          color: AppColors.primaryColors,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                AppUtils.verticalDivider(),
-                const SizedBox(
-                  height: 14,
-                ),
-                const Text(
-                  "Address",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.primaryGrayColors),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  widget.customerData.addressLine1 == null
-                      ? ''
-                      : widget.customerData.addressLine1.toString(),
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryTitleColor),
-                ),
-                AppUtils.verticalDivider(),
-                const SizedBox(
-                  height: 14,
-                ),
-                // const Text(
-                //   "License Number",
-                //   style: TextStyle(
-                //       fontSize: 14,
-                //       fontWeight: FontWeight.w400,
-                //       color: AppColors.primaryGrayColors),
-                // ),
-                // const SizedBox(
-                //   height: 5,
-                // ),
-                // const Text(
-                //   "Need to change",
-                //   style: TextStyle(
-                //       fontSize: 16,
-                //       fontWeight: FontWeight.w500,
-                //       color: AppColors.primaryTitleColor),
-                // ),
-                // AppUtils.verticalDivider(),
-                // const SizedBox(
-                //   height: 14,
-                // ),
-                const Text(
-                  "Customer Created",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.primaryGrayColors),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Text(
-                  AppUtils.getFormattedForInformationScreen(
-                          widget.customerData.createdAt.toString())
-                      .toString(),
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.primaryTitleColor),
-                ),
-                AppUtils.verticalDivider(),
-                const SizedBox(
-                  height: 14,
-                ),
-              ],
-            ),
-          )),
+              )),
     );
   }
 
@@ -876,6 +921,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           "New Estimate",
                           DummyCustomerScreen(
                             customerId: widget.customerData.id.toString(),
+                            navigation: 'customer_navigation',
                           ),
                         ),
                         const SizedBox(
@@ -1020,7 +1066,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             ),
           ],
         ),
-        onPressed: title == "New Vehicle"
+        onPressed: title == "New Vehicle" || title == "New Estimate"
             ? () async {
                 Navigator.pop(context);
                 await Navigator.of(context)
@@ -1028,10 +1074,12 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                   MaterialPageRoute(builder: (context) => constructor),
                 )
                     .then((value) {
-                  log('here');
-
                   setState(() {
-                    selectedIndex = 3;
+                    if (title == "New Vehicle") {
+                      selectedIndex = 3;
+                      BlocProvider.of<CustomerBloc>(context)
+                          .estimateCurrentPage = 1;
+                    }
                   });
                 });
               }

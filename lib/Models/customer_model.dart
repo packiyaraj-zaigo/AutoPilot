@@ -118,9 +118,9 @@ class Datum {
   int isLaborRate;
   String laborRate;
   int periodicalMaintenanceNotifications;
-  CreatedBy createdBy;
-  DateTime createdAt;
-  DateTime updatedAt;
+  CreatedBy? createdBy;
+  DateTime? createdAt;
+  DateTime? updatedAt;
   dynamic provinceName;
   dynamic pricingMatrix;
   dynamic laborMatrix;
@@ -153,9 +153,9 @@ class Datum {
     required this.isLaborRate,
     required this.laborRate,
     required this.periodicalMaintenanceNotifications,
-    required this.createdBy,
-    required this.createdAt,
-    required this.updatedAt,
+    this.createdBy,
+    this.createdAt,
+    this.updatedAt,
     required this.provinceName,
     required this.pricingMatrix,
     required this.laborMatrix,
@@ -227,9 +227,9 @@ class Datum {
         "labor_rate": laborRate,
         "periodical_maintenance_notifications":
             periodicalMaintenanceNotifications,
-        "created_by": createdBy.toJson(),
-        "created_at": createdAt.toIso8601String(),
-        "updated_at": updatedAt.toIso8601String(),
+        "created_by": createdBy?.toJson(),
+        "created_at": createdAt?.toIso8601String(),
+        "updated_at": updatedAt?.toIso8601String(),
         "province_name": provinceName,
         "pricing_matrix": pricingMatrix,
         "labor_matrix": laborMatrix,

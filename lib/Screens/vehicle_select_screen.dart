@@ -19,11 +19,16 @@ import 'app_drawer.dart';
 
 class SelectVehiclesScreen extends StatefulWidget {
   const SelectVehiclesScreen(
-      {Key? key, required this.navigation, this.orderId, this.customerId})
+      {Key? key,
+      required this.navigation,
+      this.orderId,
+      this.customerId,
+      this.subNavigation})
       : super(key: key);
   final String navigation;
   final String? orderId;
   final String? customerId;
+  final String? subNavigation;
 
   @override
   State<SelectVehiclesScreen> createState() => _SelectVehiclesScreenState();
@@ -370,6 +375,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                 builder: (context) {
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
+                    navigation: widget.subNavigation,
                   );
                 },
               ));
@@ -379,6 +385,7 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
                 builder: (context) {
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
+                    navigation: widget.subNavigation,
                   );
                 },
               ));

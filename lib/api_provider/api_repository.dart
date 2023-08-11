@@ -419,6 +419,10 @@ class ApiRepository {
     return apiProvider.getSingleEstimate(token, orderId);
   }
 
+  Future getSingleCustomer(String token, String id) {
+    return apiProvider.getSingleCustomer(token, id);
+  }
+
   Future getEstimateNote(String token, String orderId) {
     return apiProvider.getEstimateNote(token, orderId);
   }
