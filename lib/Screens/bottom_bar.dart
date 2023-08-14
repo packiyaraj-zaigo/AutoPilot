@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/appointment_details_screen.dart';
 import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
@@ -156,13 +157,13 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                     actions: [
                       IconButton(
                           onPressed: () {
-                            // Navigator.push(context, MaterialPageRoute(
-                            //   builder: (context) {
-                            //     return AddCompanyScreen();
-                            //   },
-                            // ));
-                            CommonWidgets().showSuccessDialog(
-                                context, "Successfully created data");
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) {
+                                return AppointmentDetailsScreen();
+                              },
+                            ));
+                            // CommonWidgets().showSuccessDialog(
+                            //     context, "Successfully created data");
                           },
                           icon: SvgPicture.asset(
                             "assets/images/message.svg",
