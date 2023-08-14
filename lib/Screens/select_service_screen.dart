@@ -513,9 +513,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                       itemType: item.cannedServiceItems![i].itemType,
                       itemName: item.cannedServiceItems![i].itemName,
                       discount: item.cannedServiceItems![i].discount,
-                      discountType:
-                          item.cannedServiceItems![i].discountType?.name ??
-                              'Percentage',
+                      discountType: item.cannedServiceItems![i].discountType,
                       position: "0",
                       quantityHours: item.cannedServiceItems![i].quanityHours,
                       subTotal: item.cannedServiceItems![i].subTotal,
