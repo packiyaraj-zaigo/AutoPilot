@@ -18,6 +18,7 @@ import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -160,6 +161,8 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                             //     return AddCompanyScreen();
                             //   },
                             // ));
+                            CommonWidgets().showSuccessDialog(
+                                context, "Successfully created data");
                           },
                           icon: SvgPicture.asset(
                             "assets/images/message.svg",

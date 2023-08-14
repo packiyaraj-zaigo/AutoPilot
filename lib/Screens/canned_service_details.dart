@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
 import 'package:auto_pilot/Screens/add_service_screen.dart';
@@ -31,6 +33,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
   @override
   void initState() {
     super.initState();
+    log(widget.service.toJson().toString());
     if (widget.service.cannedServiceItems != null &&
         widget.service.cannedServiceItems!.isNotEmpty) {
       for (var element in widget.service.cannedServiceItems!) {

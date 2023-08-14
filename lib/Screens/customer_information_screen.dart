@@ -1222,17 +1222,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         onPressed: title == "New Vehicle" || title == "New Estimate"
             ? () async {
                 Navigator.pop(context);
-                await Navigator.of(context)
-                    .push(
+                await Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => constructor),
-                )
-                    .then((value) {
-                  setState(() {
-                    if (title == "New Vehicle") {
-                      selectedIndex = 3;
-                      BlocProvider.of<CustomerBloc>(context).currentPage = 1;
-                    }
-                  });
+                );
+                setState(() {
+                  if (title == "New Vehicle") {
+                    BlocProvider.of<CustomerBloc>(context).currentPage = 1;
+                  }
                 });
               }
             : () => Navigator.of(context).pushAndRemoveUntil(
