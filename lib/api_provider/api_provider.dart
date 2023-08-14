@@ -500,10 +500,11 @@ class ApiProvider {
 
   Future<dynamic> calendarload(String token, DateTime selectedDate) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      final clientId = await AppUtils.getUserID();
 
       var url = Uri.parse(
-          '${BASE_URL}api/calendar_events_mobile?client_id=${prefs.getString(AppConstants.USER_ID)}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1, selectedDate.minute - 1)}');
+          '${BASE_URL}api/calendar_events_mobile?client_id=${clientId}&start_date=$selectedDate&end_date=${DateTime(selectedDate.year, selectedDate.month, selectedDate.day + 1, selectedDate.minute - 1)}');
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();
