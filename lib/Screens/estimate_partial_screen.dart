@@ -1018,16 +1018,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.grey.shade50,
                               ),
-                              child:state is SendEstimateToCustomerLoadingState?const Center(
-                                child: CupertinoActivityIndicator(),
-                              ): const Text(
-                                "Send to customer",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.primaryColors,
-                                ),
-                              ),
+                              child: state is SendEstimateToCustomerLoadingState
+                                  ? const Center(
+                                      child: CupertinoActivityIndicator(),
+                                    )
+                                  : const Text(
+                                      "Send to customer",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: AppColors.primaryColors,
+                                      ),
+                                    ),
                             ),
                           ),
                         ),
@@ -2374,7 +2376,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
           taxAmount =
               taxAmount + (double.parse(element2.tax) * tempPrice / 100);
-          discountAmount = discountAmount + double.parse(element2.discount);
+          if (element2.discountType == "Fixed") {
+            discountAmount = discountAmount + double.parse(element2.discount);
+          } else {
+            discountAmount = discountAmount +
+                (double.parse(element2.discount) *
+                        double.parse(element2.unitPrice)) /
+                    100;
+          }
         });
       });
     });
