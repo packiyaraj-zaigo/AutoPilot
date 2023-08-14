@@ -43,7 +43,10 @@ class EditEstimateState extends EstimateState {
 
 class AddEstimateNoteState extends EstimateState {}
 
-class AddEstimateNoteErrorState extends EstimateState {}
+class AddEstimateNoteErrorState extends EstimateState {
+  final String errorMessage;
+  AddEstimateNoteErrorState({required this.errorMessage});
+}
 
 class CreateAppointmentEstimateState extends EstimateState {}
 
@@ -67,6 +70,8 @@ class GetSingleEstimateState extends EstimateState {
   final CreateEstimateModel createEstimateModel;
   GetSingleEstimateState({required this.createEstimateModel});
 }
+
+class GetSingleEstimateLoadingState extends EstimateState {}
 
 class GetEstimateNoteState extends EstimateState {
   final EstimateNoteModel estimateNoteModel;
@@ -101,7 +106,11 @@ class CreateOrderServiceState extends EstimateState {
   CreateOrderServiceState({required this.orderServiceId});
 }
 
+class CreateOrderServiceLoadingState extends EstimateState {}
+
 class CreateOrderServiceItemState extends EstimateState {}
+
+class CreateOrderServiceItemLoadingState extends EstimateState {}
 
 class DeleteOrderServiceState extends EstimateState {}
 

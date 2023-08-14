@@ -396,14 +396,14 @@ class _VechileInformationState extends State<VechileInformation> {
                                                     color: AppColors
                                                         .primaryGrayColors),
                                               ),
-                                              // Text(
-                                              //   "${vechile?.firstName ?? '-'}",
-                                              //   style: const TextStyle(
-                                              //       fontSize: 16,
-                                              //       fontWeight: FontWeight.w500,
-                                              //       color: AppColors
-                                              //           .primaryTitleColor),
-                                              // ),
+                                              Text(
+                                                "${vechile?.customer?.firstName ?? '-'}",
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: AppColors
+                                                        .primaryTitleColor),
+                                              ),
                                               AppUtils.verticalDivider(),
                                               const SizedBox(
                                                 height: 20,
@@ -686,12 +686,12 @@ class _VechileInformationState extends State<VechileInformation> {
                               ],
                             ),
                             onPressed: () {
-                              // Navigator.push(
-                              //     context,
-                              //     MaterialPageRoute(
-                              //         builder: (context) => CreateVehicleScreen(
-                              //               editVehicle: widget.vechile,
-                              //             )));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CreateVehicleScreen(
+                                            editVehicle: vechile,
+                                          )));
                             }),
                       ),
                       SizedBox(

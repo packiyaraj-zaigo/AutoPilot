@@ -568,13 +568,21 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
-                        context.read<EstimateBloc>().add(
-                            CreateOrderServiceEvent(
-                                orderId: widget.orderId,
-                                serviceName: item.serviceName,
-                                serviceNotes: item.serviceNote.toString(),
-                                laborRate: item.serviceEpa,
-                                tax: item.tax));
+                        // _debouncer.run(() {
+                        if (state is! CreateOrderServiceLoadingState &&
+                            state is! GetSingleEstimateLoadingState &&
+                            state is! CreateOrderServiceItemLoadingState) {
+                          context.read<EstimateBloc>().add(
+                              CreateOrderServiceEvent(
+                                  orderId: widget.orderId,
+                                  serviceName: item.serviceName,
+                                  serviceNotes: item.serviceNote.toString(),
+                                  laborRate: item.serviceEpa,
+                                  tax: item.tax));
+                        }
+                        //  });
+
+                        // Navigator.pop(context);
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),
