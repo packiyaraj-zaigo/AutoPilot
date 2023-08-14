@@ -385,13 +385,20 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                             borderRadius: BorderRadius.circular(12),
                             color: AppColors.primaryColors,
                           ),
-                          child: Text(
-                            widget.customerEdit != null ? "Update" : "Confirm",
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white),
-                          ),
+                          child: state is EditCustomerLoading ||
+                                  state is AddCustomerLoading
+                              ? const Center(
+                                  child: CupertinoActivityIndicator(),
+                                )
+                              : Text(
+                                  widget.customerEdit != null
+                                      ? "Update"
+                                      : "Confirm",
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
                         ),
                       ),
                       GestureDetector(
@@ -990,33 +997,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
           !addressErrorStatus &&
           !cityErrorStatus &&
           !zipCodeErrorStatus) {
-        context.read<CustomerBloc>().add(EditCustomerDetails(
-            context: context,
-            firstName: firstNameController.text,
-            lastName: lastNameController.text,
-            email: emailController.text,
-            mobileNo: phoneNumberController.text
-                .trim()
-                .replaceAll(RegExp(r'[^\w\s]+'), '')
-                .replaceAll(" ", ""),
-            customerNotes: customerNotesController.text,
-            address: addressController.text,
-            city: cityController.text,
-            state: provinceController.text,
-            stateId: provinceId == null
-                ? widget.customerEdit!.provinceId.toString()
-                : provinceId.toString(),
-            pinCode: zipCodeController.text,
-            id: widget.customerEdit!.id.toString()));
-      } else {
-        if (!firstNameErrorStatus &&
-            !lastNameErrorStatus &&
-            !emailErrorStatus &&
-            !phoneNumberErrorStatus &&
-            !addressErrorStatus &&
-            !cityErrorStatus &&
-            !zipCodeErrorStatus) {
-          context.read<CustomerBloc>().add(AddCustomerDetails(
+        if (state is! EditCustomerLoading) {
+          context.read<CustomerBloc>().add(EditCustomerDetails(
               context: context,
               firstName: firstNameController.text,
               lastName: lastNameController.text,
@@ -1029,8 +1011,37 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               address: addressController.text,
               city: cityController.text,
               state: provinceController.text,
-              stateId: provinceId.toString(),
-              pinCode: zipCodeController.text));
+              stateId: provinceId == null
+                  ? widget.customerEdit!.provinceId.toString()
+                  : provinceId.toString(),
+              pinCode: zipCodeController.text,
+              id: widget.customerEdit!.id.toString()));
+        }
+      } else {
+        if (!firstNameErrorStatus &&
+            !lastNameErrorStatus &&
+            !emailErrorStatus &&
+            !phoneNumberErrorStatus &&
+            !addressErrorStatus &&
+            !cityErrorStatus &&
+            !zipCodeErrorStatus) {
+          if (state is! AddCustomerLoading) {
+            context.read<CustomerBloc>().add(AddCustomerDetails(
+                context: context,
+                firstName: firstNameController.text,
+                lastName: lastNameController.text,
+                email: emailController.text,
+                mobileNo: phoneNumberController.text
+                    .trim()
+                    .replaceAll(RegExp(r'[^\w\s]+'), '')
+                    .replaceAll(" ", ""),
+                customerNotes: customerNotesController.text,
+                address: addressController.text,
+                city: cityController.text,
+                state: provinceController.text,
+                stateId: provinceId.toString(),
+                pinCode: zipCodeController.text));
+          }
         }
       }
     });

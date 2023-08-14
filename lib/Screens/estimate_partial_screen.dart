@@ -189,6 +189,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
             print(networkImageList.length);
             print(networkImageList);
+          } else if (state is AddEstimateNoteErrorState) {
+            CommonWidgets().showDialog(context, state.errorMessage);
           }
           //  else if (state is EstimateCreateOrderImageState) {
           //   print("image ui state emitted");
@@ -1016,7 +1018,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 borderRadius: BorderRadius.circular(12),
                                 color: Colors.grey.shade50,
                               ),
-                              child: const Text(
+                              child:state is SendEstimateToCustomerLoadingState?const Center(
+                                child: CupertinoActivityIndicator(),
+                              ): const Text(
                                 "Send to customer",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -1838,8 +1842,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           "Please select a customer before adding a service");
                     }
                   } else {
-                    CommonWidgets().showDialog(context,
-                        "Please save the unsaved changes before selecting the service");
+                    // CommonWidgets().showDialog(context,
+                    //     "Please save the unsaved changes before selecting the service");
+
+                    showPopUpBeforeService(context);
                   }
                 }
               },
@@ -3907,6 +3913,271 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       onPressed: () {
                         context.read<EstimateBloc>().add(DeleteEstimateEvent(
                             id: widget.estimateDetails.data.id.toString()));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future showPopUpBeforeService(BuildContext ctx) {
+    return showCupertinoDialog(
+      context: ctx,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is AddEstimateNoteState ||
+                state is CreateAppointmentEstimateState) {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return SelectServiceScreen(
+                    orderId: widget.estimateDetails.data.id.toString(),
+                    navigation: widget.navigation,
+                  );
+                },
+              ));
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Save Changes?"),
+                content: const Text(
+                    "Save the unsaved changes before creating a service"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        bool validateDurations(
+                            String firstDurationStr, String secondDurationStr) {
+                          if (firstDurationStr.isEmpty &&
+                              secondDurationStr.isEmpty) {
+                            return true;
+                          }
+                          // Parse the durations into hours and minutes
+                          List<String> firstParts = firstDurationStr.split(':');
+                          List<String> secondParts =
+                              secondDurationStr.split(':');
+                          int firstHours = int.parse(firstParts[0]);
+                          int firstMinutes = int.parse(firstParts[1]);
+                          int secondHours = int.parse(secondParts[0]);
+                          int secondMinutes = int.parse(secondParts[1]);
+
+                          // Convert the durations to total minutes for comparison
+                          int firstTotalMinutes =
+                              firstHours * 60 + firstMinutes;
+                          int secondTotalMinutes =
+                              secondHours * 60 + secondMinutes;
+
+                          // Compare the durations and return the result
+                          return firstTotalMinutes < secondTotalMinutes;
+                        }
+
+                        bool isError = false;
+
+                        if (startTimeController.text.isNotEmpty &&
+                            endTimeController.text.isNotEmpty &&
+                            dateController.text.isNotEmpty &&
+                            appointmentController.text.isNotEmpty) {
+                          final validate = validateDurations(
+                              startTimeController.text.trim(),
+                              endTimeController.text.trim());
+
+                          if (!validate) {
+                            CommonWidgets().showDialog(context,
+                                'Start time should be less than end time');
+                            return;
+                          }
+
+                          if (isAppointmentEdit == false) {
+                            context.read<EstimateBloc>().add(
+                                  CreateAppointmentEstimateEvent(
+                                    startTime: dateController.text +
+                                        " " +
+                                        startTimeController.text,
+                                    endTime: dateController.text +
+                                        " " +
+                                        endTimeController.text,
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString(),
+                                    appointmentNote: appointmentController.text,
+                                    customerId: widget
+                                        .estimateDetails.data.customerId
+                                        .toString(),
+                                    vehicleId: widget
+                                            .estimateDetails.data.vehicle?.id
+                                            .toString() ??
+                                        "0",
+                                  ),
+                                );
+
+                            context.read<EstimateBloc>().add(EditEstimateEvent(
+                                id: widget.estimateDetails.data.vehicle?.id
+                                        .toString() ??
+                                    "0",
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
+                                which: "vehicle",
+                                customerId: widget
+                                        .estimateDetails.data.customer?.id
+                                        .toString() ??
+                                    "",
+                                dropScedule: dateController.text));
+                          } else {
+                            print("editteeddd");
+                            // if (int.parse(startTimeController.text
+                            //         .substring(0, 2)) <
+                            //     int.parse(
+                            //         endTimeController.text.substring(0, 2))) {
+                            //   print(
+                            //       startTimeController.text + "starttt timee");
+
+                            //   print(endTimeController.text + "endddd timee");
+
+                            //   CommonWidgets().showDialog(context,
+                            //       'Appointment start time should be less than appointment end time');
+                            //   isError = true;
+                            // } else {
+                            context.read<EstimateBloc>().add(
+                                EditAppointmentEstimateEvent(
+                                    startTime: dateController.text +
+                                        " " +
+                                        startTimeController.text,
+                                    endTime: dateController.text +
+                                        " " +
+                                        endTimeController.text,
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString(),
+                                    appointmentNote: appointmentController.text,
+                                    customerId: widget
+                                        .estimateDetails.data.customerId
+                                        .toString(),
+                                    vehicleId: widget
+                                            .estimateDetails.data.vehicle?.id
+                                            .toString() ??
+                                        "",
+                                    id: estimateAppointmentEditId));
+
+                            context.read<EstimateBloc>().add(EditEstimateEvent(
+                                id: widget.estimateDetails.data.vehicle?.id
+                                        .toString() ??
+                                    "0",
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
+                                which: "vehicle",
+                                customerId: widget
+                                        .estimateDetails.data.customer?.id
+                                        .toString() ??
+                                    "",
+                                dropScedule: dateController.text));
+                          }
+                        }
+
+                        final validate = validateDurations(
+                            startTimeController.text.trim(),
+                            endTimeController.text.trim());
+
+                        if (estimateNoteController.text.isNotEmpty &&
+                            validate) {
+                          if (!isEstimateNoteEdit) {
+                            context.read<EstimateBloc>().add(
+                                AddEstimateNoteEvent(
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString(),
+                                    comment: estimateNoteController.text));
+                          } else {
+                            context.read<EstimateBloc>().add(
+                                EditEstimateNoteEvent(
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString(),
+                                    comment: estimateNoteController.text,
+                                    id: estimateNoteEditId));
+                          }
+                        }
+                        //  }
+                        if (networkImageList.isNotEmpty) {
+                          context.read<EstimateBloc>().add(
+                                CreateOrderImageEvent(
+                                  imageUrlList:
+                                      networkImageList.where((element) {
+                                    return element != "";
+                                  }).toList(),
+                                  inspectionId: "",
+                                  orderId:
+                                      widget.estimateDetails.data.id.toString(),
+                                ),
+                              );
+                        }
+
+                        if (!isError) {
+                          if (isCustomerEdit) {
+                            CommonWidgets().showDialog(
+                                context, "Please select a customer");
+                          } else if (widget.navigation ==
+                              "customer_navigation") {
+                            final estimate = widget.estimateDetails.data;
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => CustomerInformationScreen(
+                                  id: estimate.customerId.toString(),
+                                  customerData: cm.Datum(
+                                    id: estimate.customerId,
+                                    clientId: estimate.clientId,
+                                    email: estimate.customer?.email ?? '',
+                                    firstName:
+                                        estimate.customer?.firstName ?? '',
+                                    lastName: estimate.customer?.lastName ?? '',
+                                    notes: "",
+                                    companyName: "",
+                                    referralSource: "",
+                                    fleet: "",
+                                    addressLine1: "",
+                                    addressLine2: "",
+                                    townCity: "",
+                                    provinceId: 0,
+                                    zipcode: "",
+                                    phone: "",
+                                    labels: "",
+                                    isTax: 0,
+                                    tax: "",
+                                    isDiscount: 0,
+                                    discountPercentge: "",
+                                    discountType: "",
+                                    isLaborMatrix: 0,
+                                    laborMatrixId: 0,
+                                    pricingMatrixId: 0,
+                                    isLaborRate: 0,
+                                    laborRate: "",
+                                    periodicalMaintenanceNotifications: 0,
+                                    provinceName: 0,
+                                    pricingMatrix: 0,
+                                    laborMatrix: 0,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                          //  else {
+                          //   Navigator.pushAndRemoveUntil(context,
+                          //       MaterialPageRoute(
+                          //     builder: (context) {
+                          //       return BottomBarScreen(
+                          //         currentIndex: 3,
+                          //         tabControllerIndex: widget.controllerIndex,
+                          //       );
+                          //     },
+                          //   ), (route) => false);
+                          // }
+                        }
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),

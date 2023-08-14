@@ -187,14 +187,20 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           event.orderId, event.comment, token);
 
       log("res${addEstimateNoteRes.body}");
+      Map decodedBody = json.decode(addEstimateNoteRes.body);
 
       if (addEstimateNoteRes.statusCode == 201) {
         emit(AddEstimateNoteState());
       } else {
-        emit(AddEstimateNoteErrorState());
+        if (decodedBody.containsKey("comments")) {
+          emit(AddEstimateNoteErrorState(
+              errorMessage: decodedBody["comments"][0]));
+        } else {
+          emit(AddEstimateNoteErrorState(errorMessage: "Something went wrong"));
+        }
       }
     } catch (e, s) {
-      emit(AddEstimateNoteErrorState());
+      emit(AddEstimateNoteErrorState(errorMessage: "Something went wrong"));
 
       print(e.toString());
       print(s);
@@ -332,6 +338,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     Emitter<EstimateState> emit,
   ) async {
     try {
+      emit(GetSingleEstimateLoadingState());
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString(AppConstants.USER_TOKEN);
       CreateEstimateModel createEstimateModel;
@@ -556,6 +563,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     Emitter<EstimateState> emit,
   ) async {
     try {
+      emit(CreateOrderServiceLoadingState());
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString(AppConstants.USER_TOKEN);
 
@@ -592,6 +600,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     Emitter<EstimateState> emit,
   ) async {
     try {
+      emit(CreateOrderServiceItemLoadingState());
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString(AppConstants.USER_TOKEN);
       Response createOrderServiceItem =

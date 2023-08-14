@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/single_vehicle_info_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vin_global_response.dart';
@@ -28,7 +29,7 @@ class CreateVehicleScreen extends StatefulWidget {
   });
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
-  final Datum? editVehicle;
+  final Vehicle? editVehicle;
   final String? navigation;
   final String? customerId;
 
@@ -105,11 +106,10 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     licController.text = widget.editVehicle!.licencePlate ?? "";
     typeController.text = widget.editVehicle!.vehicleType;
     vinController.text = widget.editVehicle!.vin ?? '';
-    customerController.text =
-        ((widget.editVehicle!.customer?['first_name'] ?? '') +
-                " " +
-                (widget.editVehicle!.customer?['last_name'] ?? ''))
-            .trim();
+    customerController.text = ((widget.editVehicle!.customer?.firstName ?? '') +
+            " " +
+            (widget.editVehicle!.customer?.lastName ?? ''))
+        .trim();
     customerId = widget.editVehicle!.customerId ?? 0;
     log(customerId.toString());
   }
@@ -157,7 +157,9 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                   if (state is CreateVehicleErrorState) {
                     CommonWidgets().showDialog(context, state.message);
                   } else if (state is CreateVehicleSuccessState) {
-                    if (widget.navigation != null &&
+                    if (widget.navigation == "partial_estimate") {
+                      Navigator.pop(context);
+                    } else if (widget.navigation != null &&
                         !isChecked &&
                         widget.navigation != "estimate_screen") {
                       log('here');
