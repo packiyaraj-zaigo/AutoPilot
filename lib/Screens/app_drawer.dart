@@ -1,8 +1,8 @@
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
-import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
+import 'package:auto_pilot/Screens/legal.dart';
 import 'package:auto_pilot/Screens/parts_list_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/Screens/time_card_screen.dart';
@@ -10,7 +10,6 @@ import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,21 +36,13 @@ showDrawer(BuildContext context) {
             ),
             accountEmail: Text(
               userName.isNotEmpty
-                  ? "${userName[0].toUpperCase() + userName.substring(1)}"
+                  ? userName[0].toUpperCase() + userName.substring(1)
                   : "",
               style: const TextStyle(
                   fontSize: 28,
                   color: AppColors.primaryTitleColor,
                   fontWeight: FontWeight.w600),
             ),
-            // currentAccountPictureSize: Size.square(50),
-            // currentAccountPicture: CircleAvatar(
-            //   backgroundColor: Color.fromARGB(255, 165, 255, 137),
-            //   child: Text(
-            //     "A",
-            //     style: TextStyle(fontSize: 30.0, color: Colors.blue),
-            //   ), //Text
-            // ), //circleAvatar
           ), //UserAccountDrawerHeader
         ),
         const SizedBox(
@@ -60,7 +51,7 @@ showDrawer(BuildContext context) {
         drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard",
             context, BottomBarScreen()),
         drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees",
-            context, EmployeeListScreen()),
+            context, const EmployeeListScreen()),
         drawerTileWidget(
             "assets/images/customer_drawer_icon.svg",
             "Customers",
@@ -68,8 +59,7 @@ showDrawer(BuildContext context) {
             // DummyScreen(
             //   name: "Customer Screen",
             // )),
-            CustomersScreen()),
-        //  CustomersScreen()),
+            const CustomersScreen()),
         drawerTileWidget(
             "assets/images/vehicle_drawer_icon.svg",
             "Vehicles",
@@ -77,11 +67,9 @@ showDrawer(BuildContext context) {
             // DummyScreen(
             //   name: "Vehicle Screen",
             // )),
-            VehiclesScreen()),
-        // VehiclesScreen()),
-
+            const VehiclesScreen()),
         drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
-            context, PartsScreen()),
+            context, const PartsScreen()),
         drawerTileWidget(
             "assets/images/service_drawer_icon.svg",
             "Services",
@@ -89,20 +77,20 @@ showDrawer(BuildContext context) {
             // DummyScreen(
             // name: "Service Screen",
             // )),
-            ServicesListScreen()),
+            const ServicesListScreen()),
         // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
         //     context, BottomBarScreen()),
         drawerTileWidget(
           "assets/images/time_card_drawer_icon.svg",
           "Time Cards",
           context,
-          TimeCardsScreen(),
+          const TimeCardsScreen(),
         ),
         const SizedBox(
           height: 52,
         ),
         drawerBottomTile("Settings", context, BottomBarScreen()),
-        drawerBottomTile("Legal", context, BottomBarScreen()),
+        drawerBottomTile("Legal", context, const LegalScreen()),
         drawerBottomTile("About", context, BottomBarScreen()),
         drawerBottomTile("Sign Out", context, BottomBarScreen()),
         const SizedBox(
@@ -159,25 +147,29 @@ Widget drawerTileWidget(
 
 Widget drawerBottomTile(String label, BuildContext context, constructor) {
   return GestureDetector(
+    behavior: HitTestBehavior.translucent,
     onTap: () async {
       if (label == "Sign Out") {
-        AppUtils.setToken("");
-        AppUtils.setUserName("");
-        AppUtils.setTokenValidity('');
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setBool('add_company', false);
-
         Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
           builder: (context) {
             return const WelcomeScreen();
           },
         ), (route) => false);
+        AppUtils.setToken("");
+        AppUtils.setUserName("");
+        AppUtils.setTokenValidity('');
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setBool('add_company', false);
+      } else if (label == "Legal") {
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => constructor,
+        ));
       } else {
         Navigator.pop(context);
       }
     },
     child: Padding(
-      padding: const EdgeInsets.only(left: 33.0, top: 26),
+      padding: const EdgeInsets.only(left: 33.0, top: 13, bottom: 13),
       child: Text(
         label,
         style: const TextStyle(
