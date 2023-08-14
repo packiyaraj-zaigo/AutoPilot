@@ -1595,7 +1595,8 @@ class ApiProvider {
         ..fields['service_name'] = serviceName
         ..fields['service_note'] = serviceNotes
         ..fields['technician_id'] = "0"
-        ..fields['service_price'] = servicePrice;
+        ..fields['service_price'] = servicePrice
+        ..fields["tax"] = tax;
 
       request.headers.addAll(getHeader(token));
       inspect(request);
@@ -1771,7 +1772,8 @@ class ApiProvider {
         "template_id": 2,
         "subject": subject,
         "send_email": true,
-        "notes": "Test"
+        "notes": "Test",
+        "enable_signature": true
       };
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse('${BASE_URL}api/authorize_digital_signatures');

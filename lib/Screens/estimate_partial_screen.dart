@@ -1650,7 +1650,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           : Row(
                               children: [
                                 Text(
-                                    "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  "),
+                                    "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  ",
+                                    style: const TextStyle(
+                                color: AppColors.primaryTitleColor,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                overflow: TextOverflow.ellipsis),),
                                 GestureDetector(
                                   onTap: () {
                                     showModalBottomSheet(
@@ -2411,6 +2416,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     totalAmount = 0;
     balanceDueAmount = 0;
     widget.estimateDetails.data.orderService?.forEach((element) {
+      if (element.orderServiceItems!.isEmpty) {
+        laborAmount += double.parse(element.servicePrice);
+        taxAmount += double.parse(element.tax);
+      }
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
           setState(() {
