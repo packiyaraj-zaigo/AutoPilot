@@ -794,7 +794,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
             height: 56,
-            width: label == "Price" || label == "Cost"
+            width: label == "Price" || label == "Cost" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
@@ -1471,6 +1471,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addPartNameController = TextEditingController();
     final addPartDescriptionController = TextEditingController();
     final addPartPriceController = TextEditingController();
+    final addPartQuantityController = TextEditingController(text: '0');
     final addPartCostController = TextEditingController();
     final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
@@ -1479,6 +1480,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String addPartNameErrorStatus = '';
     String addPartDescriptionErrorStatus = '';
     String addPartPriceErrorStatus = '';
+    String addPartQuantityErrorStatus = '';
     String addPartCostErrorStatus = '';
     String addPartDiscountErrorStatus = '';
     String adddPartPartNumberErrorStatus = '';
@@ -1507,6 +1509,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addPartPriceErrorStatus = '';
       }
+      if (addPartQuantityController.text.trim().isEmpty) {
+        addPartQuantityErrorStatus = "Quantity can't be empty";
+        status = false;
+      } else {
+        addPartQuantityErrorStatus = '';
+      }
       if (addPartDiscountController.text.trim().isEmpty) {
         addPartDiscountErrorStatus = "Discount can't be empty";
         status = false;
@@ -1529,43 +1537,62 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addPartPriceController.text.isNotEmpty) {
-        if (client?.taxOnParts == "N") {
-          if (addPartDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addPartPriceController.text) ?? 0);
-          } else {
-            double discount =
-                double.tryParse(addPartDiscountController.text) ?? 0;
-            if (isPercentage) {
-              discount = ((double.tryParse(addPartPriceController.text) ?? 0) *
-                      (double.tryParse(addPartDiscountController.text) ?? 0)) /
-                  100;
+        if (addPartQuantityController.text.isNotEmpty) {
+          double quantity =
+              double.tryParse(addPartQuantityController.text) ?? 1;
+          if (client?.taxOnParts == "N") {
+            if (addPartDiscountController.text.isEmpty) {
+              subTotal = (double.tryParse(addPartPriceController.text) ?? 0) *
+                  quantity;
+            } else {
+              double discount =
+                  double.tryParse(addPartDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount =
+                    (((double.tryParse(addPartPriceController.text) ?? 0) *
+                                quantity) *
+                            (double.tryParse(addPartDiscountController.text) ??
+                                0)) /
+                        100;
+              }
+              subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                      quantity) -
+                  discount;
             }
-            subTotal =
-                (double.tryParse(addPartPriceController.text) ?? 0) - discount;
-          }
-          total = subTotal;
-        } else {
-          final tax = (double.tryParse(client?.salesTaxRate ?? '') ?? 0) / 100;
-          if (addPartDiscountController.text.isEmpty) {
-            subTotal =
-                (double.tryParse(addPartPriceController.text) ?? 0) * tax +
-                    (double.tryParse(addPartPriceController.text) ?? 0);
-            total = (double.tryParse(addPartPriceController.text) ?? 0);
+            total = subTotal;
           } else {
-            double discount =
-                double.tryParse(addPartDiscountController.text) ?? 0;
-            if (isPercentage) {
-              discount = ((double.tryParse(addPartPriceController.text) ?? 0) *
-                      (double.tryParse(addPartDiscountController.text) ?? 0)) /
-                  100;
+            final tax =
+                (double.tryParse(client?.salesTaxRate ?? '') ?? 0) / 100;
+            if (addPartDiscountController.text.isEmpty) {
+              subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                          quantity) *
+                      tax +
+                  ((double.tryParse(addPartPriceController.text) ?? 0) *
+                      quantity);
+              total = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                  quantity);
+            } else {
+              double discount =
+                  double.tryParse(addPartDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount =
+                    (((double.tryParse(addPartPriceController.text) ?? 0) *
+                                quantity) *
+                            (double.tryParse(addPartDiscountController.text) ??
+                                0)) /
+                        100;
+              }
+              subTotal = (((double.tryParse(addPartPriceController.text) ?? 0) *
+                              quantity) -
+                          discount) *
+                      tax +
+                  (((double.tryParse(addPartPriceController.text) ?? 0) *
+                          quantity) -
+                      discount);
+              total = (((double.tryParse(addPartPriceController.text) ?? 0) *
+                      quantity) -
+                  discount);
             }
-            subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                        discount) *
-                    tax +
-                ((double.tryParse(addPartPriceController.text) ?? 0) -
-                    discount);
-            total = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                discount);
           }
         }
       }
@@ -1623,18 +1650,41 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           textBox(
-                              "Amount",
+                              "Enter Price",
                               addPartPriceController,
                               "Price",
                               addPartPriceErrorStatus.isNotEmpty,
                               context,
                               true,
                               newSetState),
-                          pricingModelDropDown()
+                          textBox(
+                              "Amount",
+                              addPartQuantityController,
+                              "Quantity",
+                              addPartQuantityErrorStatus.isNotEmpty,
+                              context,
+                              true,
+                              newSetState),
                         ],
                       ),
                     ),
-                    errorWidget(error: addPartPriceErrorStatus),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.7,
+                          child: errorWidget(
+                            error: addPartPriceErrorStatus,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.7,
+                          child: errorWidget(
+                            error: addPartQuantityErrorStatus,
+                          ),
+                        ),
+                      ],
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox("Amount", addPartCostController, "Cost ",
@@ -1844,6 +1894,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               itemName: addPartNameController.text,
                               unitPrice: addPartPriceController.text,
                               discount: addPartDiscountController.text,
+                              quanityHours: addPartQuantityController.text,
                               discountType:
                                   isPercentage ? "Percentage" : "Fixed",
                               itemType: "Part",
