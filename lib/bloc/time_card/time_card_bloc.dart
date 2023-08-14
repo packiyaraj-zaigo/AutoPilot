@@ -17,6 +17,7 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
   bool isLoading = false;
   int currentPage = 1;
   int totalPages = 1;
+  final apiRepo = ApiRepository();
 
   TimeCardBloc() : super(TimeCardInitial()) {
     on<GetAllTimeCardsEvent>(getAllTimeCards);
@@ -33,9 +34,10 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
     }
     try {
       final token = await AppUtils.getToken();
-      final Response response = await ApiProvider().getAllTimeCards(token);
+      final Response response = await apiRepo.getAllTimeCards(token);
       final body = jsonDecode(response.body);
       if (response.statusCode == 200) {
+        log(body.toString() + "BODY");
         log(body['data'].toString());
         final List<TimeCardModel> timeCards = [];
         if (body['data'] != null && body['data'].isNotEmpty) {
@@ -61,7 +63,7 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
     try {
       final token = await AppUtils.getToken();
       final Response response =
-          await ApiRepository().createTimeCard(token, event.timeCard);
+          await apiRepo.createTimeCard(token, event.timeCard);
       final body = jsonDecode(response.body);
       if (response.statusCode == 201) {
         emit(CreateTimeCardSucessState());
