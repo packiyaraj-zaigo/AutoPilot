@@ -1087,11 +1087,46 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  color: balanceDueAmount <= 0
-                                      ? const Color(0xff12A58C)
-                                      : AppColors.primaryColors),
+                                  color:
+                                      balanceDueAmount <= 0 &&
+                                              widget.estimateDetails.data
+                                                      .orderService !=
+                                                  null &&
+                                              widget.estimateDetails.data
+                                                  .orderService!.isNotEmpty &&
+                                              widget
+                                                      .estimateDetails
+                                                      .data
+                                                      .orderService![0]
+                                                      .orderServiceItems !=
+                                                  null &&
+                                              widget
+                                                  .estimateDetails
+                                                  .data
+                                                  .orderService![0]
+                                                  .orderServiceItems!
+                                                  .isNotEmpty
+                                          ? const Color(0xff12A58C)
+                                          : AppColors.primaryColors),
                               child: Text(
-                                balanceDueAmount <= 0
+                                balanceDueAmount <= 0 &&
+                                        widget.estimateDetails.data
+                                                .orderService !=
+                                            null &&
+                                        widget.estimateDetails.data
+                                            .orderService!.isNotEmpty &&
+                                        widget
+                                                .estimateDetails
+                                                .data
+                                                .orderService![0]
+                                                .orderServiceItems !=
+                                            null &&
+                                        widget
+                                            .estimateDetails
+                                            .data
+                                            .orderService![0]
+                                            .orderServiceItems!
+                                            .isNotEmpty
                                     ? "Paid In Full"
                                     : "Collect Payment",
                                 style: const TextStyle(
@@ -1589,24 +1624,58 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         fontSize: 16,
                         fontWeight: FontWeight.w600),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      showModalBottomSheet(
-                        context: context,
-                        builder: (context) {
-                          return editServiceSheet(
-                              widget.estimateDetails.data
-                                      .orderService?[serviceIndex].id
-                                      .toString() ??
-                                  "",
-                              serviceIndex);
-                        },
-                      );
-                    },
-                    child: const Icon(
-                      Icons.more_horiz,
-                      color: AppColors.primaryColors,
-                    ),
+                  Row(
+                    children: [
+                      widget.estimateDetails.data.orderService![serviceIndex]
+                              .orderServiceItems!.isNotEmpty
+                          ? GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return editServiceSheet(
+                                        widget.estimateDetails.data
+                                                .orderService?[serviceIndex].id
+                                                .toString() ??
+                                            "",
+                                        serviceIndex);
+                                  },
+                                );
+                              },
+                              child: const Icon(
+                                Icons.more_horiz,
+                                color: AppColors.primaryColors,
+                              ),
+                            )
+                          : Row(
+                              children: [
+                                Text(
+                                    "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  "),
+                                GestureDetector(
+                                  onTap: () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      builder: (context) {
+                                        return editServiceSheet(
+                                            widget
+                                                    .estimateDetails
+                                                    .data
+                                                    .orderService?[serviceIndex]
+                                                    .id
+                                                    .toString() ??
+                                                "",
+                                            serviceIndex);
+                                      },
+                                    );
+                                  },
+                                  child: const Icon(
+                                    Icons.more_horiz,
+                                    color: AppColors.primaryColors,
+                                  ),
+                                )
+                              ],
+                            ),
+                    ],
                   )
                 ],
               ),
@@ -2371,8 +2440,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         }
 
         setState(() {
-          double tempPrice = double.parse(element2.unitPrice) -
-              double.parse(element2.discount);
+          double tempPrice = 0.00;
+          if (element2.discountType == "Fixed") {
+            tempPrice = double.parse(element2.unitPrice) -
+                double.parse(element2.discount);
+          } else {
+            tempPrice = double.parse(element2.unitPrice) -
+                (double.parse(element2.discount) *
+                        double.parse(element2.unitPrice)) /
+                    100;
+          }
 
           taxAmount =
               taxAmount + (double.parse(element2.tax) * tempPrice / 100);

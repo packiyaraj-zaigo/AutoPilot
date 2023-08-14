@@ -115,13 +115,14 @@ class DeleteOrderImageEvent extends EstimateEvent {
 }
 
 class CreateOrderServiceEvent extends EstimateEvent {
-  final String orderId, serviceName, serviceNotes, laborRate, tax;
+  final String orderId, serviceName, serviceNotes, laborRate, tax, servicePrice;
   CreateOrderServiceEvent(
       {required this.orderId,
       required this.serviceName,
       required this.serviceNotes,
       required this.laborRate,
-      required this.tax});
+      required this.tax,
+      required this.servicePrice});
 }
 
 class CreateOrderServiceItemEvent extends EstimateEvent {

@@ -1583,7 +1583,8 @@ class ApiProvider {
       String serviceName,
       String serviceNotes,
       String laborRate,
-      String tax) async {
+      String tax,
+      String servicePrice) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -1593,7 +1594,8 @@ class ApiProvider {
         ..fields['order_id'] = orderId
         ..fields['service_name'] = serviceName
         ..fields['service_note'] = serviceNotes
-        ..fields['technician_id'] = "0";
+        ..fields['technician_id'] = "0"
+        ..fields['service_price'] = servicePrice;
 
       request.headers.addAll(getHeader(token));
       inspect(request);
