@@ -1,7 +1,10 @@
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Screens/employee_details_screen.dart';
+import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/src/material/dialog.dart' as dialog;
+import 'package:flutter_svg/svg.dart';
 
 class CommonWidgets {
   Future showDialog(BuildContext context, message) {
@@ -22,6 +25,40 @@ class CommonWidgets {
 
   employeeCard({required Employee item}) {
     return _EmployeeCard(item: item);
+  }
+
+  showSuccessDialog(BuildContext context, String message) {
+    return dialog.showDialog(
+      context: context,
+      builder: (context) {
+        Future.delayed(const Duration(seconds: 2)).then((value) {
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        });
+        return AlertDialog(
+          scrollable: true,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          content: Column(
+            children: [
+              SvgPicture.asset("assets/images/success_icon.svg"),
+              const SizedBox(
+                height: 16,
+              ),
+              Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.primaryTitleColor,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
 

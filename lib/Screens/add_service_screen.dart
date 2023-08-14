@@ -840,7 +840,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   : [],
               maxLength: 25,
               decoration: InputDecoration(
-                suffixIcon: label == 'Discount' || label.contains("Labor Rate")
+                suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
                         CupertinoIcons.money_dollar,
                         color: AppColors.primaryColors,
@@ -1048,6 +1048,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
@@ -1097,9 +1098,19 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               subTotal =
                   (double.tryParse(addMaterialPriceController.text) ?? 0);
             } else {
-              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                      0) -
-                  (double.tryParse(addMaterialDiscountController.text) ?? 0));
+              if (isPercentage) {
+                subTotal = (double.tryParse(addMaterialPriceController.text) ??
+                        0) -
+                    ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+                            (double.tryParse(
+                                    addMaterialDiscountController.text) ??
+                                0)) /
+                        100;
+              } else {
+                subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+                        0) -
+                    (double.tryParse(addMaterialDiscountController.text) ?? 0));
+              }
             }
             total = subTotal;
           } else {
@@ -1113,17 +1124,24 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       (double.tryParse(addMaterialPriceController.text) ?? 0);
               total = (double.tryParse(addMaterialPriceController.text) ?? 0);
             } else {
-              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                              0) -
-                          (double.tryParse(
-                                  addMaterialDiscountController.text) ??
-                              0)) *
-                      tax +
+              double discount =
+                  double.tryParse(addMaterialDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount = ((double.tryParse(addMaterialPriceController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialDiscountController.text) ??
+                            0)) /
+                    100;
+              }
+
+              subTotal =
                   ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                      (double.tryParse(addMaterialDiscountController.text) ??
-                          0));
-              total = ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                  (double.tryParse(addMaterialDiscountController.text) ?? 0));
+                              discount) *
+                          tax +
+                      ((double.tryParse(addMaterialPriceController.text) ?? 0) -
+                          discount);
+              total = (double.tryParse(addMaterialPriceController.text) ?? 0) -
+                  (discount);
             }
           }
         }
@@ -1213,55 +1231,98 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       errorWidget(error: addMaterialCostErrorStatus),
                       Padding(
                         padding: EdgeInsets.only(top: 17),
-                        child: textBox(
-                            "Enter Amount",
-                            addMaterialDiscountController,
-                            "Discount",
-                            addMaterialDiscountErrorStatus.isNotEmpty,
-                            context,
-                            true,
-                            newSetState),
-                      ),
-                      errorWidget(error: addMaterialDiscountErrorStatus),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 17),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Stack(
                           children: [
-                            const Text(
-                              "Label",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xff6A7187),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                newSetState(() {
-                                  tagDataList.add("Tag");
-                                });
-                              },
-                              child: const Row(
+                            textBox(
+                                "Enter Amount",
+                                addMaterialDiscountController,
+                                "Discount",
+                                addMaterialDiscountErrorStatus.isNotEmpty,
+                                context,
+                                true,
+                                newSetState),
+                            Positioned(
+                              right: 10,
+                              top: 42,
+                              child: Row(
                                 children: [
-                                  Icon(
-                                    Icons.add,
-                                    color: AppColors.primaryColors,
+                                  GestureDetector(
+                                    onTap: () {
+                                      isPercentage = false;
+                                      newSetState(() {});
+                                    },
+                                    child: Icon(
+                                      CupertinoIcons.money_dollar,
+                                      color: isPercentage
+                                          ? AppColors.greyText
+                                          : AppColors.primaryColors,
+                                    ),
                                   ),
                                   Text(
-                                    "Add New",
+                                    '  /  ',
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryColors,
+                                      color: AppColors.greyText,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      isPercentage = true;
+                                      newSetState(() {});
+                                    },
+                                    child: Icon(
+                                      Icons.percent,
+                                      color: !isPercentage
+                                          ? AppColors.greyText
+                                          : AppColors.primaryColors,
                                     ),
                                   ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
+                      errorWidget(error: addMaterialDiscountErrorStatus),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 17),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       const Text(
+                      //         "Label",
+                      //         style: TextStyle(
+                      //           fontSize: 14,
+                      //           fontWeight: FontWeight.w500,
+                      //           color: Color(0xff6A7187),
+                      //         ),
+                      //       ),
+                      //       GestureDetector(
+                      //         onTap: () {
+                      //           newSetState(() {
+                      //             tagDataList.add("Tag");
+                      //           });
+                      //         },
+                      //         child: const Row(
+                      //           children: [
+                      //             Icon(
+                      //               Icons.add,
+                      //               color: AppColors.primaryColors,
+                      //             ),
+                      //             Text(
+                      //               "Add New",
+                      //               style: TextStyle(
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w600,
+                      //                 color: AppColors.primaryColors,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
                       GridView.builder(
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1361,6 +1422,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           onPressed: () {
                             final status = addMaterialValidation(newSetState);
                             if (status) {
+                              final focus = FocusNode().requestFocus();
                               material.add(CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
                                 note: addMaterialDescriptionController.text,
@@ -1368,6 +1430,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 itemName: addMaterialNameController.text,
                                 unitPrice: addMaterialPriceController.text,
                                 discount: addMaterialDiscountController.text,
+                                discountType:
+                                    isPercentage ? "Percentage" : "Fixed",
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
                               ));
@@ -1422,6 +1486,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
@@ -1469,8 +1534,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           if (addPartDiscountController.text.isEmpty) {
             subTotal = (double.tryParse(addPartPriceController.text) ?? 0);
           } else {
-            subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                (double.tryParse(addPartDiscountController.text) ?? 0));
+            double discount =
+                double.tryParse(addPartDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                      (double.tryParse(addPartDiscountController.text) ?? 0)) /
+                  100;
+            }
+            subTotal =
+                (double.tryParse(addPartPriceController.text) ?? 0) - discount;
           }
           total = subTotal;
         } else {
@@ -1481,14 +1553,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     (double.tryParse(addPartPriceController.text) ?? 0);
             total = (double.tryParse(addPartPriceController.text) ?? 0);
           } else {
+            double discount =
+                double.tryParse(addPartDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                      (double.tryParse(addPartDiscountController.text) ?? 0)) /
+                  100;
+            }
             subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                        (double.tryParse(addPartDiscountController.text) ??
-                            0)) *
+                        discount) *
                     tax +
                 ((double.tryParse(addPartPriceController.text) ?? 0) -
-                    (double.tryParse(addPartDiscountController.text) ?? 0));
+                    discount);
             total = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                (double.tryParse(addPartDiscountController.text) ?? 0));
+                discount);
           }
         }
       }
@@ -1564,58 +1642,101 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           addPartCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addPartCostErrorStatus),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: textBox(
-                        "Enter Amount",
-                        addPartDiscountController,
-                        "Discount",
-                        addPartDiscountErrorStatus.isNotEmpty,
-                        context,
-                        true,
-                        newSetState,
-                      ),
+                    Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 17),
+                          child: textBox(
+                            "Enter Amount",
+                            addPartDiscountController,
+                            "Discount",
+                            addPartDiscountErrorStatus.isNotEmpty,
+                            context,
+                            true,
+                            newSetState,
+                          ),
+                        ),
+                        Positioned(
+                          right: 10,
+                          top: 58,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = false;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.money_dollar,
+                                  color: isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                              Text(
+                                '  /  ',
+                                style: TextStyle(
+                                  color: AppColors.greyText,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = true;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  Icons.percent,
+                                  color: !isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     errorWidget(error: addPartDiscountErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Label",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              newSetState(() {
-                                tagDataList.add("Tag");
-                              });
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                ),
-                                Text(
-                                  "Add New",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 17),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         "Label",
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Color(0xff6A7187),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           newSetState(() {
+                    //             tagDataList.add("Tag");
+                    //           });
+                    //         },
+                    //         child: const Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.add,
+                    //               color: AppColors.primaryColors,
+                    //             ),
+                    //             Text(
+                    //               "Add New",
+                    //               style: TextStyle(
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: AppColors.primaryColors,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
                     GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -1715,6 +1836,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         onPressed: () {
                           final status = addPartValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             part.add(CannedServiceAddModel(
                               cannedServiceId: int.parse(serviceId),
                               note: addPartDescriptionController.text,
@@ -1722,6 +1845,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               itemName: addPartNameController.text,
                               unitPrice: addPartPriceController.text,
                               discount: addPartDiscountController.text,
+                              discountType:
+                                  isPercentage ? "Percentage" : "Fixed",
                               itemType: "Part",
                               subTotal: subTotal.toStringAsFixed(2),
                             ));
@@ -1773,6 +1898,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
@@ -1820,8 +1946,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = (double.tryParse(addLaborCostController.text) ?? 0);
           } else {
+            double discount =
+                double.tryParse(addLaborDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+                      (double.tryParse(addLaborDiscountController.text) ?? 0)) /
+                  100;
+            }
             subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
-                (double.tryParse(addLaborDiscountController.text) ?? 0));
+                discount);
           }
           total = subTotal;
         } else {
@@ -1835,18 +1968,24 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
                 (double.tryParse(addLaborCostController.text) ?? 0));
           } else {
+            double discount =
+                double.tryParse(addLaborDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+                      (double.tryParse(addLaborDiscountController.text) ?? 0)) /
+                  100;
+            }
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
                             (double.tryParse(addLaborCostController.text) ??
                                 0)) -
-                        (double.tryParse(addLaborDiscountController.text) ??
-                            0)) *
+                        discount) *
                     tax +
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
                         (double.tryParse(addLaborCostController.text) ?? 0)) -
-                    (double.tryParse(addLaborDiscountController.text) ?? 0));
+                    discount);
             total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
                     (double.tryParse(addLaborCostController.text) ?? 0)) -
-                (double.tryParse(addLaborDiscountController.text) ?? 0));
+                discount);
           }
         }
       }
@@ -1922,16 +2061,59 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           newSetState),
                     ),
                     errorWidget(error: addLaborCostErrorStatus),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: textBox(
-                          "Enter Amount",
-                          addLaborDiscountController,
-                          "Discount",
-                          addLaborDiscountErrorStatus.isNotEmpty,
-                          context,
-                          true,
-                          newSetState),
+                    Stack(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 17),
+                          child: textBox(
+                              "Enter Amount",
+                              addLaborDiscountController,
+                              "Discount",
+                              addLaborDiscountErrorStatus.isNotEmpty,
+                              context,
+                              true,
+                              newSetState),
+                        ),
+                        Positioned(
+                          right: 10,
+                          top: 58,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = false;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.money_dollar,
+                                  color: isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                              Text(
+                                '  /  ',
+                                style: TextStyle(
+                                  color: AppColors.greyText,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = true;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  Icons.percent,
+                                  color: !isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     errorWidget(error: addLaborDiscountErrorStatus),
                     Padding(
@@ -2006,6 +2188,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         onPressed: () {
                           final status = addLaborValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             labor.add(CannedServiceAddModel(
                               cannedServiceId: int.parse(serviceId),
                               note: addLaborDescriptionController.text,
@@ -2014,6 +2198,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               itemName: addLaborNameController.text,
                               unitPrice: addLaborCostController.text,
                               discount: addLaborDiscountController.text,
+                              discountType:
+                                  isPercentage ? "Percentage" : "Fixed",
+
                               quanityHours: addLaborHoursController.text,
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
@@ -2168,45 +2355,45 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           addFeeCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Label",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              newSetState(() {
-                                tagDataList.add("Tag");
-                              });
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                ),
-                                Text(
-                                  "Add New",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 17),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         "Label",
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Color(0xff6A7187),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           newSetState(() {
+                    //             tagDataList.add("Tag");
+                    //           });
+                    //         },
+                    //         child: const Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.add,
+                    //               color: AppColors.primaryColors,
+                    //             ),
+                    //             Text(
+                    //               "Add New",
+                    //               style: TextStyle(
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: AppColors.primaryColors,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
                     GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -2295,6 +2482,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         onPressed: () {
                           final status = addFeeValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             fee.add(CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
                                 note: addFeeDescriptionController.text,
@@ -2355,6 +2544,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
@@ -2398,9 +2588,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             subTotal =
                 (double.tryParse(addSubContractPriceController.text) ?? 0);
           } else {
-            subTotal = ((double.tryParse(addSubContractPriceController.text) ??
-                    0) -
-                (double.tryParse(addSubContractDiscountController.text) ?? 0));
+            double discount =
+                double.tryParse(addSubContractDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addSubContractCostController.text) ??
+                          0) *
+                      (double.tryParse(addSubContractDiscountController.text) ??
+                          0)) /
+                  100;
+            }
+            subTotal =
+                ((double.tryParse(addSubContractPriceController.text) ?? 0) -
+                    discount);
           }
           total = subTotal;
         } else {
@@ -2413,18 +2612,24 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     (double.tryParse(addSubContractPriceController.text) ?? 0);
             total = (double.tryParse(addSubContractPriceController.text) ?? 0);
           } else {
+            double discount =
+                double.tryParse(addSubContractDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addSubContractCostController.text) ??
+                          0) *
+                      (double.tryParse(addSubContractDiscountController.text) ??
+                          0)) /
+                  100;
+            }
             subTotal = ((double.tryParse(addSubContractPriceController.text) ??
                             0) -
-                        (double.tryParse(
-                                addSubContractDiscountController.text) ??
-                            0)) *
+                        discount) *
                     tax +
                 ((double.tryParse(addSubContractPriceController.text) ?? 0) -
-                    (double.tryParse(addSubContractDiscountController.text) ??
-                        0));
-            total = ((double.tryParse(addSubContractPriceController.text) ??
-                    0) -
-                (double.tryParse(addSubContractDiscountController.text) ?? 0));
+                    discount);
+            total =
+                ((double.tryParse(addSubContractPriceController.text) ?? 0) -
+                    discount);
           }
         }
       }
@@ -2517,57 +2722,100 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             style: TextStyle(color: Color(0xFF6A7187))),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox(
-                          "Amount",
-                          addSubContractDiscountController,
-                          "Discount",
-                          addSubContractDiscountErrorStatus.isNotEmpty,
-                          context,
-                          true,
-                          newSetState),
+                    Stack(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 17.0),
+                          child: textBox(
+                              "Amount",
+                              addSubContractDiscountController,
+                              "Discount",
+                              addSubContractDiscountErrorStatus.isNotEmpty,
+                              context,
+                              true,
+                              newSetState),
+                        ),
+                        Positioned(
+                          right: 10,
+                          top: 58,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = false;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.money_dollar,
+                                  color: isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                              Text(
+                                '  /  ',
+                                style: TextStyle(
+                                  color: AppColors.greyText,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = true;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  Icons.percent,
+                                  color: !isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     errorWidget(error: addSubContractDiscountErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Label",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              newSetState(() {
-                                tagDataList.add("Tag");
-                              });
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                ),
-                                Text(
-                                  "Add New",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 17),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         "Label",
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Color(0xff6A7187),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           newSetState(() {
+                    //             tagDataList.add("Tag");
+                    //           });
+                    //         },
+                    //         child: const Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.add,
+                    //               color: AppColors.primaryColors,
+                    //             ),
+                    //             Text(
+                    //               "Add New",
+                    //               style: TextStyle(
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: AppColors.primaryColors,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
                     GridView.builder(
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
@@ -2667,6 +2915,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         onPressed: () {
                           final status = addSubContractValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             subContract.add(
                               CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
@@ -2675,6 +2925,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 part: '',
                                 itemName: addSubContractNameController.text,
                                 discount: addSubContractDiscountController.text,
+                                discountType:
+                                    isPercentage ? "Percentage" : "Fixed",
+
                                 tax: isTax == true ? 'Y' : 'N',
                                 vendorId: vendorId,
                                 unitPrice: addSubContractPriceController.text,

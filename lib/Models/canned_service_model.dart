@@ -205,7 +205,7 @@ class CannedServiceItem {
   String unitPrice;
   String quanityHours;
   String discount;
-  Type? discountType;
+  String discountType;
   dynamic statusLabels;
   String subTotal;
   String? partName;
@@ -281,7 +281,7 @@ class CannedServiceItem {
         unitPrice: json["unit_price"],
         quanityHours: json["quanity_hours"],
         discount: json["discount"],
-        discountType: typeValues.map[json["discount_type"]]!,
+        discountType: json["discount_type"] ?? "Fixed",
         statusLabels: json["status_labels"],
         subTotal: json["sub_total"],
         partName: json["part_name"],
