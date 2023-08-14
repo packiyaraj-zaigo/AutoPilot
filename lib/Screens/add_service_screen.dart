@@ -654,10 +654,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 subT += double.parse(element.subTotal);
                               });
                               subT += double.tryParse(rateController.text) ?? 0;
-                              subT += (double.tryParse(rateController.text) ??
-                                      0) *
-                                  (double.tryParse(taxController.text) ?? 0) /
-                                  100;
 
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),
@@ -665,7 +661,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 servicePrice: rateController.text,
                                 serviceNote: laborDescriptionController.text,
                                 discount: '0',
-                                tax: '0',
+                                // tax: client!.taxOnLabors == "Y" ? client!.laborTaxRate : '0',
+                                tax: client!.taxOnLabors == "Y"
+                                    ? client!.laborTaxRate ?? '0'
+                                    : '0',
                                 subTotal: subT.toStringAsFixed(2),
                               );
                               log(subT.toString());
