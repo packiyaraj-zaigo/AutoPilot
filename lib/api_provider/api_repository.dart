@@ -454,9 +454,9 @@ class ApiRepository {
   }
 
   Future createOrderService(String token, String orderId, String serviceName,
-      String serviceNotes, String laborRate, String tax) {
-    return apiProvider.createOrderService(
-        token, orderId, serviceName, serviceNotes, laborRate, tax);
+      String serviceNotes, String laborRate, String tax, String servicePrice) {
+    return apiProvider.createOrderService(token, orderId, serviceName,
+        serviceNotes, laborRate, tax, servicePrice);
   }
 
   Future createOrderServiceItem(
