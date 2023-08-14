@@ -77,10 +77,8 @@ class _PartsInformationState extends State<PartsInformation> {
           Navigator.of(context).pushReplacement(MaterialPageRoute(
             builder: (context) => PartsScreen(),
           ));
-          ScaffoldMessenger.maybeOf(context)?.showSnackBar(SnackBar(
-            content: Text("Part Deleted Succefully"),
-            backgroundColor: CupertinoColors.activeGreen,
-          ));
+          CommonWidgets()
+              .showSuccessDialog(context, "Part Deleted Successfully");
         }
         if (state is DeletePartErrorState) {
           CommonWidgets().showDialog(context, state.message);

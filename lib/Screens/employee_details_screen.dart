@@ -77,12 +77,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
           if (state is DeleteEmployeeSuccessState) {
             Navigator.of(context).pop();
             Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => EmployeeListScreen(),
+              builder: (context) => const EmployeeListScreen(),
             ));
 
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Employee Deleted Succefully"),
-                backgroundColor: Colors.green));
+            CommonWidgets()
+                .showSuccessDialog(context, "Employee Deleted Successfully");
           }
           if (state is DeleteEmployeeErrorState) {
             Navigator.of(context).pop(true);

@@ -187,3 +187,21 @@ class GetPaymentHistoryEvent extends EstimateEvent {
 
   GetPaymentHistoryEvent({required this.orderId});
 }
+
+class CreateEstimateFromAppointmentEvent extends EstimateEvent {
+  final String customerId;
+  final String vehicleId;
+  final String appointmentId;
+  final String startTime;
+  final String endTime;
+  final String appointmentNote;
+
+  const CreateEstimateFromAppointmentEvent({
+    required this.customerId,
+    required this.vehicleId,
+    required this.appointmentId,
+    required this.startTime,
+    required this.endTime,
+    required this.appointmentNote,
+  });
+}

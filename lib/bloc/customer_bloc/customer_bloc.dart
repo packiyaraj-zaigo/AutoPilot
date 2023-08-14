@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -9,6 +11,7 @@ import 'package:auto_pilot/Models/estimate_model.dart' as em;
 import 'package:auto_pilot/Models/vechile_model.dart' as vm;
 
 import 'package:auto_pilot/Screens/customers_screen.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -380,22 +383,13 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           event.stateId,
           event.id);
       var unloadData = _decoder.convert(loadedResponse.body);
-      print('nnnnnnnnnnnnnnnnnnnnnnnnnn');
-
-      print(unloadData.toString());
       if (loadedResponse.statusCode == 200 ||
           loadedResponse.statusCode == 201) {
-        print('sssvvvvvvvvvvvvvvvvvvvvvvvs');
-
-        ScaffoldMessenger.of(event.context).showSnackBar(
-          SnackBar(
-            content: Text("Customer Edited Successfully"),
-            backgroundColor: Colors.green,
-          ),
-        );
+        CommonWidgets()
+            .showSuccessDialog(event.context, 'Customer Updated Successfully');
         Navigator.of(event.context).pushAndRemoveUntil(
           MaterialPageRoute(
-            builder: (context) => CustomersScreen(),
+            builder: (context) => const CustomersScreen(),
           ),
           (route) => false,
         );

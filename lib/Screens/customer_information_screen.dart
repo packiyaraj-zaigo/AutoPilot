@@ -158,23 +158,15 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             BlocProvider.of<CustomerBloc>(context).add(GetAllCustomerNotesEvent(
                 id: widget.customerData.id.toString()));
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Note Created Successfully"),
-                backgroundColor: Colors.green,
-              ),
-            );
+            CommonWidgets()
+                .showSuccessDialog(context, "Note Created Successfully");
           } else if (state is CreateCustomerNoteErrorState) {
             CommonWidgets().showDialog(context, state.message);
           } else if (state is DeleteCustomerNoteSuccessState) {
             BlocProvider.of<CustomerBloc>(context).add(GetAllCustomerNotesEvent(
                 id: widget.customerData.id.toString()));
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text("Note Deleted Successfully"),
-                backgroundColor: Colors.green,
-              ),
-            );
+            CommonWidgets()
+                .showSuccessDialog(context, "Note Deleted Successfully");
           } else if (state is DeleteCustomerNoteErrorState) {
             CommonWidgets().showDialog(context, state.message);
           } else if (state is GetCustomerNotesSuccessState) {

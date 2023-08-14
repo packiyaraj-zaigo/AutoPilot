@@ -57,6 +57,47 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<CollectPaymentEstimateEvent>(collectPaymentBloc);
     on<DeleteEstimateEvent>(deleteEstimateBloc);
     on<GetPaymentHistoryEvent>(getPaymentHistoryBloc);
+    on<CreateEstimateFromAppointmentEvent>(createEstimateFromAppointment);
+  }
+
+  Future<void> createEstimateFromAppointment(
+    CreateEstimateFromAppointmentEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      emit(CreateEstimateLoadingState());
+      final token = await AppUtils.getToken();
+      final response = await _apiRepository.createNewEstimateFromAppointment(
+          event.vehicleId, event.customerId, token);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final createModel = createEstimateModelFromJson(response.body);
+        final appointmentResponse =
+            await _apiRepository.editAppointmentEstimate(
+          token,
+          createModel.data.id.toString(),
+          event.customerId,
+          event.vehicleId,
+          event.startTime,
+          event.endTime,
+          event.appointmentNote,
+          event.appointmentId,
+        );
+        if (appointmentResponse.statusCode == 200 ||
+            appointmentResponse.statusCode == 201) {
+          emit(CreateEstimateState(
+              createEstimateModel: createEstimateModelFromJson(response.body)));
+        } else {
+          emit(CreateEstimateErrorState(
+              errorMessage:
+                  'Estimate created but something went wrong with appointment'));
+        }
+      } else {
+        emit(CreateEstimateErrorState(errorMessage: 'Something went wrong'));
+      }
+    } catch (e) {
+      emit(CreateEstimateErrorState(errorMessage: 'Something went wrong'));
+      log(e.toString() + " Create estimate from appointmet bloc error");
+    }
   }
 
   Future<void> getEstimateBloc(

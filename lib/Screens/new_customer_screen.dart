@@ -138,12 +138,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                     (route) => false,
                   );
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Customer Created Successfully"),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
+                  CommonWidgets().showSuccessDialog(
+                      context, "Customer Created Successfully");
                   Navigator.of(context).pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const CustomersScreen(),

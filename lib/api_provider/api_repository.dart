@@ -313,6 +313,12 @@ class ApiRepository {
     return apiProvider.createNewEstimate(id, which, token);
   }
 
+  Future createNewEstimateFromAppointment(
+      String vehicleId, String customerId, dynamic token) {
+    return apiProvider.createNewEstimateFromAppointment(
+        vehicleId, customerId, token);
+  }
+
   Future createAppointmentEstimate(
       dynamic token,
       String orderId,

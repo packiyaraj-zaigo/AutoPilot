@@ -77,10 +77,8 @@ class _VechileInformationState extends State<VechileInformation> {
                   builder: (context) => const VehiclesScreen(),
                 ),
                 (route) => false);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Vehicle Deleted Successfully'),
-              backgroundColor: Colors.green,
-            ));
+            CommonWidgets()
+                .showSuccessDialog(context, "Vehicle Deleted Successfully");
           } else if (state is DeleteVechileDetailsErrorState) {
             Navigator.pop(context);
             CommonWidgets().showDialog(context, state.message);

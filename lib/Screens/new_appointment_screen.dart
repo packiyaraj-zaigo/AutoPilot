@@ -4,6 +4,7 @@ import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
+import 'package:auto_pilot/Screens/dummy_appointment_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/bloc/appointment/appointment_bloc.dart';
 import '../Models/vechile_model.dart' as vm;
@@ -123,18 +124,18 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             log(isChecked.toString());
             if (isChecked == true) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                builder: (context) => CreateEstimateScreen(
-                  customer: customer,
-                  vehicle: vehicle,
+                builder: (context) => DummyAppointmentScreen(
+                  customerId: customer!.id.toString(),
+                  vehicleId: vehicle!.id.toString(),
+                  appointmentId: state.id,
+                  startTime: startDateToServer!.add(startTime).toString(),
+                  endTime: endDateToServer!.add(endTime).toString(),
+                  appointmentNote: notesController.text.trim(),
                 ),
               ));
             } else {
-              // ScaffoldMessenger.of(context).showSnackBar(
-              //   const SnackBar(
-              //     content: Text('Appointment created succesfully'),
-              //     backgroundColor: Colors.green,
-              //   ),
-              // );
+              CommonWidgets().showSuccessDialog(
+                  context, "Appointment Created Successfully");
               Navigator.of(context).pop();
             }
           }
@@ -207,7 +208,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 textBox("Select Customer", customerController, "Customer",
                     customerErrorMsg),
                 const SizedBox(height: 16),
-                textBox("Select Customer", vehicleController, "Vehicle",
+                textBox("Select Vehicle", vehicleController, "Vehicle",
                     vehicleErrorMsg),
                 const SizedBox(height: 16),
                 textBox("Enter Name", nameController, "Name", nameErrorMsg),
@@ -429,14 +430,24 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               label,
               style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xff6A7187)),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff6A7187),
+              ),
+            ),
+            const Text(
+              " *",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(
+                  0xffD80027,
+                ),
+              ),
             ),
           ],
         ),
@@ -491,14 +502,24 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               label,
               style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xff6A7187)),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff6A7187),
+              ),
+            ),
+            const Text(
+              " *",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(
+                  0xffD80027,
+                ),
+              ),
             ),
           ],
         ),
@@ -553,12 +574,27 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xff6A7187)),
+        Row(
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Color(0xff6A7187),
+              ),
+            ),
+            const Text(
+              " *",
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                color: Color(
+                  0xffD80027,
+                ),
+              ),
+            ),
+          ],
         ),
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
