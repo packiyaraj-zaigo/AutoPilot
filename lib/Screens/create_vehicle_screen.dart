@@ -182,12 +182,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                     } else {
                       Navigator.pop(context, vinController.text);
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Vehicle Created Successfully'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    CommonWidgets().showSuccessDialog(
+                        context, "Vehicle Created Successfully");
                   } else if (state is EditVehicleErrorState) {
                     CommonWidgets().showDialog(context, state.message);
                   } else if (state is EditVehicleSuccessState) {
@@ -198,12 +194,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                       (route) => false,
                     );
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Vehicle Updated Successfully'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    CommonWidgets().showSuccessDialog(
+                        context, "Vehicle Updated Successfully");
                   } else if (state is DropdownVechileDetailsSuccessState) {
                     dropdownData.addAll(state.dropdownData.data.data);
                   }

@@ -109,14 +109,12 @@ class _CreatePartsScreenState extends State<CreatePartsScreen> {
                   MaterialPageRoute(
                     builder: (context) => const PartsScreen(),
                   ));
-              ScaffoldMessenger.of((context)).showSnackBar(
-                SnackBar(
-                  content: Text(widget.part == null
+
+              CommonWidgets().showSuccessDialog(
+                  context,
+                  widget.part == null
                       ? 'Part Created Successfully'
-                      : "Part Updated Successfully"),
-                  backgroundColor: Colors.green,
-                ),
-              );
+                      : "Part Updated Successfully");
             }
           },
           child: BlocBuilder<PartsBloc, PartsState>(builder: (context, state) {

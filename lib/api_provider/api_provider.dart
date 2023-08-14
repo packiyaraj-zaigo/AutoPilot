@@ -1056,6 +1056,28 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> createNewEstimateFromAppointment(
+      String vehicleId, String customerId, dynamic token) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      final clientId = await AppUtils.getUserID();
+      var url = Uri.parse("${BASE_URL}api/orders");
+      var request = http.MultipartRequest("POST", url)
+        ..fields['client_id'] = clientId;
+      request.fields['vehicle_id'] = vehicleId;
+      request.fields['customer_id'] = customerId;
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      return http.Response.fromStream(response);
+    } catch (e) {
+      log(e.toString() + "create estimate from appointment api error");
+    }
+  }
+
   Future<dynamic> editEstimate(String id, String which, dynamic token,
       String orderId, String customerId, String? dropSchedule) async {
     print("into provider");

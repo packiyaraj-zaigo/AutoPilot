@@ -126,10 +126,8 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => const ServicesListScreen(),
               ));
-
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Service Deleted Successfully"),
-                  backgroundColor: Colors.green));
+              CommonWidgets()
+                  .showSuccessDialog(context, 'Service Deleted Successfully');
             }
             if (state is DeleteCannedServiceErrorState) {
               Navigator.of(context).pop(true);
