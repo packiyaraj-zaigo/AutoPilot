@@ -1964,4 +1964,15 @@ class ApiProvider {
       log(e.toString() + "Notification API error");
     }
   }
+
+  Future<dynamic> globalSearch(String token, String query) async {
+    try {
+      final url = Uri.parse(
+          '${BASE_URL}api/search?keyword=$query&show_vehicle=1&show_estimate=1&show_customer=1');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Search api error");
+    }
+  }
 }

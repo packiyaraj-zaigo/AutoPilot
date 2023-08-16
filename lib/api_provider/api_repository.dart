@@ -587,6 +587,10 @@ class ApiRepository {
   Future<dynamic> getVehicleInfo(dynamic token, String vehicleId) async {
     return apiProvider.getVehicleInfo(token, vehicleId);
   }
+
+  Future<dynamic> globalSearch(String token, String query) async {
+    return apiProvider.globalSearch(token, query);
+  }
 }
 
 class NetworkError extends Error {}

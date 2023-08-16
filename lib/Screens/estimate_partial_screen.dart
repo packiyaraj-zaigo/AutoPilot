@@ -236,41 +236,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     MaterialPageRoute(
                       builder: (context) => CustomerInformationScreen(
                         id: estimate.customerId.toString(),
-                        customerData: cm.Datum(
-                          id: estimate.customerId,
-                          clientId: estimate.clientId,
-                          email: estimate.customer?.email ?? '',
-                          firstName: estimate.customer?.firstName ?? '',
-                          lastName: estimate.customer?.lastName ?? '',
-                          notes: "",
-                          companyName: "",
-                          referralSource: "",
-                          fleet: "",
-                          addressLine1: "",
-                          addressLine2: "",
-                          townCity: "",
-                          provinceId: 0,
-                          zipcode: "",
-                          phone: "",
-                          labels: "",
-                          isTax: 0,
-                          tax: "",
-                          isDiscount: 0,
-                          discountPercentge: "",
-                          discountType: "",
-                          isLaborMatrix: 0,
-                          laborMatrixId: 0,
-                          pricingMatrixId: 0,
-                          isLaborRate: 0,
-                          laborRate: "",
-                          periodicalMaintenanceNotifications: 0,
-                          provinceName: 0,
-                          pricingMatrix: 0,
-                          laborMatrix: 0,
-                        ),
                       ),
                     ),
                   );
+                } else if (widget.navigation == 'search') {
+                  Navigator.pop(context);
                 } else {
                   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                     builder: (context) {
@@ -303,38 +273,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             MaterialPageRoute(
                               builder: (context) => CustomerInformationScreen(
                                 id: widget.customerId!.toString(),
-                                customerData: cm.Datum(
-                                  id: widget.customerId!,
-                                  clientId: estimate.clientId,
-                                  email: estimate.customer?.email ?? '',
-                                  firstName: estimate.customer?.firstName ?? '',
-                                  lastName: estimate.customer?.lastName ?? '',
-                                  notes: "",
-                                  companyName: "",
-                                  referralSource: "",
-                                  fleet: "",
-                                  addressLine1: "",
-                                  addressLine2: "",
-                                  townCity: "",
-                                  provinceId: 0,
-                                  zipcode: "",
-                                  phone: "",
-                                  labels: "",
-                                  isTax: 0,
-                                  tax: "",
-                                  isDiscount: 0,
-                                  discountPercentge: "",
-                                  discountType: "",
-                                  isLaborMatrix: 0,
-                                  laborMatrixId: 0,
-                                  pricingMatrixId: 0,
-                                  isLaborRate: 0,
-                                  laborRate: "",
-                                  periodicalMaintenanceNotifications: 0,
-                                  provinceName: 0,
-                                  pricingMatrix: 0,
-                                  laborMatrix: 0,
-                                ),
                               ),
                             ),
                           );
@@ -349,7 +287,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               );
                             },
                           ));
-                        } else {
+                        } else if (widget.navigation == 'search') {
+                          Navigator.pop(context);
+                        }  else {
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(
                             builder: (context) {
@@ -551,44 +491,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   builder: (context) =>
                                       CustomerInformationScreen(
                                     id: estimate.customerId.toString(),
-                                    customerData: cm.Datum(
-                                      id: estimate.customerId,
-                                      clientId: estimate.clientId,
-                                      email: estimate.customer?.email ?? '',
-                                      firstName:
-                                          estimate.customer?.firstName ?? '',
-                                      lastName:
-                                          estimate.customer?.lastName ?? '',
-                                      notes: "",
-                                      companyName: "",
-                                      referralSource: "",
-                                      fleet: "",
-                                      addressLine1: "",
-                                      addressLine2: "",
-                                      townCity: "",
-                                      provinceId: 0,
-                                      zipcode: "",
-                                      phone: "",
-                                      labels: "",
-                                      isTax: 0,
-                                      tax: "",
-                                      isDiscount: 0,
-                                      discountPercentge: "",
-                                      discountType: "",
-                                      isLaborMatrix: 0,
-                                      laborMatrixId: 0,
-                                      pricingMatrixId: 0,
-                                      isLaborRate: 0,
-                                      laborRate: "",
-                                      periodicalMaintenanceNotifications: 0,
-                                      provinceName: 0,
-                                      pricingMatrix: 0,
-                                      laborMatrix: 0,
-                                    ),
                                   ),
                                 ),
                               );
-                            } else {
+                            } else if (widget.navigation == 'search') {
+                  Navigator.pop(context);
+                }  else {
                               Navigator.pushAndRemoveUntil(context,
                                   MaterialPageRoute(
                                 builder: (context) {
@@ -1650,12 +1558,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           : Row(
                               children: [
                                 Text(
-                                    "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  ",
-                                    style: const TextStyle(
-                                color: AppColors.primaryTitleColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                overflow: TextOverflow.ellipsis),),
+                                  "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  ",
+                                  style: const TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
                                 GestureDetector(
                                   onTap: () {
                                     showModalBottomSheet(
@@ -1785,8 +1694,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             builder: (context) {
                               return NewCustomerScreen(
                                 navigation: "partial_estimate",
-                                orderId: widget.estimateDetails.data.id.toString(),
-
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
                               );
                             },
                             isScrollControlled: true,
@@ -1797,9 +1706,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             builder: (context) {
                               return CreateVehicleScreen(
                                 navigation: "partial_estimate",
-                                customerId: widget.estimateDetails.data.customer?.id.toString()??"0",
-                                orderId: widget.estimateDetails.data.id.toString(),
-                                
+                                customerId: widget
+                                        .estimateDetails.data.customer?.id
+                                        .toString() ??
+                                    "0",
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
                               );
                             },
                             isScrollControlled: true,
@@ -3580,42 +3492,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 MaterialPageRoute(
                   builder: (context) => CustomerInformationScreen(
                     id: estimate.customerId.toString(),
-                    customerData: cm.Datum(
-                      id: estimate.customerId,
-                      clientId: estimate.clientId,
-                      email: estimate.customer?.email ?? '',
-                      firstName: estimate.customer?.firstName ?? '',
-                      lastName: estimate.customer?.lastName ?? '',
-                      notes: "",
-                      companyName: "",
-                      referralSource: "",
-                      fleet: "",
-                      addressLine1: "",
-                      addressLine2: "",
-                      townCity: "",
-                      provinceId: 0,
-                      zipcode: "",
-                      phone: "",
-                      labels: "",
-                      isTax: 0,
-                      tax: "",
-                      isDiscount: 0,
-                      discountPercentge: "",
-                      discountType: "",
-                      isLaborMatrix: 0,
-                      laborMatrixId: 0,
-                      pricingMatrixId: 0,
-                      isLaborRate: 0,
-                      laborRate: "",
-                      periodicalMaintenanceNotifications: 0,
-                      provinceName: 0,
-                      pricingMatrix: 0,
-                      laborMatrix: 0,
-                    ),
                   ),
                 ),
               );
-            } else {
+            } else if (widget.navigation == 'search') {
+              Navigator.pop(context);
+            }  else {
               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                 builder: (context) {
                   return BottomBarScreen(
@@ -3954,42 +3836,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   MaterialPageRoute(
                     builder: (context) => CustomerInformationScreen(
                       id: estimate.customerId.toString(),
-                      customerData: cm.Datum(
-                        id: estimate.customerId,
-                        clientId: estimate.clientId,
-                        email: estimate.customer?.email ?? '',
-                        firstName: estimate.customer?.firstName ?? '',
-                        lastName: estimate.customer?.lastName ?? '',
-                        notes: "",
-                        companyName: "",
-                        referralSource: "",
-                        fleet: "",
-                        addressLine1: "",
-                        addressLine2: "",
-                        townCity: "",
-                        provinceId: 0,
-                        zipcode: "",
-                        phone: "",
-                        labels: "",
-                        isTax: 0,
-                        tax: "",
-                        isDiscount: 0,
-                        discountPercentge: "",
-                        discountType: "",
-                        isLaborMatrix: 0,
-                        laborMatrixId: 0,
-                        pricingMatrixId: 0,
-                        isLaborRate: 0,
-                        laborRate: "",
-                        periodicalMaintenanceNotifications: 0,
-                        provinceName: 0,
-                        pricingMatrix: 0,
-                        laborMatrix: 0,
-                      ),
                     ),
                   ),
                 );
-              } else {
+              } else if (widget.navigation == 'search') {
+                  Navigator.pop(context);
+                }  else {
                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                   builder: (context) {
                     return BottomBarScreen(
@@ -4229,39 +4081,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               MaterialPageRoute(
                                 builder: (context) => CustomerInformationScreen(
                                   id: estimate.customerId.toString(),
-                                  customerData: cm.Datum(
-                                    id: estimate.customerId,
-                                    clientId: estimate.clientId,
-                                    email: estimate.customer?.email ?? '',
-                                    firstName:
-                                        estimate.customer?.firstName ?? '',
-                                    lastName: estimate.customer?.lastName ?? '',
-                                    notes: "",
-                                    companyName: "",
-                                    referralSource: "",
-                                    fleet: "",
-                                    addressLine1: "",
-                                    addressLine2: "",
-                                    townCity: "",
-                                    provinceId: 0,
-                                    zipcode: "",
-                                    phone: "",
-                                    labels: "",
-                                    isTax: 0,
-                                    tax: "",
-                                    isDiscount: 0,
-                                    discountPercentge: "",
-                                    discountType: "",
-                                    isLaborMatrix: 0,
-                                    laborMatrixId: 0,
-                                    pricingMatrixId: 0,
-                                    isLaborRate: 0,
-                                    laborRate: "",
-                                    periodicalMaintenanceNotifications: 0,
-                                    provinceName: 0,
-                                    pricingMatrix: 0,
-                                    laborMatrix: 0,
-                                  ),
                                 ),
                               ),
                             );

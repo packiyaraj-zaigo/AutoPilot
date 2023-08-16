@@ -219,8 +219,9 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                                       MaterialPageRoute(
                                                           builder: (context) =>
                                                               CustomerInformationScreen(
-                                                                  customerData:
-                                                                      item)));
+                                                                id: item.id
+                                                                    .toString(),
+                                                              )));
                                                 },
                                                 child: ListTile(
                                                   title: Text(
