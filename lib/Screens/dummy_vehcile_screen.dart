@@ -7,9 +7,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class DummyVehicleScreen extends StatefulWidget {
   const DummyVehicleScreen(
-      {super.key, required this.vehicleId, this.navigation});
+      {super.key,
+      required this.vehicleId,
+      this.navigation,
+      this.orderId,
+      this.customerId});
   final String vehicleId;
   final String? navigation;
+  final String? orderId;
+  final String? customerId;
 
   @override
   State<DummyVehicleScreen> createState() => _DummyVehicleScreenState();
@@ -20,10 +26,25 @@ class _DummyVehicleScreenState extends State<DummyVehicleScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EstimateBloc(apiRepository: ApiRepository())
-        ..add(CreateEstimateEvent(id: widget.vehicleId, which: "vehicle")),
+        ..add(widget.orderId == null
+            ? CreateEstimateEvent(id: widget.vehicleId, which: "vehicle")
+            : EditEstimateEvent(
+                id: widget.vehicleId,
+                orderId: widget.orderId!,
+                which: "vehicle",
+                customerId: widget.customerId!)),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
           if (state is CreateEstimateState) {
+            Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) {
+                return EstimatePartialScreen(
+                  estimateDetails: state.createEstimateModel,
+                  navigation: widget.navigation,
+                );
+              },
+            ));
+          } else if (state is EditEstimateState) {
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(

@@ -19,7 +19,9 @@ import '../utils/app_strings.dart';
 class NewCustomerScreen extends StatefulWidget {
   final Datum? customerEdit;
   final String? navigation;
-  const NewCustomerScreen({Key? key, this.customerEdit, this.navigation})
+  final String? orderId;
+  const NewCustomerScreen(
+      {Key? key, this.customerEdit, this.navigation, this.orderId})
       : super(key: key);
 
   @override
@@ -127,7 +129,16 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               '==========================errrrrrrrrorrrrrrrrr';
             } else if (state is CreateCustomerState) {
               if (widget.navigation != null) {
-                Navigator.pop(context);
+                //  Navigator.pop(context);
+                Navigator.pushReplacement(context, MaterialPageRoute(
+                  builder: (context) {
+                    return DummyCustomerScreen(
+                      customerId: state.id,
+                      navigation: widget.navigation,
+                      orderId: widget.orderId,
+                    );
+                  },
+                ));
               } else {
                 if (check) {
                   Navigator.of(context).pushAndRemoveUntil(
