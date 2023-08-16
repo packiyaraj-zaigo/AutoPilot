@@ -135,14 +135,6 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             selectedIndex == 1 ? AppColors.primaryColors : null,
                       ),
                     ),
-                    2: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: SvgPicture.asset(
-                        'assets/images/employee_payment_icon.svg',
-                        color:
-                            selectedIndex == 2 ? AppColors.primaryColors : null,
-                      ),
-                    ),
                   },
                 ),
               ),
@@ -359,9 +351,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         ),
                       ],
                     )
-                  : selectedIndex == 1
-                      ? chatWidget()
-                      : const Text('payment')
+                  : chatWidget()
             ],
           ),
         ),
