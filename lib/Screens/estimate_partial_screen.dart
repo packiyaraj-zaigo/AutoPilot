@@ -2686,10 +2686,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               padding: const EdgeInsets.only(top: 18.0),
               child: GestureDetector(
                 onTap: () {
+                  if(!isVehicleEdit){
+
                   setState(() {
                     isCustomerEdit = true;
                   });
                   Navigator.pop(context);
+                  }
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -2701,13 +2704,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg",
+                      color: isVehicleEdit?Colors.grey:AppColors.primaryColors,),
+                       Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
                           "Edit Customer",
                           style: TextStyle(
-                              color: AppColors.primaryColors,
+                              color:isVehicleEdit?Colors.grey: AppColors.primaryColors,
                               fontSize: 18,
                               fontWeight: FontWeight.w600),
                         ),
@@ -2721,7 +2725,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 padding: const EdgeInsets.only(top: 18.0),
                 child: GestureDetector(
                   onTap: () {
-                    if (widget.estimateDetails.data.vehicle != null) {
+                    if (widget.estimateDetails.data.vehicle != null && !isCustomerEdit) {
                       setState(() {
                         isVehicleEdit = true;
                       });
@@ -2741,7 +2745,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       children: [
                         SvgPicture.asset(
                           "assets/images/edit_pen_icon.svg",
-                          color: widget.estimateDetails.data.vehicle != null
+                          color: widget.estimateDetails.data.vehicle != null && !isCustomerEdit
                               ? AppColors.primaryColors
                               : Colors.grey,
                         ),
@@ -2751,7 +2755,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             "Edit Vehicle",
                             style: TextStyle(
                                 color:
-                                    widget.estimateDetails.data.vehicle != null
+                                    widget.estimateDetails.data.vehicle != null && !isCustomerEdit
                                         ? AppColors.primaryColors
                                         : Colors.grey,
                                 fontSize: 18,
