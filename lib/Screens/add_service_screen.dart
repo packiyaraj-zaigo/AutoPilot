@@ -2754,24 +2754,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
-                    Row(
-                      // mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Checkbox(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            splashRadius: 0,
-                            visualDensity: VisualDensity.compact,
-                            value: isTax,
-                            onChanged: (value) {
-                              newSetState(() {
-                                isTax = value!;
-                              });
-                            }),
-                        Text('Allow Tax Charges On Sub Contract',
-                            style: TextStyle(color: Color(0xFF6A7187))),
-                      ],
-                    ),
                     Stack(
                       children: [
                         Padding(
