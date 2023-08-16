@@ -177,9 +177,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           //   ), (route) => false);
           // }
           if (state is GetEstimateNoteState) {
+            estimateNoteList.clear();
             estimateNoteList.addAll(state.estimateNoteModel.data);
+            isEstimateNoteEdit = false;
           }
           if (state is GetEstimateAppointmentState) {
+            isAppointmentEdit = false;
             appointmentDetailsModel = state.estimateAppointmentModel;
           } else if (state is EstimateUploadImageState) {
             print(state.imagePath);
@@ -1048,15 +1051,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               //   },
                               // );
                               if (balanceDueAmount <= 0 &&
-                                  widget.estimateDetails.data.orderService !=
-                                      null &&
-                                  widget.estimateDetails.data.orderService!
-                                      .isNotEmpty &&
-                                  widget.estimateDetails.data.orderService![0]
-                                          .orderServiceItems !=
-                                      null &&
-                                  widget.estimateDetails.data.orderService![0]
-                                      .orderServiceItems!.isNotEmpty) {
+                                      widget.estimateDetails.data
+                                              .orderService !=
+                                          null &&
+                                      widget.estimateDetails.data.orderService!
+                                          .isNotEmpty &&
+                                      widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService![0]
+                                              .orderServiceItems !=
+                                          null
+                                  //     &&
+                                  // widget.estimateDetails.data.orderService![0]
+                                  //     .orderServiceItems!.isNotEmpty
+                                  ) {
                                 Navigator.push(context, MaterialPageRoute(
                                   builder: (context) {
                                     return PaymentListScreen(
@@ -1087,27 +1096,27 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12),
-                                  color:
-                                      balanceDueAmount <= 0 &&
-                                              widget.estimateDetails.data
-                                                      .orderService !=
-                                                  null &&
-                                              widget.estimateDetails.data
-                                                  .orderService!.isNotEmpty &&
-                                              widget
-                                                      .estimateDetails
-                                                      .data
-                                                      .orderService![0]
-                                                      .orderServiceItems !=
-                                                  null &&
-                                              widget
+                                  color: balanceDueAmount <= 0 &&
+                                          widget.estimateDetails.data
+                                                  .orderService !=
+                                              null &&
+                                          widget.estimateDetails.data
+                                              .orderService!.isNotEmpty &&
+                                          widget
                                                   .estimateDetails
                                                   .data
                                                   .orderService![0]
-                                                  .orderServiceItems!
-                                                  .isNotEmpty
-                                          ? const Color(0xff12A58C)
-                                          : AppColors.primaryColors),
+                                                  .orderServiceItems !=
+                                              null
+                                      //      &&
+                                      // widget
+                                      //     .estimateDetails
+                                      //     .data
+                                      //     .orderService![0]
+                                      //     .orderServiceItems!
+                                      //     .isNotEmpty
+                                      ? const Color(0xff12A58C)
+                                      : AppColors.primaryColors),
                               child: Text(
                                 balanceDueAmount <= 0 &&
                                         widget.estimateDetails.data
@@ -1120,13 +1129,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                 .data
                                                 .orderService![0]
                                                 .orderServiceItems !=
-                                            null &&
-                                        widget
-                                            .estimateDetails
-                                            .data
-                                            .orderService![0]
-                                            .orderServiceItems!
-                                            .isNotEmpty
+                                            null
+                                    //  &&
+                                    // widget
+                                    //     .estimateDetails
+                                    //     .data
+                                    //     .orderService![0]
+                                    //     .orderServiceItems!
+                                    //     .isNotEmpty
                                     ? "Paid In Full"
                                     : "Collect Payment",
                                 style: const TextStyle(
@@ -1650,12 +1660,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           : Row(
                               children: [
                                 Text(
-                                    "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  ",
-                                    style: const TextStyle(
-                                color: AppColors.primaryTitleColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                overflow: TextOverflow.ellipsis),),
+                                  "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].servicePrice ?? ""}  ",
+                                  style: const TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      overflow: TextOverflow.ellipsis),
+                                ),
                                 GestureDetector(
                                   onTap: () {
                                     showModalBottomSheet(
@@ -1785,8 +1796,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             builder: (context) {
                               return NewCustomerScreen(
                                 navigation: "partial_estimate",
-                                orderId: widget.estimateDetails.data.id.toString(),
-
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
                               );
                             },
                             isScrollControlled: true,
@@ -1797,9 +1808,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             builder: (context) {
                               return CreateVehicleScreen(
                                 navigation: "partial_estimate",
-                                customerId: widget.estimateDetails.data.customer?.id.toString()??"0",
-                                orderId: widget.estimateDetails.data.id.toString(),
-                                
+                                customerId: widget
+                                        .estimateDetails.data.customer?.id
+                                        .toString() ??
+                                    "0",
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
                               );
                             },
                             isScrollControlled: true,
@@ -3445,7 +3459,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             if (state is GetEstimateNoteState) {
               estimateNoteList.clear();
               estimateNoteList.addAll(state.estimateNoteModel.data);
-              setState(() {});
+              setState(() {
+                isEstimateNoteEdit = false;
+              });
             }
             // TODO: implement listener
           },
@@ -3488,11 +3504,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               context.read<EstimateBloc>().add(GetEstimateAppointmentEvent(
                   orderId: widget.estimateDetails.data.id.toString()));
 
-              Navigator.pop(context);
+              // Navigator.pop(context);
+              // setState(() {
+
+              // });
             }
             if (state is GetEstimateAppointmentState) {
               appointmentDetailsModel = state.estimateAppointmentModel;
               setState(() {});
+              Navigator.pop(context);
             }
             // TODO: implement listener
           },
@@ -4035,7 +4055,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         child: BlocListener<EstimateBloc, EstimateState>(
           listener: (context, state) {
             if (state is AddEstimateNoteState ||
-                state is CreateAppointmentEstimateState) {
+                state is CreateAppointmentEstimateState ||
+                state is EditEstimateNoteState ||
+                state is EditAppointmentEstimateState) {
+              startTimeController.clear();
+              endTimeController.clear();
+              dateController.clear();
+              appointmentController.clear();
+              estimateNoteController.clear();
+              log(state.toString() + "STATEs");
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
                   return SelectServiceScreen(
@@ -4043,7 +4071,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     navigation: widget.navigation,
                   );
                 },
-              ));
+              )).then((value) {
+                _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                    GetEstimateAppointmentEvent(
+                        orderId: widget.estimateDetails.data.id.toString()));
+
+                _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                    GetEstimateNoteEvent(
+                        orderId: widget.estimateDetails.data.id.toString()));
+                Navigator.pop(context);
+              });
+
+              //  context.read<EstimateBloc>().add(GetSingleEstimateEvent(orderId: widget.estimateDetails.data.id.toString()));
             }
             // TODO: implement listener
           },
@@ -4278,6 +4317,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           //   ), (route) => false);
                           // }
                         }
+                        // Navigator.pop(context);
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),

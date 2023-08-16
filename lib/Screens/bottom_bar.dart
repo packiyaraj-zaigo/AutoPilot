@@ -13,6 +13,7 @@ import 'package:auto_pilot/Screens/estimate_screen.dart';
 import 'package:auto_pilot/Screens/new_appointment_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
+import 'package:auto_pilot/Screens/notification_screen.dart';
 import 'package:auto_pilot/Screens/scanner_screen.dart';
 import 'package:auto_pilot/Screens/work_flow_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -171,11 +172,12 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                           )),
                       IconButton(
                           onPressed: () {
-                            // Navigator.of(context).push(
-                            //   MaterialPageRoute(
-                            //     builder: (context) => const NotificationScreen(),
-                            //   ),
-                            // );
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const NotificationScreen(),
+                              ),
+                            );
                           },
                           icon: SvgPicture.asset(
                             "assets/images/notification.svg",
