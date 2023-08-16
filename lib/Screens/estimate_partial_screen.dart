@@ -239,41 +239,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     MaterialPageRoute(
                       builder: (context) => CustomerInformationScreen(
                         id: estimate.customerId.toString(),
-                        customerData: cm.Datum(
-                          id: estimate.customerId,
-                          clientId: estimate.clientId,
-                          email: estimate.customer?.email ?? '',
-                          firstName: estimate.customer?.firstName ?? '',
-                          lastName: estimate.customer?.lastName ?? '',
-                          notes: "",
-                          companyName: "",
-                          referralSource: "",
-                          fleet: "",
-                          addressLine1: "",
-                          addressLine2: "",
-                          townCity: "",
-                          provinceId: 0,
-                          zipcode: "",
-                          phone: "",
-                          labels: "",
-                          isTax: 0,
-                          tax: "",
-                          isDiscount: 0,
-                          discountPercentge: "",
-                          discountType: "",
-                          isLaborMatrix: 0,
-                          laborMatrixId: 0,
-                          pricingMatrixId: 0,
-                          isLaborRate: 0,
-                          laborRate: "",
-                          periodicalMaintenanceNotifications: 0,
-                          provinceName: 0,
-                          pricingMatrix: 0,
-                          laborMatrix: 0,
-                        ),
                       ),
                     ),
                   );
+                } else if (widget.navigation == 'search') {
+                  Navigator.pop(context);
                 } else {
                   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                     builder: (context) {
@@ -306,38 +276,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             MaterialPageRoute(
                               builder: (context) => CustomerInformationScreen(
                                 id: widget.customerId!.toString(),
-                                customerData: cm.Datum(
-                                  id: widget.customerId!,
-                                  clientId: estimate.clientId,
-                                  email: estimate.customer?.email ?? '',
-                                  firstName: estimate.customer?.firstName ?? '',
-                                  lastName: estimate.customer?.lastName ?? '',
-                                  notes: "",
-                                  companyName: "",
-                                  referralSource: "",
-                                  fleet: "",
-                                  addressLine1: "",
-                                  addressLine2: "",
-                                  townCity: "",
-                                  provinceId: 0,
-                                  zipcode: "",
-                                  phone: "",
-                                  labels: "",
-                                  isTax: 0,
-                                  tax: "",
-                                  isDiscount: 0,
-                                  discountPercentge: "",
-                                  discountType: "",
-                                  isLaborMatrix: 0,
-                                  laborMatrixId: 0,
-                                  pricingMatrixId: 0,
-                                  isLaborRate: 0,
-                                  laborRate: "",
-                                  periodicalMaintenanceNotifications: 0,
-                                  provinceName: 0,
-                                  pricingMatrix: 0,
-                                  laborMatrix: 0,
-                                ),
                               ),
                             ),
                           );
@@ -352,7 +290,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               );
                             },
                           ));
-                        } else {
+                        } else if (widget.navigation == 'search') {
+                          Navigator.pop(context);
+                        }  else {
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(
                             builder: (context) {
@@ -554,44 +494,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   builder: (context) =>
                                       CustomerInformationScreen(
                                     id: estimate.customerId.toString(),
-                                    customerData: cm.Datum(
-                                      id: estimate.customerId,
-                                      clientId: estimate.clientId,
-                                      email: estimate.customer?.email ?? '',
-                                      firstName:
-                                          estimate.customer?.firstName ?? '',
-                                      lastName:
-                                          estimate.customer?.lastName ?? '',
-                                      notes: "",
-                                      companyName: "",
-                                      referralSource: "",
-                                      fleet: "",
-                                      addressLine1: "",
-                                      addressLine2: "",
-                                      townCity: "",
-                                      provinceId: 0,
-                                      zipcode: "",
-                                      phone: "",
-                                      labels: "",
-                                      isTax: 0,
-                                      tax: "",
-                                      isDiscount: 0,
-                                      discountPercentge: "",
-                                      discountType: "",
-                                      isLaborMatrix: 0,
-                                      laborMatrixId: 0,
-                                      pricingMatrixId: 0,
-                                      isLaborRate: 0,
-                                      laborRate: "",
-                                      periodicalMaintenanceNotifications: 0,
-                                      provinceName: 0,
-                                      pricingMatrix: 0,
-                                      laborMatrix: 0,
-                                    ),
                                   ),
                                 ),
                               );
-                            } else {
+                            } else if (widget.navigation == 'search') {
+                  Navigator.pop(context);
+                }  else {
                               Navigator.pushAndRemoveUntil(context,
                                   MaterialPageRoute(
                                 builder: (context) {
@@ -3600,42 +3508,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 MaterialPageRoute(
                   builder: (context) => CustomerInformationScreen(
                     id: estimate.customerId.toString(),
-                    customerData: cm.Datum(
-                      id: estimate.customerId,
-                      clientId: estimate.clientId,
-                      email: estimate.customer?.email ?? '',
-                      firstName: estimate.customer?.firstName ?? '',
-                      lastName: estimate.customer?.lastName ?? '',
-                      notes: "",
-                      companyName: "",
-                      referralSource: "",
-                      fleet: "",
-                      addressLine1: "",
-                      addressLine2: "",
-                      townCity: "",
-                      provinceId: 0,
-                      zipcode: "",
-                      phone: "",
-                      labels: "",
-                      isTax: 0,
-                      tax: "",
-                      isDiscount: 0,
-                      discountPercentge: "",
-                      discountType: "",
-                      isLaborMatrix: 0,
-                      laborMatrixId: 0,
-                      pricingMatrixId: 0,
-                      isLaborRate: 0,
-                      laborRate: "",
-                      periodicalMaintenanceNotifications: 0,
-                      provinceName: 0,
-                      pricingMatrix: 0,
-                      laborMatrix: 0,
-                    ),
                   ),
                 ),
               );
-            } else {
+            } else if (widget.navigation == 'search') {
+              Navigator.pop(context);
+            }  else {
               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                 builder: (context) {
                   return BottomBarScreen(
@@ -3974,42 +3852,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   MaterialPageRoute(
                     builder: (context) => CustomerInformationScreen(
                       id: estimate.customerId.toString(),
-                      customerData: cm.Datum(
-                        id: estimate.customerId,
-                        clientId: estimate.clientId,
-                        email: estimate.customer?.email ?? '',
-                        firstName: estimate.customer?.firstName ?? '',
-                        lastName: estimate.customer?.lastName ?? '',
-                        notes: "",
-                        companyName: "",
-                        referralSource: "",
-                        fleet: "",
-                        addressLine1: "",
-                        addressLine2: "",
-                        townCity: "",
-                        provinceId: 0,
-                        zipcode: "",
-                        phone: "",
-                        labels: "",
-                        isTax: 0,
-                        tax: "",
-                        isDiscount: 0,
-                        discountPercentge: "",
-                        discountType: "",
-                        isLaborMatrix: 0,
-                        laborMatrixId: 0,
-                        pricingMatrixId: 0,
-                        isLaborRate: 0,
-                        laborRate: "",
-                        periodicalMaintenanceNotifications: 0,
-                        provinceName: 0,
-                        pricingMatrix: 0,
-                        laborMatrix: 0,
-                      ),
                     ),
                   ),
                 );
-              } else {
+              } else if (widget.navigation == 'search') {
+                  Navigator.pop(context);
+                }  else {
                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                   builder: (context) {
                     return BottomBarScreen(
@@ -4268,39 +4116,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               MaterialPageRoute(
                                 builder: (context) => CustomerInformationScreen(
                                   id: estimate.customerId.toString(),
-                                  customerData: cm.Datum(
-                                    id: estimate.customerId,
-                                    clientId: estimate.clientId,
-                                    email: estimate.customer?.email ?? '',
-                                    firstName:
-                                        estimate.customer?.firstName ?? '',
-                                    lastName: estimate.customer?.lastName ?? '',
-                                    notes: "",
-                                    companyName: "",
-                                    referralSource: "",
-                                    fleet: "",
-                                    addressLine1: "",
-                                    addressLine2: "",
-                                    townCity: "",
-                                    provinceId: 0,
-                                    zipcode: "",
-                                    phone: "",
-                                    labels: "",
-                                    isTax: 0,
-                                    tax: "",
-                                    isDiscount: 0,
-                                    discountPercentge: "",
-                                    discountType: "",
-                                    isLaborMatrix: 0,
-                                    laborMatrixId: 0,
-                                    pricingMatrixId: 0,
-                                    isLaborRate: 0,
-                                    laborRate: "",
-                                    periodicalMaintenanceNotifications: 0,
-                                    provinceName: 0,
-                                    pricingMatrix: 0,
-                                    laborMatrix: 0,
-                                  ),
                                 ),
                               ),
                             );

@@ -27,11 +27,11 @@ import '../utils/app_utils.dart';
 class CustomerInformationScreen extends StatefulWidget {
   const CustomerInformationScreen({
     Key? key,
-    required this.customerData,
-    this.id,
+    required this.id,
+    this.navigation,
   }) : super(key: key);
-  final Datum customerData;
-  final String? id;
+  final String id;
+  final String? navigation;
 
   @override
   State<CustomerInformationScreen> createState() =>
@@ -39,6 +39,8 @@ class CustomerInformationScreen extends StatefulWidget {
 }
 
 class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
+  Datum? customerData;
+
   final List<CustomerNoteModel> notes = [];
   final List _segmentTitles = [
     SvgPicture.asset(
@@ -85,10 +87,6 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.id != null) {
-      BlocProvider.of<CustomerBloc>(context)
-          .add(GetSingleCustomerEvent(id: widget.id!));
-    }
   }
 
   @override
@@ -101,10 +99,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         automaticallyImplyLeading: false,
         leading: IconButton(
           onPressed: () {
-            Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                    builder: (context) => const cs.CustomersScreen()),
-                (route) => false);
+            if (widget.navigation != null) {
+              Navigator.pop(context);
+            } else {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (context) => const cs.CustomersScreen()),
+                  (route) => false);
+            }
           },
           icon: Icon(
             Icons.arrow_back,
@@ -136,173 +138,170 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           )
         ],
       ),
-      body: BlocListener<CustomerBloc, CustomerState>(
-        listener: (context, state) {
-          if (state is CustomerError) {
-          } else if (state is DeleteCustomer) {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) {
-                return const cs.CustomersScreen();
-              },
-            ));
-          } else if (state is DeleteCustomerErrorState) {
-            Navigator.of(context).pop();
-            CommonWidgets().showDialog(context, state.errorMsg);
-          } else if (state is DeleteCustomerLoading) {
-            showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) => CupertinoActivityIndicator(),
-            );
-          } else if (state is CreateCustomerNoteSuccessState) {
-            BlocProvider.of<CustomerBloc>(context).add(GetAllCustomerNotesEvent(
-                id: widget.customerData.id.toString()));
-            Navigator.pop(context);
-            CommonWidgets()
-                .showSuccessDialog(context, "Note Created Successfully");
-          } else if (state is CreateCustomerNoteErrorState) {
-            CommonWidgets().showDialog(context, state.message);
-          } else if (state is DeleteCustomerNoteSuccessState) {
-            BlocProvider.of<CustomerBloc>(context).add(GetAllCustomerNotesEvent(
-                id: widget.customerData.id.toString()));
-            CommonWidgets()
-                .showSuccessDialog(context, "Note Deleted Successfully");
-          } else if (state is DeleteCustomerNoteErrorState) {
-            CommonWidgets().showDialog(context, state.message);
-          } else if (state is GetCustomerNotesSuccessState) {
-            notes.clear();
-            notes.addAll(state.notes);
-          } else if (state is GetCustomerNotesErrorState) {
-            CommonWidgets().showDialog(context, state.message);
-          }
-          if (state is GetCustomerEstimatesSuccessState) {
-            log('here');
-            estimateData.addAll(state.estimateData.data.data);
-          } else if (state is GetCustomerEstimatesLoadingState) {
-            estimateData.clear();
-          } else if (state is GetSingleEstimateState) {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) {
-                return EstimatePartialScreen(
-                  estimateDetails: state.createEstimateModel,
-                  navigation: 'customer_navigation',
-                );
-              },
-            ));
-          } else if (state is GetSingleCustomerErrorState) {
-            CommonWidgets().showDialog(
-                context, "Something went wrong please try again later");
-          } else if (state is GetSingleCustomerSuccessState) {
-            widget.customerData.addressLine1 = state.customer.addressLine1;
-            widget.customerData.createdAt = state.customer.createdAt;
-            widget.customerData.firstName = state.customer.firstName;
-            widget.customerData.lastName = state.customer.lastName;
-            widget.customerData.email = state.customer.email;
-            widget.customerData.phone = state.customer.phone;
-            log(state.customer.toJson().toString());
-          } else if (state is GetCustomerVehiclesSuccessState) {
-            vehicles = state.vehicles.data.data;
-          }
-        },
-        child: BlocBuilder<CustomerBloc, CustomerState>(
-          builder: (context, state) {
-            if (state is CustomerLoading) {
-              return const Center(child: CupertinoActivityIndicator());
+      body: BlocProvider(
+        create: (context) =>
+            CustomerBloc()..add(GetSingleCustomerEvent(id: widget.id!)),
+        child: BlocListener<CustomerBloc, CustomerState>(
+          listener: (context, state) {
+            if (state is CustomerError) {
+            } else if (state is DeleteCustomer) {
+              Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) {
+                  return const cs.CustomersScreen();
+                },
+              ));
+            } else if (state is DeleteCustomerErrorState) {
+              Navigator.of(context).pop();
+              CommonWidgets().showDialog(context, state.errorMsg);
+            } else if (state is DeleteCustomerLoading) {
+              showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => CupertinoActivityIndicator(),
+              );
+            } else if (state is CreateCustomerNoteSuccessState) {
+              BlocProvider.of<CustomerBloc>(context).add(
+                  GetAllCustomerNotesEvent(id: customerData!.id.toString()));
+              Navigator.pop(context);
+              CommonWidgets()
+                  .showSuccessDialog(context, "Note Created Successfully");
+            } else if (state is CreateCustomerNoteErrorState) {
+              CommonWidgets().showDialog(context, state.message);
+            } else if (state is DeleteCustomerNoteSuccessState) {
+              BlocProvider.of<CustomerBloc>(context).add(
+                  GetAllCustomerNotesEvent(id: customerData!.id.toString()));
+              CommonWidgets()
+                  .showSuccessDialog(context, "Note Deleted Successfully");
+            } else if (state is DeleteCustomerNoteErrorState) {
+              CommonWidgets().showDialog(context, state.message);
+            } else if (state is GetCustomerNotesSuccessState) {
+              notes.clear();
+              notes.addAll(state.notes);
+            } else if (state is GetCustomerNotesErrorState) {
+              CommonWidgets().showDialog(context, state.message);
+            }
+            if (state is GetCustomerEstimatesSuccessState) {
+              log('here');
+              estimateData.addAll(state.estimateData.data.data);
+            } else if (state is GetCustomerEstimatesLoadingState) {
+              estimateData.clear();
+            } else if (state is GetSingleEstimateState) {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                    navigation: 'customer_navigation',
+                  );
+                },
+              ));
             } else if (state is GetSingleCustomerErrorState) {
-              return const Center(
-                child: Text(
-                  "Something went wrong",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.greyText,
-                  ),
-                ),
-              );
-            } else {
-              return Padding(
-                padding: const EdgeInsets.only(left: 24, right: 24, top: 22),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${widget.customerData.firstName} ${widget.customerData.lastName}',
-                      style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primaryTitleColor),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    CupertinoSlidingSegmentedControl(
-                      onValueChanged: (value) {
-                        setState(() {
-                          selectedIndex = value ?? 0;
-                          customerMessageList.clear();
-                        });
-                        if (value == 0) {
-                          BlocProvider.of<CustomerBloc>(context).add(
-                              GetSingleCustomerEvent(
-                                  id: widget.customerData.id.toString()));
-                        }
-                        if (value == 1) {
-                          BlocProvider.of<CustomerBloc>(context).add(
-                              GetAllCustomerNotesEvent(
-                                  id: widget.customerData.id.toString()));
-                        } else if (value == 2) {
-                          BlocProvider.of<CustomerBloc>(context)
-                              .messageCurrentPage = 1;
-                          BlocProvider.of<CustomerBloc>(context)
-                              .messageTotalPage = 1;
-                          BlocProvider.of<CustomerBloc>(context)
-                              .add(GetCustomerMessageEvent());
-                        } else if (value == 3) {
-                          BlocProvider.of<CustomerBloc>(context).currentPage =
-                              1;
-                          BlocProvider.of<CustomerBloc>(context).add(
-                              GetCustomerVehiclesEvent(
-                                  id: widget.customerData.id.toString()));
-                        } else if (value == 4) {
-                          BlocProvider.of<CustomerBloc>(context).currentPage =
-                              1;
-                          estimateData.clear();
-                          BlocProvider.of<CustomerBloc>(context).add(
-                              GetCustomerEstimatesEvent(
-                                  customerId:
-                                      widget.customerData.id.toString()));
-                        }
-                      },
-                      groupValue: selectedIndex,
-                      children: {
-                        for (int i = 0; i < _segmentTitles.length; i++)
-                          i: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 12, horizontal: 25),
-                            child: _segmentTitles[i],
-                          )
-                      },
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    selectedIndex == 0
-                        ? detailsWidget(context, state)
-                        : selectedIndex == 1
-                            ? Expanded(
-                                child: notesWidget(state),
-                              )
-                            : selectedIndex == 2
-                                ? chatWidget(context)
-                                : selectedIndex == 3
-                                    ? vehiclesWidget(state)
-                                    : estimateWidget(state, context)
-                  ],
-                ),
-              );
+              CommonWidgets().showDialog(
+                  context, "Something went wrong please try again later");
+            } else if (state is GetSingleCustomerSuccessState) {
+              customerData = state.customer;
+            } else if (state is GetCustomerVehiclesSuccessState) {
+              vehicles = state.vehicles.data.data;
             }
           },
+          child: BlocBuilder<CustomerBloc, CustomerState>(
+            builder: (context, state) {
+              if (state is CustomerLoading) {
+                return const Center(child: CupertinoActivityIndicator());
+              } else if (state is GetSingleCustomerErrorState) {
+                return const Center(
+                  child: Text(
+                    "Something went wrong",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.greyText,
+                    ),
+                  ),
+                );
+              } else {
+                return Padding(
+                  padding: const EdgeInsets.only(left: 24, right: 24, top: 22),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${customerData?.firstName} ${customerData?.lastName}',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CupertinoSlidingSegmentedControl(
+                        onValueChanged: (value) {
+                          setState(() {
+                            selectedIndex = value ?? 0;
+                            customerMessageList.clear();
+                          });
+                          if (value == 0) {
+                            BlocProvider.of<CustomerBloc>(context).add(
+                                GetSingleCustomerEvent(
+                                    id: customerData!.id.toString()));
+                          }
+                          if (value == 1) {
+                            BlocProvider.of<CustomerBloc>(context).add(
+                                GetAllCustomerNotesEvent(
+                                    id: customerData!.id.toString()));
+                          } else if (value == 2) {
+                            BlocProvider.of<CustomerBloc>(context)
+                                .messageCurrentPage = 1;
+                            BlocProvider.of<CustomerBloc>(context)
+                                .messageTotalPage = 1;
+                            BlocProvider.of<CustomerBloc>(context)
+                                .add(GetCustomerMessageEvent());
+                          } else if (value == 3) {
+                            BlocProvider.of<CustomerBloc>(context).currentPage =
+                                1;
+                            BlocProvider.of<CustomerBloc>(context).add(
+                                GetCustomerVehiclesEvent(
+                                    id: customerData!.id.toString()));
+                          } else if (value == 4) {
+                            BlocProvider.of<CustomerBloc>(context).currentPage =
+                                1;
+                            estimateData.clear();
+                            BlocProvider.of<CustomerBloc>(context).add(
+                                GetCustomerEstimatesEvent(
+                                    customerId: customerData!.id.toString()));
+                          }
+                        },
+                        groupValue: selectedIndex,
+                        children: {
+                          for (int i = 0; i < _segmentTitles.length; i++)
+                            i: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 12, horizontal: 25),
+                              child: _segmentTitles[i],
+                            )
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      selectedIndex == 0
+                          ? detailsWidget(context, state)
+                          : selectedIndex == 1
+                              ? Expanded(
+                                  child: notesWidget(state),
+                                )
+                              : selectedIndex == 2
+                                  ? chatWidget(context)
+                                  : selectedIndex == 3
+                                      ? vehiclesWidget(state)
+                                      : estimateWidget(state, context)
+                    ],
+                  ),
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -354,7 +353,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             .isPagenationLoading = true;
                         BlocProvider.of<CustomerBloc>(context).add(
                             GetCustomerVehiclesEvent(
-                                id: widget.customerData.id.toString()));
+                                id: customerData!.id.toString()));
                       }
                     }),
                   itemBuilder: (context, index) {
@@ -479,10 +478,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               height: 5,
                             ),
                             Text(
-                              widget.customerData.phone.isEmpty
+                              customerData != null &&
+                                      customerData!.phone.isEmpty
                                   ? ''
-                                  : '(${widget.customerData.phone.substring(0, 3)}) ${widget.customerData.phone.substring(3, 6)}-${widget.customerData.phone.substring(6)}'
-                              // widget.customerData.phone.toString()
+                                  : '(${customerData?.phone.substring(0, 3)}) ${customerData?.phone.substring(3, 6)}-${customerData?.phone.substring(6)}'
+                              // customerData!.phone.toString()
                               ,
                               style: const TextStyle(
                                   fontSize: 16,
@@ -497,7 +497,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               onPressed: () {
                                 final Uri smsLaunchUri = Uri(
                                   scheme: 'sms',
-                                  path: widget.customerData.phone,
+                                  path: customerData!.phone,
                                   queryParameters: <String, String>{
                                     'body': Uri.encodeComponent(' '),
                                   },
@@ -519,7 +519,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               onPressed: () {
                                 final Uri emailLaunchUri = Uri(
                                   scheme: 'tel',
-                                  path: widget.customerData.phone ?? '',
+                                  path: customerData!.phone ?? '',
                                 );
 
                                 launchUrl(emailLaunchUri);
@@ -561,7 +561,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                               height: 5,
                             ),
                             Text(
-                              widget.customerData.email.toString(),
+                              (customerData?.email ?? '').toString(),
                               style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -581,7 +581,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
                             final Uri emailLaunchUri = Uri(
                               scheme: 'mailto',
-                              path: widget.customerData.email,
+                              path: customerData!.email,
                               query: encodeQueryParameters(<String, String>{
                                 'subject': ' ',
                               }),
@@ -617,9 +617,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                       height: 5,
                     ),
                     Text(
-                      widget.customerData.addressLine1 == null
+                      customerData != null && customerData!.addressLine1 == null
                           ? ''
-                          : widget.customerData.addressLine1.toString(),
+                          : (customerData?.addressLine1).toString(),
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -661,12 +661,12 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                       height: 5,
                     ),
                     Text(
-                      widget.customerData.createdAt == null
+                      customerData == null || customerData!.createdAt == null
                           ? ""
                           : AppUtils.getFormattedForInformationScreen(
-                                  widget.customerData.createdAt.toString())
+                                  (customerData?.createdAt).toString())
                               .toString(),
-                      // widget.customerData.createdAt.toString(),
+                      // customerData!.createdAt.toString(),
                       style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -743,7 +743,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                         context.read<CustomerBloc>()
                           ..isFetching = true
                           ..add(GetCustomerEstimatesEvent(
-                              customerId: widget.customerData.id.toString()));
+                              customerId: customerData!.id.toString()));
                       }
                     }),
                   itemCount: estimateData.length + 1,
@@ -1054,7 +1054,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           Icons.add,
                           "New Vehicle",
                           CreateVehicleScreen(
-                            customerId: widget.customerData.id.toString(),
+                            customerId: customerData!.id.toString(),
                           ),
                         ),
                         const SizedBox(
@@ -1065,7 +1065,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           Icons.add,
                           "New Estimate",
                           DummyCustomerScreen(
-                            customerId: widget.customerData.id.toString(),
+                            customerId: customerData!.id.toString(),
                             navigation: 'customer_navigation',
                           ),
                         ),
@@ -1077,7 +1077,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           Icons.edit,
                           "Edit Customer",
                           NewCustomerScreen(
-                            customerEdit: widget.customerData,
+                            customerEdit: customerData!,
                           ),
                         ),
                         const SizedBox(
@@ -1161,7 +1161,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                         Navigator.of(context).pop(true);
                         BlocProvider.of<CustomerBloc>(context).add(
                             DeleteCustomerEvent(
-                                customerId: widget.customerData.id.toString(),
+                                customerId: customerData!.id.toString(),
                                 context: context));
                       },
                     ),
@@ -1348,13 +1348,13 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                   context.read<CustomerBloc>().add(
                                       SendCustomerMessageEvent(
                                           customerId:
-                                              widget.customerData.id.toString(),
+                                              customerData!.id.toString(),
                                           messageBody: messageController.text));
 
                                   cm.Datum localMessage = cm.Datum(
-                                      clientId: widget.customerData.clientId,
+                                      clientId: customerData!.clientId,
                                       createdAt: DateTime.now(),
-                                      id: widget.customerData.id,
+                                      id: customerData!.id,
                                       messageBody: messageController.text,
                                       messageType: "",
                                       receiverCustomerId: null,
@@ -1608,8 +1608,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                 addNoteErrorStatus = '';
                                 BlocProvider.of<CustomerBloc>(context).add(
                                     CreateCustomerNoteEvent(
-                                        customerId:
-                                            widget.customerData.id.toString(),
+                                        customerId: customerData!.id.toString(),
                                         notes: addNoteController.text.trim()));
                               }
                               setDialog(() {});
@@ -1692,7 +1691,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
     //                           BlocProvider.of<CustomerBloc>(context).add(
     //                               CreateCustomerNoteEvent(
     //                                   customerId:
-    //                                       widget.customerData.id.toString(),
+    //                                       customerData!.id.toString(),
     //                                   notes: addNoteController.text.trim()));
     //                         }
     //                         setDialog(() {});

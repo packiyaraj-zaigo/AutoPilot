@@ -10,6 +10,7 @@ import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
+import 'package:auto_pilot/Screens/global_search_screen.dart';
 import 'package:auto_pilot/Screens/new_appointment_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/no_internet_screen.dart';
@@ -21,6 +22,7 @@ import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -540,6 +542,36 @@ class _BottomBarScreenState extends State<BottomBarScreen>
           padding: const EdgeInsets.all(24.0),
           child: Column(
             children: [
+              CupertinoTextField(
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => const GlobalSearchScreen(),
+                  ));
+                },
+                textAlignVertical: TextAlignVertical.bottom,
+                padding: const EdgeInsets.only(top: 14, bottom: 14, left: 16),
+                readOnly: true,
+                prefix: const Row(
+                  children: [
+                    SizedBox(width: 24),
+                    Icon(
+                      CupertinoIcons.search,
+                      color: Color(0xFF7F808C),
+                      size: 20,
+                    ),
+                  ],
+                ),
+                placeholder: 'Search By Keyword',
+                maxLines: 1,
+                placeholderStyle: const TextStyle(
+                  color: Color(0xFF7F808C),
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              const Divider(),
               bottomSheetTile(
                   "New Estimate",
                   "assets/images/estimate_icon.svg",
