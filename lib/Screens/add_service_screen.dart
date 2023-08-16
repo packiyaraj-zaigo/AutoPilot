@@ -824,7 +824,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
-                      label == 'Price '
+                      label == 'Price ' ||
+                      label == "Quantity"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == 'Discount' ||
@@ -834,7 +835,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
-                      label == 'Price '
+                      label == 'Price ' ||
+                      label == "Quantity"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : [],
               maxLength: 25,
