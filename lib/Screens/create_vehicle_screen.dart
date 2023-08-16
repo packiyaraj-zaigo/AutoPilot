@@ -19,19 +19,20 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateVehicleScreen extends StatefulWidget {
-  const CreateVehicleScreen({
-    super.key,
-    this.vehicle,
-    this.vin = '',
-    this.editVehicle,
-    this.navigation,
-    this.customerId,
-  });
+  const CreateVehicleScreen(
+      {super.key,
+      this.vehicle,
+      this.vin = '',
+      this.editVehicle,
+      this.navigation,
+      this.customerId,
+      this.orderId});
   final String vin;
   final VinGlobalSearchResponseModel? vehicle;
   final Vehicle? editVehicle;
   final String? navigation;
   final String? customerId;
+  final String? orderId;
 
   @override
   State<CreateVehicleScreen> createState() => _CreateVehicleScreenState();
@@ -158,7 +159,17 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                     CommonWidgets().showDialog(context, state.message);
                   } else if (state is CreateVehicleSuccessState) {
                     if (widget.navigation == "partial_estimate") {
-                      Navigator.pop(context);
+                      //   Navigator.pop(context);
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) {
+                          return DummyVehicleScreen(
+                            vehicleId: state.createdId.toString(),
+                            navigation: "partial_estimate",
+                            customerId: widget.customerId,
+                            orderId: widget.orderId,
+                          );
+                        },
+                      ));
                     } else if (widget.navigation != null &&
                         !isChecked &&
                         widget.navigation != "estimate_screen") {
@@ -176,10 +187,23 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                           return DummyVehicleScreen(
                             vehicleId: state.createdId.toString(),
                             navigation: "vehicle_info",
+                            customerId: widget.customerId,
+                            orderId: widget.orderId,
+                          );
+                        },
+                      ));
+                    } else if (widget.navigation == "estimate_screen" &&
+                        !isChecked) {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                        builder: (context) {
+                          return DummyVehicleScreen(
+                            vehicleId: state.createdId,
+                            navigation: widget.navigation,
                           );
                         },
                       ));
                     } else {
+                      log("nav herrre");
                       Navigator.pop(context, vinController.text);
                     }
                     CommonWidgets().showSuccessDialog(

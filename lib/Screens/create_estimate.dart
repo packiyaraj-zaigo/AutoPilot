@@ -22,9 +22,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CreateEstimateScreen extends StatefulWidget {
-  const CreateEstimateScreen(
-      {super.key});
-  
+  const CreateEstimateScreen({super.key});
 
   @override
   State<CreateEstimateScreen> createState() => _CreateEstimateScreenState();

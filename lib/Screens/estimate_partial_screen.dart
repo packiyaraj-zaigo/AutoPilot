@@ -1785,6 +1785,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             builder: (context) {
                               return NewCustomerScreen(
                                 navigation: "partial_estimate",
+                                orderId: widget.estimateDetails.data.id.toString(),
+
                               );
                             },
                             isScrollControlled: true,
@@ -1795,6 +1797,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             builder: (context) {
                               return CreateVehicleScreen(
                                 navigation: "partial_estimate",
+                                customerId: widget.estimateDetails.data.customer?.id.toString()??"0",
+                                orderId: widget.estimateDetails.data.id.toString(),
+                                
                               );
                             },
                             isScrollControlled: true,
