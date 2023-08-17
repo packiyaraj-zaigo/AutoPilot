@@ -364,16 +364,14 @@ class ApiRepository {
   }
 
   Future getAllWorkflows(String token) {
-    return apiProvider.getAllWorkflows(token);
+    return apiProvider.getAllWorkflows(token);}
   Future authServiceByTech(dynamic token, String auth, String serviceName,
       String technicianId, String serviceId) {
     return apiProvider.authServiceByTech(
         token, serviceId, technicianId, serviceName, auth);
   }
 
-  Future getAllWorkflows(String token, int page) {
-    return apiProvider.getAllWorkflows(token, page);
-  }
+
 
   Future editWorkflows(String token, String clientBucketId, String orderId,
       String updatedBy, String oldBucketId, String workflowId) async {
