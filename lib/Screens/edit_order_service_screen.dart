@@ -1340,61 +1340,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ],
                       ),
                       errorWidget(error: addMaterialDiscountErrorStatus),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 17),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "Label",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Color(0xff6A7187),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                newSetState(() {
-                                  tagDataList.add("Tag");
-                                });
-                              },
-                              child: const Row(
-                                children: [
-                                  Icon(
-                                    Icons.add,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                  Text(
-                                    "Add New",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.primaryColors,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                //  maxCrossAxisExtent: 150,
-                                mainAxisSpacing: 20,
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 8,
-                                childAspectRatio: 3),
-                        itemBuilder: (context, index) {
-                          return tagWidget(
-                              tagDataList[index], index, newSetState);
-                        },
-                        itemCount: tagDataList.length,
-                        physics: ClampingScrollPhysics(),
-                        shrinkWrap: true,
-                      ),
+                     
                       Padding(
                         padding: EdgeInsets.only(top: 17),
                         child: textBox(
@@ -1795,61 +1741,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addPartDiscountErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Label",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              newSetState(() {
-                                tagDataList.add("Tag");
-                              });
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                ),
-                                Text(
-                                  "Add New",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
+                    
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: textBox(
@@ -2441,61 +2333,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           addFeeCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Label",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              newSetState(() {
-                                tagDataList.add("Tag");
-                              });
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                ),
-                                Text(
-                                  "Add New",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
+                    
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2670,7 +2508,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractCostController.text) ??
+              discount = ((double.tryParse(addSubContractPriceController.text) ??
                           0) *
                       (double.tryParse(addSubContractDiscountController.text) ??
                           0)) /
@@ -2694,7 +2532,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractCostController.text) ??
+              discount = ((double.tryParse(addSubContractPriceController.text) ??
                           0) *
                       (double.tryParse(addSubContractDiscountController.text) ??
                           0)) /
@@ -2849,61 +2687,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addSubContractDiscountErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Label",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xff6A7187),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              newSetState(() {
-                                tagDataList.add("Tag");
-                              });
-                            },
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.add,
-                                  color: AppColors.primaryColors,
-                                ),
-                                Text(
-                                  "Add New",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryColors,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
+                    
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
