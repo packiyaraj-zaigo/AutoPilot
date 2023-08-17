@@ -837,7 +837,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
             height: 56,
-            width: label == "Price" || label == "Cost"
+            width: label == "Price" || label == "Cost" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
@@ -876,7 +876,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
-                      label == 'Price '
+                      label == 'Price ' ||
+                      label == "Quantity"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == 'Discount' ||
@@ -886,7 +887,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
-                      label == 'Price '
+                      label == 'Price ' ||
+                      label == "Quantity"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : [],
               maxLength: 50,
