@@ -364,14 +364,14 @@ class ApiRepository {
   }
 
   Future getAllWorkflows(String token) {
-    return apiProvider.getAllWorkflows(token);}
+    return apiProvider.getAllWorkflows(token);
+  }
+
   Future authServiceByTech(dynamic token, String auth, String serviceName,
       String technicianId, String serviceId) {
     return apiProvider.authServiceByTech(
         token, serviceId, technicianId, serviceName, auth);
   }
-
-
 
   Future editWorkflows(String token, String clientBucketId, String orderId,
       String updatedBy, String oldBucketId, String workflowId) async {
@@ -547,9 +547,10 @@ class ApiRepository {
       String paymentMode,
       String amount,
       String date,
-      String notes) async {
-    return apiProvider.collectPayment(
-        token, customerId, orderId, paymentMode, amount, date, notes);
+      String notes,
+      String? transactionId) async {
+    return apiProvider.collectPayment(token, customerId, orderId, paymentMode,
+        amount, date, notes, transactionId);
   }
 
   Future<dynamic> deleteEstimate(dynamic token, String id) async {

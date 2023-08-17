@@ -1909,7 +1909,8 @@ class ApiProvider {
       String paymentMode,
       String amount,
       String date,
-      String notes) async {
+      String notes,
+      String? transactionId) async {
     try {
       final body = {
         "customer_id": customerId,
@@ -1919,6 +1920,9 @@ class ApiProvider {
         "payment_date": date,
         "note": notes
       };
+      if (transactionId != null) {
+        body['transaction_id'] = transactionId;
+      }
 
       final url = Uri.parse('${BASE_URL}api/payments');
       final response = await http.post(url,

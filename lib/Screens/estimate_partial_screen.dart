@@ -115,12 +115,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   final creditNameOnCardController = TextEditingController();
   final creditCardNumberController = TextEditingController();
   final creditRefNumberController = TextEditingController();
+  final creditDateController = TextEditingController();
   bool paymentAmountErrorStatus = false;
   bool cashDateErrorStatus = false;
   bool cashNoteErrorStatus = false;
   bool creditNameErrorStatus = false;
   bool creditCardNumberErrorStatus = false;
   bool creditRefNumberErrorStatus = false;
+  bool creditDateErrorStatus = false;
   late TabController tabController;
   bool isDrop = false;
 
@@ -1519,7 +1521,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget serviceDetailsWidget() {
-    log((widget.estimateDetails.data.orderService?.length).toString()+"loooooo");
+    log((widget.estimateDetails.data.orderService?.length).toString() +
+        "loooooo");
     return ListView.builder(
       itemBuilder: (context, index) {
         return serviceTileWidget(index);
@@ -1812,7 +1815,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               readOnly: label == 'Date' ||
                       label == "Vehicle" ||
                       label == "Customer" ||
-                      label == "Service"
+                      label == "Service" ||
+                      label == "Payment Date"
                   ? true
                   : false,
               onTap: () async {
@@ -1904,6 +1908,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
+                  suffix: label == "Amount To Pay"
+                      ? GestureDetector(
+                          onTap: () {
+                            paymentAmountController.text =
+                                balanceDueAmount.toStringAsFixed(2);
+                          },
+                          child: const Text(
+                            "Full Amount",
+                            style: TextStyle(
+                                color: AppColors.primaryColors,
+                                fontWeight: FontWeight.w600),
+                          ))
+                      : null,
                   suffixIcon: label == "Customer" ||
                           label == "Vehicle" ||
                           label == "Service"
@@ -1911,7 +1928,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           Icons.keyboard_arrow_down_rounded,
                           color: AppColors.primaryColors,
                         )
-                      : const SizedBox(),
+                      : null,
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
@@ -2397,7 +2414,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         }
         if (element2.itemType.toLowerCase() == "labor") {
           setState(() {
-            laborAmount = laborAmount + double.parse(element2.unitPrice);
+            laborAmount = laborAmount +
+                (double.parse(element2.unitPrice) *
+                    int.parse(element2.quanityHours));
           });
         }
         if (element2.itemType.toLowerCase() == "subcontract") {
@@ -2413,7 +2432,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         }
         if (element2.itemType.toLowerCase() == "part") {
           setState(() {
-            partAmount = partAmount + double.parse(element2.unitPrice);
+            partAmount = partAmount +
+                (double.parse(element2.unitPrice) *
+                    int.parse(element2.quanityHours));
           });
         }
 
@@ -2481,6 +2502,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             cashNoteController.clear();
 
             Navigator.pop(context);
+            CommonWidgets().showSuccessDialog(
+                _scaffoldKey.currentContext!, "Payment Successful");
           }
         },
         child: BlocBuilder<EstimateBloc, EstimateState>(
@@ -2507,6 +2530,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         ),
                         GestureDetector(
                             onTap: () {
+                              tabController.index = 0;
+
+                              paymentAmountController.clear();
+                              cashDateController.clear();
+                              cashNoteController.clear();
+                              creditCardNumberController.clear();
+                              creditRefNumberController.clear();
+
                               Navigator.pop(context);
                             },
                             child: const Icon(Icons.close))
@@ -2605,26 +2636,76 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               padding: const EdgeInsets.only(top: 24.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  context.read<EstimateBloc>().add(
-                                        CollectPaymentEstimateEvent(
-                                            amount:
-                                                paymentAmountController.text,
-                                            customerId: widget.estimateDetails
-                                                    .data.customer?.id
-                                                    .toString() ??
-                                                "",
-                                            orderId: widget
-                                                .estimateDetails.data.id
-                                                .toString(),
-                                            paymentMode:
-                                                tabController.index == 0
-                                                    ? "Cash"
-                                                    : tabController.index == 1
-                                                        ? "Credit Card"
-                                                        : "Check",
-                                            date: cashDateController.text,
-                                            note: cashNoteController.text),
-                                      );
+                                  if (tabController.index == 0) {
+                                    context.read<EstimateBloc>().add(
+                                          CollectPaymentEstimateEvent(
+                                              amount:
+                                                  paymentAmountController.text,
+                                              customerId: widget.estimateDetails
+                                                      .data.customer?.id
+                                                      .toString() ??
+                                                  "",
+                                              orderId: widget
+                                                  .estimateDetails.data.id
+                                                  .toString(),
+                                              paymentMode: "Cash",
+                                              // tabController.index == 0
+                                              //     ? "Cash"
+                                              //     : tabController.index == 1
+                                              //         ? "Credit Card"
+                                              //         : "Check",
+                                              date: cashDateController.text,
+                                              note: cashNoteController.text),
+                                        );
+                                  } else if (tabController.index == 1) {
+                                    context.read<EstimateBloc>().add(
+                                          CollectPaymentEstimateEvent(
+                                              amount:
+                                                  paymentAmountController.text,
+                                              customerId: widget.estimateDetails
+                                                      .data.customer?.id
+                                                      .toString() ??
+                                                  "",
+                                              orderId: widget
+                                                  .estimateDetails.data.id
+                                                  .toString(),
+                                              paymentMode: "creditcard",
+                                              // tabController.index == 0
+                                              //     ? "Cash"
+                                              //     : tabController.index == 1
+                                              //         ? "Credit Card"
+                                              //         : "Check",
+                                              date: cashDateController.text,
+                                              note: creditCardNumberController
+                                                  .text
+                                                  .replaceAll("X", "")
+                                                  .trim(),
+                                              transactionId:
+                                                  creditRefNumberController
+                                                      .text),
+                                        );
+                                  } else {
+                                    context.read<EstimateBloc>().add(
+                                          CollectPaymentEstimateEvent(
+                                              amount:
+                                                  paymentAmountController.text,
+                                              customerId: widget.estimateDetails
+                                                      .data.customer?.id
+                                                      .toString() ??
+                                                  "",
+                                              orderId: widget
+                                                  .estimateDetails.data.id
+                                                  .toString(),
+                                              paymentMode: "check",
+                                              // tabController.index == 0
+                                              //     ? "Cash"
+                                              //     : tabController.index == 1
+                                              //         ? "Credit Card"
+                                              //         : "Check",
+                                              date: cashDateController.text,
+                                              note: cashNoteController.text),
+                                        );
+                                  }
                                 },
                                 child: Container(
                                   height: 56,
@@ -2688,8 +2769,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         padding: const EdgeInsets.only(top: 16.0),
         child: Column(
           children: [
-            textBox("Enter Name on Card", creditNameOnCardController,
-                "Name On Card", creditNameErrorStatus),
+            // textBox("Enter Name on Card", creditNameOnCardController,
+            //     "Name On Card", creditNameErrorStatus),
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: textBox(
@@ -2702,6 +2783,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               padding: const EdgeInsets.only(top: 8.0),
               child: textBox("Enter Transaction Id", creditRefNumberController,
                   "Transaction Id", creditRefNumberErrorStatus),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: textBox("Select Date", cashDateController, "Payment Date",
+                  creditDateErrorStatus),
             )
           ],
         ),

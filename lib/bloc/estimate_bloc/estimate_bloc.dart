@@ -787,7 +787,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           event.paymentMode,
           event.amount,
           event.date,
-          event.note);
+          event.note,
+          event.transactionId);
 
       log("res${collectPaymentRes.body}");
 
