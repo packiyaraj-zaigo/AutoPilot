@@ -273,6 +273,17 @@ class AppUtils {
     return userID ?? "";
   }
 
+  static Future<void> setCurrentUserID(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('current_user_id', value);
+  }
+
+  static Future<String> geCurrenttUserID() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userID = prefs.getString('current_user_id');
+    return userID ?? "";
+  }
+
   //temp for showing the add company screen.
   ///////////////////////////////////////////////////////////////
   static calendarStyle() {

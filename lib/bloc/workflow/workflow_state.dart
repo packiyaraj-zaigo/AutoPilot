@@ -11,8 +11,10 @@ class WorkflowInitial extends WorkflowState {}
 
 class GetAllWorkflowSuccessState extends WorkflowState {
   final List<WorkflowModel> workflows;
+  final List<WorkflowStatusModel> statuses;
   const GetAllWorkflowSuccessState({
     required this.workflows,
+    required this.statuses,
   });
 
   @override
@@ -36,3 +38,12 @@ class CreateWorkflowErrorState extends WorkflowState {
 }
 
 class CreateWorkflowSuccessState extends WorkflowState {}
+
+class EditWorkflowLoadingState extends WorkflowState {}
+
+class EditWorkflowErrorState extends WorkflowState {
+  final String message;
+  const EditWorkflowErrorState({required this.message});
+}
+
+class EditWorkflowSuccessState extends WorkflowState {}
