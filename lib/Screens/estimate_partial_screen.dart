@@ -81,6 +81,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   String vehicleErrorMsg = "";
   String customerErrorMsg = '';
   String estimateNoteErrorMsg = '';
+  String authStatus = "";
 
   //Estimate note model variables
 
@@ -128,7 +129,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   List<String> authorizedValues = [
     "Not Yet Authorized",
     "Authorized",
-    "Declined"
   ];
   int authorizedIndex = 0;
 
@@ -146,6 +146,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     calculateAmount();
     print(materialAmount.toString() + "amount");
     tabController = TabController(length: 3, vsync: this);
+
     // TODO: implement initState
     super.initState();
   }
@@ -292,7 +293,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           ));
                         } else if (widget.navigation == 'search') {
                           Navigator.pop(context);
-                        }  else {
+                        } else {
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(
                             builder: (context) {
@@ -498,8 +499,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 ),
                               );
                             } else if (widget.navigation == 'search') {
-                  Navigator.pop(context);
-                }  else {
+                              Navigator.pop(context);
+                            } else {
                               Navigator.pushAndRemoveUntil(context,
                                   MaterialPageRoute(
                                 builder: (context) {
@@ -538,9 +539,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Estimate Details',
-                          style: TextStyle(
+                        Text(
+                          '${widget.estimateDetails.data.orderStatus} Details',
+                          style: const TextStyle(
                               color: AppColors.primaryTitleColor,
                               fontSize: 28,
                               fontWeight: FontWeight.w600),
@@ -562,7 +563,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Estimate #${widget.estimateDetails.data.orderNumber}',
+                                '${widget.estimateDetails.data.orderStatus} #${widget.estimateDetails.data.orderNumber}',
                                 style: const TextStyle(
                                     color: AppColors.primaryTitleColor,
                                     fontSize: 18,
@@ -998,62 +999,80 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 }
                               }
                             },
-                            child: Container(
-                              height: 56,
-                              alignment: Alignment.center,
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: balanceDueAmount <= 0 &&
-                                          widget.estimateDetails.data
-                                                  .orderService !=
-                                              null &&
-                                          widget.estimateDetails.data
-                                              .orderService!.isNotEmpty &&
-                                          widget
-                                                  .estimateDetails
-                                                  .data
-                                                  .orderService![0]
-                                                  .orderServiceItems !=
-                                              null
-                                      //      &&
-                                      // widget
-                                      //     .estimateDetails
-                                      //     .data
-                                      //     .orderService![0]
-                                      //     .orderServiceItems!
-                                      //     .isNotEmpty
-                                      ? const Color(0xff12A58C)
-                                      : AppColors.primaryColors),
-                              child: Text(
-                                balanceDueAmount <= 0 &&
-                                        widget.estimateDetails.data
-                                                .orderService !=
-                                            null &&
-                                        widget.estimateDetails.data
-                                            .orderService!.isNotEmpty &&
-                                        widget
-                                                .estimateDetails
-                                                .data
-                                                .orderService![0]
-                                                .orderServiceItems !=
-                                            null
-                                    //  &&
-                                    // widget
-                                    //     .estimateDetails
-                                    //     .data
-                                    //     .orderService![0]
-                                    //     .orderServiceItems!
-                                    //     .isNotEmpty
-                                    ? "Paid In Full"
-                                    : "Collect Payment",
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                            child: widget.estimateDetails.data.orderStatus ==
+                                    "Estimate"
+                                ? Container(
+                                    height: 56,
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.grey.shade300),
+                                    child: Text(
+                                      "Collect Payment",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.grey.shade500,
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: 56,
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: balanceDueAmount <= 0 &&
+                                                widget.estimateDetails.data
+                                                        .orderService !=
+                                                    null &&
+                                                widget.estimateDetails.data
+                                                    .orderService!.isNotEmpty &&
+                                                widget
+                                                        .estimateDetails
+                                                        .data
+                                                        .orderService![0]
+                                                        .orderServiceItems !=
+                                                    null
+                                            //      &&
+                                            // widget
+                                            //     .estimateDetails
+                                            //     .data
+                                            //     .orderService![0]
+                                            //     .orderServiceItems!
+                                            //     .isNotEmpty
+                                            ? const Color(0xff12A58C)
+                                            : AppColors.primaryColors),
+                                    child: Text(
+                                      balanceDueAmount <= 0 &&
+                                              widget.estimateDetails.data
+                                                      .orderService !=
+                                                  null &&
+                                              widget.estimateDetails.data
+                                                  .orderService!.isNotEmpty &&
+                                              widget
+                                                      .estimateDetails
+                                                      .data
+                                                      .orderService![0]
+                                                      .orderServiceItems !=
+                                                  null
+                                          //  &&
+                                          // widget
+                                          //     .estimateDetails
+                                          //     .data
+                                          //     .orderService![0]
+                                          //     .orderServiceItems!
+                                          //     .isNotEmpty
+                                          ? "Paid In Full"
+                                          : "Collect Payment",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(
@@ -1500,6 +1519,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget serviceDetailsWidget() {
+    log((widget.estimateDetails.data.orderService?.length).toString()+"loooooo");
     return ListView.builder(
       itemBuilder: (context, index) {
         return serviceTileWidget(index);
@@ -1550,7 +1570,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               onTap: () {
                                 showModalBottomSheet(
                                   context: context,
+                                  isScrollControlled: true,
                                   builder: (context) {
+                                    changeAuthIndex(widget
+                                        .estimateDetails
+                                        .data
+                                        .orderService![serviceIndex]
+                                        .isAuthorized);
                                     return editServiceSheet(
                                         widget.estimateDetails.data
                                                 .orderService?[serviceIndex].id
@@ -1645,6 +1671,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         .orderServiceItems
                         ?.length ??
                     0,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Text(
+                  widget.estimateDetails.data.orderService?[serviceIndex]
+                              .isAuthorized ==
+                          "Y"
+                      ? "Authorized"
+                      : "Not Yet Authorized",
+                  style: TextStyle(
+                      color: widget.estimateDetails.data
+                                  .orderService?[serviceIndex].isAuthorized ==
+                              "Y"
+                          ? Color(0xff12A58C)
+                          : Color(0xffFF5C5C)),
+                ),
               )
             ],
           ),
@@ -2686,13 +2728,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               padding: const EdgeInsets.only(top: 18.0),
               child: GestureDetector(
                 onTap: () {
-                  if(!isVehicleEdit){
-
                   setState(() {
                     isCustomerEdit = true;
                   });
                   Navigator.pop(context);
-                  }
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -2704,14 +2743,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset("assets/images/edit_pen_icon.svg",
-                      color: isVehicleEdit?Colors.grey:AppColors.primaryColors,),
-                       Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 8.0),
                         child: Text(
                           "Edit Customer",
                           style: TextStyle(
-                              color:isVehicleEdit?Colors.grey: AppColors.primaryColors,
+                              color: AppColors.primaryColors,
                               fontSize: 18,
                               fontWeight: FontWeight.w600),
                         ),
@@ -2725,7 +2763,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 padding: const EdgeInsets.only(top: 18.0),
                 child: GestureDetector(
                   onTap: () {
-                    if (widget.estimateDetails.data.vehicle != null && !isCustomerEdit) {
+                    if (widget.estimateDetails.data.vehicle != null) {
                       setState(() {
                         isVehicleEdit = true;
                       });
@@ -2745,7 +2783,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       children: [
                         SvgPicture.asset(
                           "assets/images/edit_pen_icon.svg",
-                          color: widget.estimateDetails.data.vehicle != null && !isCustomerEdit
+                          color: widget.estimateDetails.data.vehicle != null
                               ? AppColors.primaryColors
                               : Colors.grey,
                         ),
@@ -2755,7 +2793,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             "Edit Vehicle",
                             style: TextStyle(
                                 color:
-                                    widget.estimateDetails.data.vehicle != null && !isCustomerEdit
+                                    widget.estimateDetails.data.vehicle != null
                                         ? AppColors.primaryColors
                                         : Colors.grey,
                                 fontSize: 18,
@@ -3073,285 +3111,353 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget editServiceSheet(String id, int index) {
-    return Container(
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 2.6,
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Select an option",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0),
-              child: GestureDetector(
-                onTap: () {
-                  // setState(() {
-                  //   // isEstimateNoteEdit = true;
-                  //   // estimateNoteEditId = id;
-                  //   // estimateNoteController.text = oldNote;
-                  // });
-                  List<CannedServiceAddModel> materialAddModel = [];
-                  List<CannedServiceAddModel> partAddModel = [];
-                  List<CannedServiceAddModel> laborAddModel = [];
-                  List<CannedServiceAddModel> feeAddModel = [];
-                  List<CannedServiceAddModel> subContractAddModel = [];
-
-                  // print(widget.estimateDetails.data.orderService![index]
-                  //         .orderServiceItems![2]
-                  //         .toJson()
-                  //         .toString() +
-                  //     "lissttt");
-
-                  if (widget.estimateDetails.data.orderService![index]
-                      .orderServiceItems!.isNotEmpty) {
-                    widget.estimateDetails.data.orderService![index]
-                        .orderServiceItems!
-                        .forEach((e) {
-                      print("maapppp");
-
-                      if (e.itemType == "Material") {
-                        print("map in if");
-                        materialAddModel.add(
-                          CannedServiceAddModel(
-                            cannedServiceId: e.orderServiceId,
-                            itemName: e.itemName,
-                            unitPrice: e.unitPrice,
-                            discount: e.discount,
-                            subTotal: e.subTotal,
-                            note: e.itemServiceNote ?? "",
-                            part: e.partName ?? "",
-                            discountType: e.discountType,
-                            id: e.id.toString(),
-                            itemType: e.itemType,
-                            position: e.position,
-                            quanityHours: e.quanityHours,
-                            tax: e.tax,
-                            vendorId: e.vendorId,
-                          ),
-                        );
-                      } else if (e.itemType.toLowerCase() == "part") {
-                        partAddModel.add(CannedServiceAddModel(
-                            cannedServiceId: e.orderServiceId,
-                            itemName: e.itemName,
-                            unitPrice: e.unitPrice,
-                            discount: e.discount,
-                            subTotal: e.subTotal,
-                            note: e.itemServiceNote ?? '',
-                            part: e.partName ?? "",
-                            discountType: e.discountType,
-                            id: e.id.toString(),
-                            itemType: e.itemType,
-                            position: e.position,
-                            quanityHours: e.quanityHours,
-                            tax: e.tax,
-                            vendorId: e.vendorId));
-                      } else if (e.itemType.toLowerCase() == "labor") {
-                        laborAddModel.add(CannedServiceAddModel(
-                            cannedServiceId: e.orderServiceId,
-                            itemName: e.itemName,
-                            unitPrice: e.unitPrice,
-                            discount: e.discount,
-                            subTotal: e.subTotal,
-                            note: e.itemServiceNote ?? "",
-                            part: e.partName ?? "",
-                            discountType: e.discountType,
-                            id: e.id.toString(),
-                            itemType: e.itemType,
-                            position: e.position,
-                            quanityHours: e.quanityHours,
-                            tax: e.tax,
-                            vendorId: e.vendorId));
-                      } else if (e.itemType.toLowerCase() == "fee") {
-                        feeAddModel.add(CannedServiceAddModel(
-                            cannedServiceId: e.orderServiceId,
-                            itemName: e.itemName,
-                            unitPrice: e.unitPrice,
-                            discount: e.discount,
-                            subTotal: e.subTotal,
-                            note: e.itemServiceNote ?? "",
-                            part: e.partName ?? "",
-                            discountType: e.discountType,
-                            id: e.id.toString(),
-                            itemType: e.itemType,
-                            position: e.position,
-                            quanityHours: e.quanityHours,
-                            tax: e.tax,
-                            vendorId: e.vendorId));
-                      } else if (e.itemType.toLowerCase() == "subcontract") {
-                        subContractAddModel.add(CannedServiceAddModel(
-                            cannedServiceId: e.orderServiceId,
-                            itemName: e.itemName,
-                            unitPrice: e.unitPrice,
-                            discount: e.discount,
-                            subTotal: e.subTotal,
-                            note: e.itemServiceNote ?? "",
-                            part: e.partName ?? "",
-                            discountType: e.discountType,
-                            id: e.id.toString(),
-                            itemType: e.itemType,
-                            position: e.position,
-                            quanityHours: e.quanityHours,
-                            tax: e.tax,
-                            vendorId: e.vendorId));
-                      }
-                    });
-                  }
-
-                  Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) {
-                      return EditOrderServiceScreen(
-                        material: materialAddModel,
-                        fee: feeAddModel,
-                        labor: laborAddModel,
-                        part: partAddModel,
-                        technicianId: widget.estimateDetails.data
-                                    .orderService![index].technicianId !=
-                                0
-                            ? widget.estimateDetails.data.orderService![index]
-                                .technicianId
-                                .toString()
-                            : "",
-                        orderId: widget.estimateDetails.data.id.toString(),
-                        subContract: subContractAddModel,
-                        service: cs.Datum(
-                            id: widget
-                                .estimateDetails.data.orderService![index].id,
-                            clientId: widget.estimateDetails.data.clientId,
-                            serviceNote: widget.estimateDetails.data
-                                .orderService![index].serviceNote,
-                            serviceName: widget.estimateDetails.data
-                                .orderService![index].serviceName,
-                            servicePrice: widget.estimateDetails.data
-                                .orderService![index].servicePrice,
-                            discount: widget.estimateDetails.data
-                                .orderService![index].discount,
-                            serviceEpa: widget.estimateDetails.data
-                                .orderService![index].serviceEpa,
-                            shopSupplies: widget.estimateDetails.data
-                                .orderService![index].shopSupplies,
-                            tax: widget
-                                .estimateDetails.data.orderService![index].tax,
-                            subTotal: widget.estimateDetails.data
-                                .orderService![index].subTotal,
-                            maintenancePeriod: widget.estimateDetails.data
-                                .orderService![index].maintenancePeriod,
-                            maintenancePeriodType: widget.estimateDetails.data
-                                .orderService![index].maintenancePeriodType,
-                            communicationChannel: widget.estimateDetails.data
-                                .orderService![index].communicationChannel,
-                            createdAt: widget.estimateDetails.data
-                                .orderService![index].createdAt,
-                            updatedAt: widget.estimateDetails.data
-                                .orderService![index].updatedAt),
-                      );
+    return StatefulBuilder(builder: (context, newSetState) {
+      return SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(12)),
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height / 2,
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Select an option",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      newSetState(() {
+                        isDrop = true;
+                      });
                     },
-                  ));
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  height: 56,
-                  decoration: BoxDecoration(
-                      color: const Color(0xffF6F6F6),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Edit",
-                          style: TextStyle(
-                              color: AppColors.primaryColors,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
+                    child: isDrop
+                        ? authorizeDrop(
+                            newSetState,
+                            context,
+                            widget.estimateDetails.data.orderService![index].id
+                                .toString(),
+                            widget.estimateDetails.data.orderService![index]
+                                .serviceName,
+                            widget.estimateDetails.data.orderService![index]
+                                .technicianId
+                                .toString(),
+                            authStatus)
+                        : Container(
+                            height: 56,
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                                color: Color(0xffF6F6F6),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const SizedBox(),
+                                  Text(
+                                    authorizedValues[authorizedIndex],
+                                    style: const TextStyle(
+                                        color: AppColors.primaryColors,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  const Icon(
+                                    Icons.keyboard_arrow_down_rounded,
+                                    color: AppColors.primaryColors,
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  deleteOrderServicePopup(context, "", id, index);
-                  // print("ontapped");
-                  // deleteEstimatNotePopup(context, "", id);
+                Padding(
+                  padding: const EdgeInsets.only(top: 18.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      // setState(() {
+                      //   // isEstimateNoteEdit = true;
+                      //   // estimateNoteEditId = id;
+                      //   // estimateNoteController.text = oldNote;
+                      // });
+                      List<CannedServiceAddModel> materialAddModel = [];
+                      List<CannedServiceAddModel> partAddModel = [];
+                      List<CannedServiceAddModel> laborAddModel = [];
+                      List<CannedServiceAddModel> feeAddModel = [];
+                      List<CannedServiceAddModel> subContractAddModel = [];
 
-                  // Navigator.pop(context);
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  height: 56,
-                  decoration: BoxDecoration(
-                      color: const Color(0xffF6F6F6),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SvgPicture.asset("assets/images/delete_icon.svg"),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Remove",
-                          style: TextStyle(
-                              color: Color(0xffFF5C5C),
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
-                        ),
+                      // print(widget.estimateDetails.data.orderService![index]
+                      //         .orderServiceItems![2]
+                      //         .toJson()
+                      //         .toString() +
+                      //     "lissttt");
+
+                      if (widget.estimateDetails.data.orderService![index]
+                          .orderServiceItems!.isNotEmpty) {
+                        widget.estimateDetails.data.orderService![index]
+                            .orderServiceItems!
+                            .forEach((e) {
+                          print("maapppp");
+
+                          if (e.itemType == "Material") {
+                            print("map in if");
+                            materialAddModel.add(
+                              CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                              ),
+                            );
+                          } else if (e.itemType.toLowerCase() == "part") {
+                            partAddModel.add(CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? '',
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId));
+                          } else if (e.itemType.toLowerCase() == "labor") {
+                            laborAddModel.add(CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId));
+                          } else if (e.itemType.toLowerCase() == "fee") {
+                            feeAddModel.add(CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId));
+                          } else if (e.itemType.toLowerCase() ==
+                              "subcontract") {
+                            subContractAddModel.add(CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId));
+                          }
+                        });
+                      }
+
+                      Navigator.pop(context);
+                      Navigator.push(context, MaterialPageRoute(
+                        builder: (context) {
+                          return EditOrderServiceScreen(
+                            material: materialAddModel,
+                            fee: feeAddModel,
+                            labor: laborAddModel,
+                            part: partAddModel,
+                            technicianId: widget.estimateDetails.data
+                                        .orderService![index].technicianId !=
+                                    0
+                                ? widget.estimateDetails.data
+                                    .orderService![index].technicianId
+                                    .toString()
+                                : "",
+                            orderId: widget.estimateDetails.data.id.toString(),
+                            subContract: subContractAddModel,
+                            service: cs.Datum(
+                                id: widget.estimateDetails.data
+                                    .orderService![index].id,
+                                clientId: widget.estimateDetails.data.clientId,
+                                serviceNote: widget.estimateDetails.data
+                                    .orderService![index].serviceNote,
+                                serviceName: widget.estimateDetails.data
+                                    .orderService![index].serviceName,
+                                servicePrice: widget.estimateDetails.data
+                                    .orderService![index].servicePrice,
+                                discount: widget.estimateDetails.data
+                                    .orderService![index].discount,
+                                serviceEpa: widget.estimateDetails.data
+                                    .orderService![index].serviceEpa,
+                                shopSupplies: widget.estimateDetails.data
+                                    .orderService![index].shopSupplies,
+                                tax: widget.estimateDetails.data
+                                    .orderService![index].tax,
+                                subTotal: widget.estimateDetails.data
+                                    .orderService![index].subTotal,
+                                maintenancePeriod: widget.estimateDetails.data
+                                    .orderService![index].maintenancePeriod,
+                                maintenancePeriodType: widget
+                                    .estimateDetails
+                                    .data
+                                    .orderService![index]
+                                    .maintenancePeriodType,
+                                communicationChannel: widget
+                                    .estimateDetails
+                                    .data
+                                    .orderService![index]
+                                    .communicationChannel,
+                                createdAt: widget.estimateDetails.data
+                                    .orderService![index].createdAt,
+                                updatedAt: widget.estimateDetails.data
+                                    .orderService![index].updatedAt),
+                          );
+                        },
+                      ));
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      height: 56,
+                      decoration: BoxDecoration(
+                          color: const Color(0xffF6F6F6),
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset("assets/images/edit_pen_icon.svg"),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 8.0),
+                            child: Text(
+                              "Edit",
+                              style: TextStyle(
+                                  color: AppColors.primaryColors,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+                isDrop
+                    ? const SizedBox()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 18.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            deleteOrderServicePopup(context, "", id, index);
+                            // print("ontapped");
+                            // deleteEstimatNotePopup(context, "", id);
+
+                            // Navigator.pop(context);
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width,
+                            height: 56,
+                            decoration: BoxDecoration(
+                                color: const Color(0xffF6F6F6),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                    "assets/images/delete_icon.svg"),
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    "Remove",
+                                    style: TextStyle(
+                                        color: Color(0xffFF5C5C),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                isDrop
+                    ? const SizedBox()
+                    : Padding(
+                        padding: const EdgeInsets.only(top: 18.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width,
+                            height: 56,
+                            decoration: BoxDecoration(
+                                color: const Color(0xffF6F6F6),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                        color: AppColors.primaryTitleColor,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 18.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width,
-                  height: 56,
-                  decoration: BoxDecoration(
-                      color: const Color(0xffF6F6F6),
-                      borderRadius: BorderRadius.circular(8)),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Cancel",
-                          style: TextStyle(
-                              color: AppColors.primaryTitleColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            )
-          ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Future deleteEstimatNotePopup(BuildContext ctx, message, String id) {
@@ -3517,7 +3623,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               );
             } else if (widget.navigation == 'search') {
               Navigator.pop(context);
-            }  else {
+            } else {
               Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                 builder: (context) {
                   return BottomBarScreen(
@@ -3608,45 +3714,45 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            newSetState(() {
-                              isDrop = true;
-                            });
-                          },
-                          child: isDrop
-                              ? authorizeDrop(newSetState)
-                              : Container(
-                                  height: 56,
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                      color: Color(0xffF6F6F6),
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 24.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const SizedBox(),
-                                        Text(
-                                          authorizedValues[authorizedIndex],
-                                          style: const TextStyle(
-                                              color: AppColors.primaryColors,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600),
-                                        ),
-                                        const Icon(
-                                          Icons.keyboard_arrow_down_rounded,
-                                          color: AppColors.primaryColors,
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                        ),
+                        // GestureDetector(
+                        //   onTap: () {
+                        //     newSetState(() {
+                        //       isDrop = true;
+                        //     });
+                        //   },
+                        //   child: isDrop
+                        //       ? authorizeDrop(newSetState)
+                        //       : Container(
+                        //           height: 56,
+                        //           alignment: Alignment.center,
+                        //           width: MediaQuery.of(context).size.width,
+                        //           decoration: BoxDecoration(
+                        //               color: Color(0xffF6F6F6),
+                        //               borderRadius: BorderRadius.circular(8)),
+                        //           child: Padding(
+                        //             padding: const EdgeInsets.symmetric(
+                        //                 horizontal: 24.0),
+                        //             child: Row(
+                        //               mainAxisAlignment:
+                        //                   MainAxisAlignment.spaceBetween,
+                        //               children: [
+                        //                 const SizedBox(),
+                        //                 Text(
+                        //                   authorizedValues[authorizedIndex],
+                        //                   style: const TextStyle(
+                        //                       color: AppColors.primaryColors,
+                        //                       fontSize: 16,
+                        //                       fontWeight: FontWeight.w600),
+                        //                 ),
+                        //                 const Icon(
+                        //                   Icons.keyboard_arrow_down_rounded,
+                        //                   color: AppColors.primaryColors,
+                        //                 )
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         ),
+                        // ),
                         Padding(
                           padding: const EdgeInsets.only(top: 18.0),
                           child: GestureDetector(
@@ -3728,7 +3834,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     });
   }
 
-  Widget authorizeDrop(StateSetter newSetState) {
+  Widget authorizeDrop(StateSetter newSetState, BuildContext context, serviceId,
+      serviceName, technicianId, auth) {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -3783,13 +3890,29 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 children: [
                   GestureDetector(
                     onTap: () {
-                      newSetState(() {
-                        final temp = authorizedValues[0];
-                        authorizedValues[0] = authorizedValues[1];
-                        authorizedValues[1] = temp;
+                      // newSetState(() {
+                      //   final temp = authorizedValues[0];
+                      //   authorizedValues[0] = authorizedValues[1];
+                      //   authorizedValues[1] = temp;
 
-                        isDrop = false;
+                      //   isDrop = false;
+                      // });
+                      newSetState(() {
+                        authStatus = authorizedValues[1];
                       });
+
+                      showAuthPopup(
+                          authStatus == "Authorized"
+                              ? "Authorize Service?"
+                              : "Un Authorize Service?",
+                          authStatus == "Authorized"
+                              ? "Do you want to authorize this service"
+                              : "Do you want to unauthorize this service?",
+                          context,
+                          authStatus == "Authorized" ? "Y" : "N",
+                          serviceId,
+                          technicianId,
+                          serviceName);
                     },
                     child: Container(
                       height: 56,
@@ -3807,32 +3930,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      newSetState(() {
-                        final temp = authorizedValues[0];
-                        authorizedValues[0] = authorizedValues[2];
-                        authorizedValues[2] = temp;
+                  // GestureDetector(
+                  //   onTap: () {
+                  //     newSetState(() {
+                  //       final temp = authorizedValues[0];
+                  //       authorizedValues[0] = authorizedValues[2];
+                  //       authorizedValues[2] = temp;
 
-                        isDrop = false;
-                      });
-                    },
-                    child: Container(
-                      height: 56,
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                        child: Text(
-                          authorizedValues[2],
-                          style: const TextStyle(
-                              color: AppColors.primaryColors,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-                  ),
+                  //       isDrop = false;
+                  //     });
+                  //   },
+                  //   child: Container(
+                  //     height: 56,
+                  //     alignment: Alignment.center,
+                  //     width: MediaQuery.of(context).size.width,
+                  //     child: Padding(
+                  //       padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  //       child: Text(
+                  //         authorizedValues[2],
+                  //         style: const TextStyle(
+                  //             color: AppColors.primaryColors,
+                  //             fontSize: 16,
+                  //             fontWeight: FontWeight.w600),
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -3860,8 +3983,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   ),
                 );
               } else if (widget.navigation == 'search') {
-                  Navigator.pop(context);
-                }  else {
+                Navigator.pop(context);
+              } else {
                 Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                   builder: (context) {
                     return BottomBarScreen(
@@ -4149,5 +4272,67 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         ),
       ),
     );
+  }
+
+  Future showAuthPopup(String title, String message, BuildContext context,
+      String auth, String serviceId, String technicianId, String serviceName) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<EstimateBloc, EstimateState>(
+          listener: (context, state) {
+            if (state is AuthServiceByTechnicianState) {
+              context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                  orderId: widget.estimateDetails.data.id.toString()));
+            }
+            if (state is GetSingleEstimateState) {
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                    estimateDetails: state.createEstimateModel,
+                    navigation: widget.navigation,
+                  );
+                },
+              ));
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<EstimateBloc, EstimateState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: Text(title),
+                content: Text(message),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context.read<EstimateBloc>().add(
+                            AuthServiceByTechnicianEvent(
+                                auth: auth,
+                                serviceId: serviceId,
+                                serviceName: serviceName,
+                                technicianId: technicianId));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  )
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  changeAuthIndex(String auth) {
+    if (auth == "Y") {
+      String temp = "";
+      temp = authorizedValues[0];
+      authorizedValues[0] = authorizedValues[1];
+      authorizedValues[1] = temp;
+    }
   }
 }

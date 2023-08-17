@@ -363,6 +363,12 @@ class ApiRepository {
     return apiProvider.deleteEstimateNote(token, id);
   }
 
+  Future authServiceByTech(dynamic token, String auth, String serviceName,
+      String technicianId, String serviceId) {
+    return apiProvider.authServiceByTech(
+        token, serviceId, technicianId, serviceName, auth);
+  }
+
   Future getAllWorkflows(String token, int page) {
     return apiProvider.getAllWorkflows(token, page);
   }
