@@ -9,9 +9,15 @@ abstract class WorkflowEvent extends Equatable {
 
 class GetAllWorkflows extends WorkflowEvent {}
 
-class CreateWorkflow extends WorkflowEvent {
+class CreateWorkflowBucketEvent extends WorkflowEvent {
   final Map<String, dynamic> json;
-  const CreateWorkflow({required this.json});
+  const CreateWorkflowBucketEvent({required this.json});
+}
+
+class EditWorkflowBucketEvent extends WorkflowEvent {
+  final String id;
+  final Map<String, dynamic> json;
+  const EditWorkflowBucketEvent({required this.json, required this.id});
 }
 
 class EditWorkflow extends WorkflowEvent {
@@ -25,4 +31,9 @@ class EditWorkflow extends WorkflowEvent {
     required this.orderId,
     required this.oldBucketId,
   });
+}
+
+class GetSingleWorkflowEvent extends WorkflowEvent {
+  final String id;
+  const GetSingleWorkflowEvent({required this.id});
 }

@@ -63,6 +63,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
   int? vendorId;
   bool isTax = false;
+  bool isPercentage = false;
 
   final technicianController = TextEditingController();
   String technicianError = '';
@@ -890,7 +891,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                   : [],
               maxLength: 50,
               decoration: InputDecoration(
-                suffixIcon: label == 'Discount' || label.contains("Labor Rate")
+                suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
                         CupertinoIcons.money_dollar,
                         color: AppColors.primaryColors,
@@ -1003,6 +1004,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           ),
           GestureDetector(
             onTap: () {
+              isPercentage = false;
               if (label == "Material") {
                 showDialog(
                   barrierDismissible: false,
@@ -1103,6 +1105,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String adddMaterialBatchErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
@@ -1152,10 +1155,21 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
               subTotal =
                   (double.tryParse(addMaterialPriceController.text) ?? 0);
             } else {
-              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                      0) -
-                  (double.tryParse(addMaterialDiscountController.text) ?? 0));
+              if (isPercentage) {
+                subTotal = (double.tryParse(addMaterialPriceController.text) ??
+                        0) -
+                    ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+                            (double.tryParse(
+                                    addMaterialDiscountController.text) ??
+                                0)) /
+                        100;
+              } else {
+                subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+                        0) -
+                    (double.tryParse(addMaterialDiscountController.text) ?? 0));
+              }
             }
+            total = subTotal;
           } else {
             final tax =
                 (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
@@ -1165,16 +1179,26 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                   (double.tryParse(addMaterialPriceController.text) ?? 0) *
                           tax +
                       (double.tryParse(addMaterialPriceController.text) ?? 0);
+              total = (double.tryParse(addMaterialPriceController.text) ?? 0);
             } else {
-              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                              0) -
-                          (double.tryParse(
-                                  addMaterialDiscountController.text) ??
-                              0)) *
-                      tax +
+              double discount =
+                  double.tryParse(addMaterialDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount = ((double.tryParse(addMaterialPriceController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialDiscountController.text) ??
+                            0)) /
+                    100;
+              }
+
+              subTotal =
                   ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                      (double.tryParse(addMaterialDiscountController.text) ??
-                          0));
+                              discount) *
+                          tax +
+                      ((double.tryParse(addMaterialPriceController.text) ?? 0) -
+                          discount);
+              total = (double.tryParse(addMaterialPriceController.text) ?? 0) -
+                  (discount);
             }
           }
         }
@@ -1262,16 +1286,56 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
-                      Padding(
-                        padding: EdgeInsets.only(top: 17),
-                        child: textBox(
-                            "Enter Amount",
-                            addMaterialDiscountController,
-                            "Discount",
-                            addMaterialDiscountErrorStatus.isNotEmpty,
-                            context,
-                            true,
-                            newSetState),
+                      Stack(
+                        children: [
+                          textBox(
+                              "Enter Amount",
+                              addMaterialDiscountController,
+                              "Discount",
+                              addMaterialDiscountErrorStatus.isNotEmpty,
+                              context,
+                              true,
+                              newSetState),
+                          Positioned(
+                            right: 10,
+                            top: 42,
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    isPercentage = false;
+                                    newSetState(() {});
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.money_dollar,
+                                    color: isPercentage
+                                        ? AppColors.greyText
+                                        : AppColors.primaryColors,
+                                  ),
+                                ),
+                                Text(
+                                  '  /  ',
+                                  style: TextStyle(
+                                    color: AppColors.greyText,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    isPercentage = true;
+                                    newSetState(() {});
+                                  },
+                                  child: Icon(
+                                    Icons.percent,
+                                    color: !isPercentage
+                                        ? AppColors.greyText
+                                        : AppColors.primaryColors,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       errorWidget(error: addMaterialDiscountErrorStatus),
                       Padding(
@@ -1346,6 +1410,94 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
+                              "Total :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${total.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Tax :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${(subTotal - total).toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Total :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${total.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Tax :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${(subTotal - total).toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
                               "Sub Total :",
                               style: TextStyle(
                                   fontSize: 16,
@@ -1375,6 +1527,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 itemName: addMaterialNameController.text,
                                 unitPrice: addMaterialPriceController.text,
                                 discount: addMaterialDiscountController.text,
+                                discountType:
+                                    isPercentage ? "Percentage" : "Fixed",
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
                               ));
@@ -1418,16 +1572,19 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     final addPartCostController = TextEditingController();
     final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
+    final addPartQuantityController = TextEditingController();
 
     //Add part errorstatus and error message variables
     String addPartNameErrorStatus = '';
     String addPartDescriptionErrorStatus = '';
+    String addPartQuantityErrorStatus = '';
     String addPartPriceErrorStatus = '';
     String addPartCostErrorStatus = '';
     String addPartDiscountErrorStatus = '';
     String adddPartPartNumberErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
@@ -1461,6 +1618,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
       } else {
         adddPartPartNumberErrorStatus = '';
       }
+      if (addPartQuantityController.text.trim().isEmpty) {
+        addPartQuantityErrorStatus = "Quantity can't be empty";
+        status = false;
+      } else {
+        addPartQuantityErrorStatus = '';
+      }
 
       setState(() {});
       return status;
@@ -1468,26 +1631,62 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addPartPriceController.text.isNotEmpty) {
-        if (client?.taxOnParts == "N") {
-          if (addPartDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addPartPriceController.text) ?? 0);
+        if (addPartQuantityController.text.isNotEmpty) {
+          double quantity =
+              double.tryParse(addPartQuantityController.text) ?? 1;
+          if (client?.taxOnParts == "N") {
+            if (addPartDiscountController.text.isEmpty) {
+              subTotal = (double.tryParse(addPartPriceController.text) ?? 0) *
+                  quantity;
+            } else {
+              double discount =
+                  double.tryParse(addPartDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount =
+                    (((double.tryParse(addPartPriceController.text) ?? 0) *
+                                quantity) *
+                            (double.tryParse(addPartDiscountController.text) ??
+                                0)) /
+                        100;
+              }
+              subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                      quantity) -
+                  discount;
+            }
+            total = subTotal;
           } else {
-            subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                (double.tryParse(addPartDiscountController.text) ?? 0));
-          }
-        } else {
-          final tax = (double.tryParse(client?.salesTaxRate ?? '') ?? 0) / 100;
-          if (addPartDiscountController.text.isEmpty) {
-            subTotal =
-                (double.tryParse(addPartPriceController.text) ?? 0) * tax +
-                    (double.tryParse(addPartPriceController.text) ?? 0);
-          } else {
-            subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) -
-                        (double.tryParse(addPartDiscountController.text) ??
-                            0)) *
-                    tax +
-                ((double.tryParse(addPartPriceController.text) ?? 0) -
-                    (double.tryParse(addPartDiscountController.text) ?? 0));
+            final tax =
+                (double.tryParse(client?.salesTaxRate ?? '') ?? 0) / 100;
+            if (addPartDiscountController.text.isEmpty) {
+              subTotal = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                          quantity) *
+                      tax +
+                  ((double.tryParse(addPartPriceController.text) ?? 0) *
+                      quantity);
+              total = ((double.tryParse(addPartPriceController.text) ?? 0) *
+                  quantity);
+            } else {
+              double discount =
+                  double.tryParse(addPartDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount =
+                    (((double.tryParse(addPartPriceController.text) ?? 0) *
+                                quantity) *
+                            (double.tryParse(addPartDiscountController.text) ??
+                                0)) /
+                        100;
+              }
+              subTotal = (((double.tryParse(addPartPriceController.text) ?? 0) *
+                              quantity) -
+                          discount) *
+                      tax +
+                  (((double.tryParse(addPartPriceController.text) ?? 0) *
+                          quantity) -
+                      discount);
+              total = (((double.tryParse(addPartPriceController.text) ?? 0) *
+                      quantity) -
+                  discount);
+            }
           }
         }
       }
@@ -1545,35 +1744,97 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           textBox(
-                              "Amount",
+                              "Enter Price",
                               addPartPriceController,
                               "Price",
                               addPartPriceErrorStatus.isNotEmpty,
                               context,
                               true,
                               newSetState),
-                          pricingModelDropDown()
+                          textBox(
+                              "Amount",
+                              addPartQuantityController,
+                              "Quantity",
+                              addPartQuantityErrorStatus.isNotEmpty,
+                              context,
+                              true,
+                              newSetState),
                         ],
                       ),
                     ),
-                    errorWidget(error: addPartPriceErrorStatus),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.7,
+                          child: errorWidget(
+                            error: addPartPriceErrorStatus,
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.7,
+                          child: errorWidget(
+                            error: addPartQuantityErrorStatus,
+                          ),
+                        ),
+                      ],
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox("Amount", addPartCostController, "Cost ",
                           addPartCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addPartCostErrorStatus),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: textBox(
-                        "Enter Amount",
-                        addPartDiscountController,
-                        "Discount",
-                        addPartDiscountErrorStatus.isNotEmpty,
-                        context,
-                        true,
-                        newSetState,
-                      ),
+                    Stack(
+                      children: [
+                        textBox(
+                            "Enter Amount",
+                            addPartDiscountController,
+                            "Discount",
+                            addPartDiscountErrorStatus.isNotEmpty,
+                            context,
+                            true,
+                            newSetState),
+                        Positioned(
+                          right: 10,
+                          top: 42,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = false;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.money_dollar,
+                                  color: isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                              Text(
+                                '  /  ',
+                                style: TextStyle(
+                                  color: AppColors.greyText,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = true;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  Icons.percent,
+                                  color: !isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     errorWidget(error: addPartDiscountErrorStatus),
                     Padding(
@@ -1648,6 +1909,50 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Sub Total :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -1676,7 +1981,10 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               part: addPartPartNumberController.text,
                               itemName: addPartNameController.text,
                               unitPrice: addPartPriceController.text,
+                              quanityHours: addPartQuantityController.text,
                               discount: addPartDiscountController.text,
+                              discountType:
+                                  isPercentage ? "Percentage" : "Fixed",
                               itemType: "Part",
                               subTotal: subTotal.toStringAsFixed(2),
                             ));
@@ -1727,6 +2035,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String addLaborHoursErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
@@ -1771,9 +2080,17 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = (double.tryParse(addLaborCostController.text) ?? 0);
           } else {
+            double discount =
+                double.tryParse(addLaborDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+                      (double.tryParse(addLaborDiscountController.text) ?? 0)) /
+                  100;
+            }
             subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
-                (double.tryParse(addLaborDiscountController.text) ?? 0));
+                discount);
           }
+          total = subTotal;
         } else {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
@@ -1782,16 +2099,27 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                     tax +
                 ((double.tryParse(addLaborHoursController.text) ?? 1) *
                     (double.tryParse(addLaborCostController.text) ?? 0));
+            total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
+                (double.tryParse(addLaborCostController.text) ?? 0));
           } else {
+            double discount =
+                double.tryParse(addLaborDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+                      (double.tryParse(addLaborDiscountController.text) ?? 0)) /
+                  100;
+            }
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
                             (double.tryParse(addLaborCostController.text) ??
                                 0)) -
-                        (double.tryParse(addLaborDiscountController.text) ??
-                            0)) *
+                        discount) *
                     tax +
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
                         (double.tryParse(addLaborCostController.text) ?? 0)) -
-                    (double.tryParse(addLaborDiscountController.text) ?? 0));
+                    discount);
+            total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
+                    (double.tryParse(addLaborCostController.text) ?? 0)) -
+                discount);
           }
         }
       }
@@ -1867,18 +2195,102 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           newSetState),
                     ),
                     errorWidget(error: addLaborCostErrorStatus),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: textBox(
-                          "Enter Amount",
-                          addLaborDiscountController,
-                          "Discount",
-                          addLaborDiscountErrorStatus.isNotEmpty,
-                          context,
-                          true,
-                          newSetState),
+                    Stack(
+                      children: [
+                        textBox(
+                            "Enter Amount",
+                            addLaborDiscountController,
+                            "Discount",
+                            addLaborDiscountErrorStatus.isNotEmpty,
+                            context,
+                            true,
+                            newSetState),
+                        Positioned(
+                          right: 10,
+                          top: 42,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = false;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.money_dollar,
+                                  color: isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                              Text(
+                                '  /  ',
+                                style: TextStyle(
+                                  color: AppColors.greyText,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = true;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  Icons.percent,
+                                  color: !isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                     errorWidget(error: addLaborDiscountErrorStatus),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -1915,6 +2327,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               itemName: addLaborNameController.text,
                               unitPrice: addLaborCostController.text,
                               discount: addLaborDiscountController.text,
+                              discountType:
+                                  isPercentage ? "Percentage" : "Fixed",
                               quanityHours: addLaborHoursController.text,
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
@@ -1964,6 +2378,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String addFeeCostErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addFeeValidation(StateSetter setState) {
       bool status = true;
@@ -2000,6 +2415,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           subTotal = (double.tryParse(addFeePriceController.text) ?? 0) * tax +
               (double.tryParse(addFeePriceController.text) ?? 0);
         }
+        total = (double.tryParse(addFeePriceController.text) ?? 0);
       }
       return Column(
         children: [
@@ -2128,6 +2544,50 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Sub Total :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -2209,6 +2669,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String addSubContractVendorErrorStatus = '';
 
     double subTotal = 0;
+    double total = 0;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
@@ -2248,10 +2709,20 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
             subTotal =
                 (double.tryParse(addSubContractPriceController.text) ?? 0);
           } else {
-            subTotal = ((double.tryParse(addSubContractPriceController.text) ??
-                    0) -
-                (double.tryParse(addSubContractDiscountController.text) ?? 0));
+            double discount =
+                double.tryParse(addSubContractDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addSubContractCostController.text) ??
+                          0) *
+                      (double.tryParse(addSubContractDiscountController.text) ??
+                          0)) /
+                  100;
+            }
+            subTotal =
+                ((double.tryParse(addSubContractPriceController.text) ?? 0) -
+                    discount);
           }
+          total = subTotal;
         } else {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
 
@@ -2260,16 +2731,26 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                 (double.tryParse(addSubContractPriceController.text) ?? 0) *
                         tax +
                     (double.tryParse(addSubContractPriceController.text) ?? 0);
+            total = (double.tryParse(addSubContractPriceController.text) ?? 0);
           } else {
+            double discount =
+                double.tryParse(addSubContractDiscountController.text) ?? 0;
+            if (isPercentage) {
+              discount = ((double.tryParse(addSubContractCostController.text) ??
+                          0) *
+                      (double.tryParse(addSubContractDiscountController.text) ??
+                          0)) /
+                  100;
+            }
             subTotal = ((double.tryParse(addSubContractPriceController.text) ??
                             0) -
-                        (double.tryParse(
-                                addSubContractDiscountController.text) ??
-                            0)) *
+                        discount) *
                     tax +
                 ((double.tryParse(addSubContractPriceController.text) ?? 0) -
-                    (double.tryParse(addSubContractDiscountController.text) ??
-                        0));
+                    discount);
+            total =
+                ((double.tryParse(addSubContractPriceController.text) ?? 0) -
+                    discount);
           }
         }
       }
@@ -2344,30 +2825,70 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     Checkbox(
+                    //         value: isTax,
+                    //         onChanged: (value) {
+                    //           newSetState(() {
+                    //             isTax = value!;
+                    //           });
+                    //         }),
+                    //     Text('Allow Tax Charges On Sub Contract',
+                    //         style: TextStyle(color: Color(0xFF6A7187))),
+                    //   ],
+                    // ),
+                    Stack(
                       children: [
-                        Checkbox(
-                            value: isTax,
-                            onChanged: (value) {
-                              newSetState(() {
-                                isTax = value!;
-                              });
-                            }),
-                        Text('Allow Tax Charges On Sub Contract',
-                            style: TextStyle(color: Color(0xFF6A7187))),
+                        textBox(
+                            "Enter Amount",
+                            addSubContractDiscountController,
+                            "Discount",
+                            addSubContractDiscountErrorStatus.isNotEmpty,
+                            context,
+                            true,
+                            newSetState),
+                        Positioned(
+                          right: 10,
+                          top: 42,
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = false;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  CupertinoIcons.money_dollar,
+                                  color: isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                              Text(
+                                '  /  ',
+                                style: TextStyle(
+                                  color: AppColors.greyText,
+                                  fontSize: 18,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  isPercentage = true;
+                                  newSetState(() {});
+                                },
+                                child: Icon(
+                                  Icons.percent,
+                                  color: !isPercentage
+                                      ? AppColors.greyText
+                                      : AppColors.primaryColors,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox(
-                          "Amount",
-                          addSubContractDiscountController,
-                          "Discount",
-                          addSubContractDiscountErrorStatus.isNotEmpty,
-                          context,
-                          true,
-                          newSetState),
                     ),
                     errorWidget(error: addSubContractDiscountErrorStatus),
                     Padding(
@@ -2436,6 +2957,51 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractVendorErrorStatus),
+
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Tax :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${(subTotal - total).toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2475,6 +3041,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 tax: isTax == true ? 'Y' : 'N',
                                 vendorId: vendorId,
                                 unitPrice: addSubContractPriceController.text,
+                                discountType:
+                                    isPercentage ? "Percentage" : "Fixed",
                                 itemType: "SubContract",
                                 subTotal: subTotal.toStringAsFixed(2),
                               ),

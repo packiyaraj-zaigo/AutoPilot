@@ -37,7 +37,10 @@ class CreateWorkflowErrorState extends WorkflowState {
   const CreateWorkflowErrorState({required this.message});
 }
 
-class CreateWorkflowSuccessState extends WorkflowState {}
+class CreateWorkflowSuccessState extends WorkflowState {
+  @override
+  List<Object> get props => [];
+}
 
 class EditWorkflowLoadingState extends WorkflowState {}
 
@@ -47,3 +50,12 @@ class EditWorkflowErrorState extends WorkflowState {
 }
 
 class EditWorkflowSuccessState extends WorkflowState {}
+
+class GetSingleBucketLoadingState extends WorkflowState {}
+
+class GetSingleBucketErrorState extends WorkflowState {
+  final String message;
+  const GetSingleBucketErrorState({required this.message});
+}
+
+class GetSingleBucketSuccessState extends WorkflowState {}

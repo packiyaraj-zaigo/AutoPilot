@@ -364,14 +364,14 @@ class ApiRepository {
   }
 
   Future getAllWorkflows(String token) {
-    return apiProvider.getAllWorkflows(token);}
+    return apiProvider.getAllWorkflows(token);
+  }
+
   Future authServiceByTech(dynamic token, String auth, String serviceName,
       String technicianId, String serviceId) {
     return apiProvider.authServiceByTech(
         token, serviceId, technicianId, serviceName, auth);
   }
-
-
 
   Future editWorkflows(String token, String clientBucketId, String orderId,
       String updatedBy, String oldBucketId, String workflowId) async {
@@ -409,6 +409,15 @@ class ApiRepository {
 
   Future addWorkflowBucket(String token, Map<String, dynamic> json) {
     return apiProvider.addWorkflowBucket(token, json);
+  }
+
+  Future editWorkflowBucket(
+      String token, Map<String, dynamic> json, String id) {
+    return apiProvider.editWorkflowBucket(token, json, id);
+  }
+
+  Future getSingleWorkflowBucket(String token, String id) async {
+    return apiProvider.getSingleWorkflowBucket(token, id);
   }
 
   Future<dynamic> createCannedOrderService(

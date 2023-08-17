@@ -18,7 +18,8 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
 
   WorkflowBloc() : super(WorkflowInitial()) {
     on<GetAllWorkflows>(getAllWorkflows);
-    on<CreateWorkflow>(createWorkflow);
+    on<CreateWorkflowBucketEvent>(createWorkflowBucket);
+    on<EditWorkflowBucketEvent>(editWorkflowBucket);
     on<EditWorkflow>(editWorkflow);
   }
 
@@ -92,8 +93,56 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
     }
   }
 
-  createWorkflow(
-    CreateWorkflow event,
+  getSingleWorkflowBucket(
+    GetSingleWorkflowEvent event,
+    Emitter<WorkflowState> emit,
+  ) async {
+    try {
+      emit(GetSingleBucketLoadingState());
+      final token = await AppUtils.getToken();
+      final response = await apiRepo.getSingleWorkflowBucket(token, event.id);
+      if (response.statusCode == 200) {
+        log(response.body.toString());
+        emit(GetSingleBucketSuccessState());
+      } else {
+        emit(GetSingleBucketErrorState(message: 'Something went wrong'));
+      }
+    } catch (e) {
+      log(e.toString() + " Get single error");
+      emit(GetSingleBucketErrorState(message: 'Something went wrong'));
+    }
+  }
+
+  editWorkflowBucket(
+    EditWorkflowBucketEvent event,
+    Emitter<WorkflowState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final Response response =
+          await apiRepo.editWorkflowBucket(token, event.json, event.id);
+      log(response.body.toString());
+      final body = json.decode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(CreateWorkflowSuccessState());
+      } else {
+        if (body.containsKey('error')) {
+          emit(CreateWorkflowErrorState(message: body['error']));
+        } else if (body.containsKey('message')) {
+          emit(CreateWorkflowErrorState(message: body['message']));
+        } else {
+          emit(CreateWorkflowErrorState(
+              message: body[body.keys.first][0].toString()));
+        }
+      }
+    } catch (e) {
+      log("$e Worfflow create bloc error");
+      emit(const CreateWorkflowErrorState(message: 'Something went wrong'));
+    }
+  }
+
+  createWorkflowBucket(
+    CreateWorkflowBucketEvent event,
     Emitter<WorkflowState> emit,
   ) async {
     try {
