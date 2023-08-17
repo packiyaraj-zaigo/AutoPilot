@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:auto_pilot/Screens/estimate_details_screen.dart';
 import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
-import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
+import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart' as eb;
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_strings.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -292,20 +292,35 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
     return showCupertinoDialog(
       context: context,
       builder: (context) => BlocProvider(
-        create: (context) => EstimateBloc(apiRepository: ApiRepository()),
-        child: BlocListener<EstimateBloc, EstimateState>(
+        create: (context) => eb.EstimateBloc(apiRepository: ApiRepository()),
+        child: BlocListener<eb.EstimateBloc, eb.EstimateState>(
           listener: (context, state) {
-            if (state is CreateEstimateState) {
-              Navigator.pop(context);
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) {
-                  return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel,
-                    navigation: widget.subNavigation,
-                  );
-                },
-              ));
-            } else if (state is EditEstimateState) {
+            if (state is eb.CreateEstimateState) {
+              // Navigator.pop(context);
+              // Navigator.pushReplacement(context, MaterialPageRoute(
+              //   builder: (context) {
+              //     return EstimatePartialScreen(
+              //       estimateDetails: state.createEstimateModel,
+              //       navigation: widget.subNavigation,
+              //     );
+              //   },
+              // ));
+
+              context.read<eb.EstimateBloc>().add(eb.GetSingleEstimateEvent(
+                  orderId: state.createEstimateModel.data.id.toString()));
+            } else if (state is eb.EditEstimateState) {
+              // Navigator.pushReplacement(context, MaterialPageRoute(
+              //   builder: (context) {
+              //     return EstimatePartialScreen(
+              //       estimateDetails: state.createEstimateModel,
+              //       navigation: widget.subNavigation,
+              //     );
+              //   },
+              // ));
+
+              context.read<eb.EstimateBloc>().add(eb.GetSingleEstimateEvent(
+                  orderId: state.createEstimateModel.data.id.toString()));
+            } else if (state is eb.GetSingleEstimateState) {
               Navigator.pushReplacement(context, MaterialPageRoute(
                 builder: (context) {
                   return EstimatePartialScreen(
@@ -317,7 +332,7 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
             }
             // TODO: implement listener
           },
-          child: BlocBuilder<EstimateBloc, EstimateState>(
+          child: BlocBuilder<eb.EstimateBloc, eb.EstimateState>(
             builder: (context, state) {
               return CupertinoAlertDialog(
                 title: widget.navigation == "new"
@@ -334,15 +349,16 @@ class _SelectCustomerScreenState extends State<SelectCustomerScreen> {
                       onPressed: () {
                         networkCheck().then((value) {
                           if (widget.navigation == "new") {
-                            context.read<EstimateBloc>().add(
-                                CreateEstimateEvent(
+                            context.read<eb.EstimateBloc>().add(
+                                eb.CreateEstimateEvent(
                                     id: item.id.toString(), which: "customer"));
                           } else {
-                            context.read<EstimateBloc>().add(EditEstimateEvent(
-                                id: item.id.toString(),
-                                orderId: widget.orderId ?? "",
-                                which: "customer",
-                                customerId: item.id.toString()));
+                            context.read<eb.EstimateBloc>().add(
+                                eb.EditEstimateEvent(
+                                    id: item.id.toString(),
+                                    orderId: widget.orderId ?? "",
+                                    which: "customer",
+                                    customerId: item.id.toString()));
                           }
                         });
                       }),

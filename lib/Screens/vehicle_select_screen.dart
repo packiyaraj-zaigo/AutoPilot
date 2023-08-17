@@ -370,16 +370,32 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
         child: BlocListener<EstimateBloc, EstimateState>(
           listener: (context, state) {
             if (state is CreateEstimateState) {
-              Navigator.pop(context);
-              Navigator.pushReplacement(context, MaterialPageRoute(
-                builder: (context) {
-                  return EstimatePartialScreen(
-                    estimateDetails: state.createEstimateModel,
-                    navigation: widget.subNavigation,
-                  );
-                },
-              ));
+              // Navigator.pop(context);
+              // Navigator.pushReplacement(context, MaterialPageRoute(
+              //   builder: (context) {
+              //     return EstimatePartialScreen(
+              //       estimateDetails: state.createEstimateModel,
+              //       navigation: widget.subNavigation,
+              //     );
+              //   },
+              // ));
+
+              context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                  orderId: state.createEstimateModel.data.id.toString()));
             } else if (state is EditEstimateState) {
+              // Navigator.pop(context);
+              // Navigator.pushReplacement(context, MaterialPageRoute(
+              //   builder: (context) {
+              //     return EstimatePartialScreen(
+              //       estimateDetails: state.createEstimateModel,
+              //       navigation: widget.subNavigation,
+              //     );
+              //   },
+              // ));
+
+              context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                  orderId: state.createEstimateModel.data.id.toString()));
+            } else if (state is GetSingleEstimateState) {
               Navigator.pop(context);
               Navigator.pushReplacement(context, MaterialPageRoute(
                 builder: (context) {
