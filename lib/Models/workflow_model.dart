@@ -17,7 +17,6 @@ class WorkflowModel {
   DateTime? updatedAt;
   Orders? orders;
   BucketName? bucketName;
-  WorkflowBucketModel? bucket;
 
   WorkflowModel({
     this.id,
@@ -53,7 +52,6 @@ class WorkflowModel {
         "updated_at": updatedAt?.toIso8601String(),
         "orders": orders?.toJson(),
         "bucket_name": bucketName?.toJson(),
-        "bucket": bucket?.toJson(),
       };
 }
 

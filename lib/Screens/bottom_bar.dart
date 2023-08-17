@@ -53,9 +53,14 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     log(widget.tabControllerIndex.toString());
 
     estimateTabController = TabController(
-        length: 4, initialIndex: widget.tabControllerIndex ?? 0, vsync: this);
+        length: 4,
+        initialIndex:
+            widget.tabControllerIndex != 3 ? 0 : widget.tabControllerIndex!,
+        vsync: this);
     workFlowTabController = TabController(
       length: 2,
+      initialIndex:
+          widget.tabControllerIndex != 1 ? 0 : widget.tabControllerIndex!,
       vsync: this,
     );
 

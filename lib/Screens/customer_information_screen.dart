@@ -226,7 +226,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${customerData?.firstName} ${customerData?.lastName}',
+                        '${customerData?.firstName ?? ''} ${customerData?.lastName ?? ''}',
                         style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,

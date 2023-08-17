@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/workflow_bucket_model.dart';
+import 'package:auto_pilot/Models/workflow_status_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
@@ -14,13 +15,32 @@ part 'workflow_state.dart';
 
 class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
   final apiRepo = ApiRepository();
-  int currentPage = 1;
-  int totalPages = 1;
-  bool isLoading = false;
+
   WorkflowBloc() : super(WorkflowInitial()) {
     on<GetAllWorkflows>(getAllWorkflows);
-    on<EditWorkflowPosition>(editWorkflowPosition);
     on<CreateWorkflow>(createWorkflow);
+    on<EditWorkflow>(editWorkflow);
+  }
+
+  Future<void> editWorkflow(
+    EditWorkflow event,
+    Emitter<WorkflowState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final userId = await AppUtils.geCurrenttUserID();
+      final response = await apiRepo.editWorkflows(token, event.clientBucketId,
+          event.orderId, userId, event.oldBucketId, event.workflowId);
+      log(response.body.toString());
+      if (response.statusCode == 200) {
+        emit(EditWorkflowSuccessState());
+      } else {
+        emit(EditWorkflowErrorState(message: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(EditWorkflowErrorState(message: "Something went wrong"));
+      log(e.toString() + " edit workflow bloc error");
+    }
   }
 
   getAllWorkflows(
@@ -29,92 +49,46 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
   ) async {
     try {
       emit(const GetAllWorkflowLoadingState());
-      if (currentPage != 1) {
-        isLoading = true;
-      }
+
       final token = await AppUtils.getToken();
-      final Response response =
-          await apiRepo.getAllWorkflows(token, currentPage);
+      final Response response = await apiRepo.getAllWorkflows(token);
       final body = jsonDecode(response.body);
       if (response.statusCode == 200) {
         final data = body['data'];
         log(data.toString());
         List<WorkflowModel> workflows = [];
+        List<WorkflowStatusModel> statuses = [];
         if (data != null && data.isNotEmpty) {
           data.forEach((workflow) {
             workflows.add(WorkflowModel.fromJson(workflow));
           });
-        }
-        final List<WorkflowBucketModel> buckets = [];
-        final Response initialResponse =
-            await apiRepo.getWorkflowBucket(token, currentPage);
-
-        if (initialResponse.statusCode == 200) {
-          final body = jsonDecode(initialResponse.body);
-          if (body['data']['data'] != null && body['data']['data'].isNotEmpty) {
-            body['data']['data'].forEach((json) {
-              buckets.add(WorkflowBucketModel.fromJson(json));
-            });
-          }
-          currentPage++;
-          totalPages = body['data']['last_page'] ?? 1;
-          bool retry = false;
-          while (currentPage <= totalPages) {
-            final Response nextResponse =
-                await apiRepo.getWorkflowBucket(token, currentPage);
-            if (nextResponse.statusCode == 200) {
-              retry = false;
-              final nextBody = jsonDecode(nextResponse.body);
-              if (nextBody['data']['data'] != null &&
-                  nextBody['data']['data'].isNotEmpty) {
-                nextBody['data']['data'].forEach((json) {
-                  buckets.add(WorkflowBucketModel.fromJson(json));
+          try {
+            final statusResponse = await apiRepo.getAllStatus(token);
+            log(statusResponse.body.toString() + "Status body");
+            if (statusResponse.statusCode == 200) {
+              final statusBody = await jsonDecode(statusResponse.body);
+              if (statusBody['data'] != null && statusBody['data'].isNotEmpty) {
+                statusBody['data'].forEach((status) {
+                  statuses.add(WorkflowStatusModel.fromJson(status));
                 });
               }
-              currentPage++;
-              totalPages = body['data']['last_page'] ?? 1;
             } else {
-              if (retry) {
-                break;
-              }
-
-              retry = true;
+              // emit(GetAllWorkflowErrorState(message: body[body.keys.first][0]));
+              log("somethign went wrong");
             }
-            if (currentPage >= totalPages) {
-              break;
-            }
-            log(currentPage.toString());
+          } catch (e) {
+            log(e.toString() + " Status bloc error");
           }
         }
-        for (var element in workflows) {
-          element.bucket = buckets
-              .where((bucket) {
-                return element.bucketName?.id == bucket.id;
-              })
-              .toList()
-              .last;
-        }
-        emit(GetAllWorkflowSuccessState(workflows: workflows));
+
+        emit(GetAllWorkflowSuccessState(
+            workflows: workflows, statuses: statuses));
       } else {
         emit(GetAllWorkflowErrorState(message: body[body.keys.first][0]));
       }
     } catch (e, s) {
       log("$e ${s}Workflow get bloc error");
       emit(const GetAllWorkflowErrorState(message: 'Something went wrong'));
-    }
-  }
-
-  editWorkflowPosition(
-    EditWorkflowPosition event,
-    Emitter<WorkflowState> emit,
-  ) async {
-    try {
-      final token = await AppUtils.getToken();
-      final Response response =
-          await apiRepo.editWorkflowPosition(token, event.workflow);
-      log(response.body.toString());
-    } catch (e) {
-      log("${e}Workflow set bloc error");
     }
   }
 

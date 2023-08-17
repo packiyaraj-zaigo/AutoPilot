@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/workflow_model.dart';
+import 'package:auto_pilot/Models/workflow_status_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_workflow.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -31,86 +33,97 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<BoardList> workflowOrderList = [];
+  List<WorkflowStatusModel> statuses = [];
   List<String> workflowOrderHeadings = [];
-  List<List<WorkflowModel>> workflowOrderModelsList = [];
   List<BoardList> lists = [];
-
-  late final WorkflowBloc bloc;
 
   @override
   void initState() {
     super.initState();
-    bloc = BlocProvider.of<WorkflowBloc>(context);
-    bloc.add(GetAllWorkflows());
   }
 
-  filterWorkflowOrders(String title, List<WorkflowModel> workflows) {
-    if (!workflowOrderHeadings.contains(title)) {
-      workflowOrderHeadings.add(title);
-      final tasks =
-          workflows.where((element) => element.bucket?.title == title).toList();
-      tasks.sort(
-        (a, b) {
-          final aPos = a.bucket?.position;
-          final bPos = b.bucket?.position;
-          return bPos!.compareTo(aPos!);
-        },
-      );
-      workflowOrderList.add(boardWidget(tasks));
-      workflowOrderModelsList.add(tasks);
+  filterColumns(List<WorkflowModel> workflows) {
+    for (var status in statuses) {
+      final filteredList = workflows
+          .where((element) => element.bucketName?.parentId == status.id)
+          .toList();
+      workflowOrderList.add(boardWidget(filteredList, status));
     }
   }
 
   @override
   void dispose() {
     super.dispose();
-    boardViewController.state.dispose();
+    if (boardViewController.state.mounted) {
+      boardViewController.state.dispose();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      body: SafeArea(
-        child: ScrollConfiguration(
-          behavior: const ScrollBehavior(),
-          child: BlocListener<WorkflowBloc, WorkflowState>(
-            listener: (context, state) {
-              if (state is GetAllWorkflowSuccessState) {
-                for (int i = 0; i < state.workflows.length; i++) {
-                  filterWorkflowOrders(
-                      state.workflows[i].bucket?.title ?? '', state.workflows);
+    return BlocProvider(
+      create: (context) {
+        return WorkflowBloc()..add(GetAllWorkflows());
+      },
+      child: Scaffold(
+        key: scaffoldKey,
+        body: SafeArea(
+          child: ScrollConfiguration(
+            behavior: const ScrollBehavior(),
+            child: BlocListener<WorkflowBloc, WorkflowState>(
+              listener: (context, state) {
+                if (state is GetAllWorkflowSuccessState) {
+                  statuses.addAll(state.statuses);
+                  filterColumns(state.workflows);
                 }
-              }
-            },
-            child: BlocBuilder<WorkflowBloc, WorkflowState>(
-              builder: (context, state) {
-                if (state is GetAllWorkflowLoadingState && !bloc.isLoading) {
-                  return const Center(
-                    child: CupertinoActivityIndicator(),
-                  );
-                } else if (state is GetAllWorkflowErrorState) {
-                  return Center(
-                    child: Text(state.message,
-                        style: const TextStyle(color: AppColors.greyText)),
-                  );
+                if (state is EditWorkflowSuccessState ||
+                    state is EditWorkflowErrorState) {
+                  Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => BottomBarScreen(
+                                currentIndex: 1,
+                              )),
+                      (route) => false);
                 }
-                return TabBarView(
-                  controller: widget.tabController,
-                  children: [
-                    BoardView(
-                      width: 240,
-                      lists: workflowOrderList,
-                      boardViewController: boardViewController,
-                    ),
-                    BoardView(
-                      width: 240,
-                      lists: lists,
-                      boardViewController: boardViewController,
-                    ),
-                  ],
-                );
               },
+              child: BlocBuilder<WorkflowBloc, WorkflowState>(
+                builder: (context, state) {
+                  if (state is GetAllWorkflowLoadingState) {
+                    return const Center(
+                      child: CupertinoActivityIndicator(),
+                    );
+                  } else if (state is GetAllWorkflowErrorState) {
+                    return Center(
+                      child: Text(state.message,
+                          style: const TextStyle(color: AppColors.greyText)),
+                    );
+                  }
+                  return TabBarView(
+                    controller: widget.tabController
+                      ..addListener(() {
+                        Navigator.of(scaffoldKey.currentContext!)
+                            .pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => BottomBarScreen(
+                                          currentIndex: 1,
+                                          tabControllerIndex:
+                                              widget.tabController.index,
+                                        )),
+                                (route) => false);
+                      }),
+                    children: [
+                      BoardView(
+                        width: 240,
+                        lists: workflowOrderList,
+                      ),
+                      BoardView(
+                        width: 240,
+                        lists: lists,
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         ),
@@ -118,7 +131,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  BoardList boardWidget(List<WorkflowModel> workflows) {
+  BoardList boardWidget(
+      List<WorkflowModel> workflows, WorkflowStatusModel status) {
     return BoardList(
       backgroundColor: Colors.transparent,
       header: [
@@ -131,7 +145,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                workflows[0].bucket?.title ?? '',
+                status.title,
                 style: const TextStyle(
                   color: AppColors.primaryColors,
                   fontWeight: FontWeight.w500,
@@ -139,10 +153,14 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               ),
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => CreateWorkflowScreen()));
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          CreateWorkflowScreen(id: status.id.toString()),
+                    ),
+                  );
                 },
-                child: Icon(
+                child: const Icon(
                   Icons.more_horiz,
                   color: AppColors.primaryColors,
                 ),
@@ -156,16 +174,20 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
         (index) => BoardItem(
           onDropItem:
               (listIndex, itemIndex, oldListIndex, oldItemIndex, state) {
-            //if (listIndex != oldListIndex && itemIndex != oldItemIndex) {
-            final workflow =
-                workflowOrderModelsList[oldListIndex!][oldItemIndex!];
-            workflowOrderModelsList[listIndex!].insert(itemIndex!, workflow);
-            workflowOrderModelsList[oldListIndex].removeAt(oldItemIndex);
-            workflow.bucket!.position = itemIndex + 1;
-            workflow.bucket!.title = workflowOrderHeadings[listIndex];
-
-            log(workflow.bucket!.toJson().toString());
-            bloc.add(EditWorkflowPosition(workflow: workflow.bucket!));
+            log(statuses[listIndex ?? 0].title);
+            if (listIndex != null &&
+                oldListIndex != null &&
+                listIndex != oldListIndex) {
+              scaffoldKey.currentContext!.read<WorkflowBloc>().add(
+                    EditWorkflow(
+                      workflowId: workflows[index].id.toString(),
+                      clientBucketId:
+                          statuses[listIndex].childBuckets.first.id.toString(),
+                      orderId: workflows[index].orderId.toString(),
+                      oldBucketId: status.id.toString(),
+                    ),
+                  );
+            }
           },
           item: Column(
             children: [
@@ -179,9 +201,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   }
 
   Container workflowCard(WorkflowModel workflow) {
-    String str = workflow.bucket!.color ?? '';
+    String str = workflow.bucketName!.color ?? '';
     str = str.replaceAll('#', '0xFF');
-    final color = int.parse(str);
 
     return Container(
       width: 200,
@@ -205,7 +226,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              '${AppUtils.getTimeFormatted(workflow.createdAt ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.promiseDate ?? DateTime.now())}',
+              '${AppUtils.getTimeFormatted(workflow.orders?.shopStart ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.shopFinish ?? DateTime.now())}',
               style: const TextStyle(
                 color: Color(0xFF9A9A9A),
                 fontSize: 12,
@@ -215,10 +236,10 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${workflow.orders?.orderStatus ?? ''} #${workflow.orderId} - ${workflow.orders?.estimationName}',
-              style: const TextStyle(
+              '${workflow.orders?.orderStatus ?? ''} #${workflow.orders?.orderNumber ?? ''} - ${workflow.orders?.estimationName ?? ''}',
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: AppColors.primaryColors,
+                color: Color(int.tryParse(str) ?? 0xFF1355FF),
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -241,21 +262,21 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
-            Container(
-              height: 24,
-              decoration: BoxDecoration(
-                  color: Color(0xFFF5F5F5),
-                  borderRadius: BorderRadius.circular(12)),
-              child: const Padding(
-                padding: EdgeInsets.only(left: 14.0, right: 14, top: 5),
-                child: Text(
-                  'Tag',
-                  maxLines: 1,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-              ),
-            ),
+            // Container(
+            //   height: 24,
+            //   decoration: BoxDecoration(
+            //       color: Color(0xFFF5F5F5),
+            //       borderRadius: BorderRadius.circular(12)),
+            //   child: const Padding(
+            //     padding: EdgeInsets.only(left: 14.0, right: 14, top: 5),
+            //     child: Text(
+            //       'Tag',
+            //       maxLines: 1,
+            //       textAlign: TextAlign.center,
+            //       style: TextStyle(fontWeight: FontWeight.w500),
+            //     ),
+            //   ),
+            // ),
             Container(
                 height: 24,
                 decoration: BoxDecoration(
@@ -263,7 +284,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     borderRadius: BorderRadius.circular(12)),
                 child: Center(
                   child: Text(
-                    workflow.bucket?.parentTitle ?? '',
+                    workflow.bucketName?.title ?? '',
                     maxLines: 1,
                     textAlign: TextAlign.center,
                     style: TextStyle(

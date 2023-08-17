@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
@@ -9,8 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateWorkflowScreen extends StatefulWidget {
-  const CreateWorkflowScreen({super.key});
-
+  const CreateWorkflowScreen({super.key, required this.id});
+  final String id;
   @override
   State<CreateWorkflowScreen> createState() => _CreateWorkflowScreenState();
 }
@@ -131,89 +132,94 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                     )),
               ),
               const SizedBox(height: 20),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Statuses',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                      height: 1.5,
-                    ),
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.translucent,
-                    onTap: () {
-                      statuses.add(
-                        'Status is good',
-                      );
-                      setState(() {});
-                    },
-                    child: const Row(
-                      children: [
-                        Icon(
-                          CupertinoIcons.add,
-                          color: AppColors.primaryColors,
-                          size: 16,
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          'Add Status',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primaryColors,
-                              height: 1.5),
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-              const SizedBox(height: 24),
-              ListView.builder(
-                physics: const NeverScrollableScrollPhysics(),
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            statuses[index],
-                            style: TextStyle(
-                              color: AppColors.primaryTitleColor,
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                            ),
-                          ),
-                          IconButton(
-                              onPressed: () {
-                                statuses.removeAt(index);
-                                setState(() {});
-                              },
-                              icon: const Icon(
-                                CupertinoIcons.clear_circled_solid,
-                                color: Color(0xFFFF5C5C),
-                                size: 18,
-                              ))
-                        ],
-                      ),
-                      Divider(height: 16)
-                    ],
-                  );
-                },
-                itemCount: statuses.length,
-              ),
+              // Row(
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //   children: [
+              //     const Text(
+              //       'Statuses',
+              //       style: TextStyle(
+              //         fontSize: 18,
+              //         fontWeight: FontWeight.w500,
+              //         height: 1.5,
+              //       ),
+              //     ),
+              //     GestureDetector(
+              //       behavior: HitTestBehavior.translucent,
+              //       onTap: () {
+              //         statuses.add(
+              //           'Status is good',
+              //         );
+              //         setState(() {});
+              //       },
+              //       child: const Row(
+              //         children: [
+              //           Icon(
+              //             CupertinoIcons.add,
+              //             color: AppColors.primaryColors,
+              //             size: 16,
+              //           ),
+              //           SizedBox(width: 5),
+              //           Text(
+              //             'Add Status',
+              //             style: TextStyle(
+              //                 fontSize: 16,
+              //                 fontWeight: FontWeight.w600,
+              //                 color: AppColors.primaryColors,
+              //                 height: 1.5),
+              //           )
+              //         ],
+              //       ),
+              //     )
+              //   ],
+              // ),
+              // const SizedBox(height: 24),
+              // ListView.builder(
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   shrinkWrap: true,
+              //   itemBuilder: (context, index) {
+              //     return Column(
+              //       children: [
+              //         Row(
+              //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //           children: [
+              //             Text(
+              //               statuses[index],
+              //               style: TextStyle(
+              //                 color: AppColors.primaryTitleColor,
+              //                 fontWeight: FontWeight.w400,
+              //                 fontSize: 16,
+              //               ),
+              //             ),
+              //             IconButton(
+              //                 onPressed: () {
+              //                   statuses.removeAt(index);
+              //                   setState(() {});
+              //                 },
+              //                 icon: const Icon(
+              //                   CupertinoIcons.clear_circled_solid,
+              //                   color: Color(0xFFFF5C5C),
+              //                   size: 18,
+              //                 ))
+              //           ],
+              //         ),
+              //         Divider(height: 16)
+              //       ],
+              //     );
+              //   },
+              //   itemCount: statuses.length,
+              // ),
               BlocListener<WorkflowBloc, WorkflowState>(
                 listener: (context, state) {
                   if (state is CreateWorkflowErrorState) {
                     CommonWidgets().showDialog(context, state.message);
                   } else if (state is CreateWorkflowSuccessState) {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              BottomBarScreen(currentIndex: 1),
+                        ),
+                        (route) => false);
                   }
                 },
                 child: BlocBuilder<WorkflowBloc, WorkflowState>(
@@ -221,6 +227,7 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                     return ElevatedButton(
                       onPressed: () {
                         if (validate()) {
+                          log(code.value.toString() + "Color");
                           BlocProvider.of<WorkflowBloc>(context).add(
                             CreateWorkflow(
                               json: {
@@ -228,7 +235,7 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                                 'title': titleController.text,
                                 'color': code.value.toString(),
                                 'position': positionController.text,
-                                'parent_id': 0,
+                                'parent_id': widget.id,
                               },
                             ),
                           );

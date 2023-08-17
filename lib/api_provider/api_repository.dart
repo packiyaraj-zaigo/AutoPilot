@@ -363,16 +363,18 @@ class ApiRepository {
     return apiProvider.deleteEstimateNote(token, id);
   }
 
-  Future getAllWorkflows(String token, int page) {
-    return apiProvider.getAllWorkflows(token, page);
+  Future getAllWorkflows(String token) {
+    return apiProvider.getAllWorkflows(token);
   }
 
-  Future getWorkflowBucket(String token, int page) {
-    return apiProvider.getWorkflowBucket(token, page);
+  Future editWorkflows(String token, String clientBucketId, String orderId,
+      String updatedBy, String oldBucketId, String workflowId) async {
+    return apiProvider.editWorkflows(
+        token, clientBucketId, orderId, updatedBy, oldBucketId, workflowId);
   }
 
-  Future editWorkflowPosition(String token, WorkflowBucketModel workflow) {
-    return apiProvider.editWorkflowPosition(token, workflow);
+  Future getAllStatus(String token) {
+    return apiProvider.getAllStatus(token);
   }
 
   Future editPart(String token, PartsDatum part) {

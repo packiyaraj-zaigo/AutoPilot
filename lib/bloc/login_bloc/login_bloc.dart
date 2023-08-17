@@ -82,6 +82,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         emit(UserLoginSuccessState());
         AppUtils.setToken(userLoginData['access_token']);
         AppUtils.setUserID(userLoginData['client_id'].toString());
+        AppUtils.setCurrentUserID(userLoginData['user_id'].toString());
+
         AppUtils.setTokenValidity(userLoginData['expires_at'].toString());
 
         if (userLoginData['isCompanySetup'] == 1) {
