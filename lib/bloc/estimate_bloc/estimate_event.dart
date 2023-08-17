@@ -205,3 +205,12 @@ class CreateEstimateFromAppointmentEvent extends EstimateEvent {
     required this.appointmentNote,
   });
 }
+
+class AuthServiceByTechnicianEvent extends EstimateEvent {
+  final String serviceId, serviceName, technicianId, auth;
+  AuthServiceByTechnicianEvent(
+      {required this.serviceId,
+      required this.serviceName,
+      required this.technicianId,
+      required this.auth});
+}

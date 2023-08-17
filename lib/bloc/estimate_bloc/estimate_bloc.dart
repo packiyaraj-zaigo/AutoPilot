@@ -58,6 +58,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<DeleteEstimateEvent>(deleteEstimateBloc);
     on<GetPaymentHistoryEvent>(getPaymentHistoryBloc);
     on<CreateEstimateFromAppointmentEvent>(createEstimateFromAppointment);
+    on<AuthServiceByTechnicianEvent>(authServiceByTechnicianBloc);
   }
 
   Future<void> createEstimateFromAppointment(
@@ -870,6 +871,41 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       }
     } catch (e, s) {
       emit(GetPaymentHistoryErrorState(errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> authServiceByTechnicianBloc(
+    AuthServiceByTechnicianEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      emit(AuthServiceByTechnicianLoadingState());
+
+      Response getPaymentResponse = await _apiRepository.authServiceByTech(
+          token,
+          event.auth,
+          event.serviceName,
+          event.technicianId,
+          event.serviceId);
+
+      log("res${getPaymentResponse.body}");
+
+      if (getPaymentResponse.statusCode == 200) {
+        emit(AuthServiceByTechnicianState());
+      } else {
+        emit(AuthServiceByTechnicianErrorState(
+            errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(AuthServiceByTechnicianErrorState(
+          errorMessage: "Something went wrong"));
 
       print(e.toString());
       print(s);

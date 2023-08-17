@@ -1701,6 +1701,28 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> authServiceByTech(dynamic token, String serviceId,
+      String technicianId, serviceName, String auth) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      Map body = {
+        "is_authorized": auth,
+        "service_name": serviceName,
+        "technician_id": technicianId
+      };
+      var url = Uri.parse("${BASE_URL}api/order_services/$serviceId");
+      var response =
+          http.put(url, headers: getHeader(token), body: json.encode(body));
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + "Delete Canned Service api error");
+    }
+  }
+
   Future<dynamic> editCannedOrderService(
       String token, CannedServiceCreateModel model, String id) async {
     try {

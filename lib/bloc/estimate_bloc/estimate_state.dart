@@ -168,3 +168,12 @@ class GetPaymentHistoryErrorState extends EstimateState {
   final String errorMessage;
   GetPaymentHistoryErrorState({required this.errorMessage});
 }
+
+class AuthServiceByTechnicianState extends EstimateState {}
+
+class AuthServiceByTechnicianLoadingState extends EstimateState {}
+
+class AuthServiceByTechnicianErrorState extends EstimateState {
+  final String errorMessage;
+  AuthServiceByTechnicianErrorState({required this.errorMessage});
+}
