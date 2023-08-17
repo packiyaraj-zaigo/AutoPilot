@@ -411,6 +411,15 @@ class ApiRepository {
     return apiProvider.addWorkflowBucket(token, json);
   }
 
+  Future editWorkflowBucket(
+      String token, Map<String, dynamic> json, String id) {
+    return apiProvider.editWorkflowBucket(token, json, id);
+  }
+
+  Future getSingleWorkflowBucket(String token, String id) async {
+    return apiProvider.getSingleWorkflowBucket(token, id);
+  }
+
   Future<dynamic> createCannedOrderService(
       String token, CannedServiceCreateModel model) {
     return apiProvider.createCannedOrderService(token, model);

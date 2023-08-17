@@ -2643,7 +2643,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractCostController.text) ??
+              discount = ((double.tryParse(addSubContractPriceController.text) ??
                           0) *
                       (double.tryParse(addSubContractDiscountController.text) ??
                           0)) /
@@ -2667,7 +2667,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractCostController.text) ??
+              discount = ((double.tryParse(addSubContractPriceController.text) ??
                           0) *
                       (double.tryParse(addSubContractDiscountController.text) ??
                           0)) /

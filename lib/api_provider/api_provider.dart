@@ -1370,6 +1370,30 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getSingleWorkflowBucket(String token, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets/$id');
+      final response = await http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Get workflow api error");
+    }
+  }
+
+  Future<dynamic> editWorkflowBucket(
+      String token, Map<String, dynamic> map, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets/$id');
+      final clientId = await AppUtils.getUserID();
+      map['client_id'] = int.parse(clientId);
+      final response = await http.put(url,
+          headers: getHeader(token), body: json.encode(map));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Add workflow api error");
+    }
+  }
+
   Future<dynamic> createCannedOrderService(
       String token, CannedServiceCreateModel model) async {
     try {

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/workflow_status_model.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -10,8 +11,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CreateWorkflowScreen extends StatefulWidget {
-  const CreateWorkflowScreen({super.key, required this.id});
+  const CreateWorkflowScreen({super.key, required this.id, this.status});
   final String id;
+  final ChildBucket? status;
   @override
   State<CreateWorkflowScreen> createState() => _CreateWorkflowScreenState();
 }
@@ -33,6 +35,14 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
   ];
   Color code = Colors.transparent;
   List<String> statuses = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.status != null) {
+      titleController.text = widget.status!.title;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,24 +124,24 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                     )),
               ),
               const SizedBox(height: 16),
-              textBox('Select Position', positionController, 'Position',
-                  positionError.isNotEmpty),
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Visibility(
-                    visible: positionError.isNotEmpty,
-                    child: Text(
-                      positionError,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Color(
-                          0xffD80027,
-                        ),
-                      ),
-                    )),
-              ),
-              const SizedBox(height: 20),
+              // textBox('Select Position', positionController, 'Position',
+              //     positionError.isNotEmpty),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 8.0),
+              //   child: Visibility(
+              //       visible: positionError.isNotEmpty,
+              //       child: Text(
+              //         positionError,
+              //         style: const TextStyle(
+              //           fontSize: 14,
+              //           fontWeight: FontWeight.w500,
+              //           color: Color(
+              //             0xffD80027,
+              //           ),
+              //         ),
+              //       )),
+              // ),
+              // const SizedBox(height: 20),
               // Row(
               //   crossAxisAlignment: CrossAxisAlignment.center,
               //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -228,17 +238,33 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                       onPressed: () {
                         if (validate()) {
                           log(code.value.toString() + "Color");
-                          BlocProvider.of<WorkflowBloc>(context).add(
-                            CreateWorkflow(
-                              json: {
-                                'workflow_type': "Shop",
-                                'title': titleController.text,
-                                'color': code.value.toString(),
-                                'position': positionController.text,
-                                'parent_id': widget.id,
-                              },
-                            ),
-                          );
+                          if (widget.status != null) {
+                            BlocProvider.of<WorkflowBloc>(context).add(
+                              EditWorkflowBucketEvent(
+                                id: widget.status!.id.toString(),
+                                json: {
+                                  'id': widget.status!.id.toString(),
+                                  'workflow_type': "Shop",
+                                  'title': titleController.text,
+                                  'color': code.value.toString(),
+                                  'position': '0',
+                                  'parent_id': widget.id,
+                                },
+                              ),
+                            );
+                          } else {
+                            BlocProvider.of<WorkflowBloc>(context).add(
+                              CreateWorkflowBucketEvent(
+                                json: {
+                                  'workflow_type': "Shop",
+                                  'title': titleController.text,
+                                  'color': code.value.toString(),
+                                  'position': '0',
+                                  'parent_id': widget.id,
+                                },
+                              ),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -322,7 +348,7 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
-              maxLength: 50,
+              maxLength: 25,
               onTap: label == "Color"
                   ? () {
                       log('here');
@@ -403,12 +429,12 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
     } else {
       colorError = '';
     }
-    if (positionController.text.isEmpty) {
-      positionError = "Position cant't be empty";
-      status = false;
-    } else {
-      positionError = '';
-    }
+    // if (positionController.text.isEmpty) {
+    //   positionError = "Position cant't be empty";
+    //   status = false;
+    // } else {
+    //   positionError = '';
+    // }
     setState(() {});
     return status;
   }

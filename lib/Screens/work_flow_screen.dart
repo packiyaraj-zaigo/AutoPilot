@@ -33,9 +33,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<BoardList> workflowOrderList = [];
+  List<BoardList> workflowVehicleList = [];
   List<WorkflowStatusModel> statuses = [];
-  List<String> workflowOrderHeadings = [];
-  List<BoardList> lists = [];
 
   @override
   void initState() {
@@ -47,7 +46,13 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
       final filteredList = workflows
           .where((element) => element.bucketName?.parentId == status.id)
           .toList();
-      workflowOrderList.add(boardWidget(filteredList, status));
+      final vehicleList = workflows
+          .where((element) =>
+              element.bucketName?.parentId == status.id &&
+              element.orders?.vehicle != null)
+          .toList();
+      workflowOrderList.add(boardWidget(filteredList, status, false));
+      workflowVehicleList.add(boardWidget(vehicleList, status, true));
     }
   }
 
@@ -104,11 +109,12 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                         Navigator.of(scaffoldKey.currentContext!)
                             .pushAndRemoveUntil(
                                 MaterialPageRoute(
-                                    builder: (context) => BottomBarScreen(
-                                          currentIndex: 1,
-                                          tabControllerIndex:
-                                              widget.tabController.index,
-                                        )),
+                                  builder: (context) => BottomBarScreen(
+                                    currentIndex: 1,
+                                    tabControllerIndex:
+                                        widget.tabController.index,
+                                  ),
+                                ),
                                 (route) => false);
                       }),
                     children: [
@@ -118,7 +124,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                       ),
                       BoardView(
                         width: 240,
-                        lists: lists,
+                        lists: workflowVehicleList,
                       ),
                     ],
                   );
@@ -131,8 +137,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  BoardList boardWidget(
-      List<WorkflowModel> workflows, WorkflowStatusModel status) {
+  BoardList boardWidget(List<WorkflowModel> workflows,
+      WorkflowStatusModel status, bool isVehicle) {
     return BoardList(
       backgroundColor: Colors.transparent,
       header: [
@@ -191,7 +197,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           },
           item: Column(
             children: [
-              workflowCard(workflows[index]),
+              workflowCard(workflows[index], isVehicle, status),
               const SizedBox(height: 16)
             ],
           ),
@@ -200,9 +206,23 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  Container workflowCard(WorkflowModel workflow) {
+  Container workflowCard(
+      WorkflowModel workflow, bool isVehicle, WorkflowStatusModel status) {
     String str = workflow.bucketName!.color ?? '';
     str = str.replaceAll('#', '0xFF');
+    String mainTitle = "";
+    String secondaryTitle = "";
+    if (isVehicle) {
+      mainTitle =
+          '${workflow.orders?.vehicle?.vehicleYear ?? ''} ${workflow.orders?.vehicle?.vehicleModel ?? ''}';
+      secondaryTitle =
+          '${workflow.orders?.orderStatus ?? ''} #${workflow.orders?.orderNumber ?? ''} - ${workflow.orders?.estimationName ?? ''}';
+    } else {
+      mainTitle =
+          '${workflow.orders?.orderStatus ?? ''} #${workflow.orders?.orderNumber ?? ''} - ${workflow.orders?.estimationName ?? ''}';
+      secondaryTitle =
+          '${workflow.orders?.vehicle?.vehicleYear ?? ''} ${workflow.orders?.vehicle?.vehicleModel ?? ''}';
+    }
 
     return Container(
       width: 200,
@@ -236,7 +256,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${workflow.orders?.orderStatus ?? ''} #${workflow.orders?.orderNumber ?? ''} - ${workflow.orders?.estimationName ?? ''}',
+              mainTitle,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: Color(int.tryParse(str) ?? 0xFF1355FF),
@@ -254,7 +274,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${workflow.orders?.vehicle?.vehicleYear ?? ''} ${workflow.orders?.vehicle?.vehicleModel}',
+              secondaryTitle,
               style: const TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),
@@ -277,28 +297,114 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
             //     ),
             //   ),
             // ),
-            Container(
-                height: 24,
-                decoration: BoxDecoration(
-                    color: const Color(0xFFF5F5F5),
-                    borderRadius: BorderRadius.circular(12)),
-                child: Center(
-                  child: Text(
-                    workflow.bucketName?.title ?? '',
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color:
-                            // str == '' ?
-                            AppColors.primaryColors
-                        // : Color(color),
-                        ),
-                  ),
-                ))
+            GestureDetector(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => dropDown(status, workflow),
+                );
+              },
+              child: Container(
+                  height: 24,
+                  decoration: BoxDecoration(
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12)),
+                  child: Center(
+                    child: Text(
+                      workflow.bucketName?.title ?? '',
+                      maxLines: 1,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color:
+                              // str == '' ?
+                              AppColors.primaryColors
+                          // : Color(color),
+                          ),
+                    ),
+                  )),
+            )
           ],
         ),
       ),
+    );
+  }
+
+  AlertDialog dropDown(WorkflowStatusModel status, WorkflowModel workflow) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      scrollable: true,
+      title: const Text(
+        'Select Status',
+        style: TextStyle(
+          color: AppColors.primaryTitleColor,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      content: Builder(builder: (context) {
+        return Column(
+          children: List.generate(
+            status.childBuckets.length,
+            (index) => Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: GestureDetector(
+                onTap: () {
+                  scaffoldKey.currentContext!.read<WorkflowBloc>().add(
+                        EditWorkflow(
+                          workflowId: workflow.id.toString(),
+                          clientBucketId:
+                              status.childBuckets[index].id.toString(),
+                          orderId: workflow.orderId.toString(),
+                          oldBucketId: status.id.toString(),
+                        ),
+                      );
+                  Navigator.pop(context);
+                },
+                child: Container(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width - 75,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          status.childBuckets[index].title,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => CreateWorkflowScreen(
+                                  id: status.childBuckets[index].parentId
+                                      .toString(),
+                                  status: status.childBuckets[index]),
+                            ),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.edit,
+                          color: AppColors.primaryColors,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      }),
     );
   }
 }
