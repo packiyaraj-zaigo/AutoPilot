@@ -30,3 +30,10 @@ class EditEmployee extends EmployeeEvent {
   final int id;
   const EditEmployee({required this.employee, required this.id});
 }
+
+class GetEmployeeMessageEvent extends EmployeeEvent {
+  final String receiverUserId;
+  GetEmployeeMessageEvent({
+    required this.receiverUserId,
+  });
+}

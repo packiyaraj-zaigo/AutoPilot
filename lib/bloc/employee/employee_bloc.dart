@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'package:auto_pilot/Models/employee_message_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -10,6 +12,7 @@ import 'package:auto_pilot/Models/role_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'employee_event.dart';
 part 'employee_state.dart';
@@ -19,13 +22,18 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
   bool isPagenationLoading = false;
   final apiRepo = ApiRepository();
   int currentPage = 1;
-  int totalPages = 1;
+  int totalPages = 0;
+
+  int messageCurrentPage = 1;
+  int messageTotalPage = 1;
+  bool messageIsFetching = false;
   EmployeeBloc() : super(EmployeeInitial()) {
     on<GetAllEmployees>(getAllEmployee);
     on<CreateEmployee>(createEmployee);
     on<GetAllRoles>(getAllRoles);
     on<DeleteEmployee>(deleteEmployee);
     on<EditEmployee>(editEmployee);
+    on<GetEmployeeMessageEvent>(getEmployeeMessageBloc);
   }
 
   editEmployee(
@@ -186,6 +194,52 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       emit(EmployeeDetailsErrorState(message: e.toString()));
       isEmployeesLoading = false;
       isPagenationLoading = false;
+    }
+  }
+
+  Future<void> getEmployeeMessageBloc(
+    GetEmployeeMessageEvent event,
+    Emitter<EmployeeState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+
+      EmployeeMessageModel employeeMessageModel;
+
+      if (messageCurrentPage == 1) {
+        emit(GetEmployeeMessageLoadingState());
+      }
+
+      Response getEmployeeMessage = await apiRepo.getEmployeeMessage(
+          token!, messageCurrentPage, event.receiverUserId);
+
+      log("res${getEmployeeMessage.body}");
+
+      if (getEmployeeMessage.statusCode == 200) {
+        employeeMessageModel =
+            employeeMessageModelFromJson(getEmployeeMessage.body);
+        totalPages = employeeMessageModel.data.lastPage ?? 1;
+        messageIsFetching = false;
+        emit(GetEmployeeMessageState(
+            employeeMessageModel: employeeMessageModel));
+
+        if (messageTotalPage > messageCurrentPage && messageCurrentPage != 0) {
+          messageCurrentPage += 1;
+        } else {
+          messageCurrentPage = 0;
+        }
+      } else {
+        emit(
+            GetEmployeeMessageErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(GetEmployeeMessageErrorState(errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
     }
   }
 }

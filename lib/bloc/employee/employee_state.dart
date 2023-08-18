@@ -62,3 +62,18 @@ class EditEmployeeErrorState extends EmployeeState {
 }
 
 class EditEmployeeSuccessState extends EmployeeState {}
+
+class GetEmployeeMessageState extends EmployeeState {
+  final EmployeeMessageModel employeeMessageModel;
+  GetEmployeeMessageState({required this.employeeMessageModel});
+
+  @override
+  List<Object> get props => [employeeMessageModel];
+}
+
+class GetEmployeeMessageLoadingState extends EmployeeState {}
+
+class GetEmployeeMessageErrorState extends EmployeeState {
+  final String errorMessage;
+  GetEmployeeMessageErrorState({required this.errorMessage});
+}
