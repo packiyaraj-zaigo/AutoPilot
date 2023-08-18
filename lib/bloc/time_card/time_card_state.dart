@@ -29,3 +29,27 @@ class CreateTimeCardErrorState extends TimeCardState {
 }
 
 class CreateTimeCardSucessState extends TimeCardState {}
+
+class GetUserTimeCardsLoadingState extends TimeCardState {}
+
+class GetUserTimeCardsErrorState extends TimeCardState {
+  final String message;
+  const GetUserTimeCardsErrorState({required this.message});
+}
+
+class GetUserTimeCardsSuccessState extends TimeCardState {
+  final List<TimeCardUserModel> timeCards;
+  const GetUserTimeCardsSuccessState({required this.timeCards});
+
+  @override
+  List<Object> get props => [timeCards];
+}
+
+class EditTimeCardLoadingState extends TimeCardState {}
+
+class EditTimeCardErrorState extends TimeCardState {
+  final String message;
+  const EditTimeCardErrorState({required this.message});
+}
+
+class EditTimeCardSuccessState extends TimeCardState {}

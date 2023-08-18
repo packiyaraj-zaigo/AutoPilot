@@ -121,7 +121,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             CommonWidgets().showDialog(context, state.message);
           }
           if (state is CreateAppointmentSuccessState) {
-            log(isChecked.toString());
+            log(state.toString());
             if (isChecked == true) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => DummyAppointmentScreen(
@@ -134,9 +134,9 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                 ),
               ));
             } else {
+              Navigator.of(context).pop();
               CommonWidgets().showSuccessDialog(
                   context, "Appointment Created Successfully");
-              Navigator.of(context).pop();
             }
           }
         },

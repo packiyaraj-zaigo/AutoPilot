@@ -16,5 +16,11 @@ class CreateTimeCardEvent extends TimeCardEvent {
 
 class EditTimeCardEvent extends TimeCardEvent {
   final TimeCardCreateModel timeCard;
-  const EditTimeCardEvent({required this.timeCard});
+  final String id;
+  const EditTimeCardEvent({required this.timeCard, required this.id});
+}
+
+class GetUserTimeCardsEvent extends TimeCardEvent {
+  final String id;
+  const GetUserTimeCardsEvent({required this.id});
 }

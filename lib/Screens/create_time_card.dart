@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/time_card_create_model.dart';
+import 'package:auto_pilot/Models/time_card_user_model.dart';
 import 'package:auto_pilot/Screens/time_card_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
@@ -11,12 +12,15 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TimeCardCreate extends StatefulWidget {
-  const TimeCardCreate({super.key, this.id = -1, this.employee = ''});
+  const TimeCardCreate(
+      {super.key, this.id = -1, this.employee = '', this.timeCard});
   final int? id;
   final String? employee;
+  final TimeCardUserModel? timeCard;
 
   @override
   State<TimeCardCreate> createState() => _TimeCardCreateState();
@@ -42,11 +46,36 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
   Duration clockOut = const Duration();
   DateTime selectedDate = DateTime.now();
 
+  populateData() {
+    final timeCard = widget.timeCard!;
+    employeeController.text =
+        timeCard.technician.firstName + timeCard.technician.lastName;
+    taskController.text = timeCard.activityType;
+    dateController.text =
+        AppUtils.getDateFormatterUI(timeCard.clockInTime.toString());
+    clockInController.text =
+        "${timeCard.clockInTime.hour}:${timeCard.clockInTime.minute}";
+    clockOutController.text =
+        "${timeCard.clockOutTime.hour}:${timeCard.clockOutTime.minute}";
+    totalTimeController.text = "${timeCard.totalTime.substring(0, 5)} Hours";
+    notesController.text = timeCard.notes;
+    selectedDate = timeCard.clockInTime;
+    clockIn = Duration(
+        hours: timeCard.clockInTime.hour, minutes: timeCard.clockInTime.minute);
+    clockOut = Duration(
+        hours: timeCard.clockOutTime.hour,
+        minutes: timeCard.clockOutTime.minute);
+    technicianId = timeCard.technicianId;
+  }
+
   @override
   void initState() {
     super.initState();
     technicianId = widget.id!;
     employeeController.text = widget.employee!;
+    if (widget.timeCard != null) {
+      populateData();
+    }
   }
 
   @override
@@ -80,17 +109,23 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
         listener: (context, state) {
           if (state is CreateTimeCardErrorState) {
             CommonWidgets().showDialog(context, state.message);
-          } else if (state is CreateTimeCardSucessState) {
+          } else if (state is CreateTimeCardSucessState ||
+              state is EditTimeCardSuccessState) {
             Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
                   builder: (context) => const TimeCardsScreen(),
                 ),
                 (route) => false);
+            CommonWidgets().showSuccessDialog(context,
+                'Successfully ${widget.timeCard == null ? "Created" : "Updated"} the\ntime card');
+          } else if (state is EditTimeCardErrorState) {
+            CommonWidgets().showDialog(context, state.message);
           }
         },
         child: BlocBuilder<TimeCardBloc, TimeCardState>(
           builder: (context, state) {
-            if (state is CreateTimeCardLoadingState) {
+            if (state is CreateTimeCardLoadingState ||
+                state is EditTimeCardLoadingState) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
@@ -151,7 +186,10 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                         onTap: () async {
                           final status = validate();
                           if (status) {
-                            final clientId = await AppUtils.getUserID();
+                            dynamic clientId = await AppUtils.getUserID();
+                            if (widget.timeCard != null) {
+                              clientId = widget.timeCard!.clientId.toString();
+                            }
                             final clockedIn = DateTime(
                                 selectedDate.year,
                                 selectedDate.month,
@@ -174,8 +212,15 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                                 clockInTime: clockedIn,
                                 clockOutTime: clockedOut,
                                 totalTime: totalTime);
-                            BlocProvider.of<TimeCardBloc>(context)
-                                .add(CreateTimeCardEvent(timeCard: timeCard));
+                            if (widget.timeCard != null) {
+                              BlocProvider.of<TimeCardBloc>(context).add(
+                                  EditTimeCardEvent(
+                                      timeCard: timeCard,
+                                      id: widget.timeCard!.id.toString()));
+                            } else {
+                              BlocProvider.of<TimeCardBloc>(context)
+                                  .add(CreateTimeCardEvent(timeCard: timeCard));
+                            }
                           }
                         },
                         child: Container(
@@ -186,9 +231,9 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                             borderRadius: BorderRadius.circular(12),
                             color: AppColors.primaryColors,
                           ),
-                          child: const Text(
-                            "Confirm",
-                            style: TextStyle(
+                          child: Text(
+                            widget.timeCard != null ? "Update" : "Confirm",
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white),
@@ -304,7 +349,9 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                           },
                         );
                       }
-                      if (label == 'Employee' && widget.id == -1) {
+                      if (label == 'Employee' &&
+                          widget.id == -1 &&
+                          widget.timeCard == null) {
                         showModalBottomSheet(
                             context: context,
                             builder: (context) => employeeListSheet());
@@ -388,7 +435,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                       } else {
                         if (clockOutController.text.isEmpty) {
                           clockOutController.text =
-                              '${clockIn.inHours.toString().padLeft(2, '0')} : ${(clockIn.inMinutes % 60).toString().padLeft(2, '0')}';
+                              '${clockIn.inHours.toString().padLeft(2, '0')}:${(clockIn.inMinutes % 60).toString().padLeft(2, '0')}';
                           clockOut = Duration(
                               hours: clockIn.inHours,
                               minutes: clockIn.inMinutes % 60);
@@ -398,9 +445,9 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                           clockOutController.text.isNotEmpty &&
                           clockOut >= clockIn) {
                         totalTimeController.text =
-                            '${(clockOut.inHours - clockIn.inHours).toString().padLeft(2, '0')} : ${((clockOut.inMinutes % 60) - (clockIn.inMinutes % 60)).toString().padLeft(2, '0')} : 00 Hours';
+                            '${(clockOut.inHours - clockIn.inHours).toString().padLeft(2, '0')}:${((clockOut.inMinutes % 60) - (clockIn.inMinutes % 60)).toString().padLeft(2, '0')} Hours';
                       } else {
-                        totalTimeController.text = '00 : 00 : 00 Hours';
+                        totalTimeController.text = '00:00 Hours';
                       }
                     })
               ],
@@ -422,7 +469,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                 onTimerDurationChanged: (Duration changeTimer) {
                   if (isClockIn) {
                     clockInController.text =
-                        '${(changeTimer.inHours).toString().padLeft(2, '0')} : ${(changeTimer.inMinutes % 60).toString().padLeft(2, '0')}';
+                        '${(changeTimer.inHours).toString().padLeft(2, '0')}:${(changeTimer.inMinutes % 60).toString().padLeft(2, '0')}';
                     clockIn = changeTimer;
                   } else {
                     clockOutController.text =
@@ -456,7 +503,8 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                         Navigator.pop(context);
                         if (dateController.text.isEmpty) {
                           final date = DateTime.now().toString();
-                          final formattedDate = AppUtils.getDateFormatted(date);
+                          final formattedDate =
+                              AppUtils.getDateFormatterUI(date);
                           dateController.text = formattedDate;
                         }
                       })
@@ -751,14 +799,14 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                                             BlocProvider.of<EmployeeBloc>(
                                                     context)
                                                 .totalPages) {
-                                      final debouncer = Debouncer();
+                                      // final debouncer = Debouncer();
 
-                                      debouncer.run(() {
-                                        BlocProvider.of<EmployeeBloc>(context)
-                                            .isPagenationLoading = true;
-                                        BlocProvider.of<EmployeeBloc>(context)
-                                            .add(GetAllEmployees());
-                                      });
+                                      // debouncer.run(() {
+                                      BlocProvider.of<EmployeeBloc>(context)
+                                          .isPagenationLoading = true;
+                                      BlocProvider.of<EmployeeBloc>(context)
+                                          .add(GetAllEmployees());
+                                      // });
                                     }
                                   }),
                                 physics: const ClampingScrollPhysics(),
@@ -772,22 +820,6 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
           },
         ),
       ),
-    );
-  }
-}
-
-class Debouncer {
-  int? milliseconds;
-  VoidCallback? action;
-  Timer? timer;
-
-  run(VoidCallback action) {
-    if (null != timer) {
-      timer!.cancel();
-    }
-    timer = Timer(
-      const Duration(milliseconds: Duration.millisecondsPerSecond),
-      action,
     );
   }
 }

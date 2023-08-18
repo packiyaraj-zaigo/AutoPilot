@@ -823,6 +823,18 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> getUserTimeCards(
+      String token, String technicianId, int page) async {
+    try {
+      final url = Uri.parse(
+          "${BASE_URL}api/clocks?technician_id=$technicianId&page=$page");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + "  Get all time cards api error");
+    }
+  }
+
   Future<dynamic> getProvince(String token, int currentPage) async {
     print("into provider");
 
@@ -850,6 +862,18 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + "  Create time cards api error");
+    }
+  }
+
+  Future<dynamic> editTimeCard(
+      String token, TimeCardCreateModel timeCard, String id) async {
+    try {
+      final url = Uri.parse("${BASE_URL}api/clocks/$id");
+      final response = http.put(url,
+          headers: getHeader(token), body: json.encode(timeCard.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + "  Edit time cards api error");
     }
   }
 

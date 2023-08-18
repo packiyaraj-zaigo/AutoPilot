@@ -41,6 +41,7 @@ class CommonWidgets {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           content: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SvgPicture.asset("assets/images/success_icon.svg"),
               const SizedBox(
@@ -48,6 +49,7 @@ class CommonWidgets {
               ),
               Text(
                 message,
+                textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w500,
