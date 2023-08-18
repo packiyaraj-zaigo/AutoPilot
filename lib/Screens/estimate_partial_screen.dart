@@ -2416,7 +2416,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           setState(() {
             laborAmount = laborAmount +
                 (double.parse(element2.unitPrice) *
-                    int.parse(element2.quanityHours));
+                    double.parse(element2.quanityHours));
           });
         }
         if (element2.itemType.toLowerCase() == "subcontract") {
@@ -2434,7 +2434,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           setState(() {
             partAmount = partAmount +
                 (double.parse(element2.unitPrice) *
-                    int.parse(element2.quanityHours));
+                    double.parse(element2.quanityHours));
           });
         }
 
@@ -4369,8 +4369,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         child: BlocListener<EstimateBloc, EstimateState>(
           listener: (context, state) {
             if (state is AuthServiceByTechnicianState) {
-              context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+              // context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+              //     orderId: widget.estimateDetails.data.id.toString()));
+
+              context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
                   orderId: widget.estimateDetails.data.id.toString()));
+            }
+            if(state is ChangeEstimateStatusState){
+                context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                  orderId: widget.estimateDetails.data.id.toString()));
+
             }
             if (state is GetSingleEstimateState) {
               Navigator.pushReplacement(context, MaterialPageRoute(
