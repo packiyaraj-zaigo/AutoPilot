@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:auto_pilot/Models/time_card_user_model.dart';
 import 'package:auto_pilot/api_provider/api_provider.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -15,13 +16,66 @@ part 'time_card_state.dart';
 
 class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
   bool isLoading = false;
+
   int currentPage = 1;
   int totalPages = 1;
+  int currentUserTimeCardIndex = 1;
+  int totalUserTimeCardIndex = 1;
+  bool isCurrentUserTimeCardLoading = false;
   final apiRepo = ApiRepository();
 
   TimeCardBloc() : super(TimeCardInitial()) {
     on<GetAllTimeCardsEvent>(getAllTimeCards);
+    on<GetUserTimeCardsEvent>(getUserTimeCards);
     on<CreateTimeCardEvent>(createTimeCard);
+    on<EditTimeCardEvent>(editTimeCard);
+  }
+
+  getUserTimeCards(
+    GetUserTimeCardsEvent event,
+    Emitter<TimeCardState> emit,
+  ) async {
+    try {
+      emit(GetUserTimeCardsLoadingState());
+      if (currentPage == 1) {
+        isCurrentUserTimeCardLoading = true;
+      }
+
+      final token = await AppUtils.getToken();
+      await apiRepo
+          .getUserTimeCards(token, event.id, currentUserTimeCardIndex)
+          .then((value) async {
+        if (value.statusCode == 200) {
+          final responseBody = await jsonDecode(value.body);
+          final data = responseBody['data'];
+
+          final List<TimeCardUserModel> timeCards = [];
+          if (data['data'] != null && data['data'].isNotEmpty) {
+            data['data'].forEach((timeCard) {
+              timeCards.add(TimeCardUserModel.fromJson(timeCard));
+            });
+          }
+
+          currentUserTimeCardIndex = data['current_page'] ?? 1;
+          totalPages = data['last_page'] ?? 1;
+          if (currentUserTimeCardIndex <= totalPages) {
+            currentUserTimeCardIndex++;
+          }
+
+          emit(
+            GetUserTimeCardsSuccessState(timeCards: timeCards),
+          );
+        } else {
+          log(value.body.toString());
+          final body = jsonDecode(value.body);
+          emit(GetUserTimeCardsErrorState(message: body['message']));
+        }
+        isCurrentUserTimeCardLoading = false;
+      });
+    } catch (e) {
+      emit(GetUserTimeCardsErrorState(message: e.toString()));
+      isCurrentUserTimeCardLoading = false;
+    }
   }
 
   getAllTimeCards(
@@ -77,6 +131,30 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
     } catch (e) {
       log(e.toString() + "Create time card bloc error");
       emit(CreateTimeCardErrorState(message: 'Something went wrong'));
+    }
+  }
+
+  editTimeCard(
+    EditTimeCardEvent event,
+    Emitter<TimeCardState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final Response response =
+          await apiRepo.editTimeCard(token, event.timeCard, event.id);
+      final body = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        emit(EditTimeCardSuccessState());
+      } else {
+        if (body.containsKey('message')) {
+          emit(EditTimeCardErrorState(message: body['message'].toString()));
+        } else {
+          emit(const EditTimeCardErrorState(message: 'Something went wrong'));
+        }
+      }
+    } catch (e) {
+      log(e.toString() + "Edit time card bloc error");
+      emit(EditTimeCardErrorState(message: 'Something went wrong'));
     }
   }
 }

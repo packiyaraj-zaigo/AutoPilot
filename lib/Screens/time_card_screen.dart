@@ -4,6 +4,7 @@ import 'package:auto_pilot/Models/time_card_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_time_card.dart';
+import 'package:auto_pilot/Screens/user_time_cards_screen.dart';
 import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
@@ -258,29 +259,44 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                                                       MainAxisAlignment
                                                           .spaceBetween,
                                                   children: [
-                                                    Container(
-                                                      width: (MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width -
-                                                              96) /
-                                                          2,
-                                                      height: 40,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(12),
-                                                        color: const Color(
-                                                            0xFFF5F5F5),
-                                                      ),
-                                                      child: const Center(
-                                                        child: Text(
-                                                          'Edit',
-                                                          style: TextStyle(
-                                                            color: AppColors
-                                                                .primaryColors,
-                                                            fontWeight:
-                                                                FontWeight.w600,
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        Navigator.of(context)
+                                                            .push(
+                                                                MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              UserTimeCardsScreen(
+                                                                  id: timeCard
+                                                                      .technicianId
+                                                                      .toString()),
+                                                        ));
+                                                      },
+                                                      child: Container(
+                                                        width: (MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width -
+                                                                96) /
+                                                            2,
+                                                        height: 40,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(12),
+                                                          color: const Color(
+                                                              0xFFF5F5F5),
+                                                        ),
+                                                        child: const Center(
+                                                          child: Text(
+                                                            'Edit',
+                                                            style: TextStyle(
+                                                              color: AppColors
+                                                                  .primaryColors,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                            ),
                                                           ),
                                                         ),
                                                       ),

@@ -244,8 +244,16 @@ class ApiRepository {
     return apiProvider.getAllTimeCards(token);
   }
 
+  Future getUserTimeCards(String token, String technicianId, int page) {
+    return apiProvider.getUserTimeCards(token, technicianId, page);
+  }
+
   Future createTimeCard(String token, TimeCardCreateModel timeCard) {
     return apiProvider.createTimeCard(token, timeCard);
+  }
+
+  Future editTimeCard(String token, TimeCardCreateModel timeCard, String id) {
+    return apiProvider.editTimeCard(token, timeCard, id);
   }
 
   Future addParts(
