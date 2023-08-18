@@ -108,8 +108,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
-        title: const Text(
-          'New Service',
+        title: Text(
+          widget.service != null ? "Edit Service" : 'New Service',
           style: TextStyle(color: Colors.black87, fontSize: 16),
         ),
         centerTitle: true,
@@ -2643,11 +2643,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractPriceController.text) ??
-                          0) *
-                      (double.tryParse(addSubContractDiscountController.text) ??
-                          0)) /
-                  100;
+              discount =
+                  ((double.tryParse(addSubContractPriceController.text) ?? 0) *
+                          (double.tryParse(
+                                  addSubContractDiscountController.text) ??
+                              0)) /
+                      100;
             }
             subTotal =
                 ((double.tryParse(addSubContractPriceController.text) ?? 0) -
@@ -2667,11 +2668,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractPriceController.text) ??
-                          0) *
-                      (double.tryParse(addSubContractDiscountController.text) ??
-                          0)) /
-                  100;
+              discount =
+                  ((double.tryParse(addSubContractPriceController.text) ?? 0) *
+                          (double.tryParse(
+                                  addSubContractDiscountController.text) ??
+                              0)) /
+                      100;
             }
             subTotal = ((double.tryParse(addSubContractPriceController.text) ??
                             0) -

@@ -625,6 +625,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     } else {
       positionError = '';
     }
+    log(dropdownValue + "ROLE");
     setState(() {});
     return status;
   }
