@@ -104,19 +104,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     );
                   }
                   return TabBarView(
-                    controller: widget.tabController
-                      ..addListener(() {
-                        Navigator.of(scaffoldKey.currentContext!)
-                            .pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => BottomBarScreen(
-                                    currentIndex: 1,
-                                    tabControllerIndex:
-                                        widget.tabController.index,
-                                  ),
-                                ),
-                                (route) => false);
-                      }),
+                    controller: widget.tabController..addListener(() {}),
                     children: [
                       BoardView(
                         width: 240,

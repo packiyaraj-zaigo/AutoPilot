@@ -537,7 +537,8 @@ class ApiProvider {
       final response = http.post(Uri.parse('${BASE_URL}api/users'),
           headers: getHeader(token), body: json.encode(model.toJson()));
 
-      log(model.phone);
+      log(model.toJson().toString());
+
       return response;
     } catch (e) {
       print(e.toString() + 'Create employee error');
@@ -1350,6 +1351,7 @@ class ApiProvider {
       final response = http.put(Uri.parse('${BASE_URL}api/users/$id'),
           headers: getHeader(token), body: json.encode(model.toJson()));
       inspect(response);
+      log(model.toJson().toString());
       return response;
     } catch (e) {
       print(e.toString() + 'Create employee error');
