@@ -216,3 +216,8 @@ class AuthServiceByTechnicianEvent extends EstimateEvent {
       required this.technicianId,
       required this.auth});
 }
+
+class ChangeEstimateStatusEvent extends EstimateEvent {
+  final String orderId;
+  ChangeEstimateStatusEvent({required this.orderId});
+}

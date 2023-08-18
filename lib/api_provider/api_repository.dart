@@ -609,6 +609,10 @@ class ApiRepository {
   Future<dynamic> globalSearch(String token, String query) async {
     return apiProvider.globalSearch(token, query);
   }
+
+  Future<dynamic> changeEstimateStatus(String token, String orderId) async {
+    return apiProvider.estimateStatusChange(token, orderId);
+  }
 }
 
 class NetworkError extends Error {}

@@ -1780,6 +1780,8 @@ class ApiProvider {
       }
       map['order_service_id'] = serviceId;
       map.remove('canned_service_id');
+      map["tax"] = model.tax;
+      map.remove('is_tax');
 
       final response = await http.post(url,
           headers: getHeader(token), body: json.encode(map));
@@ -2030,6 +2032,18 @@ class ApiProvider {
       final url = Uri.parse(
           '${BASE_URL}api/search?keyword=$query&show_vehicle=1&show_estimate=1&show_customer=1');
       final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Search api error");
+    }
+  }
+
+  Future<dynamic> estimateStatusChange(String token, String orderId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/orders/status/$orderId');
+      final response = http.post(url,
+          headers: getHeader(token),
+          body: json.encode({"order_status": 'Order'}));
       return response;
     } catch (e) {
       log(e.toString() + " Search api error");

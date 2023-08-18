@@ -177,3 +177,12 @@ class AuthServiceByTechnicianErrorState extends EstimateState {
   final String errorMessage;
   AuthServiceByTechnicianErrorState({required this.errorMessage});
 }
+
+class ChangeEstimateStatusState extends EstimateState {}
+
+class ChangeEstimateStausLoadingState extends EstimateState {}
+
+class ChangeEstimateStatusErrorState extends EstimateState {
+  final String errorMessage;
+  ChangeEstimateStatusErrorState({required this.errorMessage});
+}

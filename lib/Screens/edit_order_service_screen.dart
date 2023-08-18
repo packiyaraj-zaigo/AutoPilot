@@ -119,8 +119,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
-        title: const Text(
-          'New Service',
+        title: Text(
+          widget.service != null ? "Edit Service" : 'New Service',
           style: TextStyle(color: Colors.black87, fontSize: 16),
         ),
         centerTitle: true,
@@ -1340,7 +1340,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ],
                       ),
                       errorWidget(error: addMaterialDiscountErrorStatus),
-                     
                       Padding(
                         padding: EdgeInsets.only(top: 17),
                         child: textBox(
@@ -1435,6 +1434,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                     isPercentage ? "Percentage" : "Fixed",
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
+                                tax: client!.taxOnMaterial == "Y"
+                                    ? client!.materialTaxRate ?? '0'
+                                    : '0',
                               ));
                               setState(() {});
                               Navigator.pop(context);
@@ -1741,7 +1743,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addPartDiscountErrorStatus),
-                    
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: textBox(
@@ -1837,6 +1838,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   isPercentage ? "Percentage" : "Fixed",
                               itemType: "Part",
                               subTotal: subTotal.toStringAsFixed(2),
+                              tax: client!.taxOnParts == "Y"
+                                  ? client!.salesTaxRate ?? '0'
+                                  : '0',
                             ));
                             setState(() {});
                             Navigator.pop(context);
@@ -2182,6 +2186,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               quanityHours: addLaborHoursController.text,
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
+                              tax: client!.taxOnLabors == "Y"
+                                  ? client!.materialTaxRate ?? '0'
+                                  : '0',
                             ));
                             setState(() {});
                             Navigator.pop(context);
@@ -2333,7 +2340,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           addFeeCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
-                    
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2415,6 +2421,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 discount: '0',
                                 unitPrice: addFeePriceController.text,
                                 itemType: "Fee",
+                                tax: client!.taxOnLabors == "Y"
+                                    ? client!.materialTaxRate ?? '0'
+                                    : '0',
                                 subTotal: subTotal.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
@@ -2508,11 +2517,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractPriceController.text) ??
-                          0) *
-                      (double.tryParse(addSubContractDiscountController.text) ??
-                          0)) /
-                  100;
+              discount =
+                  ((double.tryParse(addSubContractPriceController.text) ?? 0) *
+                          (double.tryParse(
+                                  addSubContractDiscountController.text) ??
+                              0)) /
+                      100;
             }
             subTotal =
                 ((double.tryParse(addSubContractPriceController.text) ?? 0) -
@@ -2532,11 +2542,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
             double discount =
                 double.tryParse(addSubContractDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addSubContractPriceController.text) ??
-                          0) *
-                      (double.tryParse(addSubContractDiscountController.text) ??
-                          0)) /
-                  100;
+              discount =
+                  ((double.tryParse(addSubContractPriceController.text) ?? 0) *
+                          (double.tryParse(
+                                  addSubContractDiscountController.text) ??
+                              0)) /
+                      100;
             }
             subTotal = ((double.tryParse(addSubContractPriceController.text) ??
                             0) -
@@ -2687,7 +2698,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addSubContractDiscountErrorStatus),
-                    
+
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2780,13 +2791,16 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 part: '',
                                 itemName: addSubContractNameController.text,
                                 discount: addSubContractDiscountController.text,
-                                tax: isTax == true ? 'Y' : 'N',
+                                //tax: isTax == true ? 'Y' : 'N',
                                 vendorId: vendorId,
                                 unitPrice: addSubContractPriceController.text,
                                 discountType:
                                     isPercentage ? "Percentage" : "Fixed",
                                 itemType: "SubContract",
                                 subTotal: subTotal.toStringAsFixed(2),
+                                tax: client!.taxOnLabors == "Y"
+                                    ? client!.materialTaxRate ?? '0'
+                                    : '0',
                               ),
                             );
                             setState(() {});
