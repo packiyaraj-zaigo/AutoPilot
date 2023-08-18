@@ -613,6 +613,11 @@ class ApiRepository {
   Future<dynamic> changeEstimateStatus(String token, String orderId) async {
     return apiProvider.estimateStatusChange(token, orderId);
   }
+
+  Future<dynamic> getEmployeeMessage(
+      String token, int currentPage, String recieverUserId) async {
+    return apiProvider.getEmployeeMessage(token, currentPage, recieverUserId);
+  }
 }
 
 class NetworkError extends Error {}

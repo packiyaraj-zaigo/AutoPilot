@@ -2051,4 +2051,22 @@ class ApiProvider {
       log(e.toString() + " Search api error");
     }
   }
+
+  Future<dynamic> getEmployeeMessage(
+      String token, int currentPage, String receiverUserId) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final userId = await AppUtils.geCurrenttUserID();
+      final response = await http.get(
+        Uri.parse(
+            '${BASE_URL}api/notifications?client_id=$clientId&sender_user_id=$userId&reciever_user_id=$receiverUserId&page=$currentPage'),
+        headers: getHeader(token),
+      );
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
+    }
+  }
 }

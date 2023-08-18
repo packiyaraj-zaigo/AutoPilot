@@ -116,6 +116,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     setState(() {
                       selectedIndex = value ?? 0;
                     });
+
+                    if (selectedIndex == 1) {
+                      context.read<EmployeeBloc>().add(GetEmployeeMessageEvent(
+                          receiverUserId: widget.employee.id.toString()));
+                    }
                   },
                   groupValue: selectedIndex,
                   children: {
