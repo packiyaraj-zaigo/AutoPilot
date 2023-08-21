@@ -69,8 +69,8 @@ class _BottomBarScreenState extends State<BottomBarScreen>
       const DashBoardScreen(),
       // WorkFlowScreen(tabController: workFlowTabController),
       DummyScreen(name: "Work flow Screen"),
-      DummyScreen(name: "Calendar Screen"),
-      //  const CalendarScreen(),
+      // DummyScreen(name: "Calendar Screen"),
+      const CalendarScreen(),
       EstimateScreen(
         tabController: estimateTabController,
       )

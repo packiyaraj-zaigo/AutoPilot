@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Screens/appointment_details_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -261,157 +262,167 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                             const SizedBox(
                                                               height: 10,
                                                             ),
-                                                            Container(
-                                                              width: 230,
-                                                              height: 200,
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                color: Colors
-                                                                    .white,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            12),
-                                                                boxShadow: [
-                                                                  BoxShadow(
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .withOpacity(
-                                                                            0.1),
-                                                                    spreadRadius:
-                                                                        1,
-                                                                    blurRadius:
-                                                                        10,
-                                                                    offset: const Offset(
-                                                                        7,
-                                                                        7), // changes position of shadow
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        16.0),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .spaceEvenly,
-                                                                  children: [
-                                                                    Text(
-                                                                      state
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .push(
+                                                                        MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) {
+                                                                    return AppointmentDetailsScreen(
+                                                                      eventId: state
                                                                           .calendarModel
                                                                           .data[
                                                                               rowIndex]
                                                                           .data[
                                                                               colIndex]
-                                                                          .text,
-                                                                      style:
-                                                                          const TextStyle(
-                                                                        color: Color(
-                                                                            0xFF9A9A9A),
-                                                                        fontSize:
-                                                                            12,
-                                                                        fontWeight:
-                                                                            FontWeight.w500,
-                                                                      ),
-                                                                      maxLines:
+                                                                          .key
+                                                                          .toString(),
+                                                                    );
+                                                                  },
+                                                                ));
+                                                              },
+                                                              child: Container(
+                                                                width: 230,
+                                                                height: 200,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              12),
+                                                                  boxShadow: [
+                                                                    BoxShadow(
+                                                                      color: Colors
+                                                                          .grey
+                                                                          .withOpacity(
+                                                                              0.1),
+                                                                      spreadRadius:
                                                                           1,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                    ),
-                                                                    Text(
-                                                                      state
-                                                                          .calendarModel
-                                                                          .data[
-                                                                              rowIndex]
-                                                                          .data[
-                                                                              colIndex]
-                                                                          .text2,
-                                                                      style:
-                                                                          const TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w600,
-                                                                        color: AppColors
-                                                                            .primaryColors,
-                                                                      ),
-                                                                      maxLines:
-                                                                          1,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                    ),
-                                                                    Text(
-                                                                      state.calendarModel.data[rowIndex].data[colIndex].text3 ==
-                                                                              null
-                                                                          ? 'no data'
-                                                                          : '${state.calendarModel.data[rowIndex].data[colIndex].text3}' ??
-                                                                              '',
-                                                                      style:
-                                                                          const TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xFF333333),
-                                                                      ),
-                                                                      maxLines:
-                                                                          1,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                    ),
-                                                                    Text(
-                                                                      state.calendarModel.data[rowIndex].data[colIndex].text3 ==
-                                                                              null
-                                                                          ? 'no data'
-                                                                          : '${state.calendarModel.data[rowIndex].data[colIndex].text4}',
-                                                                      style:
-                                                                          const TextStyle(
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        color: Color(
-                                                                            0xFF333333),
-                                                                      ),
-                                                                      maxLines:
-                                                                          1,
-                                                                      overflow:
-                                                                          TextOverflow
-                                                                              .ellipsis,
-                                                                    ),
-                                                                    Container(
-                                                                      height:
-                                                                          24,
-                                                                      decoration: BoxDecoration(
-                                                                          color: const Color(
-                                                                              0xFFF5F5F5),
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(12)),
-                                                                      child:
-                                                                          const Padding(
-                                                                        padding: EdgeInsets.only(
-                                                                            left:
-                                                                                14.0,
-                                                                            right:
-                                                                                14,
-                                                                            top:
-                                                                                5),
-                                                                        child:
-                                                                            Text(
-                                                                          'Tag',
-                                                                          maxLines:
-                                                                              1,
-                                                                          textAlign:
-                                                                              TextAlign.center,
-                                                                          style:
-                                                                              TextStyle(fontWeight: FontWeight.w500),
-                                                                        ),
-                                                                      ),
+                                                                      blurRadius:
+                                                                          10,
+                                                                      offset: const Offset(
+                                                                          7,
+                                                                          7), // changes position of shadow
                                                                     ),
                                                                   ],
+                                                                ),
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                              .all(
+                                                                          16.0),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceEvenly,
+                                                                    children: [
+                                                                      Text(
+                                                                        state
+                                                                            .calendarModel
+                                                                            .data[rowIndex]
+                                                                            .data[colIndex]
+                                                                            .text,
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          color:
+                                                                              Color(0xFF9A9A9A),
+                                                                          fontSize:
+                                                                              12,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                        ),
+                                                                        maxLines:
+                                                                            1,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                      Text(
+                                                                        state
+                                                                            .calendarModel
+                                                                            .data[rowIndex]
+                                                                            .data[colIndex]
+                                                                            .text2,
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                          color:
+                                                                              AppColors.primaryColors,
+                                                                        ),
+                                                                        maxLines:
+                                                                            1,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                      Text(
+                                                                        state.calendarModel.data[rowIndex].data[colIndex].text3 ==
+                                                                                null
+                                                                            ? 'no data'
+                                                                            : '${state.calendarModel.data[rowIndex].data[colIndex].text3}' ??
+                                                                                '',
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.w400,
+                                                                          color:
+                                                                              Color(0xFF333333),
+                                                                        ),
+                                                                        maxLines:
+                                                                            1,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                      Text(
+                                                                        state.calendarModel.data[rowIndex].data[colIndex].text3 ==
+                                                                                null
+                                                                            ? 'no data'
+                                                                            : '${state.calendarModel.data[rowIndex].data[colIndex].text4}',
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.w400,
+                                                                          color:
+                                                                              Color(0xFF333333),
+                                                                        ),
+                                                                        maxLines:
+                                                                            1,
+                                                                        overflow:
+                                                                            TextOverflow.ellipsis,
+                                                                      ),
+                                                                      Container(
+                                                                        height:
+                                                                            24,
+                                                                        decoration: BoxDecoration(
+                                                                            color:
+                                                                                const Color(0xFFF5F5F5),
+                                                                            borderRadius: BorderRadius.circular(12)),
+                                                                        child:
+                                                                            const Padding(
+                                                                          padding: EdgeInsets.only(
+                                                                              left: 14.0,
+                                                                              right: 14,
+                                                                              top: 5),
+                                                                          child:
+                                                                              Text(
+                                                                            'Tag',
+                                                                            maxLines:
+                                                                                1,
+                                                                            textAlign:
+                                                                                TextAlign.center,
+                                                                            style:
+                                                                                TextStyle(fontWeight: FontWeight.w500),
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),

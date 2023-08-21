@@ -186,3 +186,21 @@ class ChangeEstimateStatusErrorState extends EstimateState {
   final String errorMessage;
   ChangeEstimateStatusErrorState({required this.errorMessage});
 }
+
+class GetEventDetailsByIdState extends EstimateState {
+  final String orderId, notes;
+  final DateTime beginDate, endDate;
+
+  GetEventDetailsByIdState(
+      {required this.orderId,
+      required this.notes,
+      required this.beginDate,
+      required this.endDate});
+}
+
+class GetEventDetailsByIdErrorState extends EstimateState {
+  final String errorMessage;
+  GetEventDetailsByIdErrorState({required this.errorMessage});
+}
+
+class AppointmentDetailsLoadingState extends EstimateState {}

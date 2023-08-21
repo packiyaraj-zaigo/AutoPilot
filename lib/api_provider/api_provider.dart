@@ -2097,4 +2097,20 @@ class ApiProvider {
       log(e.toString() + 'Delete part provider error');
     }
   }
+
+  Future<dynamic> getEventDetailsById(String token, String eventId) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      // final userId = await AppUtils.geCurrenttUserID();
+      final response = await http.get(
+        Uri.parse('${BASE_URL}api/calendar_events/$eventId'),
+        headers: getHeader(token),
+      );
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
+    }
+  }
 }
