@@ -26,6 +26,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   int selectedIndex = 0;
   List<Widget> messageChatWidgetList = [];
   final messageController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     final date =
@@ -126,6 +127,9 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
 
                     if (selectedIndex == 1) {
                       messageChatWidgetList.clear();
+                      context.read<EmployeeBloc>().messageCurrentPage = 1;
+                      context.read<EmployeeBloc>().messageTotalPage = 1;
+                      context.read<EmployeeBloc>().messageIsFetching = true;
                       context.read<EmployeeBloc>().add(
                             GetEmployeeMessageEvent(
                               receiverUserId: widget.employee.id.toString(),
@@ -515,6 +519,20 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   Widget chatBoxWidget() {
     return Expanded(
       child: ListView.builder(
+        controller: scrollController
+          ..addListener(() {
+            if (scrollController.offset ==
+                    scrollController.position.maxScrollExtent &&
+                !BlocProvider.of<EmployeeBloc>(context).messageIsFetching &&
+                BlocProvider.of<EmployeeBloc>(context).messageCurrentPage <=
+                    BlocProvider.of<EmployeeBloc>(context).messageTotalPage) {
+              BlocProvider.of<EmployeeBloc>(context).messageIsFetching = true;
+
+              BlocProvider.of<EmployeeBloc>(context).add(
+                  GetEmployeeMessageEvent(
+                      receiverUserId: widget.employee.id.toString()));
+            }
+          }),
         reverse: true,
         itemBuilder: (context, index) {
           final messages = messageChatWidgetList.reversed.toList();
