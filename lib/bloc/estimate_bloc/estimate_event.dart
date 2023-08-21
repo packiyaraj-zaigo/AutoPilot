@@ -222,3 +222,8 @@ class ChangeEstimateStatusEvent extends EstimateEvent {
   final String orderId;
   ChangeEstimateStatusEvent({required this.orderId});
 }
+
+class GetEventDetailsByIdEvent extends EstimateEvent {
+  final String eventId;
+  GetEventDetailsByIdEvent({required this.eventId});
+}

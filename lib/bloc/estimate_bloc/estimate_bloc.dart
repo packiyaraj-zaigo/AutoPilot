@@ -60,6 +60,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<CreateEstimateFromAppointmentEvent>(createEstimateFromAppointment);
     on<AuthServiceByTechnicianEvent>(authServiceByTechnicianBloc);
     on<ChangeEstimateStatusEvent>(changeEstimateStateBloc);
+    on<GetEventDetailsByIdEvent>(getEventDetailsByIdBloc);
   }
 
   Future<void> createEstimateFromAppointment(
@@ -939,6 +940,41 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     } catch (e, s) {
       emit(
           ChangeEstimateStatusErrorState(errorMessage: "Something went wrong"));
+
+      print(e.toString());
+      print(s);
+
+      print("thisss");
+    }
+  }
+
+  Future<void> getEventDetailsByIdBloc(
+    GetEventDetailsByIdEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      emit(AppointmentDetailsLoadingState());
+
+      Response getEventDetailsRes =
+          await _apiRepository.getEventDetailsById(token!, event.eventId);
+
+      log("res${getEventDetailsRes.body}");
+
+      if (getEventDetailsRes.statusCode == 200) {
+        final decodedBody = json.decode(getEventDetailsRes.body);
+        emit(GetEventDetailsByIdState(
+            orderId: decodedBody['data']['search_id'].toString(),
+            beginDate: DateTime.parse(decodedBody['data']['begin_date']),
+            endDate: DateTime.parse(decodedBody['data']['complete_date']),
+            notes: decodedBody['data']['notes']));
+      } else {
+        emit(GetEventDetailsByIdErrorState(
+            errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      emit(GetEventDetailsByIdErrorState(errorMessage: "Something went wrong"));
 
       print(e.toString());
       print(s);
