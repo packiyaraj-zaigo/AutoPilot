@@ -102,7 +102,7 @@ class _VechileInformationState extends State<VechileInformation> {
           } else if (state is GetEstimateFromVehicleLoadingState) {
             estimateData.clear();
           } else if (state is GetSingleEstimateFromVehicleState) {
-            Navigator.push(context, MaterialPageRoute(
+            Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(
                   estimateDetails: state.createEstimateModel,

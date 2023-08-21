@@ -9,6 +9,7 @@ import 'package:auto_pilot/Screens/calendar_screen.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
+import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/estimate_screen.dart';
 import 'package:auto_pilot/Screens/global_search_screen.dart';
 import 'package:auto_pilot/Screens/new_appointment_screen.dart';
@@ -66,10 +67,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
 
     pages = [
       const DashBoardScreen(),
-      WorkFlowScreen(tabController: workFlowTabController),
-      //  DummyScreen(name: "Work flow Screen"),
-      // DummyScreen(name: "Calendar Screen"),
-      const CalendarScreen(),
+      // WorkFlowScreen(tabController: workFlowTabController),
+      DummyScreen(name: "Work flow Screen"),
+      DummyScreen(name: "Calendar Screen"),
+      //  const CalendarScreen(),
       EstimateScreen(
         tabController: estimateTabController,
       )
@@ -165,11 +166,11 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                     actions: [
                       IconButton(
                           onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(
-                              builder: (context) {
-                                return AppointmentDetailsScreen();
-                              },
-                            ));
+                            // Navigator.push(context, MaterialPageRoute(
+                            //   builder: (context) {
+                            //     return AppointmentDetailsScreen();
+                            //   },
+                            // ));
                             // CommonWidgets().showSuccessDialog(
                             //     context, "Successfully created data");
                           },
@@ -179,12 +180,12 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                           )),
                       IconButton(
                           onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const NotificationScreen(),
-                              ),
-                            );
+                            // Navigator.of(context).push(
+                            //   MaterialPageRoute(
+                            //     builder: (context) =>
+                            //         const NotificationScreen(),
+                            //   ),
+                            // );
                           },
                           icon: SvgPicture.asset(
                             "assets/images/notification.svg",

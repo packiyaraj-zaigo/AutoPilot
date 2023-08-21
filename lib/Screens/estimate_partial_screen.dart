@@ -2441,17 +2441,42 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         setState(() {
           double tempPrice = 0.00;
           if (element2.discountType == "Fixed") {
+            if(element2.itemType.toLowerCase()=="part"){
+               tempPrice = (double.parse(element2.unitPrice) *double.parse(element2.quanityHours)) -
+                double.parse(element2.discount);
+            }else{
+
             tempPrice = double.parse(element2.unitPrice) -
                 double.parse(element2.discount);
+            }
+
+            log(tempPrice.toString() + "tempp");
           } else {
+                if(element2.itemType.toLowerCase()=="part"){
+                     tempPrice = (double.parse(element2.unitPrice) * double.parse(element2.quanityHours)) -
+                (double.parse(element2.discount) *
+                        (double.parse(element2.unitPrice) * double.parse(element2.quanityHours))) /
+                    100;
+
+                }
+
             tempPrice = double.parse(element2.unitPrice) -
                 (double.parse(element2.discount) *
                         double.parse(element2.unitPrice)) /
                     100;
           }
 
-          taxAmount =
-              taxAmount + (double.parse(element2.tax) * tempPrice / 100);
+          if (element2.itemType.toLowerCase() == "part") {
+            taxAmount = taxAmount +
+                (tempPrice 
+                        *
+                        double.parse(element2.tax)) /
+                    100;
+          } else {
+            taxAmount =
+                taxAmount + (double.parse(element2.tax) * tempPrice / 100);
+          }
+
           if (element2.discountType == "Fixed") {
             discountAmount = discountAmount + double.parse(element2.discount);
           } else {
@@ -4375,10 +4400,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
                   orderId: widget.estimateDetails.data.id.toString()));
             }
-            if(state is ChangeEstimateStatusState){
-                context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+            if (state is ChangeEstimateStatusState) {
+              context.read<EstimateBloc>().add(GetSingleEstimateEvent(
                   orderId: widget.estimateDetails.data.id.toString()));
-
             }
             if (state is GetSingleEstimateState) {
               Navigator.pushReplacement(context, MaterialPageRoute(
