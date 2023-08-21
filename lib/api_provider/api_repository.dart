@@ -631,6 +631,11 @@ class ApiRepository {
   Future<dynamic> getEventDetailsById(String token, String eventId) async {
     return apiProvider.getEventDetailsById(token, eventId);
   }
+
+  Future<dynamic> sendEmployeeMessage(
+      String token, String recieverUserId, String message) async {
+    return apiProvider.sendEmployeeMessage(token, recieverUserId, message);
+  }
 }
 
 class NetworkError extends Error {}

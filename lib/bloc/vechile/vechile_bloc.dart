@@ -182,6 +182,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
     Emitter<VechileState> emit,
   ) async {
     try {
+      emit(EditVehicleLoadingState());
       final token = await AppUtils.getToken();
       final response = await apiRepo.editVechile(
         token,
@@ -198,6 +199,7 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
         event.make,
         event.customerId,
       );
+
       final body = await jsonDecode(response.body);
       log(body[body.keys.first][0].toString());
       if (response.statusCode == 200 || response.statusCode == 201) {

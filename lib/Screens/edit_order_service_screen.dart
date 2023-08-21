@@ -1478,7 +1478,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     final addPartCostController = TextEditingController();
     final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
-    final addPartQuantityController = TextEditingController();
+    final addPartQuantityController = TextEditingController(text: '1');
 
     //Add part errorstatus and error message variables
     String addPartNameErrorStatus = '';

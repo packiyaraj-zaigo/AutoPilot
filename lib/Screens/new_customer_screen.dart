@@ -370,19 +370,22 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                             ),
                       GestureDetector(
                         onTap: () {
-                          setState(() {
-                            validateConfirm(
-                                firstNameController.text,
-                                lastNameController.text,
-                                emailController.text,
-                                phoneNumberController.text,
-                                customerNotesController.text,
-                                addressController.text,
-                                cityController.text,
-                                provinceController.text,
-                                zipCodeController.text,
-                                context);
-                          });
+                          if (state is! EditCustomerLoading &&
+                              state is! AddCustomerLoading) {
+                            setState(() {
+                              validateConfirm(
+                                  firstNameController.text,
+                                  lastNameController.text,
+                                  emailController.text,
+                                  phoneNumberController.text,
+                                  customerNotesController.text,
+                                  addressController.text,
+                                  cityController.text,
+                                  provinceController.text,
+                                  zipCodeController.text,
+                                  context);
+                            });
+                          }
                         },
                         child: Container(
                           height: 56,

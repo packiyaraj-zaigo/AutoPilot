@@ -509,7 +509,12 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                       height: 50,
                                       child: ElevatedButton(
                                         onPressed: () {
-                                          validateVechile();
+                                          if (state
+                                                  is! AddVechileDetailsLoadingState &&
+                                              state
+                                                  is! EditVehicleLoadingState) {
+                                            validateVechile();
+                                          }
                                         },
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
@@ -520,7 +525,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                           ),
                                         ),
                                         child: state
-                                                is AddVechileDetailsLoadingState
+                                                is AddVechileDetailsLoadingState || state
+                                                  is EditVehicleLoadingState
                                             ? const CupertinoActivityIndicator(
                                                 color: Colors.white,
                                               )

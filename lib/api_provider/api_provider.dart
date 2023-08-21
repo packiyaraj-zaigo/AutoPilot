@@ -213,7 +213,8 @@ class ApiProvider {
   Future<dynamic> getEmployees(String token, int page, String query) async {
     try {
       final clientId = await AppUtils.getUserID();
-      String url = '${BASE_URL}api/users?client_id=$clientId';
+      String url =
+          '${BASE_URL}api/users?client_id=$clientId&order_by=id&sort=DESC';
 
       if (page != 1) {
         url = '$url&page=$page';
@@ -2087,14 +2088,42 @@ class ApiProvider {
       // final userId = await AppUtils.geCurrenttUserID();
       final response = await http.get(
         Uri.parse(
-            '${BASE_URL}api/notifications?client_id=$clientId&sender_user_id=$senderUserId&reciever_user_id=$receiverUserId&page=$currentPage'),
+            '${BASE_URL}api/notifications?sender_user_id=$senderUserId&received_user_id=$receiverUserId&page=$currentPage&offset=100'),
         headers: getHeader(token),
+      );
+      log(response.request!.url.toString());
+
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Get message api error');
+    }
+  }
+
+  Future<dynamic> sendEmployeeMessage(
+      String token, String receiverUserId, String message) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final userId = await AppUtils.geCurrenttUserID();
+      final url = Uri.parse('${BASE_URL}api/notifications');
+      final body = {
+        "client_id": clientId,
+        "title": message,
+        "message": message,
+        "is_read": true,
+        "sender_user_id": userId,
+        "received_user_id": receiverUserId,
+      };
+      final response = await http.post(
+        url,
+        headers: getHeader(token),
+        body: json.encode(body),
       );
 
       inspect(response);
       return response;
     } catch (e) {
-      log(e.toString() + 'Delete part provider error');
+      log(e.toString() + 'send message api error');
     }
   }
 
