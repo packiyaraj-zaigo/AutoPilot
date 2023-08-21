@@ -252,7 +252,9 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                   onPressed: () {
                                     if (widget.navigation != null &&
                                         widget.navigation !=
-                                            'estimate_screen') {
+                                            'estimate_screen' &&
+                                        widget.navigation !=
+                                            "partial_estimate") {
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>

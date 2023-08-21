@@ -191,6 +191,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
                     navigation: 'customer_navigation',
+                    customerId:
+                        state.createEstimateModel.data.customer?.id ?? 0,
                   );
                 },
               ));
