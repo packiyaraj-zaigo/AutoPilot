@@ -48,6 +48,7 @@ class DeleteEstimateNoteEvent extends EstimateEvent {
 class CreateAppointmentEstimateEvent extends EstimateEvent {
   final String startTime, endTime, orderId, appointmentNote;
   final String customerId, vehicleId;
+
   CreateAppointmentEstimateEvent(
       {required this.startTime,
       required this.endTime,

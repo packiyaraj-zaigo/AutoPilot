@@ -1313,7 +1313,9 @@ class ApiProvider {
         "vehicle_id": vehicleId,
         "notes": notes,
         "start_on": startTime,
-        "end_on": endTime
+        "end_on": endTime,
+        "createEvent": 1,
+        "order_id": orderId
       };
       final url = Uri.parse('${BASE_URL}api/appointments');
       final response = await http.post(
@@ -1344,7 +1346,9 @@ class ApiProvider {
         "vehicle_id": vehicleId,
         "notes": notes,
         "start_on": startTime,
-        "end_on": endTime
+        "end_on": endTime,
+        "createEvent": 1,
+        "order_id": orderId
       };
       final url = Uri.parse('${BASE_URL}api/appointments/$id');
       final response = await http.put(
