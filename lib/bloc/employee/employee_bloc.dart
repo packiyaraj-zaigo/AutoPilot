@@ -204,7 +204,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString(AppConstants.USER_TOKEN);
-
+      final userId = await AppUtils.geCurrenttUserID();
       EmployeeMessageModel employeeMessageModel;
 
       if (messageCurrentPage == 1) {
@@ -212,7 +212,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       }
 
       Response getEmployeeMessage = await apiRepo.getEmployeeMessage(
-          token!, messageCurrentPage, event.receiverUserId);
+          token!, messageCurrentPage, event.receiverUserId, userId);
 
       log("res${getEmployeeMessage.body}");
 

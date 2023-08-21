@@ -2080,14 +2080,14 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getEmployeeMessage(
-      String token, int currentPage, String receiverUserId) async {
+  Future<dynamic> getEmployeeMessage(String token, int currentPage,
+      String receiverUserId, String senderUserId) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final userId = await AppUtils.geCurrenttUserID();
+      // final userId = await AppUtils.geCurrenttUserID();
       final response = await http.get(
         Uri.parse(
-            '${BASE_URL}api/notifications?client_id=$clientId&sender_user_id=$userId&reciever_user_id=$receiverUserId&page=$currentPage'),
+            '${BASE_URL}api/notifications?client_id=$clientId&sender_user_id=$senderUserId&reciever_user_id=$receiverUserId&page=$currentPage'),
         headers: getHeader(token),
       );
 
