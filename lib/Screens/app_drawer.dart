@@ -1,6 +1,7 @@
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
+import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/legal.dart';
 import 'package:auto_pilot/Screens/parts_list_screen.dart';
@@ -81,11 +82,11 @@ showDrawer(BuildContext context) {
         // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
         //     context, BottomBarScreen()),
         drawerTileWidget(
-          "assets/images/time_card_drawer_icon.svg",
-          "Time Cards",
-          context,
-          const TimeCardsScreen(),
-        ),
+            "assets/images/time_card_drawer_icon.svg",
+            "Time Cards",
+            context,
+            //   const TimeCardsScreen(),
+            DummyScreen(name: "Time card")),
         const SizedBox(
           height: 52,
         ),
