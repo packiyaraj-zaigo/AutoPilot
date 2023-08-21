@@ -654,7 +654,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 subT += double.parse(element.subTotal);
                               });
                               subT += double.tryParse(rateController.text) ?? 0;
-
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),
                                 serviceName: serviceNameController.text,
@@ -667,7 +666,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     : '0',
                                 subTotal: subT.toStringAsFixed(2),
                               );
-                              log(subT.toString());
+                              log(subT.toStringAsFixed(2));
                               if (widget.service != null) {
                                 BlocProvider.of<ServiceBloc>(context).add(
                                   EditCannedOrderServiceEvent(
@@ -839,7 +838,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Quantity"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : [],
-              maxLength: 25,
+              maxLength: label == 'Cost' ||
+                      label == 'Cost ' ||
+                      label == 'Price' ||
+                      label == 'Tax' ||
+                      label.contains('Labor Rate') ||
+                      label == "Hours" ||
+                      label == 'Price ' ||
+                      label == "Quantity"
+                  ? 10
+                  : 25,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
@@ -1073,6 +1081,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       }
       if (addMaterialDiscountController.text.trim().isEmpty) {
         addMaterialDiscountErrorStatus = "Discount can't be empty";
+        status = false;
+      } else if (isPercentage &&
+          double.parse(addMaterialDiscountController.text) > 100) {
+        addMaterialDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
       } else if (subTotal < 0) {
         addMaterialDiscountErrorStatus = 'Discount should be less than price';
@@ -1519,6 +1531,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       }
       if (addPartDiscountController.text.trim().isEmpty) {
         addPartDiscountErrorStatus = "Discount can't be empty";
+        status = false;
+      } else if (isPercentage &&
+          double.parse(addPartDiscountController.text) > 100) {
+        addPartDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
       } else if (subTotal < 0) {
         addPartDiscountErrorStatus = "Discount cannot be greater than price";
@@ -1980,6 +1996,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       }
       if (addLaborDiscountController.text.trim().isEmpty) {
         addLaborDiscountErrorStatus = "Discount can't be empty";
+        status = false;
+      } else if (isPercentage &&
+          double.parse(addLaborDiscountController.text) > 100) {
+        addLaborDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
       } else if (subTotal < 0) {
         addLaborDiscountErrorStatus = "Discount cannot be greater than price";
@@ -2620,6 +2640,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       }
       if (addSubContractDiscountController.text.trim().isEmpty) {
         addSubContractDiscountErrorStatus = "Discount can't be empty";
+        status = false;
+      } else if (isPercentage &&
+          double.parse(addSubContractDiscountController.text) > 100) {
+        addSubContractDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
       } else if (subTotal < 0) {
         addSubContractDiscountErrorStatus =

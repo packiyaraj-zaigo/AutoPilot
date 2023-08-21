@@ -100,7 +100,7 @@ class _UserTimeCardsScreenState extends State<UserTimeCardsScreen> {
                                   child: Column(
                                     children: [
                                       Container(
-                                        height: item.notes.isEmpty ? 130 : 180,
+                                        height: item.notes.isEmpty ? 130 : 200,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
                                           color: Colors.white,

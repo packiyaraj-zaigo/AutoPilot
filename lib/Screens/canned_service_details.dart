@@ -8,6 +8,7 @@ import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -220,7 +221,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Discount',
+                                'Sub Total',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
@@ -228,7 +229,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                               ),
                               const SizedBox(height: 5),
                               Text(
-                                '${widget.service.discount} \$',
+                                '${widget.service.subTotal} \$',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
@@ -258,7 +259,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                           //   ),
                           // ),
                           const Text(
-                            'Tax',
+                            'Created On',
                             style: TextStyle(
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
@@ -266,7 +267,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                           ),
                           const SizedBox(height: 5),
                           Text(
-                            '${widget.service.tax}',
+                            '${AppUtils.getFormattedForInformationScreen(widget.service.createdAt.toString())}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
@@ -293,11 +294,11 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                           //     fontWeight: FontWeight.w400,
                           //   ),
                           // ),
-                          const SizedBox(height: 14),
-                          const Divider(
-                            thickness: 1.5,
-                            color: Color(0xFFE8EAED),
-                          ),
+                          // const SizedBox(height: 14),
+                          // const Divider(
+                          //   thickness: 1.5,
+                          //   color: Color(0xFFE8EAED),
+                          // ),
                         ],
                       )
                     : material.isEmpty &&

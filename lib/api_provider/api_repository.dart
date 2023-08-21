@@ -622,9 +622,10 @@ class ApiRepository {
     return apiProvider.estimateStatusChange(token, orderId);
   }
 
-  Future<dynamic> getEmployeeMessage(
-      String token, int currentPage, String recieverUserId) async {
-    return apiProvider.getEmployeeMessage(token, currentPage, recieverUserId);
+  Future<dynamic> getEmployeeMessage(String token, int currentPage,
+      String recieverUserId, String senderUserId) async {
+    return apiProvider.getEmployeeMessage(
+        token, currentPage, recieverUserId, senderUserId);
   }
 }
 
