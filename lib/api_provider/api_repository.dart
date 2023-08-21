@@ -627,6 +627,11 @@ class ApiRepository {
     return apiProvider.getEmployeeMessage(
         token, currentPage, recieverUserId, senderUserId);
   }
+
+  Future<dynamic> sendEmployeeMessage(
+      String token, String recieverUserId, String message) async {
+    return apiProvider.sendEmployeeMessage(token, recieverUserId, message);
+  }
 }
 
 class NetworkError extends Error {}

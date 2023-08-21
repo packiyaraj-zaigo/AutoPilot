@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Screens/create_employee_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
@@ -79,20 +81,22 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
             Navigator.of(context).pushReplacement(MaterialPageRoute(
               builder: (context) => const EmployeeListScreen(),
             ));
-
             CommonWidgets()
                 .showSuccessDialog(context, "Employee Deleted Successfully");
-          }
-          if (state is DeleteEmployeeErrorState) {
+          } else if (state is DeleteEmployeeErrorState) {
             Navigator.of(context).pop(true);
             CommonWidgets().showDialog(
                 context, 'Something went wrong please try again later');
-          }
-          if (state is DeleteEmployeeLoadingState) {
+          } else if (state is DeleteEmployeeLoadingState) {
             showDialog(
                 barrierDismissible: false,
                 context: context,
                 builder: (context) => const CupertinoActivityIndicator());
+          } else if (state is GetEmployeeMessageState) {
+            for (var message in state.messages) {
+              messageChatWidgetList.add(chatBubleWidget(message.message, '',
+                  widget.employee.id == message.receivedUserId));
+            }
           }
         },
         child: Padding(
@@ -103,7 +107,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
               const SizedBox(height: 16),
               Text(
                 '${widget.employee.firstName ?? ''} ${widget.employee.lastName ?? ''}',
-                style: TextStyle(
+                style: const TextStyle(
                     color: Color(0xFF061237),
                     fontSize: 18,
                     fontWeight: FontWeight.w600),
@@ -118,8 +122,12 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                     });
 
                     if (selectedIndex == 1) {
-                      context.read<EmployeeBloc>().add(GetEmployeeMessageEvent(
-                          receiverUserId: widget.employee.id.toString()));
+                      messageChatWidgetList.clear();
+                      context.read<EmployeeBloc>().add(
+                            GetEmployeeMessageEvent(
+                              receiverUserId: widget.employee.id.toString(),
+                            ),
+                          );
                     }
                   },
                   groupValue: selectedIndex,
@@ -365,100 +373,109 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   }
 
   Widget chatWidget() {
-    return Expanded(
-      // height: MediaQuery.of(context).size.height,
-      // width: MediaQuery.of(context).size.width,
-
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          chatBoxWidget(),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 20.0),
-            child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
+    return BlocBuilder<EmployeeBloc, EmployeeState>(
+      builder: (context, state) {
+        return state is GetEmployeeMessageLoadingState &&
+                !BlocProvider.of<EmployeeBloc>(context).messageIsFetching
+            ? const Expanded(child: CupertinoActivityIndicator())
+            : Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    messageChipWidget("Ready for pickup"),
-                    messageChipWidget("Working on.."),
-                    messageChipWidget("We are delayed")
-                  ],
-                )),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24.0),
-            child: Container(
-              height: 50,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.grey.shade300,
-                        blurRadius: 0.7,
-                        spreadRadius: 1.2,
-                        offset: Offset(3, 2))
-                  ]),
-
-              // child: Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal:22.0),
-              //   child: Row(
-              //     children: [
-              //       SvgPicture.asset("assets/images/attachment_icon.svg"),
-
-              //       TextField(
-              //         decoration: InputDecoration(
-              //           hintText: "Enter your message..",
-              //           contentPadding: EdgeInsets.all(0)
-              //         ),
-              //       )
-              //     ],
-              //   ),
-              // ),
-
-              child: TextField(
-                controller: messageController,
-                textCapitalization: TextCapitalization.sentences,
-                decoration: InputDecoration(
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 18),
-                    hintText: "Enter your messsage..",
-                    prefixIcon: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: SvgPicture.asset(
-                              "assets/images/attachment_icon.svg")),
+                    chatBoxWidget(),
+                    const SizedBox(
+                      height: 20,
                     ),
-                    suffixIcon: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            messageChatWidgetList
-                                .add(chatBubleWidget(messageController.text));
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              messageChipWidget("Ready for pickup"),
+                              messageChipWidget("Working on.."),
+                              messageChipWidget("We are delayed")
+                            ],
+                          )),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 24.0),
+                      child: Container(
+                        height: 50,
+                        width: MediaQuery.of(context).size.width,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: Colors.white,
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.grey.shade300,
+                                  blurRadius: 0.7,
+                                  spreadRadius: 1.2,
+                                  offset: Offset(3, 2))
+                            ]),
 
-                            messageController.clear();
-                          });
-                        },
-                        child: CircleAvatar(
-                          backgroundColor: AppColors.primaryColors,
-                          child:
-                              SvgPicture.asset("assets/images/send_icon.svg"),
+                        // child: Padding(
+                        //   padding: const EdgeInsets.symmetric(horizontal:22.0),
+                        //   child: Row(
+                        //     children: [
+                        //       SvgPicture.asset("assets/images/attachment_icon.svg"),
+
+                        //       TextField(
+                        //         decoration: InputDecoration(
+                        //           hintText: "Enter your message..",
+                        //           contentPadding: EdgeInsets.all(0)
+                        //         ),
+                        //       )
+                        //     ],
+                        //   ),
+                        // ),
+
+                        child: TextField(
+                          controller: messageController,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 22, vertical: 18),
+                              hintText: "Enter your messsage..",
+                              prefixIcon: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: SvgPicture.asset(
+                                        "assets/images/attachment_icon.svg")),
+                              ),
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      messageChatWidgetList.add(chatBubleWidget(
+                                          messageController.text, '', false));
+                                      BlocProvider.of<EmployeeBloc>(context)
+                                          .add(SendEmployeeMessageEvent(
+                                              receiverUserId:
+                                                  widget.employee.id.toString(),
+                                              message: messageController.text
+                                                  .trim()));
+                                      messageController.clear();
+                                    });
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: AppColors.primaryColors,
+                                    child: SvgPicture.asset(
+                                        "assets/images/send_icon.svg"),
+                                  ),
+                                ),
+                              )),
                         ),
                       ),
-                    )),
-              ),
-            ),
-          )
-        ],
-      ),
+                    )
+                  ],
+                ),
+              );
+      },
     );
   }
 
@@ -492,8 +509,10 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   Widget chatBoxWidget() {
     return Expanded(
       child: ListView.builder(
+        reverse: true,
         itemBuilder: (context, index) {
-          return messageChatWidgetList[index];
+          final messages = messageChatWidgetList.reversed.toList();
+          return messages[index];
         },
         itemCount: messageChatWidgetList.length,
         shrinkWrap: true,
@@ -502,62 +521,64 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
     );
   }
 
-  Widget chatBubleWidget(String message) {
+  Widget chatBubleWidget(String message, String time, bool isReceived) {
     return Padding(
       padding: const EdgeInsets.only(top: 12.0),
       child: Row(
+        mainAxisAlignment:
+            isReceived ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
-          Flexible(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                  // minWidth: 30,
-                  maxWidth: MediaQuery.of(context).size.width / 1.8),
-              child: Container(
-                alignment: Alignment.centerLeft,
-
-                // width: MediaQuery.of(context).size.width/3,
-                decoration: BoxDecoration(
-                    color: AppColors.primaryColors,
-                    borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0, vertical: 12),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        message,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
+          Container(
+            decoration: BoxDecoration(
+                color: AppColors.primaryColors,
+                borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: MediaQuery.of(context).size.width / 1.7,
+                        minWidth: 80),
+                    child: Text(
+                      message,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w500,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 14.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              "8:00 Am",
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            SvgPicture.asset(
-                                "assets/images/Double_tick_icon.svg")
-                          ],
-                        ),
-                      )
-                    ],
+                    ),
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 14.0),
+                    child: Row(
+                      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          time,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        //  Expanded(child: SizedBox()),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(left: 6.0),
+                        //   child: SvgPicture.asset(
+                        //       "assets/images/Double_tick_icon.svg"),
+                        // )
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
           ),
+          //   ),
+          //  ),
         ],
       ),
     );

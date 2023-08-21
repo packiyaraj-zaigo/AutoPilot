@@ -1485,7 +1485,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addPartNameController = TextEditingController();
     final addPartDescriptionController = TextEditingController();
     final addPartPriceController = TextEditingController();
-    final addPartQuantityController = TextEditingController(text: '0');
+    final addPartQuantityController = TextEditingController(text: '1');
     final addPartCostController = TextEditingController();
     final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();

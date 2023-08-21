@@ -37,3 +37,13 @@ class GetEmployeeMessageEvent extends EmployeeEvent {
     required this.receiverUserId,
   });
 }
+
+class SendEmployeeMessageEvent extends EmployeeEvent {
+  final String receiverUserId;
+  final String message;
+  SendEmployeeMessageEvent({
+    required this.receiverUserId,
+    required this.message,
+ 
+ });
+}

@@ -64,11 +64,11 @@ class EditEmployeeErrorState extends EmployeeState {
 class EditEmployeeSuccessState extends EmployeeState {}
 
 class GetEmployeeMessageState extends EmployeeState {
-  final EmployeeMessageModel employeeMessageModel;
-  GetEmployeeMessageState({required this.employeeMessageModel});
+  final List<MessageModel> messages;
+  const GetEmployeeMessageState({required this.messages});
 
   @override
-  List<Object> get props => [employeeMessageModel];
+  List<Object> get props => [messages];
 }
 
 class GetEmployeeMessageLoadingState extends EmployeeState {}

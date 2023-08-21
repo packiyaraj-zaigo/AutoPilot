@@ -34,6 +34,21 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     on<DeleteEmployee>(deleteEmployee);
     on<EditEmployee>(editEmployee);
     on<GetEmployeeMessageEvent>(getEmployeeMessageBloc);
+    on<SendEmployeeMessageEvent>(sendEmployeeMessage);
+  }
+
+  sendEmployeeMessage(
+    SendEmployeeMessageEvent event,
+    Emitter<EmployeeState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final response = await apiRepo.sendEmployeeMessage(
+          token, event.receiverUserId, event.message);
+      log(response.body.toString() + "Send message reponse");
+    } catch (e) {
+      log(e.toString() + "Send bloc message error");
+    }
   }
 
   editEmployee(
@@ -205,24 +220,50 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString(AppConstants.USER_TOKEN);
       final userId = await AppUtils.geCurrenttUserID();
-      EmployeeMessageModel employeeMessageModel;
-
       if (messageCurrentPage == 1) {
         emit(GetEmployeeMessageLoadingState());
       }
 
-      Response getEmployeeMessage = await apiRepo.getEmployeeMessage(
+      final Response response = await apiRepo.getEmployeeMessage(
           token!, messageCurrentPage, event.receiverUserId, userId);
 
-      log("res${getEmployeeMessage.body}");
+      log("first response ${response.body}");
 
-      if (getEmployeeMessage.statusCode == 200) {
-        employeeMessageModel =
-            employeeMessageModelFromJson(getEmployeeMessage.body);
-        totalPages = employeeMessageModel.data.lastPage ?? 1;
-        messageIsFetching = false;
-        emit(GetEmployeeMessageState(
-            employeeMessageModel: employeeMessageModel));
+      if (response.statusCode == 200) {
+        final List<MessageModel> messages = [];
+        final body = await jsonDecode(response.body);
+        totalPages = body['data']['last_page'] ?? 1;
+        if (body['data']['data'] != null && body['data']['data'].isNotEmpty) {
+          body['data']['data'].forEach((message) {
+            messages.add(MessageModel.fromJson(message));
+          });
+        }
+        final Response secondResponse = await apiRepo.getEmployeeMessage(
+            token, messageCurrentPage, userId, event.receiverUserId);
+
+        log("second response ${secondResponse.body}");
+        if (secondResponse.statusCode == 200) {
+          final secondBody = await jsonDecode(secondResponse.body);
+          totalPages = (secondBody['data']['last_page'] ?? 1) > totalPages
+              ? (secondBody['data']['last_page'] ?? 1)
+              : totalPages;
+          messageIsFetching = false;
+          if (secondBody['data']['data'] != null &&
+              secondBody['data']['data'].isNotEmpty) {
+            secondBody['data']['data'].forEach((secondMessage) {
+              messages.add(MessageModel.fromJson(secondMessage));
+            });
+          }
+          // messages.sort(
+          //   (a, b) {
+          //     return a.createdAt.compareTo(b.createdAt);
+          //   },
+          // );
+          emit(GetEmployeeMessageState(messages: messages));
+        } else {
+          emit(GetEmployeeMessageErrorState(
+              errorMessage: "Something went wrong"));
+        }
 
         if (messageTotalPage > messageCurrentPage && messageCurrentPage != 0) {
           messageCurrentPage += 1;
