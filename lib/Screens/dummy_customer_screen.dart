@@ -40,6 +40,18 @@ class _DummyCustomerScreenState extends State<DummyCustomerScreen> {
               },
             ));
           } else if (state is EditEstimateState) {
+            context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                orderId: state.createEstimateModel.data.id.toString()));
+
+            // Navigator.pushReplacement(context, MaterialPageRoute(
+            //   builder: (context) {
+            //     return EstimatePartialScreen(
+            //       estimateDetails: state.createEstimateModel,
+            //       navigation: widget.navigation,
+            //     );
+            //   },
+            // ));
+          } else if (state is GetSingleEstimateState) {
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(

@@ -1,4 +1,5 @@
 import 'package:auto_pilot/Models/create_estimate_model.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -21,6 +22,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   DateTime? beginDate;
   DateTime? endDate;
   String notes = "";
+  double totalAmount = 0.00;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -39,6 +41,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
           }
           if (state is GetSingleEstimateState) {
             createEstimateModel = state.createEstimateModel;
+
+            calculateAmount();
           }
           // TODO: implement listener
         },
@@ -183,13 +187,13 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                   MediaQuery.of(context).size.width),
                             ),
 
-                            const Padding(
-                              padding: EdgeInsets.only(top: 64.0),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 64.0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
+                                  const Text(
                                     "Total",
                                     style: TextStyle(
                                         color: AppColors.primaryTitleColor,
@@ -197,8 +201,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                         fontWeight: FontWeight.w600),
                                   ),
                                   Text(
-                                    "\$ 1449",
-                                    style: TextStyle(
+                                    "\$ ${totalAmount.toStringAsFixed(2)}",
+                                    style: const TextStyle(
                                         color: AppColors.primaryTitleColor,
                                         fontSize: 18,
                                         fontWeight: FontWeight.w600),
@@ -209,19 +213,30 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
 
                             Padding(
                               padding: const EdgeInsets.only(top: 25.0),
-                              child: Container(
-                                height: 56,
-                                alignment: Alignment.center,
-                                width: MediaQuery.of(context).size.width,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: AppColors.primaryColors),
-                                child: const Text(
-                                  "Go to Estimate",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) {
+                                      return EstimatePartialScreen(
+                                          estimateDetails:
+                                              createEstimateModel!);
+                                    },
+                                  ));
+                                },
+                                child: Container(
+                                  height: 56,
+                                  alignment: Alignment.center,
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: AppColors.primaryColors),
+                                  child: const Text(
+                                    "Go to Estimate",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -274,5 +289,13 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
       width: linewidth,
       color: const Color(0xffE8EAED),
     );
+  }
+
+  calculateAmount() {
+    createEstimateModel?.data.orderService?.forEach((element) {
+      element.orderServiceItems?.forEach((element2) {
+        totalAmount = totalAmount + double.parse(element2.subTotal);
+      });
+    });
   }
 }

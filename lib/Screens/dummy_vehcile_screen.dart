@@ -36,15 +36,30 @@ class _DummyVehicleScreenState extends State<DummyVehicleScreen> {
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
           if (state is CreateEstimateState) {
-            Navigator.pushReplacement(context, MaterialPageRoute(
-              builder: (context) {
-                return EstimatePartialScreen(
-                  estimateDetails: state.createEstimateModel,
-                  navigation: widget.navigation,
-                );
-              },
-            ));
+            // Navigator.pushReplacement(context, MaterialPageRoute(
+            //   builder: (context) {
+            //     return EstimatePartialScreen(
+            //       estimateDetails: state.createEstimateModel,
+            //       navigation: widget.navigation,
+            //     );
+            //   },
+            // ));
+
+            context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                orderId: state.createEstimateModel.data.id.toString()));
           } else if (state is EditEstimateState) {
+            // Navigator.pushReplacement(context, MaterialPageRoute(
+            //   builder: (context) {
+            //     return EstimatePartialScreen(
+            //       estimateDetails: state.createEstimateModel,
+            //       navigation: widget.navigation,
+            //     );
+            //   },
+            // ));
+
+            context.read<EstimateBloc>().add(GetSingleEstimateEvent(
+                orderId: state.createEstimateModel.data.id.toString()));
+          } else if (state is GetSingleEstimateState) {
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) {
                 return EstimatePartialScreen(

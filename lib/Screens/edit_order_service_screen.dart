@@ -664,12 +664,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ),
                       errorWidget(error: rateError),
 
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox("Enter Tax", taxController, "Tax",
-                            taxError.isNotEmpty, context, true),
-                      ),
-                      errorWidget(error: taxError),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 16.0),
+                      //   child: textBox("Enter Tax", taxController, "Tax",
+                      //       taxError.isNotEmpty, context, true),
+                      // ),
+                      // errorWidget(error: taxError),
 
                       const SizedBox(height: 16),
                       const SizedBox(height: 16),
