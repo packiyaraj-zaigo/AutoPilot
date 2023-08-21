@@ -126,6 +126,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   late TabController tabController;
   bool isDrop = false;
 
+  String paymentAmountErrorMessage = "";
+  String cashDateErrorMessage = "";
+  String creditCardNumberErrorMessage = "";
+  String creditCardTransIdErrorMessage = '';
+
   bool isServiceCreate = false;
   bool isPaidFull = false;
   List<String> authorizedValues = [
@@ -1898,8 +1903,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   }
                 }
               },
-              keyboardType:
-                  label == 'Phone Number' ? TextInputType.number : null,
+              keyboardType: label == 'Phone Number' || label == "Amount To pay"
+                  ? TextInputType.number
+                  : null,
               maxLength: label == 'Phone Number'
                   ? 16
                   : label == 'Password'
@@ -2441,24 +2447,25 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         setState(() {
           double tempPrice = 0.00;
           if (element2.discountType == "Fixed") {
-            if(element2.itemType.toLowerCase()=="part"){
-               tempPrice = (double.parse(element2.unitPrice) *double.parse(element2.quanityHours)) -
-                double.parse(element2.discount);
-            }else{
-
-            tempPrice = double.parse(element2.unitPrice) -
-                double.parse(element2.discount);
+            if (element2.itemType.toLowerCase() == "part") {
+              tempPrice = (double.parse(element2.unitPrice) *
+                      double.parse(element2.quanityHours)) -
+                  double.parse(element2.discount);
+            } else {
+              tempPrice = double.parse(element2.unitPrice) -
+                  double.parse(element2.discount);
             }
 
             log(tempPrice.toString() + "tempp");
           } else {
-                if(element2.itemType.toLowerCase()=="part"){
-                     tempPrice = (double.parse(element2.unitPrice) * double.parse(element2.quanityHours)) -
-                (double.parse(element2.discount) *
-                        (double.parse(element2.unitPrice) * double.parse(element2.quanityHours))) /
-                    100;
-
-                }
+            if (element2.itemType.toLowerCase() == "part") {
+              tempPrice = (double.parse(element2.unitPrice) *
+                      double.parse(element2.quanityHours)) -
+                  (double.parse(element2.discount) *
+                          (double.parse(element2.unitPrice) *
+                              double.parse(element2.quanityHours))) /
+                      100;
+            }
 
             tempPrice = double.parse(element2.unitPrice) -
                 (double.parse(element2.discount) *
@@ -2467,11 +2474,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           }
 
           if (element2.itemType.toLowerCase() == "part") {
-            taxAmount = taxAmount +
-                (tempPrice 
-                        *
-                        double.parse(element2.tax)) /
-                    100;
+            taxAmount =
+                taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
           } else {
             taxAmount =
                 taxAmount + (double.parse(element2.tax) * tempPrice / 100);
@@ -2509,6 +2513,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   paymentPopUp() {
+    paymentAmountErrorStatus = false;
+    cashDateErrorStatus = false;
+
     return BlocProvider(
       create: (context) => EstimateBloc(apiRepository: ApiRepository()),
       child: BlocListener<EstimateBloc, EstimateState>(
@@ -2533,236 +2540,414 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         },
         child: BlocBuilder<EstimateBloc, EstimateState>(
           builder: (context, state) {
-            return Container(
-              decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(12)),
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 1.2,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          "Payment",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primaryTitleColor,
+            return StatefulBuilder(builder: (context, newSetState) {
+              return Container(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12)),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height / 1.2,
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Payment",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primaryTitleColor,
+                            ),
                           ),
-                        ),
-                        GestureDetector(
-                            onTap: () {
-                              tabController.index = 0;
+                          GestureDetector(
+                              onTap: () {
+                                tabController.index = 0;
 
-                              paymentAmountController.clear();
-                              cashDateController.clear();
-                              cashNoteController.clear();
-                              creditCardNumberController.clear();
-                              creditRefNumberController.clear();
+                                paymentAmountController.clear();
+                                cashDateController.clear();
+                                cashNoteController.clear();
+                                creditCardNumberController.clear();
+                                creditRefNumberController.clear();
 
-                              Navigator.pop(context);
-                            },
-                            child: const Icon(Icons.close))
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 27.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  "Balance Due",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryTitleColor,
-                                  ),
-                                ),
-                                Text(
-                                  "\$ ${balanceDueAmount.toStringAsFixed(2)}",
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryTitleColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: textBox(
-                                  "Enter Amount",
-                                  paymentAmountController,
-                                  "Amount To Pay",
-                                  paymentAmountErrorStatus),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: TabBar(
-                                controller: tabController,
-                                enableFeedback: false,
-                                labelPadding: EdgeInsets.all(0),
-                                indicatorColor: AppColors.primaryColors,
-                                unselectedLabelColor: const Color(0xFF9A9A9A),
-                                labelColor: AppColors.primaryColors,
-                                tabs: const [
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Cash',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600),
-                                      ),
+                                Navigator.pop(context);
+                              },
+                              child: const Icon(Icons.close))
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 27.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Balance Due",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryTitleColor,
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Credit',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: 50,
-                                    child: Center(
-                                      child: Text(
-                                        'Cheque',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w600),
-                                      ),
+                                  Text(
+                                    "\$ ${balanceDueAmount.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryTitleColor,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                            LimitedBox(
-                              maxHeight:
-                                  MediaQuery.of(context).size.height / 2.8,
-                              maxWidth: MediaQuery.of(context).size.width,
-                              child: TabBarView(
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: textBox(
+                                    "Enter Amount",
+                                    paymentAmountController,
+                                    "Amount To Pay",
+                                    paymentAmountErrorStatus),
+                              ),
+                              errorWidget(paymentAmountErrorMessage,
+                                  paymentAmountErrorStatus),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: TabBar(
                                   controller: tabController,
-                                  children: [
-                                    cashTabWidget(),
-                                    creditTabWidget(),
-                                    cashTabWidget()
-                                  ]),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 24.0),
-                              child: GestureDetector(
-                                onTap: () {
-                                  if (tabController.index == 0) {
-                                    context.read<EstimateBloc>().add(
-                                          CollectPaymentEstimateEvent(
-                                              amount:
-                                                  paymentAmountController.text,
-                                              customerId: widget.estimateDetails
-                                                      .data.customer?.id
-                                                      .toString() ??
-                                                  "",
-                                              orderId: widget
-                                                  .estimateDetails.data.id
-                                                  .toString(),
-                                              paymentMode: "Cash",
-                                              // tabController.index == 0
-                                              //     ? "Cash"
-                                              //     : tabController.index == 1
-                                              //         ? "Credit Card"
-                                              //         : "Check",
-                                              date: cashDateController.text,
-                                              note: cashNoteController.text),
-                                        );
-                                  } else if (tabController.index == 1) {
-                                    context.read<EstimateBloc>().add(
-                                          CollectPaymentEstimateEvent(
-                                              amount:
-                                                  paymentAmountController.text,
-                                              customerId: widget.estimateDetails
-                                                      .data.customer?.id
-                                                      .toString() ??
-                                                  "",
-                                              orderId: widget
-                                                  .estimateDetails.data.id
-                                                  .toString(),
-                                              paymentMode: "creditcard",
-                                              // tabController.index == 0
-                                              //     ? "Cash"
-                                              //     : tabController.index == 1
-                                              //         ? "Credit Card"
-                                              //         : "Check",
-                                              date: cashDateController.text,
-                                              note: creditCardNumberController
-                                                  .text
-                                                  .replaceAll("X", "")
-                                                  .trim(),
-                                              transactionId:
-                                                  creditRefNumberController
-                                                      .text),
-                                        );
-                                  } else {
-                                    context.read<EstimateBloc>().add(
-                                          CollectPaymentEstimateEvent(
-                                              amount:
-                                                  paymentAmountController.text,
-                                              customerId: widget.estimateDetails
-                                                      .data.customer?.id
-                                                      .toString() ??
-                                                  "",
-                                              orderId: widget
-                                                  .estimateDetails.data.id
-                                                  .toString(),
-                                              paymentMode: "check",
-                                              // tabController.index == 0
-                                              //     ? "Cash"
-                                              //     : tabController.index == 1
-                                              //         ? "Credit Card"
-                                              //         : "Check",
-                                              date: cashDateController.text,
-                                              note: cashNoteController.text),
-                                        );
-                                  }
-                                },
-                                child: Container(
-                                  height: 56,
-                                  alignment: Alignment.center,
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: AppColors.primaryColors),
-                                  child: state
-                                          is CollectPaymentEstimateLoadingState
-                                      ? const Center(
-                                          child: CupertinoActivityIndicator(),
-                                        )
-                                      : const Text(
-                                          "Authorize",
+                                  enableFeedback: false,
+                                  labelPadding: EdgeInsets.all(0),
+                                  indicatorColor: AppColors.primaryColors,
+                                  unselectedLabelColor: const Color(0xFF9A9A9A),
+                                  labelColor: AppColors.primaryColors,
+                                  tabs: const [
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Cash',
                                           style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.white,
-                                          ),
+                                              fontWeight: FontWeight.w600),
                                         ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Credit',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Cheque',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                              LimitedBox(
+                                maxHeight:
+                                    MediaQuery.of(context).size.height / 2.8,
+                                maxWidth: MediaQuery.of(context).size.width,
+                                child: TabBarView(
+                                    controller: tabController,
+                                    children: [
+                                      cashTabWidget(),
+                                      creditTabWidget(),
+                                      cashTabWidget()
+                                    ]),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    if (tabController.index == 0) {
+                                      if (paymentAmountController
+                                          .text.isEmpty) {
+                                        newSetState(() {
+                                          paymentAmountErrorStatus = true;
+                                          paymentAmountErrorMessage =
+                                              "Amount can't be empty";
+                                        });
+                                      } else {
+                                        if (paymentAmountController.text ==
+                                            "0") {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Please enter a valid amount";
+                                          });
+                                        } else if (double.parse(
+                                                paymentAmountController.text) >
+                                            balanceDueAmount) {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Amount can't be greater than balance due amount";
+                                          });
+                                        } else {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = false;
+                                          });
+                                        }
+                                      }
+                                      if (cashDateController.text.isEmpty) {
+                                        newSetState(() {
+                                          cashDateErrorStatus = true;
+                                          cashDateErrorMessage =
+                                              "Payment date can't be empty";
+                                        });
+                                      } else {
+                                        newSetState(() {
+                                          cashDateErrorStatus = false;
+                                        });
+                                      }
+                                      if (!paymentAmountErrorStatus &&
+                                          !cashDateErrorStatus) {
+                                        context.read<EstimateBloc>().add(
+                                              CollectPaymentEstimateEvent(
+                                                  amount:
+                                                      paymentAmountController
+                                                          .text,
+                                                  customerId: widget
+                                                          .estimateDetails
+                                                          .data
+                                                          .customer
+                                                          ?.id
+                                                          .toString() ??
+                                                      "",
+                                                  orderId: widget
+                                                      .estimateDetails.data.id
+                                                      .toString(),
+                                                  paymentMode: "Cash",
+                                                  // tabController.index == 0
+                                                  //     ? "Cash"
+                                                  //     : tabController.index == 1
+                                                  //         ? "Credit Card"
+                                                  //         : "Check",
+                                                  date: cashDateController.text,
+                                                  note:
+                                                      cashNoteController.text),
+                                            );
+                                      }
+                                    } else if (tabController.index == 1) {
+                                      if (paymentAmountController
+                                          .text.isEmpty) {
+                                        newSetState(() {
+                                          paymentAmountErrorStatus = true;
+                                          paymentAmountErrorMessage =
+                                              "Amount can't be empty";
+                                        });
+                                      } else {
+                                        if (paymentAmountController.text ==
+                                            "0") {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Please enter a valid amount";
+                                          });
+                                        } else if (double.parse(
+                                                paymentAmountController.text) >
+                                            balanceDueAmount) {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Amount can't be greater than balance due amount";
+                                          });
+                                        } else {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = false;
+                                          });
+                                        }
+                                      }
+                                      if (cashDateController.text.isEmpty) {
+                                        newSetState(() {
+                                          cashDateErrorStatus = true;
+                                          cashDateErrorMessage =
+                                              "Payment date can't be empty";
+                                        });
+                                      } else {
+                                        newSetState(() {
+                                          cashDateErrorStatus = false;
+                                        });
+                                      }
+                                      if (creditCardNumberController
+                                          .text.isEmpty) {
+                                        newSetState(() {
+                                          creditCardNumberErrorStatus = true;
+                                          creditCardNumberErrorMessage =
+                                              "Card number can't be empty";
+                                        });
+                                      } else {
+                                        if (creditCardNumberController.text
+                                               .trim()
+                                                .replaceAll("X", "") .replaceAll(" ", "")
+                                                .length <
+                                            4) {
+                                          newSetState(() {
+                                            creditCardNumberErrorStatus = true;
+                                            creditCardNumberErrorMessage =
+                                                "Please enter last four digits";
+                                          });
+                                        } else {
+                                          newSetState(() {
+                                            creditCardNumberErrorStatus = false;
+                                          });
+                                        }
+                                      }
+
+                                      if (!paymentAmountErrorStatus &&
+                                          !cashDateErrorStatus &&
+                                          !creditCardNumberErrorStatus) {
+                                        context.read<EstimateBloc>().add(
+                                              CollectPaymentEstimateEvent(
+                                                  amount:
+                                                      paymentAmountController
+                                                          .text,
+                                                  customerId: widget
+                                                          .estimateDetails
+                                                          .data
+                                                          .customer
+                                                          ?.id
+                                                          .toString() ??
+                                                      "",
+                                                  orderId: widget
+                                                      .estimateDetails.data.id
+                                                      .toString(),
+                                                  paymentMode: "creditcard",
+                                                  // tabController.index == 0
+                                                  //     ? "Cash"
+                                                  //     : tabController.index == 1
+                                                  //         ? "Credit Card"
+                                                  //         : "Check",
+                                                  date: cashDateController.text,
+                                                  note:
+                                                      creditCardNumberController
+                                                          .text
+                                                          .replaceAll("X", "")
+                                                          .trim(),
+                                                  transactionId:
+                                                      creditRefNumberController
+                                                          .text),
+                                            );
+                                      }
+                                    } else {
+                                      if (paymentAmountController
+                                          .text.isEmpty) {
+                                        newSetState(() {
+                                          paymentAmountErrorStatus = true;
+                                          paymentAmountErrorMessage =
+                                              "Amount can't be empty";
+                                        });
+                                      } else {
+                                        if (paymentAmountController.text ==
+                                            "0") {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Please enter a valid amount";
+                                          });
+                                        } else if (double.parse(
+                                                paymentAmountController.text) >
+                                            balanceDueAmount) {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Amount can't be greater than balance due amount";
+                                          });
+                                        } else {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = false;
+                                          });
+                                        }
+                                      }
+                                      if (cashDateController.text.isEmpty) {
+                                        newSetState(() {
+                                          cashDateErrorStatus = true;
+                                          cashDateErrorMessage =
+                                              "Payment date can't be empty";
+                                        });
+                                      } else {
+                                        newSetState(() {
+                                          cashDateErrorStatus = false;
+                                        });
+                                      }
+
+                                      if (!paymentAmountErrorStatus &&
+                                          !cashDateErrorStatus) {
+                                        context.read<EstimateBloc>().add(
+                                              CollectPaymentEstimateEvent(
+                                                  amount:
+                                                      paymentAmountController
+                                                          .text,
+                                                  customerId: widget
+                                                          .estimateDetails
+                                                          .data
+                                                          .customer
+                                                          ?.id
+                                                          .toString() ??
+                                                      "",
+                                                  orderId: widget
+                                                      .estimateDetails.data.id
+                                                      .toString(),
+                                                  paymentMode: "check",
+                                                  // tabController.index == 0
+                                                  //     ? "Cash"
+                                                  //     : tabController.index == 1
+                                                  //         ? "Credit Card"
+                                                  //         : "Check",
+                                                  date: cashDateController.text,
+                                                  note:
+                                                      cashNoteController.text),
+                                            );
+                                      }
+                                    }
+                                  },
+                                  child: Container(
+                                    height: 56,
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: AppColors.primaryColors),
+                                    child: state
+                                            is CollectPaymentEstimateLoadingState
+                                        ? const Center(
+                                            child: CupertinoActivityIndicator(),
+                                          )
+                                        : const Text(
+                                            "Authorize",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            );
+              );
+            });
           },
         ),
       ),
@@ -2774,9 +2959,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       child: Padding(
         padding: const EdgeInsets.only(top: 20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             textBox("Select Date", cashDateController, "Payment Date",
                 cashDateErrorStatus),
+            errorWidget(cashDateErrorMessage, cashDateErrorStatus),
             Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: textBox("Enter Note", cashNoteController, "Note",
@@ -2793,6 +2980,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       child: Padding(
         padding: const EdgeInsets.only(top: 16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // textBox("Enter Name on Card", creditNameOnCardController,
             //     "Name On Card", creditNameErrorStatus),
@@ -2804,6 +2992,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   "Card Number",
                   creditCardNumberErrorStatus),
             ),
+            errorWidget(
+                creditCardNumberErrorMessage, creditCardNumberErrorStatus),
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: textBox("Enter Transaction Id", creditRefNumberController,
@@ -2812,8 +3002,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: textBox("Select Date", cashDateController, "Payment Date",
-                  creditDateErrorStatus),
-            )
+                  cashDateErrorStatus),
+            ),
+            errorWidget(cashDateErrorMessage, cashDateErrorStatus)
           ],
         ),
       ),
@@ -3952,6 +4143,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           GestureDetector(
+            behavior: HitTestBehavior.translucent,
             onTap: () {
               newSetState(() {
                 isDrop = false;
@@ -4000,6 +4192,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   GestureDetector(
+                    behavior: HitTestBehavior.translucent,
                     onTap: () {
                       // newSetState(() {
                       //   final temp = authorizedValues[0];
@@ -4015,7 +4208,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       showAuthPopup(
                           authStatus == "Authorized"
                               ? "Authorize Service?"
-                              : "Un Authorize Service?",
+                              : "Unauthorize Service?",
                           authStatus == "Authorized"
                               ? "Do you want to authorize this service"
                               : "Do you want to unauthorize this service?",
@@ -4452,5 +4645,24 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       authorizedValues[0] = authorizedValues[1];
       authorizedValues[1] = temp;
     }
+  }
+
+  Padding errorWidget(String errorString, bool errorStatus) {
+    //log(errorStatus.toString() + errorString);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Visibility(
+          visible: errorStatus,
+          child: Text(
+            errorString,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Color(
+                0xffD80027,
+              ),
+            ),
+          )),
+    );
   }
 }
