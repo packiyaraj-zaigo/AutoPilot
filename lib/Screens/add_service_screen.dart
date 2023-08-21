@@ -1526,6 +1526,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       if (addPartQuantityController.text.trim().isEmpty) {
         addPartQuantityErrorStatus = "Quantity can't be empty";
         status = false;
+      } else if (double.parse(addPartQuantityController.text.trim()) < 1) {
+        addPartQuantityErrorStatus = "Enter a valid quantity";
+        status = false;
       } else {
         addPartQuantityErrorStatus = '';
       }

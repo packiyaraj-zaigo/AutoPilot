@@ -26,6 +26,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   int selectedIndex = 0;
   List<Widget> messageChatWidgetList = [];
   final messageController = TextEditingController();
+  final ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     final date =
@@ -94,8 +95,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 builder: (context) => const CupertinoActivityIndicator());
           } else if (state is GetEmployeeMessageState) {
             for (var message in state.messages) {
-              messageChatWidgetList.add(chatBubleWidget(message.message, '',
-                  widget.employee.id == message.receivedUserId));
+              messageChatWidgetList.add(chatBubleWidget(
+                  message.message,
+                  AppUtils.getTimeFormattedForMessage(
+                      message.createdAt.toString()),
+                  widget.employee.id == message.senderUserId));
             }
           }
         },
@@ -123,6 +127,9 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
 
                     if (selectedIndex == 1) {
                       messageChatWidgetList.clear();
+                      context.read<EmployeeBloc>().messageCurrentPage = 1;
+                      context.read<EmployeeBloc>().messageTotalPage = 1;
+                      context.read<EmployeeBloc>().messageIsFetching = true;
                       context.read<EmployeeBloc>().add(
                             GetEmployeeMessageEvent(
                               receiverUserId: widget.employee.id.toString(),
@@ -452,7 +459,10 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                   onTap: () {
                                     setState(() {
                                       messageChatWidgetList.add(chatBubleWidget(
-                                          messageController.text, '', false));
+                                          messageController.text,
+                                          AppUtils.getTimeFormattedForMessage(
+                                              DateTime.now().toString()),
+                                          false));
                                       BlocProvider.of<EmployeeBloc>(context)
                                           .add(SendEmployeeMessageEvent(
                                               receiverUserId:
@@ -509,6 +519,20 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
   Widget chatBoxWidget() {
     return Expanded(
       child: ListView.builder(
+        controller: scrollController
+          ..addListener(() {
+            if (scrollController.offset ==
+                    scrollController.position.maxScrollExtent &&
+                !BlocProvider.of<EmployeeBloc>(context).messageIsFetching &&
+                BlocProvider.of<EmployeeBloc>(context).messageCurrentPage <=
+                    BlocProvider.of<EmployeeBloc>(context).messageTotalPage) {
+              BlocProvider.of<EmployeeBloc>(context).messageIsFetching = true;
+
+              BlocProvider.of<EmployeeBloc>(context).add(
+                  GetEmployeeMessageEvent(
+                      receiverUserId: widget.employee.id.toString()));
+            }
+          }),
         reverse: true,
         itemBuilder: (context, index) {
           final messages = messageChatWidgetList.reversed.toList();
@@ -530,13 +554,26 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-                color: AppColors.primaryColors,
+                color: isReceived ? Colors.white : AppColors.primaryColors,
+                boxShadow: isReceived
+                    ? [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(0, 7), // changes position of shadow
+                        ),
+                      ]
+                    : [],
                 borderRadius: BorderRadius.circular(12)),
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: isReceived
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.end,
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints(
@@ -544,9 +581,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         minWidth: 80),
                     child: Text(
                       message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white,
+                        color: isReceived
+                            ? AppColors.primaryTitleColor
+                            : Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -558,9 +597,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                       children: [
                         Text(
                           time,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white,
+                            color: isReceived
+                                ? AppColors.primaryTitleColor
+                                : Colors.white,
                             fontWeight: FontWeight.w400,
                           ),
                         ),

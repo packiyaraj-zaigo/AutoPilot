@@ -227,26 +227,32 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
       final Response response = await apiRepo.getEmployeeMessage(
           token!, messageCurrentPage, event.receiverUserId, userId);
 
-      log("first response ${response.body}");
+      // log("first response ${response.body}");
 
       if (response.statusCode == 200) {
         final List<MessageModel> messages = [];
         final body = await jsonDecode(response.body);
-        totalPages = body['data']['last_page'] ?? 1;
+        messageTotalPage = body['data']['last_page'] ?? 1;
         if (body['data']['data'] != null && body['data']['data'].isNotEmpty) {
           body['data']['data'].forEach((message) {
             messages.add(MessageModel.fromJson(message));
           });
         }
+        if (userId == event.receiverUserId) {
+          emit(GetEmployeeMessageState(messages: messages));
+
+          return;
+        }
         final Response secondResponse = await apiRepo.getEmployeeMessage(
             token, messageCurrentPage, userId, event.receiverUserId);
 
-        log("second response ${secondResponse.body}");
+        // log("second response ${secondResponse.body}");
         if (secondResponse.statusCode == 200) {
           final secondBody = await jsonDecode(secondResponse.body);
-          totalPages = (secondBody['data']['last_page'] ?? 1) > totalPages
-              ? (secondBody['data']['last_page'] ?? 1)
-              : totalPages;
+          messageTotalPage =
+              (secondBody['data']['last_page'] ?? 1) > messageTotalPage
+                  ? (secondBody['data']['last_page'] ?? 1)
+                  : messageTotalPage;
           messageIsFetching = false;
           if (secondBody['data']['data'] != null &&
               secondBody['data']['data'].isNotEmpty) {
@@ -254,33 +260,28 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
               messages.add(MessageModel.fromJson(secondMessage));
             });
           }
-          // messages.sort(
-          //   (a, b) {
-          //     return a.createdAt.compareTo(b.createdAt);
-          //   },
-          // );
+          messages.sort(
+            (a, b) {
+              return a.createdAt.compareTo(b.createdAt);
+            },
+          );
           emit(GetEmployeeMessageState(messages: messages));
         } else {
           emit(GetEmployeeMessageErrorState(
               errorMessage: "Something went wrong"));
         }
-
-        if (messageTotalPage > messageCurrentPage && messageCurrentPage != 0) {
-          messageCurrentPage += 1;
-        } else {
-          messageCurrentPage = 0;
+        // log(messageTotalPage.toString());
+        // log(messageCurrentPage.toString());
+        if (messageTotalPage >= messageCurrentPage) {
+          messageCurrentPage++;
         }
       } else {
         emit(
             GetEmployeeMessageErrorState(errorMessage: "Something went wrong"));
       }
-    } catch (e, s) {
+    } catch (e) {
       emit(GetEmployeeMessageErrorState(errorMessage: "Something went wrong"));
-
-      print(e.toString());
-      print(s);
-
-      print("thisss");
+      log(e.toString() + " GET MESSAGES BLOC ERROR");
     }
   }
 }

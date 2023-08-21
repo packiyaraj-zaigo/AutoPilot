@@ -1238,6 +1238,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
       listener: (context, state) async {
         if (state is GetCustomerMessageState) {
           customerMessageList.addAll(state.messageModel.data.data);
+          customerMessageList.sort((a, b) {
+            return a.createdAt.compareTo(b.createdAt);
+          });
           if (state.messageModel.data.currentPage == 1) {
             Future.delayed(Duration(milliseconds: 300)).then((value) {
               chatScrollController.animateTo(
@@ -1430,15 +1433,15 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
         return Expanded(
           child: ListView.builder(
               reverse: true,
+              // messagemobileList
               itemBuilder: (context2, index) {
+                final messages = messsageModelList.reversed.toList();
                 newIndex = index;
 
                 return chatBubleWidget(
-                    messsageModelList[index].messageBody,
-                    messsageModelList[index]
-                        .createdAt
-                        .toString()
-                        .substring(11, 16));
+                    messages[index].messageBody,
+                    AppUtils.getTimeFormattedForMessage(
+                        messages[index].createdAt.toString()));
               },
               itemCount: messsageModelList.length,
               shrinkWrap: true,
@@ -1509,11 +1512,11 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           ),
                         ),
                         //  Expanded(child: SizedBox()),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 6.0),
-                          child: SvgPicture.asset(
-                              "assets/images/Double_tick_icon.svg"),
-                        )
+                        // Padding(
+                        //   padding: const EdgeInsets.only(left: 6.0),
+                        //   child: SvgPicture.asset(
+                        //       "assets/images/Double_tick_icon.svg"),
+                        // )
                       ],
                     ),
                   )

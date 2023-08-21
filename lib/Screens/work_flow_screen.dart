@@ -44,7 +44,9 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   filterColumns(List<WorkflowModel> workflows) {
     for (var status in statuses) {
       final filteredList = workflows
-          .where((element) => element.bucketName?.parentId == status.id)
+          .where((element) =>
+              element.bucketName?.parentId == status.id &&
+              element.orders != null)
           .toList();
       final vehicleList = workflows
           .where((element) =>
