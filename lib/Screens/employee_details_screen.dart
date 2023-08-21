@@ -94,8 +94,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                 builder: (context) => const CupertinoActivityIndicator());
           } else if (state is GetEmployeeMessageState) {
             for (var message in state.messages) {
-              messageChatWidgetList.add(chatBubleWidget(message.message, '',
-                  widget.employee.id == message.receivedUserId));
+              messageChatWidgetList.add(chatBubleWidget(
+                  message.message,
+                  AppUtils.getTimeFormattedForMessage(
+                      message.createdAt.toString()),
+                  widget.employee.id == message.senderUserId));
             }
           }
         },
@@ -452,7 +455,10 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                   onTap: () {
                                     setState(() {
                                       messageChatWidgetList.add(chatBubleWidget(
-                                          messageController.text, '', false));
+                                          messageController.text,
+                                          AppUtils.getTimeFormattedForMessage(
+                                              DateTime.now().toString()),
+                                          false));
                                       BlocProvider.of<EmployeeBloc>(context)
                                           .add(SendEmployeeMessageEvent(
                                               receiverUserId:
@@ -530,13 +536,26 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-                color: AppColors.primaryColors,
+                color: isReceived ? Colors.white : AppColors.primaryColors,
+                boxShadow: isReceived
+                    ? [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 10,
+                          offset:
+                              const Offset(0, 7), // changes position of shadow
+                        ),
+                      ]
+                    : [],
                 borderRadius: BorderRadius.circular(12)),
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: isReceived
+                    ? CrossAxisAlignment.start
+                    : CrossAxisAlignment.end,
                 children: [
                   ConstrainedBox(
                     constraints: BoxConstraints(
@@ -544,9 +563,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         minWidth: 80),
                     child: Text(
                       message,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.white,
+                        color: isReceived
+                            ? AppColors.primaryTitleColor
+                            : Colors.white,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -558,9 +579,11 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                       children: [
                         Text(
                           time,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white,
+                            color: isReceived
+                                ? AppColors.primaryTitleColor
+                                : Colors.white,
                             fontWeight: FontWeight.w400,
                           ),
                         ),

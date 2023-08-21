@@ -197,6 +197,15 @@ class AppUtils {
     return outputDate;
   }
 
+  static getTimeFormattedForMessage(String date) {
+    var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
+    var inputDate = inputFormat.parse(date);
+
+    var outputFormat = DateFormat('hh:mm a');
+    var outputDate = outputFormat.format(inputDate);
+    return outputDate;
+  }
+
   static getFormattedForNotesScreen(String date) {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);
