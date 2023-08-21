@@ -1881,7 +1881,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       startTimeController.text.isEmpty &&
                       endTimeController.text.isEmpty &&
                       dateController.text.isEmpty &&
-                      appointmentController.text.isEmpty) {
+                      appointmentController.text.isEmpty && networkImageList.isEmpty) {
                     if (widget.estimateDetails.data.customer != null) {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
@@ -1903,7 +1903,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   }
                 }
               },
-              keyboardType: label == 'Phone Number' || label == "Amount To pay"
+              keyboardType: label == 'Phone Number' || label == "Amount To Pay"
                   ? TextInputType.number
                   : null,
               maxLength: label == 'Phone Number'
@@ -4335,8 +4335,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           listener: (context, state) {
             if (state is AddEstimateNoteState ||
                 state is CreateAppointmentEstimateState ||
-                state is EditEstimateNoteState ||
-                state is EditAppointmentEstimateState) {
+                state is EditEstimateNoteState || 
+                state is EditAppointmentEstimateState ||state is EstimateCreateOrderImageState) {
               startTimeController.clear();
               endTimeController.clear();
               dateController.clear();
