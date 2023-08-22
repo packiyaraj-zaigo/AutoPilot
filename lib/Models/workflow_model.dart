@@ -112,8 +112,8 @@ class Orders {
   String? orderStatus;
   dynamic promiseDate;
   int? serviceWriterId;
-  dynamic shopStart;
-  dynamic shopFinish;
+  DateTime? shopStart;
+  DateTime? shopFinish;
   Customer? customer;
   Vehicle? vehicle;
   Servicewriter? servicewriter;
@@ -145,8 +145,12 @@ class Orders {
         orderStatus: json["order_status"],
         promiseDate: json["promise_date"],
         serviceWriterId: json["service_writer_id"],
-        shopStart: json["shop_start"],
-        shopFinish: json["shop_finish"],
+        shopStart: json["shop_start"] == null
+            ? null
+            : DateTime.parse(json["shop_start"]),
+        shopFinish: json["shop_finish"] == null
+            ? null
+            : DateTime.parse(json["shop_finish"]),
         customer: json["customer"] == null
             ? null
             : Customer.fromJson(json["customer"]),
