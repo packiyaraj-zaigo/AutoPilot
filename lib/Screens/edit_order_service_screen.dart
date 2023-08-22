@@ -2187,7 +2187,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
                               tax: client!.taxOnLabors == "Y"
-                                  ? client!.materialTaxRate ?? '0'
+                                  ? client!.laborTaxRate ?? '0'
                                   : '0',
                             ));
                             setState(() {});
@@ -2422,7 +2422,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 unitPrice: addFeePriceController.text,
                                 itemType: "Fee",
                                 tax: client!.taxOnLabors == "Y"
-                                    ? client!.materialTaxRate ?? '0'
+                                    ? client!.laborTaxRate ?? '0'
                                     : '0',
                                 subTotal: subTotal.toStringAsFixed(2)));
                             setState(() {});
@@ -2799,7 +2799,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 itemType: "SubContract",
                                 subTotal: subTotal.toStringAsFixed(2),
                                 tax: client!.taxOnLabors == "Y"
-                                    ? client!.materialTaxRate ?? '0'
+                                    ? client!.laborTaxRate ?? '0'
                                     : '0',
                               ),
                             );

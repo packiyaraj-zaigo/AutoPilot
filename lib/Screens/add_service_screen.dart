@@ -2033,6 +2033,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           }
           total = subTotal;
         } else {
+          log((client?.laborTaxRate).toString());
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
@@ -2047,6 +2048,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
               discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+                      (double.tryParse(addLaborHoursController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
