@@ -830,6 +830,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             children: List.generate(4, (index) {
                               return GestureDetector(
                                   onTap: () {
+                                    log(networkImageList.toString() +
+                                        "Image List");
+                                    log(newOrderImageData.toString() +
+                                        "Image List");
                                     if (newOrderImageData.length > index ||
                                         networkImageList[index]
                                             .contains("http")) {
@@ -2471,14 +2475,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           (double.parse(element2.unitPrice) *
                               double.parse(element2.quanityHours))) /
                       100;
-            }else{
-
-            tempPrice = double.parse(element2.unitPrice) -
-                (double.parse(element2.discount) *
-                        double.parse(element2.unitPrice)) /
-                    100;
+            } else {
+              tempPrice = double.parse(element2.unitPrice) -
+                  (double.parse(element2.discount) *
+                          double.parse(element2.unitPrice)) /
+                      100;
             }
-
           }
 
           if (element2.itemType.toLowerCase() == "part" ||
