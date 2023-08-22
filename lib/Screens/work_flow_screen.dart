@@ -42,27 +42,6 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   }
 
   filterColumns(List<WorkflowModel> workflows) {
-    // if (boardViewController.state.mounted) {
-
-    boardViewController.state.listStates.forEach((element) {
-      element.itemStates.forEach((ele) {
-        if (ele.mounted) {
-          ele.deactivate();
-        }
-      });
-      if (element.mounted) {
-        element.boardListController.dispose();
-        element.deactivate();
-      }
-    });
-    boardViewController.state.boardViewController.dispose();
-    boardViewController.state.listStates.clear();
-    boardViewController.state.deactivate();
-    // }
-
-    workflowOrderList.clear();
-    workflowVehicleList.clear();
-
     for (var status in statuses) {
       final filteredList = workflows
           .where((element) =>
@@ -77,8 +56,6 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
       workflowOrderList.add(boardWidget(filteredList, status, false));
       workflowVehicleList.add(boardWidget(vehicleList, status, true));
     }
-    log(boardViewController.state.toString() + "LENGHT");
-    boardViewController.state.setState(() {});
   }
 
   @override
@@ -285,7 +262,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
             ),
             Text(
               '${workflow.orders?.customer?.firstName} ${workflow.orders?.customer?.lastName}',
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),
               ),

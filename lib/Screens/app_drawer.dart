@@ -11,6 +11,7 @@ import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -146,21 +147,46 @@ Widget drawerTileWidget(
   );
 }
 
+Future signOutPopUp(BuildContext ctx) {
+  return showCupertinoDialog(
+      context: ctx,
+      builder: (context) {
+        print('here');
+        return CupertinoAlertDialog(
+          title: const Text("Sign Out?"),
+          content: const Text("Are you sure you want to Sign Out"),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: const Text("No"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            CupertinoDialogAction(
+              child: const Text("Yes"),
+              onPressed: () async {
+                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                  builder: (context) {
+                    return const WelcomeScreen();
+                  },
+                ), (route) => false);
+                AppUtils.setToken("");
+                AppUtils.setUserName("");
+                AppUtils.setTokenValidity('');
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setBool('add_company', false);
+              },
+            ),
+          ],
+        );
+      });
+}
+
 Widget drawerBottomTile(String label, BuildContext context, constructor) {
   return GestureDetector(
     behavior: HitTestBehavior.translucent,
     onTap: () async {
       if (label == "Sign Out") {
-        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-          builder: (context) {
-            return const WelcomeScreen();
-          },
-        ), (route) => false);
-        AppUtils.setToken("");
-        AppUtils.setUserName("");
-        AppUtils.setTokenValidity('');
-        final prefs = await SharedPreferences.getInstance();
-        prefs.setBool('add_company', false);
+        Navigator.pop(context);
+        signOutPopUp(context);
       } else if (label == "Legal") {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => constructor,
