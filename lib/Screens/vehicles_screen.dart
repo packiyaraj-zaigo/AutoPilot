@@ -178,8 +178,16 @@ class _VehiclesScreenState extends State<VehiclesScreen> {
                             !BlocProvider.of<VechileBloc>(context)
                                 .isPagenationLoading) {
                           print("-----------==============================");
-                          return const Center(
-                              child: CupertinoActivityIndicator());
+                          return const Expanded(
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CupertinoActivityIndicator(),
+                                ],
+                              ),
+                            ),
+                          );
                         } else {
                           return vechile.isEmpty
                               ? SingleChildScrollView(

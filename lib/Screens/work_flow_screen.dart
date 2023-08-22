@@ -85,14 +85,14 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                 }
                 if (state is EditWorkflowSuccessState ||
                     state is EditWorkflowErrorState) {
-                  // Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
-                  //     MaterialPageRoute(
-                  //         builder: (context) => BottomBarScreen(
-                  //               currentIndex: 1,
-                  //             )),
-                  //     (route) => false);
+                  Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                          builder: (context) => BottomBarScreen(
+                                currentIndex: 1,
+                              )),
+                      (route) => false);
 
-                  context.read<WorkflowBloc>().add(GetAllWorkflows());
+                  // context.read<WorkflowBloc>().add(GetAllWorkflows());
                 }
               },
               child: BlocBuilder<WorkflowBloc, WorkflowState>(
