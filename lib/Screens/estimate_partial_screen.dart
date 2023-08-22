@@ -302,6 +302,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           ));
                         } else if (widget.navigation == 'search') {
                           Navigator.pop(context);
+                        } else if (widget.navigation == "appointment_details") {
+                          Navigator.pop(context);
                         } else {
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(

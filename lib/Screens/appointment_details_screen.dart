@@ -62,14 +62,14 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                       color: AppColors.primaryTitleColor),
                 ),
                 automaticallyImplyLeading: true,
-                actions: [
-                  IconButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.more_horiz,
-                        color: AppColors.primaryColors,
-                      ))
-                ],
+                // actions: [
+                //   IconButton(
+                //       onPressed: () {},
+                //       icon: const Icon(
+                //         Icons.more_horiz,
+                //         color: AppColors.primaryColors,
+                //       ))
+                // ],
               ),
               body: state is AppointmentDetailsLoadingState &&
                       state is GetSingleEstimateLoadingState
@@ -215,13 +215,17 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                               padding: const EdgeInsets.only(top: 25.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) {
-                                      return EstimatePartialScreen(
-                                          estimateDetails:
-                                              createEstimateModel!);
-                                    },
-                                  ));
+                                  if (createEstimateModel?.data.orderNumber !=
+                                      null) {
+                                    Navigator.push(context, MaterialPageRoute(
+                                      builder: (context) {
+                                        return EstimatePartialScreen(
+                                          estimateDetails: createEstimateModel!,
+                                          navigation: "appointment_details",
+                                        );
+                                      },
+                                    ));
+                                  }
                                 },
                                 child: Container(
                                   height: 56,
@@ -229,13 +233,21 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                   width: MediaQuery.of(context).size.width,
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
-                                      color: AppColors.primaryColors),
-                                  child: const Text(
+                                      color: createEstimateModel
+                                                  ?.data.orderNumber !=
+                                              null
+                                          ? AppColors.primaryColors
+                                          : Colors.grey.shade300),
+                                  child: Text(
                                     "Go to Estimate",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.white,
+                                      color: createEstimateModel
+                                                  ?.data.orderNumber !=
+                                              null
+                                          ? Colors.white
+                                          : Colors.grey.shade600,
                                     ),
                                   ),
                                 ),
