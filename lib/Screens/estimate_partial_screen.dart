@@ -1881,7 +1881,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       startTimeController.text.isEmpty &&
                       endTimeController.text.isEmpty &&
                       dateController.text.isEmpty &&
-                      appointmentController.text.isEmpty && networkImageList.where((element) => element.isNotEmpty).toList().isEmpty) {
+                      appointmentController.text.isEmpty &&
+                      networkImageList
+                          .where((element) => element.isNotEmpty)
+                          .toList()
+                          .isEmpty) {
                     if (widget.estimateDetails.data.customer != null) {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
@@ -2447,7 +2451,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         setState(() {
           double tempPrice = 0.00;
           if (element2.discountType == "Fixed") {
-            if (element2.itemType.toLowerCase() == "part" ||element2.itemType.toLowerCase()=="labor") {
+            if (element2.itemType.toLowerCase() == "part" ||
+                element2.itemType.toLowerCase() == "labor") {
               tempPrice = (double.parse(element2.unitPrice) *
                       double.parse(element2.quanityHours)) -
                   double.parse(element2.discount);
@@ -2458,22 +2463,26 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
             log(tempPrice.toString() + "tempp");
           } else {
-            if (element2.itemType.toLowerCase() == "part"|| element2.itemType.toLowerCase()=="labor") {
+            if (element2.itemType.toLowerCase() == "part" ||
+                element2.itemType.toLowerCase() == "labor") {
               tempPrice = (double.parse(element2.unitPrice) *
                       double.parse(element2.quanityHours)) -
                   (double.parse(element2.discount) *
                           (double.parse(element2.unitPrice) *
                               double.parse(element2.quanityHours))) /
                       100;
-            }
+            }else{
 
             tempPrice = double.parse(element2.unitPrice) -
                 (double.parse(element2.discount) *
                         double.parse(element2.unitPrice)) /
                     100;
+            }
+
           }
 
-          if (element2.itemType.toLowerCase() == "part" ||element2.itemType.toLowerCase() == "labor") {
+          if (element2.itemType.toLowerCase() == "part" ||
+              element2.itemType.toLowerCase() == "labor") {
             taxAmount =
                 taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
           } else {
@@ -2486,7 +2495,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           } else {
             discountAmount = discountAmount +
                 (double.parse(element2.discount) *
-                        double.parse(element2.unitPrice)) /
+                        double.parse(element2.unitPrice) *
+                        double.parse(element2.quanityHours)) /
                     100;
           }
         });
@@ -2793,8 +2803,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         });
                                       } else {
                                         if (creditCardNumberController.text
-                                               .trim()
-                                                .replaceAll("X", "") .replaceAll(" ", "")
+                                                .trim()
+                                                .replaceAll("X", "")
+                                                .replaceAll(" ", "")
                                                 .length <
                                             4) {
                                           newSetState(() {
@@ -4335,8 +4346,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           listener: (context, state) {
             if (state is AddEstimateNoteState ||
                 state is CreateAppointmentEstimateState ||
-                state is EditEstimateNoteState || 
-                state is EditAppointmentEstimateState ||state is EstimateCreateOrderImageState) {
+                state is EditEstimateNoteState ||
+                state is EditAppointmentEstimateState ||
+                state is EstimateCreateOrderImageState) {
               startTimeController.clear();
               endTimeController.clear();
               dateController.clear();

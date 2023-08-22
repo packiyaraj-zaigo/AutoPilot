@@ -28,9 +28,9 @@ void main() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   initScreen = prefs.getString(AppConstants.USER_TOKEN);
   addCompany = prefs.getBool('add_company');
-  final tokenDate = prefs.getString('token_expiry');
-  final date = DateTime.parse(tokenDate ?? DateTime.now().toString());
-  tokenValidity = DateTime.now().isBefore(date);
+  // final tokenDate = prefs.getString('token_expiry');
+  // final date = DateTime.parse(tokenDate ?? DateTime.now().toString());
+  // tokenValidity = DateTime.now().isBefore(date);
   runApp(const MyApp());
 }
 
