@@ -212,6 +212,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           //   ), (route) => false);
           // }
           if (state is GetOrderImageState) {
+            networkImageList.clear();
+            networkImageList.addAll(["", "", "", ""]);
             newOrderImageData.addAll(state.orderImageModel.data);
           }
           if (state is EditEstimateNoteErrorState) {
@@ -2532,8 +2534,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       create: (context) => EstimateBloc(apiRepository: ApiRepository()),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
-          // TODO: implement listener
-
           if (state is CollectPaymentEstimateState) {
             widget.estimateDetails.data.paidAmount =
                 (double.parse(widget.estimateDetails.data.paidAmount) +
@@ -4371,6 +4371,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                 _scaffoldKey.currentContext!.read<EstimateBloc>().add(
                     GetEstimateNoteEvent(
+                        orderId: widget.estimateDetails.data.id.toString()));
+                _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                    GetAllOrderImageEvent(
                         orderId: widget.estimateDetails.data.id.toString()));
                 Navigator.pop(context);
               });

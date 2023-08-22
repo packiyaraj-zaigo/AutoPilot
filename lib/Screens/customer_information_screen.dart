@@ -84,6 +84,8 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
   final estimateScrollController = ScrollController();
   final vehicleScrollController = ScrollController();
   int newIndex = 0;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -91,57 +93,58 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primaryBackgroundColors,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        leading: IconButton(
-          onPressed: () {
-            if (widget.navigation != null) {
-              Navigator.pop(context);
-            } else {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                      builder: (context) => const cs.CustomersScreen()),
-                  (route) => false);
-            }
-          },
-          icon: Icon(
-            Icons.arrow_back,
-            color: AppColors.primaryColors,
-            size: AppStrings.fontSize16,
+    return BlocProvider(
+      create: (context) =>
+          CustomerBloc()..add(GetSingleCustomerEvent(id: widget.id)),
+      child: Scaffold(
+        key: scaffoldKey,
+        backgroundColor: AppColors.primaryBackgroundColors,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          automaticallyImplyLeading: false,
+          leading: IconButton(
+            onPressed: () {
+              if (widget.navigation != null) {
+                Navigator.pop(context);
+              } else {
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                        builder: (context) => const cs.CustomersScreen()),
+                    (route) => false);
+              }
+            },
+            icon: Icon(
+              Icons.arrow_back,
+              color: AppColors.primaryColors,
+              size: AppStrings.fontSize16,
+            ),
           ),
+          title: Text(
+            'Customer Information',
+            style: TextStyle(
+                color: AppColors.primaryBlackColors,
+                fontSize: AppStrings.fontSize16,
+                fontWeight: FontWeight.w500),
+          ),
+          centerTitle: true,
+          actions: [
+            IconButton(
+                splashColor: Colors.transparent,
+                onPressed: () {
+                  showBottomSheet();
+                },
+                icon: Icon(
+                  Icons.more_horiz,
+                  size: AppStrings.fontSize20,
+                  color: AppColors.primaryColors,
+                )),
+            const SizedBox(
+              width: 20,
+            )
+          ],
         ),
-        title: Text(
-          'Customer Information',
-          style: TextStyle(
-              color: AppColors.primaryBlackColors,
-              fontSize: AppStrings.fontSize16,
-              fontWeight: FontWeight.w500),
-        ),
-        centerTitle: true,
-        actions: [
-          IconButton(
-              splashColor: Colors.transparent,
-              onPressed: () {
-                showBottomSheet();
-              },
-              icon: Icon(
-                Icons.more_horiz,
-                size: AppStrings.fontSize20,
-                color: AppColors.primaryColors,
-              )),
-          const SizedBox(
-            width: 20,
-          )
-        ],
-      ),
-      body: BlocProvider(
-        create: (context) =>
-            CustomerBloc()..add(GetSingleCustomerEvent(id: widget.id!)),
-        child: BlocListener<CustomerBloc, CustomerState>(
+        body: BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is CustomerError) {
             } else if (state is DeleteCustomer) {
@@ -980,7 +983,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             child: const Text('Yes'),
             onPressed: () {
               Navigator.of(context).pop(true);
-              BlocProvider.of<CustomerBloc>(context).add(
+              BlocProvider.of<CustomerBloc>(scaffoldKey.currentContext!).add(
                 DeleteCustomerNoteEvent(
                   id: id,
                 ),
@@ -1596,45 +1599,59 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                     errorWidget(addNoteErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 24.0),
-                      child: BlocBuilder<CustomerBloc, CustomerState>(
-                        builder: (context, state) {
-                          if (state is CreateCustomerNoteLoadingState) {
-                            return const Padding(
-                              padding: EdgeInsets.only(top: 24.0),
-                              child:
-                                  Center(child: CupertinoActivityIndicator()),
-                            );
+                      child: BlocListener<CustomerBloc, CustomerState>(
+                        listener: (context, state) {
+                          if (state is CreateCustomerNoteSuccessState) {
+                            BlocProvider.of<CustomerBloc>(
+                                    scaffoldKey.currentContext!)
+                                .add(GetAllCustomerNotesEvent(id: widget.id));
+                            Navigator.of(context).pop();
+                            CommonWidgets().showSuccessDialog(
+                                context, 'Note Crated Successfully');
                           }
-                          return GestureDetector(
-                            onTap: () {
-                              if (addNoteController.text.isEmpty) {
-                                addNoteErrorStatus = "Note can't be empty";
-                              } else {
-                                addNoteErrorStatus = '';
-                                BlocProvider.of<CustomerBloc>(context).add(
-                                    CreateCustomerNoteEvent(
-                                        customerId: customerData!.id.toString(),
-                                        notes: addNoteController.text.trim()));
-                              }
-                              setDialog(() {});
-                            },
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height: 56,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: AppColors.primaryColors),
-                              child: const Text(
-                                "Confirm",
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white),
-                              ),
-                            ),
-                          );
                         },
+                        child: BlocBuilder<CustomerBloc, CustomerState>(
+                          builder: (context, state) {
+                            if (state is CreateCustomerNoteLoadingState) {
+                              return const Padding(
+                                padding: EdgeInsets.only(top: 24.0),
+                                child:
+                                    Center(child: CupertinoActivityIndicator()),
+                              );
+                            }
+                            return GestureDetector(
+                              onTap: () {
+                                if (addNoteController.text.isEmpty) {
+                                  addNoteErrorStatus = "Note can't be empty";
+                                } else {
+                                  addNoteErrorStatus = '';
+                                  BlocProvider.of<CustomerBloc>(context).add(
+                                      CreateCustomerNoteEvent(
+                                          customerId:
+                                              customerData!.id.toString(),
+                                          notes:
+                                              addNoteController.text.trim()));
+                                }
+                                setDialog(() {});
+                              },
+                              child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: 56,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: AppColors.primaryColors),
+                                child: const Text(
+                                  "Confirm",
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       ),
                     )
                   ],

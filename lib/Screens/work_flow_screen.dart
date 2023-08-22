@@ -42,6 +42,27 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   }
 
   filterColumns(List<WorkflowModel> workflows) {
+    // if (boardViewController.state.mounted) {
+
+    boardViewController.state.listStates.forEach((element) {
+      element.itemStates.forEach((ele) {
+        if (ele.mounted) {
+          ele.deactivate();
+        }
+      });
+      if (element.mounted) {
+        element.boardListController.dispose();
+        element.deactivate();
+      }
+    });
+    boardViewController.state.boardViewController.dispose();
+    boardViewController.state.listStates.clear();
+    boardViewController.state.deactivate();
+    // }
+
+    workflowOrderList.clear();
+    workflowVehicleList.clear();
+
     for (var status in statuses) {
       final filteredList = workflows
           .where((element) =>
@@ -56,6 +77,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
       workflowOrderList.add(boardWidget(filteredList, status, false));
       workflowVehicleList.add(boardWidget(vehicleList, status, true));
     }
+    log(boardViewController.state.toString() + "LENGHT");
+    boardViewController.state.setState(() {});
   }
 
   @override
@@ -85,12 +108,14 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                 }
                 if (state is EditWorkflowSuccessState ||
                     state is EditWorkflowErrorState) {
-                  Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => BottomBarScreen(
-                                currentIndex: 1,
-                              )),
-                      (route) => false);
+                  // Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
+                  //     MaterialPageRoute(
+                  //         builder: (context) => BottomBarScreen(
+                  //               currentIndex: 1,
+                  //             )),
+                  //     (route) => false);
+
+                  context.read<WorkflowBloc>().add(GetAllWorkflows());
                 }
               },
               child: BlocBuilder<WorkflowBloc, WorkflowState>(
@@ -111,10 +136,12 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                       BoardView(
                         width: 240,
                         lists: workflowOrderList,
+                        boardViewController: boardViewController,
                       ),
                       BoardView(
                         width: 240,
                         lists: workflowVehicleList,
+                        boardViewController: boardViewController,
                       ),
                     ],
                   );
@@ -130,6 +157,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   BoardList boardWidget(List<WorkflowModel> workflows,
       WorkflowStatusModel status, bool isVehicle) {
     return BoardList(
+      boardView: boardViewController.state,
       backgroundColor: Colors.transparent,
       header: [
         SizedBox(
@@ -168,6 +196,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
       items: List.generate(
         workflows.length,
         (index) => BoardItem(
+          boardList: BoardListState(),
           onDropItem:
               (listIndex, itemIndex, oldListIndex, oldItemIndex, state) {
             log(statuses[listIndex ?? 0].title);
