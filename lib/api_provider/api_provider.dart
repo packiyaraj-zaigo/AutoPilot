@@ -1885,7 +1885,8 @@ class ApiProvider {
         "subject": subject,
         "send_email": true,
         "notes": "Test",
-        "enable_signature": true
+        "enable_signature": true,
+        "request_authorization": true
       };
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse('${BASE_URL}api/authorize_digital_signatures');
