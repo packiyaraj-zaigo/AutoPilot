@@ -100,8 +100,15 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                   builder: (context, state) {
                     if (state is GetAllTimeCardsLoadingState &&
                         !bloc.isLoading) {
-                      return const Center(
-                        child: CupertinoActivityIndicator(),
+                      return const Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CupertinoActivityIndicator(),
+                            ],
+                          ),
+                        ),
                       );
                     } else {
                       return timeCards.isEmpty

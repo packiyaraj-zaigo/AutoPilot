@@ -82,12 +82,9 @@ showDrawer(BuildContext context) {
             const ServicesListScreen()),
         // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
         //     context, BottomBarScreen()),
-        drawerTileWidget(
-            "assets/images/time_card_drawer_icon.svg",
-            "Time Cards",
-            context,
-            //   const TimeCardsScreen(),
-            DummyScreen(name: "Time card")),
+        drawerTileWidget("assets/images/time_card_drawer_icon.svg",
+            "Time Cards", context, const TimeCardsScreen()),
+        // DummyScreen(name: "Time card")),
         const SizedBox(
           height: 52,
         ),

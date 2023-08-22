@@ -223,7 +223,16 @@ class _PartsScreenState extends State<PartsScreen> {
                     if (state is PartsDetailsLoadingState &&
                         !_bloc!.isPagenationLoading) {
                       print("-----------==============================");
-                      return const Center(child: CupertinoActivityIndicator());
+                      return const Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CupertinoActivityIndicator(),
+                            ],
+                          ),
+                        ),
+                      );
                     } else {
                       return parts.isEmpty
                           ? const Expanded(
