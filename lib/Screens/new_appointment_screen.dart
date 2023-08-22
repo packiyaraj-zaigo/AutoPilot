@@ -53,6 +53,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   bool vehicleErrorMsg = false;
   bool isValidated = false;
   bool isChecked = false;
+  bool endTimeErrorStatus = false;
 
   @override
   void initState() {
@@ -199,9 +200,13 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     halfTextTime("Select Time", startTimeController,
-                        "Start time", startTimeErrorMsg),
-                    halfTextTime("Select Time", endTimeController, "End Time",
-                        endTimeErrorMsg),
+                        "Start time", startTimeErrorMsg, false),
+                    halfTextTime(
+                        "Select Time",
+                        endTimeController,
+                        "End Time",
+                        endTimeErrorMsg || endTimeErrorStatus,
+                        endTimeErrorStatus),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -296,13 +301,15 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     );
   }
 
-  errorWidget(bool isError, String label) {
+  errorWidget(bool isError, String label, bool endTimeError) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Visibility(
           visible: isError,
           child: Text(
-            ' $label cannot be empty.',
+            endTimeError
+                ? 'End Time Should be valid'
+                : ' $label cannot be empty.',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -332,8 +339,12 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     if (endTimeController.text.isEmpty) {
       endTimeErrorMsg = true;
       status = false;
+    } else if (endTime.inMinutes <= startTime.inMinutes &&
+        endDate == startDate) {
+      endTimeErrorStatus = true;
     } else {
       endTimeErrorMsg = false;
+      endTimeErrorStatus = false;
     }
     if (customerController.text.isEmpty || customer == null) {
       customerErrorMsg = true;
@@ -497,7 +508,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   }
 
   Widget halfTextTime(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus) {
+      String label, bool errorStatus, bool endTimeErrorStatus) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -564,7 +575,8 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             ),
           ),
         ),
-        errorWidget(errorStatus, label)
+        errorWidget(
+            errorStatus, label, label == "End Time" && endTimeErrorStatus)
       ],
     );
   }
@@ -664,7 +676,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             ),
           ),
         ),
-        errorWidget(errorStatus, label)
+        errorWidget(errorStatus, label, false)
       ],
     );
   }
