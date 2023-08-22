@@ -202,6 +202,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     str = str.replaceAll('#', '0xFF');
     String mainTitle = "";
     String secondaryTitle = "";
+    log(workflow.toJson().toString());
     if (isVehicle) {
       mainTitle =
           '${workflow.orders?.vehicle?.vehicleYear ?? ''} ${workflow.orders?.vehicle?.vehicleModel ?? ''}';
@@ -236,7 +237,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              '${AppUtils.getTimeFormatted(workflow.orders?.shopStart ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.shopFinish ?? DateTime.now())}',
+              '${AppUtils.getTimeFormatted(workflow.orders?.shopStart ?? DateTime.now().toString())} - ${AppUtils.getTimeFormatted(workflow.orders?.shopFinish ?? DateTime.now().toString())}',
               style: const TextStyle(
                 color: Color(0xFF9A9A9A),
                 fontSize: 12,

@@ -36,7 +36,7 @@ class CannedServiceAddModel {
     required this.part,
     this.id = '',
     this.itemType = 'Material',
-    this.quanityHours = '0',
+    this.quanityHours = '1',
     this.discountType = 'Percentage',
     this.tax = 'N',
     this.position = 0,
