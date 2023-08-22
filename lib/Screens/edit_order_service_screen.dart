@@ -1960,6 +1960,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
               discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+                      (double.tryParse(addLaborHoursController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }

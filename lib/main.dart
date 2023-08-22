@@ -75,10 +75,10 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'AutoPilot',
-        initialRoute: initScreen != "" &&
-                initScreen != null &&
-                tokenValidity != null &&
-                tokenValidity!
+        initialRoute: initScreen != "" && initScreen != null
+            // &&
+            // tokenValidity != null &&
+            // tokenValidity!
             ? addCompany == true
                 ? "/home"
                 : '/add_company'
