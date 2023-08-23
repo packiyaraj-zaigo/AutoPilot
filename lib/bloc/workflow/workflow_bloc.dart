@@ -75,7 +75,7 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
               }
             } else {
               // emit(GetAllWorkflowErrorState(message: body[body.keys.first][0]));
-              log("somethign went wrong");
+              log("Something went wrong");
             }
           } catch (e) {
             log(e.toString() + " Status bloc error");

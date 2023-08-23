@@ -47,12 +47,17 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           .where((element) =>
               element.bucketName?.parentId == status.id &&
               element.orders != null)
+          .toList()
+          .reversed
           .toList();
       final vehicleList = workflows
           .where((element) =>
               element.bucketName?.parentId == status.id &&
               element.orders?.vehicle != null)
+          .toList()
+          .reversed
           .toList();
+
       workflowOrderList.add(boardWidget(filteredList, status, false));
       workflowVehicleList.add(boardWidget(vehicleList, status, true));
     }
