@@ -3,8 +3,10 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Screens/create_estimate.dart';
+import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/dummy_appointment_screen.dart';
+import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/bloc/appointment/appointment_bloc.dart';
 import '../Models/vechile_model.dart' as vm;
@@ -55,18 +57,19 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
   bool isChecked = false;
   bool endTimeErrorStatus = false;
 
+  String createdCustomerId = "";
+  String createdVehicleId = "";
+
   @override
   void initState() {
     startDate = '';
     super.initState();
-    startDateController.text = startDate = DateFormat('dd/MM/yyyy')
-        .format(DateTime.now().subtract(const Duration(days: 4)))
-        .toString();
-    startDateToServer = DateTime.now().subtract(const Duration(days: 4));
-    completionDateController.text = endDate = DateFormat('dd/MM/yyyy')
-        .format(DateTime.now().add(const Duration(days: 3)))
-        .toString();
-    endDateToServer = DateTime.now().subtract(const Duration(days: 3));
+    startDateController.text =
+        startDate = DateFormat('dd/MM/yyyy').format(DateTime.now()).toString();
+    startDateToServer = DateTime.now();
+    completionDateController.text =
+        endDate = DateFormat('dd/MM/yyyy').format(DateTime.now()).toString();
+    endDateToServer = DateTime.now();
   }
 
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
@@ -126,8 +129,12 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
             if (isChecked == true) {
               Navigator.of(context).pushReplacement(MaterialPageRoute(
                 builder: (context) => DummyAppointmentScreen(
-                  customerId: customer!.id.toString(),
-                  vehicleId: vehicle!.id.toString(),
+                  customerId: createdCustomerId != ""
+                      ? createdCustomerId
+                      : customer!.id.toString(),
+                  vehicleId: createdVehicleId != ""
+                      ? createdVehicleId
+                      : vehicle!.id.toString(),
                   appointmentId: state.id,
                   startTime: startDateToServer!.add(startTime).toString(),
                   endTime: endDateToServer!.add(endTime).toString(),
@@ -179,10 +186,8 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                   onSelectionChanged: _onSelectionChanged,
                   selectionMode: DateRangePickerSelectionMode.range,
                   initialSelectedRange: PickerDateRange(
-                    DateTime.now().subtract(const Duration(days: 4)),
-                    DateTime.now().add(
-                      const Duration(days: 3),
-                    ),
+                    DateTime.now(),
+                    DateTime.now(),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -254,8 +259,12 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                           appointment: AppointmentCreateModel(
                             appointmentTitle: nameController.text,
                             createdBy: 0,
-                            customerId: customer!.id,
-                            vehicleId: vehicle!.id,
+                            customerId: createdCustomerId != ""
+                                ? int.parse(createdCustomerId)
+                                : customer!.id,
+                            vehicleId: createdVehicleId != ""
+                                ? int.parse(createdVehicleId)
+                                : vehicle!.id,
                             startOn: startDateToServer!.add(startTime),
                             endOn: endDateToServer!.add(endTime),
                             notes: notesController.text,
@@ -346,13 +355,17 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
       endTimeErrorMsg = false;
       endTimeErrorStatus = false;
     }
-    if (customerController.text.isEmpty || customer == null) {
+    if (customerController.text.isEmpty
+        // || customer == null
+        ) {
       customerErrorMsg = true;
       status = false;
     } else {
       customerErrorMsg = false;
     }
-    if (vehicleController.text.isEmpty || vehicle == null) {
+    if (vehicleController.text.isEmpty
+        //   || vehicle == null
+        ) {
       vehicleErrorMsg = true;
       status = false;
     } else {
@@ -587,25 +600,88 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff6A7187),
-              ),
-            ),
-            const Text(
-              " *",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Color(
-                  0xffD80027,
+            Row(
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff6A7187),
+                  ),
                 ),
-              ),
+                const Text(
+                  " *",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: Color(
+                      0xffD80027,
+                    ),
+                  ),
+                ),
+              ],
             ),
+            label == "Customer" || label == "Vehicle"
+                ? GestureDetector(
+                    onTap: () {
+                      if (label == "Customer") {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          builder: (context) {
+                            return const NewCustomerScreen(
+                              navigation: "create_appointment",
+                            );
+                          },
+                        ).then((value) {
+                          if (value != null) {
+                            setState(() {
+                              customerController.text = value[0];
+                              createdCustomerId = value[1];
+                            });
+                          }
+                        });
+                      } else if (label == "Vehicle") {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          builder: (context) {
+                            return const CreateVehicleScreen(
+                              navigation: "create_appointment",
+                            );
+                          },
+                        ).then((value) {
+                          if (value != null) {
+                            setState(() {
+                              vehicleController.text = value[0];
+                              createdVehicleId = value[1];
+                            });
+                          }
+                        });
+                      }
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: AppColors.primaryColors,
+                          size: 18,
+                        ),
+                        Text(
+                          "Add New",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  )
+                : const SizedBox()
           ],
         ),
         Padding(
