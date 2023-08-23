@@ -86,7 +86,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Sfpro"),
         debugShowCheckedModeBanner: false,
         routes: <String, WidgetBuilder>{
-          '/login': (BuildContext context) => WelcomeScreen(),
+          '/login': (BuildContext context) => BottomBarScreen(),
           '/home': (BuildContext context) => BottomBarScreen(),
           '/add_company': (BuildContext context) => AddCompanyScreen(),
         },

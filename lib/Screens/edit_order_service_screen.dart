@@ -2031,7 +2031,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       child: textBox(
                           "Hours",
                           addLaborHoursController,
-                          "Hours ",
+                          "Hours",
                           addLaborHoursErrorStatus.isNotEmpty,
                           context,
                           true,
