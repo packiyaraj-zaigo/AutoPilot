@@ -129,16 +129,23 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
               '==========================errrrrrrrrorrrrrrrrr';
             } else if (state is CreateCustomerState) {
               if (widget.navigation != null) {
+                if (widget.navigation == "create_appointment") {
+                  Navigator.pop(context, [
+                    "${firstNameController.text} ${lastNameController.text}",
+                    state.id
+                  ]);
+                } else {
+                  Navigator.pushReplacement(context, MaterialPageRoute(
+                    builder: (context) {
+                      return DummyCustomerScreen(
+                        customerId: state.id,
+                        navigation: widget.navigation,
+                        orderId: widget.orderId,
+                      );
+                    },
+                  ));
+                }
                 //  Navigator.pop(context);
-                Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) {
-                    return DummyCustomerScreen(
-                      customerId: state.id,
-                      navigation: widget.navigation,
-                      orderId: widget.orderId,
-                    );
-                  },
-                ));
               } else {
                 if (check) {
                   Navigator.of(context).pushAndRemoveUntil(
@@ -353,6 +360,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                       ),
                       widget.navigation == "estimate_screen" ||
                               widget.navigation == "partial_estimate" ||
+                              widget.navigation == "create_appointment" ||
                               widget.customerEdit != null
                           ? const SizedBox()
                           : CheckboxListTile(

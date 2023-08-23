@@ -172,7 +172,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                       ));
                     } else if (widget.navigation != null &&
                         !isChecked &&
-                        widget.navigation != "estimate_screen") {
+                        widget.navigation != "estimate_screen" &&
+                        widget.navigation != "create_appointment") {
                       log('here');
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(
@@ -202,6 +203,13 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                           );
                         },
                       ));
+                    } else if (widget.navigation != null &&
+                        widget.navigation == "create_appointment" &&
+                        !isChecked) {
+                      Navigator.pop(context, [
+                        "${yearController.text} ${makeController.text} ${modelController.text}",
+                        state.createdId
+                      ]);
                     } else {
                       log("nav herrre");
                       Navigator.pop(context, vinController.text);
@@ -475,6 +483,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                     widget.navigation == "estimate_screen" ||
                                             widget.navigation ==
                                                 "partial_estimate" ||
+                                            widget.navigation ==
+                                                "create_appointment" ||
                                             widget.editVehicle != null
                                         ? const SizedBox(height: 16)
                                         : Center(
@@ -525,8 +535,8 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                           ),
                                         ),
                                         child: state
-                                                is AddVechileDetailsLoadingState || state
-                                                  is EditVehicleLoadingState
+                                                    is AddVechileDetailsLoadingState ||
+                                                state is EditVehicleLoadingState
                                             ? const CupertinoActivityIndicator(
                                                 color: Colors.white,
                                               )
