@@ -87,13 +87,18 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 appointmentTileWidget(
-                                    "Date",
+                                    "Start Date",
                                     beginDate != null
-                                        ? DateFormat("mm/dd/yyyy")
+                                        ? DateFormat("MM/dd/yyyy")
                                             .format(beginDate!)
                                         : "",
                                     MediaQuery.of(context).size.width / 2.8),
-                                appointmentTileWidget("Status", "In Progress",
+                                appointmentTileWidget(
+                                    "End Date",
+                                    endDate != null
+                                        ? DateFormat("MM/dd/yyyy")
+                                            .format(endDate!)
+                                        : "",
                                     MediaQuery.of(context).size.width / 2.8)
                               ],
                             ),
@@ -118,13 +123,14 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                 appointmentTileWidget(
                                     "Start Time",
                                     beginDate != null
-                                        ? DateFormat("hh:mm").format(beginDate!)
+                                        ? DateFormat("hh:mm a")
+                                            .format(beginDate!)
                                         : "",
                                     MediaQuery.of(context).size.width / 2.8),
                                 appointmentTileWidget(
                                     "End Time",
                                     endDate != null
-                                        ? DateFormat("hh:mm").format(endDate!)
+                                        ? DateFormat("hh:mm a").format(endDate!)
                                         : "",
                                     MediaQuery.of(context).size.width / 2.8)
                               ],
@@ -146,7 +152,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                             //Customer name tile
                             appointmentTileWidget(
                                 "Customer Name",
-                                "${createEstimateModel?.data.customer?.firstName ?? ""} ${createEstimateModel?.data.customer?.firstName ?? ""}",
+                                "${createEstimateModel?.data.customer?.firstName ?? ""} ${createEstimateModel?.data.customer?.lastName ?? ""}",
                                 MediaQuery.of(context).size.width),
                             Padding(
                               padding: const EdgeInsets.only(top: 14.0),
