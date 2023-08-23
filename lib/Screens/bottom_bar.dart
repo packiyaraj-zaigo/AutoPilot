@@ -25,6 +25,7 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -102,11 +103,15 @@ class _BottomBarScreenState extends State<BottomBarScreen>
     });
     return WillPopScope(
       onWillPop: () async {
-        pageController.animateTo(1,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
-        widget.currentIndex = 0;
-        setState(() {});
+        if (widget.currentIndex == 0) {
+          SystemNavigator.pop();
+        } else {
+          pageController.animateTo(1,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut);
+          widget.currentIndex = 0;
+          setState(() {});
+        }
         return false;
       },
       child: BlocProvider(
