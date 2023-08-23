@@ -675,8 +675,10 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
     }
     if (taskController.text.trim().isEmpty) {
       taskError = "Task cannot be empty";
+      status = false;
     } else if (taskController.text.length > 256) {
       taskError = 'Task cannot be more than 256 characters';
+      status = false;
     } else {
       taskError = '';
     }

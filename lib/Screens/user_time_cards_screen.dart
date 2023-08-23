@@ -56,7 +56,7 @@ class _UserTimeCardsScreenState extends State<UserTimeCardsScreen> {
                 return timeCards.isEmpty
                     ? const Center(
                         child: Text(
-                        'No User Found',
+                        'No Time Cards Found',
                         style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
