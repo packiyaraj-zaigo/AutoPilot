@@ -191,6 +191,18 @@ class _CreateEstimateScreenState extends State<CreateEstimateScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    halfTextBox("Select Date", startTimeController,
+                        "Start Date", startTimeErrorStatus),
+                    halfTextBox("Select Date", endTimeController, "End Date",
+                        endTimeErrorStatus)
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 24.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     halfTextBox("Select Time", startTimeController,
                         "Start Time", startTimeErrorStatus),
                     halfTextBox("Select Time", endTimeController, "End Time",

@@ -14,7 +14,7 @@ class TimeCardUserModel {
   int id;
   int clientId;
   int technicianId;
-  int activityId;
+  int? activityId;
   String activityType;
   DateTime clockInTime;
   DateTime clockOutTime;
@@ -53,11 +53,11 @@ class TimeCardUserModel {
         clientId: json["client_id"],
         technicianId: json["technician_id"],
         activityId: json["activity_id"],
-        activityType: json["activity_type"],
+        activityType: json["activity_type"] ?? '',
         clockInTime: DateTime.parse(json["clock_in_time"]),
         clockOutTime: DateTime.parse(json["clock_out_time"]),
         totalTime: json["total_time"],
-        notes: json["notes"],
+        notes: json["notes"] ?? '',
         createdBy: json["created_by"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),

@@ -350,6 +350,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     Emitter<EstimateState> emit,
   ) async {
     try {
+      log(event.startTime + "______" + event.endTime);
       final token = await AppUtils.getToken();
       final Response editAppointmentRes =
           await _apiRepository.editAppointmentEstimate(
