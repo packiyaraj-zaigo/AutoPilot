@@ -38,7 +38,7 @@ class User {
     String laborCost;
     int commissionStructureId;
     int salesTargetId;
-    String activationToken;
+    String? activationToken;
     DateTime createdAt;
     DateTime updatedAt;
     List<Role> roles;
@@ -57,7 +57,7 @@ class User {
         required this.laborCost,
         required this.commissionStructureId,
         required this.salesTargetId,
-        required this.activationToken,
+         this.activationToken,
         required this.createdAt,
         required this.updatedAt,
         required this.roles,

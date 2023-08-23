@@ -75,13 +75,14 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     Emitter<DashboardState> emit,
   ) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString(AppConstants.USER_TOKEN);
+      // SharedPreferences prefs = await SharedPreferences.getInstance();
+      // var token = prefs.getString(AppConstants.USER_TOKEN);
+      var token = await AppUtils.getToken();
       UserProfileModel userModel;
 
       // emit(DashboardLoadingState());
 
-      Response getUserProfileRes = await _apiRepository.getUserProfile(token!);
+      Response getUserProfileRes = await _apiRepository.getUserProfile(token);
       // var getChartData = _decoder.convert(getChartDataRes.body);
       log("res${getUserProfileRes.body}");
 
