@@ -1,22 +1,16 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/Models/workflow_status_model.dart';
-import 'package:auto_pilot/Screens/app_drawer.dart';
-import 'package:auto_pilot/Screens/bottom_bar.dart';
+import 'package:auto_pilot/Screens/kanban_board.dart';
 import 'package:auto_pilot/Screens/create_workflow.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
-import 'package:boardview/board_item.dart';
-import 'package:boardview/board_list.dart';
-import 'package:boardview/boardview_controller.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:boardview/boardview.dart';
+// import 'package:boardview/boardview.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 
 class WorkFlowScreen extends StatefulWidget {
   const WorkFlowScreen({super.key, required this.tabController});
@@ -28,13 +22,15 @@ class WorkFlowScreen extends StatefulWidget {
 
 class _WorkFlowScreenState extends State<WorkFlowScreen>
     with SingleTickerProviderStateMixin {
-  BoardViewController boardViewController = BoardViewController();
+  // BoardViewController boardViewController = BoardViewController();
   // late final controller = TabController(length: 2, vsync: this);
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<BoardList> workflowOrderList = [];
   List<BoardList> workflowVehicleList = [];
   List<WorkflowStatusModel> statuses = [];
+  bool alreadyLoaded = false;
+  bool apiCall = false;
 
   @override
   void initState() {
@@ -42,6 +38,10 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   }
 
   filterColumns(List<WorkflowModel> workflows) {
+    alreadyLoaded = true;
+    apiCall = false;
+    workflowOrderList.clear();
+    workflowVehicleList.clear();
     for (var status in statuses) {
       final filteredList = workflows
           .where((element) =>
@@ -61,9 +61,9 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   @override
   void dispose() {
     super.dispose();
-    if (boardViewController.state.mounted) {
-      boardViewController.state.dispose();
-    }
+    // if (boardViewController.state.mounted) {
+    //   boardViewController.state.dispose();
+    // }
   }
 
   @override
@@ -80,24 +80,25 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
             child: BlocListener<WorkflowBloc, WorkflowState>(
               listener: (context, state) {
                 if (state is GetAllWorkflowSuccessState) {
+                  statuses.clear();
                   statuses.addAll(state.statuses);
                   filterColumns(state.workflows);
                 }
                 if (state is EditWorkflowSuccessState ||
                     state is EditWorkflowErrorState) {
-                  Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => BottomBarScreen(
-                                currentIndex: 1,
-                              )),
-                      (route) => false);
+                  // Navigator.of(scaffoldKey.currentContext!).pushAndRemoveUntil(
+                  //     MaterialPageRoute(
+                  //         builder: (context) => BottomBarScreen(
+                  //               currentIndex: 1,
+                  //             )),
+                  //     (route) => false);
 
-                  // context.read<WorkflowBloc>().add(GetAllWorkflows());
+                  context.read<WorkflowBloc>().add(GetAllWorkflows());
                 }
               },
               child: BlocBuilder<WorkflowBloc, WorkflowState>(
                 builder: (context, state) {
-                  if (state is GetAllWorkflowLoadingState) {
+                  if (state is GetAllWorkflowLoadingState && !alreadyLoaded) {
                     return const Center(
                       child: CupertinoActivityIndicator(),
                     );
@@ -108,17 +109,30 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     );
                   }
                   return TabBarView(
-                    controller: widget.tabController..addListener(() {}),
+                    controller: widget.tabController
+                      ..addListener(() {
+                        if (widget.tabController.indexIsChanging) {
+                          alreadyLoaded = false;
+                          if (!apiCall) {
+                            apiCall = true;
+                            scaffoldKey.currentContext!
+                                .read<WorkflowBloc>()
+                                .add(GetAllWorkflows());
+                          }
+                        }
+                      }),
                     children: [
                       BoardView(
                         width: 240,
                         lists: workflowOrderList,
-                        boardViewController: boardViewController,
+                        // boardViewController: boardViewController,
+                        length: statuses.length,
                       ),
                       BoardView(
                         width: 240,
                         lists: workflowVehicleList,
-                        boardViewController: boardViewController,
+                        // boardViewController: boardViewController,
+                        length: statuses.length,
                       ),
                     ],
                   );
@@ -134,7 +148,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   BoardList boardWidget(List<WorkflowModel> workflows,
       WorkflowStatusModel status, bool isVehicle) {
     return BoardList(
-      boardView: boardViewController.state,
+      // boardView: boardViewController.state,
+      length: statuses.length,
       backgroundColor: Colors.transparent,
       header: [
         SizedBox(
@@ -173,10 +188,9 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
       items: List.generate(
         workflows.length,
         (index) => BoardItem(
-          boardList: BoardListState(),
+          // boardList: BoardListState(),
           onDropItem:
               (listIndex, itemIndex, oldListIndex, oldItemIndex, state) {
-            log(statuses[listIndex ?? 0].title);
             if (listIndex != null &&
                 oldListIndex != null &&
                 listIndex != oldListIndex) {
