@@ -7,6 +7,7 @@ import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:colornames/colornames.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -248,29 +249,32 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                                     'id': widget.status!.id.toString(),
                                     'workflow_type': "Shop",
                                     'title': titleController.text,
-                                    'color': code
-                                        .toString()
-                                        .replaceAll(
-                                            "MaterialColor(primary value: Color(0xff",
-                                            "")
-                                        .replaceAll(")", ""),
+                                    'color': "#" +
+                                        code
+                                            .toString()
+                                            .replaceAll(
+                                                "${kReleaseMode ? "ColorSwatch" : "MaterialColor"}(primary value: Color(0xff",
+                                                "")
+                                            .replaceAll(")", ""),
                                     'position': '0',
                                     'parent_id': widget.id,
                                   },
                                 ),
                               );
                             } else {
+                              print(code.toString() + "COLOR");
                               BlocProvider.of<WorkflowBloc>(context).add(
                                 CreateWorkflowBucketEvent(
                                   json: {
                                     'workflow_type': "Shop",
                                     'title': titleController.text,
-                                    'color': code
-                                        .toString()
-                                        .replaceAll(
-                                            "MaterialColor(primary value: Color(0xff",
-                                            "")
-                                        .replaceAll(")", ""),
+                                    'color': "#" +
+                                        code
+                                            .toString()
+                                            .replaceAll(
+                                                "${kReleaseMode ? "ColorSwatch" : "MaterialColor"}(primary value: Color(0xff",
+                                                "")
+                                            .replaceAll(")", ""),
                                     'position': '0',
                                     'parent_id': widget.id,
                                   },
