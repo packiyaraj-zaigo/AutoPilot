@@ -1393,6 +1393,7 @@ class ApiProvider {
       final url = Uri.parse('${BASE_URL}api/workflowbuckets');
       final clientId = await AppUtils.getUserID();
       map['client_id'] = int.parse(clientId);
+      print(map.toString() + "maaappp");
       final response = await http.post(url,
           headers: getHeader(token), body: json.encode(map));
       return response;
