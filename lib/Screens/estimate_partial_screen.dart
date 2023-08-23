@@ -64,7 +64,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   final startTimeController = TextEditingController();
   final endTimeController = TextEditingController();
   final appointmentController = TextEditingController();
-  final dateController = TextEditingController();
+  final startDateController = TextEditingController();
+  final endDateController = TextEditingController();
   final serviceController = TextEditingController();
 
   //Text Field Error Status Variables
@@ -74,7 +75,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   bool startTimeErrorStatus = false;
   bool endTimeErrorStatus = false;
   bool appointmentErrorStatus = false;
-  bool dateErrorStatus = false;
+  bool startDateErrorStatus = false;
+  bool endDateErrorStatus = false;
   bool serviceErrorStatus = false;
 
   //Text Field Error Message Variables
@@ -356,7 +358,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                           if (startTimeController.text.isNotEmpty &&
                               endTimeController.text.isNotEmpty &&
-                              dateController.text.isNotEmpty &&
+                              startDateController.text.isNotEmpty &&
+                              endDateController.text.isNotEmpty &&
                               appointmentController.text.isNotEmpty) {
                             final validate = validateDurations(
                                 startTimeController.text.trim(),
@@ -371,10 +374,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             if (isAppointmentEdit == false) {
                               context.read<EstimateBloc>().add(
                                     CreateAppointmentEstimateEvent(
-                                      startTime: dateController.text +
+                                      startTime: startDateController.text +
                                           " " +
                                           startTimeController.text,
-                                      endTime: dateController.text +
+                                      endTime: endDateController.text +
                                           " " +
                                           endTimeController.text,
                                       orderId: widget.estimateDetails.data.id
@@ -404,7 +407,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .estimateDetails.data.customer?.id
                                               .toString() ??
                                           "",
-                                      dropScedule: dateController.text));
+                                      dropScedule: startDateController.text));
                             } else {
                               print("editteeddd");
                               // if (int.parse(startTimeController.text
@@ -422,10 +425,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               // } else {
                               context.read<EstimateBloc>().add(
                                   EditAppointmentEstimateEvent(
-                                      startTime: dateController.text +
+                                      startTime: startDateController.text +
                                           " " +
                                           startTimeController.text,
-                                      endTime: dateController.text +
+                                      endTime: endDateController.text +
                                           " " +
                                           endTimeController.text,
                                       orderId: widget.estimateDetails.data.id
@@ -454,7 +457,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .estimateDetails.data.customer?.id
                                               .toString() ??
                                           "",
-                                      dropScedule: dateController.text));
+                                      dropScedule: startDateController.text));
                             }
                           }
 
@@ -744,6 +747,27 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         halfTextBox(
+                                            "Select Date",
+                                            startDateController,
+                                            "Start Date",
+                                            startDateErrorStatus,
+                                            "start_time"),
+                                        halfTextBox(
+                                            "Select Date",
+                                            endDateController,
+                                            "End Date",
+                                            endDateErrorStatus,
+                                            "end_time")
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 24.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        halfTextBox(
                                             "Select Time",
                                             startTimeController,
                                             "Start Time",
@@ -758,14 +782,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       ],
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16.0),
-                                    child: textBox(
-                                        "Select Date",
-                                        dateController,
-                                        "Date",
-                                        dateErrorStatus),
-                                  ),
+                                  // Padding(
+                                  //   padding: const EdgeInsets.only(top: 16.0),
+                                  //   child: textBox(
+                                  //       "Select Date",
+                                  //       dateController,
+                                  //       "Date",
+                                  //       dateErrorStatus),
+                                  // ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 16.0),
                                     child: textBox(
@@ -1451,15 +1475,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: appointmentLabelwithValue(
-                "Date",
-                appointmentDetailsModel?.data.data != null &&
-                        appointmentDetailsModel?.data.data != []
-                    ? "${appointmentDetailsModel?.data.data[0].startOn.month}/${appointmentDetailsModel?.data.data[0].startOn.day}/${appointmentDetailsModel?.data.data[0].startOn.year}"
-                    : ""),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 16.0),
+          //   child: appointmentLabelwithValue(
+          //       "Date",
+          //       appointmentDetailsModel?.data.data != null &&
+          //               appointmentDetailsModel?.data.data != []
+          //           ? "${appointmentDetailsModel?.data.data[0].startOn.month}/${appointmentDetailsModel?.data.data[0].startOn.day}/${appointmentDetailsModel?.data.data[0].startOn.year}"
+          //           : ""),
+          // ),
           Padding(
             padding: const EdgeInsets.only(top: 16.0),
             child: appointmentLabelwithValue(
@@ -1840,13 +1864,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       return datePicker("payment");
                     },
                   );
-                } else if (label == "Date") {
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (context) {
-                      return datePicker("appointment");
-                    },
-                  );
                 } else if (label == "Customer") {
                   // showModalBottomSheet(
                   //     context: context,
@@ -1888,7 +1905,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   if (estimateNoteController.text.isEmpty &&
                       startTimeController.text.isEmpty &&
                       endTimeController.text.isEmpty &&
-                      dateController.text.isEmpty &&
+                      startDateController.text.isEmpty &&
+                      endDateController.text.isEmpty &&
                       appointmentController.text.isEmpty &&
                       networkImageList
                           .where((element) => element.isNotEmpty)
@@ -1994,11 +2012,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             cashDateController.text =
                                 "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
                           }
-                        } else {
+                        } else if (dateType == "start_date") {
                           if (selectedDate != "") {
-                            dateController.text = selectedDate;
+                            startDateController.text = selectedDate;
                           } else {
-                            dateController.text =
+                            startDateController.text =
+                                "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                          }
+                        } else if (dateType == "end_date") {
+                          if (selectedDate != "") {
+                            endDateController.text = selectedDate;
+                          } else {
+                            endDateController.text =
                                 "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
                           }
                         }
@@ -2059,12 +2084,26 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               maxLength: 50,
               readOnly: true,
               onTap: () {
-                showCupertinoModalPopup(
-                  context: context,
-                  builder: (context) {
-                    return timerPicker(whichTime);
-                  },
-                );
+                if (label == "Start Date") {
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return datePicker("start_date");
+                      });
+                } else if (label == "End Date") {
+                  showCupertinoModalPopup(
+                      context: context,
+                      builder: (context) {
+                        return datePicker("end_date");
+                      });
+                } else {
+                  showCupertinoModalPopup(
+                    context: context,
+                    builder: (context) {
+                      return timerPicker(whichTime);
+                    },
+                  );
+                }
               },
               decoration: InputDecoration(
                   hintText: placeHolder,
@@ -3313,8 +3352,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         .toString();
 
                     appointmentController.text = appointmentDetails.notes;
-                    dateController.text =
+                    startDateController.text =
                         "${appointmentDetails.startOn.year}-${appointmentDetails.startOn.month}-${appointmentDetails.startOn.day}";
+                    endDateController.text =
+                        "${appointmentDetails.endOn.year}-${appointmentDetails.endOn.month}-${appointmentDetails.endOn.day}";
 
                     estimateAppointmentEditId =
                         appointmentDetails.id.toString();
@@ -4355,7 +4396,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 state is EstimateCreateOrderImageState) {
               startTimeController.clear();
               endTimeController.clear();
-              dateController.clear();
+              startDateController.clear();
+              endDateController.clear();
               appointmentController.clear();
               estimateNoteController.clear();
               log(state.toString() + "STATEs");
@@ -4423,7 +4465,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                         if (startTimeController.text.isNotEmpty &&
                             endTimeController.text.isNotEmpty &&
-                            dateController.text.isNotEmpty &&
+                            startDateController.text.isNotEmpty &&
+                            endDateController.text.isNotEmpty &&
                             appointmentController.text.isNotEmpty) {
                           final validate = validateDurations(
                               startTimeController.text.trim(),
@@ -4438,10 +4481,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           if (isAppointmentEdit == false) {
                             context.read<EstimateBloc>().add(
                                   CreateAppointmentEstimateEvent(
-                                    startTime: dateController.text +
+                                    startTime: startDateController.text +
                                         " " +
                                         startTimeController.text,
-                                    endTime: dateController.text +
+                                    endTime: endDateController.text +
                                         " " +
                                         endTimeController.text,
                                     orderId: widget.estimateDetails.data.id
@@ -4468,7 +4511,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         .estimateDetails.data.customer?.id
                                         .toString() ??
                                     "",
-                                dropScedule: dateController.text));
+                                dropScedule: startDateController.text));
                           } else {
                             print("editteeddd");
                             // if (int.parse(startTimeController.text
@@ -4486,10 +4529,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             // } else {
                             context.read<EstimateBloc>().add(
                                 EditAppointmentEstimateEvent(
-                                    startTime: dateController.text +
+                                    startTime: startDateController.text +
                                         " " +
                                         startTimeController.text,
-                                    endTime: dateController.text +
+                                    endTime: endDateController.text +
                                         " " +
                                         endTimeController.text,
                                     orderId: widget.estimateDetails.data.id
@@ -4515,7 +4558,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         .estimateDetails.data.customer?.id
                                         .toString() ??
                                     "",
-                                dropScedule: dateController.text));
+                                dropScedule: startDateController.text));
                           }
                         }
 

@@ -1344,7 +1344,7 @@ class ApiProvider {
       final body = {
         "appointment_title": orderId,
         "customer_id": customerId,
-        "vehicle_id": vehicleId,
+        "vehicle_id": vehicleId.isEmpty ? '0' : vehicleId,
         "notes": notes,
         "start_on": startTime,
         "end_on": endTime,
