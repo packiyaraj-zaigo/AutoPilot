@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
@@ -192,7 +193,7 @@ class AppUtils {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('yyyy/MM/dd  hh:mm a');
+    var outputFormat = DateFormat('MM/dd/yyyy  hh:mm a');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
@@ -219,7 +220,7 @@ class AppUtils {
     var inputFormat = DateFormat('yyyy-MM-dd HH:mm');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('yyyy-MM-dd');
+    var outputFormat = DateFormat('MM-dd-yyyy');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
@@ -246,7 +247,7 @@ class AppUtils {
     var inputFormat = DateFormat('MMMM-dd-yyyy');
     var inputDate = inputFormat.parse(date);
 
-    var outputFormat = DateFormat('yyyy-MM-dd');
+    var outputFormat = DateFormat('MM-dd-yyyy');
     var outputDate = outputFormat.format(inputDate);
     return outputDate;
   }
@@ -258,10 +259,11 @@ class AppUtils {
   }
 
   static getTimeMinFormatted(String time) {
+    log(time);
     var inputFormat = DateFormat('HH:mm');
     var inputTime = inputFormat.parse(time);
 
-    var outputFormat = DateFormat('h:mm a');
+    var outputFormat = DateFormat('h : mm a');
     var outputTime = outputFormat.format(inputTime);
     return outputTime;
   }

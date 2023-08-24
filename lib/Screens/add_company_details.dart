@@ -639,21 +639,32 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     suffixIcon: label == "Labor Tax Rate" ||
                             label == "Parts Tax Rate" ||
                             label == "Material Tax Rate"
-                        ? Transform.scale(
-                            scale: 0.7,
-                            child: CupertinoSwitch(
-                                value: switchValue(label),
-                                onChanged: (value) {
-                                  setState(() {
-                                    if (label == "Labor Tax Rate") {
-                                      isTaxLaborRate = value;
-                                    } else if (label == "Parts Tax Rate") {
-                                      isTaxPartRate = value;
-                                    } else if (label == "Material Tax Rate") {
-                                      isTaxMaterialRate = value;
-                                    }
-                                  });
-                                }),
+                        ? Wrap(
+                            // mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.percent,
+                                color: AppColors.primaryColors,
+                              ),
+                              Transform.scale(
+                                scale: 0.7,
+                                child: CupertinoSwitch(
+                                    value: switchValue(label),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        if (label == "Labor Tax Rate") {
+                                          isTaxLaborRate = value;
+                                        } else if (label == "Parts Tax Rate") {
+                                          isTaxPartRate = value;
+                                        } else if (label ==
+                                            "Material Tax Rate") {
+                                          isTaxMaterialRate = value;
+                                        }
+                                      });
+                                    }),
+                              ),
+                            ],
                           )
                         : null,
 

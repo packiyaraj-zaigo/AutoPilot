@@ -14,6 +14,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class TimeCardCreate extends StatefulWidget {
   const TimeCardCreate(
@@ -54,9 +55,10 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
     dateController.text =
         AppUtils.getDateFormatterUI(timeCard.clockInTime.toString());
     clockInController.text =
-        "${timeCard.clockInTime.hour}:${timeCard.clockInTime.minute}";
+        DateFormat('hh : mm a').format(timeCard.clockInTime).toString();
     clockOutController.text =
-        "${timeCard.clockOutTime.hour}:${timeCard.clockOutTime.minute}";
+        DateFormat('hh : mm a').format(timeCard.clockOutTime).toString();
+
     totalTimeController.text = "${timeCard.totalTime.substring(0, 5)} Hours";
     notesController.text = timeCard.notes;
     selectedDate = timeCard.clockInTime;
@@ -427,18 +429,19 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                       final date = selectedDate;
                       if (isClockIn) {
                         if (clockInController.text.isEmpty) {
-                          clockInController.text =
-                              '${date.hour.toString().padLeft(2, '0')} : ${date.minute.toString().padLeft(2, '0')}';
                           clockIn =
                               Duration(hours: date.hour, minutes: date.minute);
+                          clockInController.text =
+                              AppUtils.getTimeMinFormatted(clockIn.toString());
                         }
                       } else {
                         if (clockOutController.text.isEmpty) {
-                          clockOutController.text =
-                              '${clockIn.inHours.toString().padLeft(2, '0')}:${(clockIn.inMinutes % 60).toString().padLeft(2, '0')}';
                           clockOut = Duration(
                               hours: clockIn.inHours,
                               minutes: clockIn.inMinutes % 60);
+
+                          clockOutController.text =
+                              AppUtils.getTimeMinFormatted(clockOut.toString());
                         }
                       }
                       if (clockInController.text.isNotEmpty &&
@@ -453,29 +456,33 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
               ],
             ),
             Flexible(
-              child: CupertinoTimerPicker(
-                mode: CupertinoTimerPickerMode.hm,
+              child: CupertinoDatePicker(
+                // mode: CupertinoTimerPickerMode.hm,
+                mode: CupertinoDatePickerMode.time,
                 minuteInterval: 1,
-                secondInterval: 1,
-                initialTimerDuration: isClockIn
-                    ? clockInController.text.isEmpty
-                        ? Duration(
-                            hours: selectedDate.hour,
-                            minutes: selectedDate.minute)
-                        : clockIn
-                    : clockOutController.text.isEmpty
-                        ? clockIn
-                        : clockIn,
-                onTimerDurationChanged: (Duration changeTimer) {
-                  if (isClockIn) {
-                    clockInController.text =
-                        '${(changeTimer.inHours).toString().padLeft(2, '0')}:${(changeTimer.inMinutes % 60).toString().padLeft(2, '0')}';
-                    clockIn = changeTimer;
-                  } else {
-                    clockOutController.text =
-                        '${changeTimer.inHours} : ${(changeTimer.inMinutes % 60).toString().padLeft(2, '0')}';
-                    clockOut = changeTimer;
-                  }
+                initialDateTime: clockInController.text != '' && isClockIn
+                    ? DateTime(
+                        2023, 1, 1, clockIn.inHours, clockIn.inMinutes % 60)
+                    : clockOutController.text != ''
+                        ? DateTime(2023, 1, 1, clockOut.inHours,
+                            clockOut.inMinutes % 60)
+                        : DateTime.now(),
+
+                onDateTimeChanged: (DateTime dateTime) {
+                  setState(() {
+                    if (isClockIn) {
+                      clockIn = Duration(
+                          hours: dateTime.hour, minutes: dateTime.minute);
+                      clockInController.text =
+                          AppUtils.getTimeMinFormatted(clockIn.toString());
+                    } else {
+                      clockOut = Duration(
+                          hours: dateTime.hour, minutes: dateTime.minute);
+
+                      clockOutController.text =
+                          AppUtils.getTimeMinFormatted(clockOut.toString());
+                    }
+                  });
                 },
               ),
             ),
@@ -645,7 +652,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
     if (notesController.text.isNotEmpty &&
             notesController.text.trim().length < 2 ||
         notesController.text.isNotEmpty &&
-            notesController.text.trim().length > 256) {
+            notesController.text.trim().length >= 256) {
       notesError = "Notes should be between 2 and 256 characters";
       status = false;
     } else {

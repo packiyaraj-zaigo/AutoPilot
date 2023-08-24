@@ -1292,6 +1292,7 @@ class ApiProvider {
         headers: getHeader(token),
         body: appointmentCreateModelToJson(appointment),
       );
+      log(response.body.toString() + "APPOINTMENT");
       return response;
     } catch (e) {
       log(e.toString() + " create appointment api error");
@@ -1348,7 +1349,7 @@ class ApiProvider {
         "notes": notes,
         "start_on": startTime,
         "end_on": endTime,
-        "createEvent": 1,
+        "createEvent": "1",
         "order_id": orderId
       };
       final url = Uri.parse('${BASE_URL}api/appointments/$id');
@@ -1357,6 +1358,11 @@ class ApiProvider {
         headers: getHeader(token),
         body: json.encode(body),
       );
+
+      log(body.toString() + "APPOINTMENT BODY");
+      log(id.toString() + "APPOINTMENT ID");
+      log(response.body.toString() + "APPOINTMENT EDIT RESPONSE");
+
       inspect(response);
       return response;
     } catch (e) {
