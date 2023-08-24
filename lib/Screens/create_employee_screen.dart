@@ -476,11 +476,6 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                   : label.contains('Name')
                       ? 100
                       : 50,
-              onSubmitted: (_) {
-                if (label != "Position") {
-                  FocusScope.of(context).nextFocus();
-                }
-              },
               decoration: InputDecoration(
                 hintText: placeHolder,
                 counterText: "",
