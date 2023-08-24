@@ -476,6 +476,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                   : label.contains('Name')
                       ? 100
                       : 50,
+              textInputAction: TextInputAction.next,
               decoration: InputDecoration(
                 hintText: placeHolder,
                 counterText: "",

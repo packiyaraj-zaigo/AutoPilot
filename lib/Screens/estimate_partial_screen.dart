@@ -2142,7 +2142,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       if (dateType == "payment") {
                         if (selectedDate != "") {
                           cashDateController.text = selectedDate;
-                          cashDateToServer = selectedDate;
+                          cashDateToServer = cashDateToServer;
                         } else {
                           cashDateController.text =
                               "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
@@ -2152,7 +2152,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       } else if (dateType == "start_date") {
                         if (selectedDate != "") {
                           startDateController.text = selectedDate;
-                          startDateToServer = selectedDate;
+                          startDateToServer = startDateToServer;
                         } else {
                           startDateController.text =
                               "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
@@ -2163,7 +2163,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       } else if (dateType == "end_date") {
                         if (selectedDate != "") {
                           endDateController.text = selectedDate;
-                          endDateToServer = selectedDate;
+                          endDateToServer = endDateToServer;
                         } else {
                           endDateController.text =
                               "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
@@ -2188,13 +2188,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =
-                          "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
+                          "${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}-${newdate.year}";
                       if (dateType == "end_date") {
-                        endDateToServer = selectedDate;
+                        endDateToServer =
+                            "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
                       } else if (dateType == "start_date") {
-                        startDateToServer = selectedDate;
+                        startDateToServer =
+                            "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
                       } else if (dateType == "payment") {
-                        cashDateToServer = selectedDate;
+                        cashDateToServer =
+                            "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
                       }
                     });
                   },
