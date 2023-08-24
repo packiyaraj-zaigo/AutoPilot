@@ -633,6 +633,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       const SizedBox(height: 16),
                       GestureDetector(
                         onTap: () async {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final validate = validation();
                           if (validate) {
                             log('Here');
@@ -1437,6 +1439,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         padding: EdgeInsets.only(top: 31),
                         child: ElevatedButton(
                           onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+
                             final status = addMaterialValidation(newSetState);
                             if (status) {
                               final focus = FocusNode().requestFocus();
@@ -1908,6 +1912,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addPartValidation(newSetState);
                           if (status) {
                             final focus = FocusNode().requestFocus();
@@ -2267,6 +2273,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addLaborValidation(newSetState);
                           if (status) {
                             final focus = FocusNode().requestFocus();
@@ -2561,6 +2569,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addFeeValidation(newSetState);
                           if (status) {
                             final focus = FocusNode().requestFocus();
@@ -2982,6 +2992,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addSubContractValidation(newSetState);
                           if (status) {
                             final focus = FocusNode().requestFocus();
