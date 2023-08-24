@@ -816,7 +816,8 @@ class ApiProvider {
   Future<dynamic> getAllTimeCards(String token) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse("${BASE_URL}api/mobilelist?client_id=$clientId");
+      final url = Uri.parse(
+          "${BASE_URL}api/mobilelist?client_id=$clientId&order_by=id&sort=DESC");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -828,7 +829,7 @@ class ApiProvider {
       String token, String technicianId, int page) async {
     try {
       final url = Uri.parse(
-          "${BASE_URL}api/clocks?technician_id=$technicianId&page=$page");
+          "${BASE_URL}api/clocks?technician_id=$technicianId&page=$page&order_by=id&sort=DESC");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -1292,7 +1293,7 @@ class ApiProvider {
         headers: getHeader(token),
         body: appointmentCreateModelToJson(appointment),
       );
-      log(response.body.toString() + "APPOINTMENT");
+      log(appointment.toJson().toString() + "APPOINTMENT");
       return response;
     } catch (e) {
       log(e.toString() + " create appointment api error");
