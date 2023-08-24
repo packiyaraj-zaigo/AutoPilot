@@ -537,7 +537,11 @@ class _LoginAndSignupScreenState extends State<LoginAndSignupScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(13.0),
                             child: SvgPicture.asset(
-                                "assets/images/password_hide_icon.svg"),
+                              isObscure
+                                  ? "assets/images/pass_show_icon.svg"
+                                  : "assets/images/password_hide_icon.svg",
+                              color: Colors.grey,
+                            ),
                           ),
                         )
                       : const SizedBox(),
