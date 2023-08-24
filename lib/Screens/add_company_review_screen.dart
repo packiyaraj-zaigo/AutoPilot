@@ -121,7 +121,7 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                       const Padding(
                         padding: EdgeInsets.only(top: 8.0),
                         child: Text(
-                          "Something wrong? Tap on the row to edit it.\nOtherwise tap confirm and continue.",
+                          "Something wrong? Tap on the row to edit it.\nOtherwise tap Confirm and continue.",
                           style: TextStyle(
                               color: AppColors.greyText,
                               fontSize: 15,

@@ -36,9 +36,9 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
     Emitter<TimeCardState> emit,
   ) async {
     try {
-      emit(GetUserTimeCardsLoadingState());
-      if (currentPage == 1) {
-        isCurrentUserTimeCardLoading = true;
+      isCurrentUserTimeCardLoading = true;
+      if (currentUserTimeCardIndex == 1) {
+        emit(GetUserTimeCardsLoadingState());
       }
 
       final token = await AppUtils.getToken();
@@ -57,10 +57,10 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
           }
 
           currentUserTimeCardIndex = data['current_page'] ?? 1;
-          totalPages = data['last_page'] ?? 1;
-          if (currentUserTimeCardIndex <= totalPages) {
-            currentUserTimeCardIndex++;
-          }
+          totalUserTimeCardIndex = data['last_page'] ?? 1;
+          // if (currentUserTimeCardIndex <= totalPages) {
+          currentUserTimeCardIndex++;
+          // }
 
           emit(
             GetUserTimeCardsSuccessState(timeCards: timeCards),

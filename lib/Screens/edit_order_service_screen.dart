@@ -239,7 +239,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           'Notes',
                           laborDescriptionError.isNotEmpty,
                           context,
-                          true),
+                          false),
                       errorWidget(error: laborDescriptionError),
 
                       const SizedBox(height: 16),
@@ -957,11 +957,13 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
       serviceNameError = '';
     }
 
-    if (laborDescriptionController.text.trim().isEmpty) {
-      laborDescriptionError = 'Notes cannot be empty';
+    if (laborDescriptionController.text.trim().isNotEmpty &&
+        laborDescriptionController.text.trim().length < 2) {
+      laborDescriptionError = 'Notes should be atleast 2 characters';
       status = false;
-    } else if (laborDescriptionController.text.trim().length < 2) {
-      laborDescriptionError = 'Notes should be greater than 2 characters';
+    } else if (laborDescriptionController.text.trim().isNotEmpty &&
+        laborDescriptionController.text.trim().length > 50) {
+      laborDescriptionError = "Notes can't be more than 50 characters";
       status = false;
     } else {
       laborDescriptionError = '';

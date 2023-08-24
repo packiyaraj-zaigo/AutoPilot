@@ -84,6 +84,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   String customerErrorMsg = '';
   String estimateNoteErrorMsg = '';
   String authStatus = "";
+  String startTimeErrorMsg = "";
+  String endTimeErrorMsg = "";
+  String appointmentErrorMsg = "";
+  String startDateErrorMsg = "";
+  String endDateErrorMsg = "";
+
+  String startTimeToServer = "";
+  String endTimeToServer = "";
+  String startDateToServer = "";
+  String endDateToServer = "";
+  String cashDateToServer = "";
 
   //Estimate note model variables
 
@@ -327,59 +338,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     Padding(
                       padding: const EdgeInsets.only(right: 12.0),
                       child: GestureDetector(
+                        behavior: HitTestBehavior.translucent,
                         onTap: () {
-                          bool validateDurations(String firstDurationStr,
-                              String secondDurationStr) {
-                            if (firstDurationStr.isEmpty &&
-                                secondDurationStr.isEmpty) {
-                              return true;
-                            }
-                            // Parse the durations into hours and minutes
-                            List<String> firstParts =
-                                firstDurationStr.split(':');
-                            List<String> secondParts =
-                                secondDurationStr.split(':');
-                            int firstHours = int.parse(firstParts[0]);
-                            int firstMinutes = int.parse(firstParts[1]);
-                            int secondHours = int.parse(secondParts[0]);
-                            int secondMinutes = int.parse(secondParts[1]);
-
-                            // Convert the durations to total minutes for comparison
-                            int firstTotalMinutes =
-                                firstHours * 60 + firstMinutes;
-                            int secondTotalMinutes =
-                                secondHours * 60 + secondMinutes;
-
-                            // Compare the durations and return the result
-                            return firstTotalMinutes < secondTotalMinutes;
-                          }
-
-                          bool isError = false;
-
-                          if (startTimeController.text.isNotEmpty &&
-                              endTimeController.text.isNotEmpty &&
-                              startDateController.text.isNotEmpty &&
-                              endDateController.text.isNotEmpty &&
-                              appointmentController.text.isNotEmpty) {
-                            final validate = validateDurations(
-                                startTimeController.text.trim(),
-                                endTimeController.text.trim());
-
-                            if (!validate) {
-                              CommonWidgets().showDialog(context,
-                                  'Start time should be less than end time');
-                              return;
-                            }
-
+                          if (appointmentValidation() &&
+                              noteValidation() &&
+                              startTimeController.text.isNotEmpty &&
+                              !isCustomerEdit &&
+                              !isVehicleEdit) {
                             if (isAppointmentEdit == false) {
                               context.read<EstimateBloc>().add(
                                     CreateAppointmentEstimateEvent(
-                                      startTime: startDateController.text +
+                                      startTime: startDateToServer +
                                           " " +
-                                          startTimeController.text,
-                                      endTime: endDateController.text +
+                                          startTimeToServer,
+                                      endTime: endDateToServer +
                                           " " +
-                                          endTimeController.text,
+                                          endTimeToServer,
                                       orderId: widget.estimateDetails.data.id
                                           .toString(),
                                       appointmentNote:
@@ -409,28 +383,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                           "",
                                       dropScedule: startDateController.text));
                             } else {
-                              print("editteeddd");
-                              // if (int.parse(startTimeController.text
-                              //         .substring(0, 2)) <
-                              //     int.parse(
-                              //         endTimeController.text.substring(0, 2))) {
-                              //   print(
-                              //       startTimeController.text + "starttt timee");
-
-                              //   print(endTimeController.text + "endddd timee");
-
-                              //   CommonWidgets().showDialog(context,
-                              //       'Appointment start time should be less than appointment end time');
-                              //   isError = true;
-                              // } else {
                               context.read<EstimateBloc>().add(
                                   EditAppointmentEstimateEvent(
-                                      startTime: startDateController.text +
+                                      startTime: startDateToServer +
                                           " " +
-                                          startTimeController.text,
-                                      endTime: endDateController.text +
+                                          startTimeToServer,
+                                      endTime: endDateToServer +
                                           " " +
-                                          endTimeController.text,
+                                          endTimeToServer,
                                       orderId: widget.estimateDetails.data.id
                                           .toString(),
                                       appointmentNote:
@@ -461,12 +421,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             }
                           }
 
-                          final validate = validateDurations(
-                              startTimeController.text.trim(),
-                              endTimeController.text.trim());
-
-                          if (estimateNoteController.text.isNotEmpty &&
-                              validate) {
+                          if ((noteValidation() &&
+                                  appointmentValidation() &&
+                                  estimateNoteController.text
+                                      .trim()
+                                      .isNotEmpty) &&
+                              !isCustomerEdit &&
+                              !isVehicleEdit) {
                             if (!isEstimateNoteEdit) {
                               context.read<EstimateBloc>().add(
                                   AddEstimateNoteEvent(
@@ -483,7 +444,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             }
                           }
                           //  }
-                          if (networkImageList.isNotEmpty) {
+                          if (noteValidation() &&
+                              appointmentValidation() &&
+                              networkImageList.isNotEmpty &&
+                              !isCustomerEdit &&
+                              !isVehicleEdit) {
                             context.read<EstimateBloc>().add(
                                   CreateOrderImageEvent(
                                     imageUrlList:
@@ -497,10 +462,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 );
                           }
 
-                          if (!isError) {
-                            if (isCustomerEdit) {
+                          if (appointmentValidation() && noteValidation()) {
+                            if (isCustomerEdit && isVehicleEdit) {
+                              CommonWidgets().showDialog(context,
+                                  "Please select a customer and vehicle");
+                            } else if (isCustomerEdit) {
                               CommonWidgets().showDialog(
                                   context, "Please select a customer");
+                            } else if (isVehicleEdit) {
+                              CommonWidgets().showDialog(
+                                  context, "Please select a vehicle");
                             } else if (widget.navigation ==
                                 "customer_navigation") {
                               final estimate = widget.estimateDetails.data;
@@ -527,20 +498,23 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             }
                           }
                         },
-                        child: const Row(
-                          children: [
-                            Text(
-                              "Save & Close",
-                              style: TextStyle(
-                                  color: AppColors.primaryColors,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600),
-                            ),
-                            Icon(
-                              Icons.close,
-                              color: AppColors.primaryColors,
-                            )
-                          ],
+                        child: Container(
+                          height: kToolbarHeight,
+                          child: const Row(
+                            children: [
+                              Text(
+                                "Save & Close",
+                                style: TextStyle(
+                                    color: AppColors.primaryColors,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              Icon(
+                                Icons.close,
+                                color: AppColors.primaryColors,
+                              )
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -659,6 +633,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                     "Note",
                                     estimateNoteErrorStatus),
                               ),
+                        estimateNoteList.isNotEmpty &&
+                                isEstimateNoteEdit == false
+                            ? const SizedBox()
+                            : errorWidget(
+                                estimateNoteErrorMsg, estimateNoteErrorStatus),
+
                         // Padding(
                         //   padding: const EdgeInsets.only(top: 20.0),
                         //   child: Row(
@@ -714,7 +694,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 subTitleWidget("Appointment"),
                                 appointmentDetailsModel != null &&
                                         appointmentDetailsModel!
-                                            .data.data.isNotEmpty
+                                            .data.data.isNotEmpty &&
+                                        !isAppointmentEdit
                                     ? GestureDetector(
                                         onTap: () {
                                           showModalBottomSheet(
@@ -739,6 +720,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 isAppointmentEdit == false
                             ? appointmentDetailsWidget()
                             : Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.only(top: 24.0),
@@ -751,13 +733,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                             startDateController,
                                             "Start Date",
                                             startDateErrorStatus,
-                                            "start_time"),
+                                            "start_time",
+                                            startDateErrorMsg),
                                         halfTextBox(
                                             "Select Date",
                                             endDateController,
                                             "End Date",
                                             endDateErrorStatus,
-                                            "end_time")
+                                            "end_time",
+                                            endDateErrorMsg)
                                       ],
                                     ),
                                   ),
@@ -772,13 +756,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                             startTimeController,
                                             "Start Time",
                                             startTimeErrorStatus,
-                                            "start_time"),
+                                            "start_time",
+                                            startTimeErrorMsg),
                                         halfTextBox(
                                             "Select Time",
                                             endTimeController,
                                             "End Time",
                                             endTimeErrorStatus,
-                                            "end_time")
+                                            "end_time",
+                                            endTimeErrorMsg)
                                       ],
                                     ),
                                   ),
@@ -798,6 +784,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         "Appointment Note",
                                         appointmentErrorStatus),
                                   ),
+                                  errorWidget(appointmentErrorMsg,
+                                      appointmentErrorStatus),
                                 ],
                               ),
 
@@ -1127,6 +1115,113 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         ),
       ),
     );
+  }
+
+  noteValidation() {
+    bool status = true;
+    if (estimateNoteController.text.trim().isNotEmpty) {
+      if (estimateNoteController.text.trim().length < 5) {
+        estimateNoteErrorMsg = "Note should be atleast 5 characters";
+        estimateNoteErrorStatus = true;
+        status = false;
+      } else {
+        estimateNoteErrorStatus = false;
+      }
+    } else {
+      estimateNoteErrorStatus = false;
+    }
+    setState(() {});
+    return status;
+  }
+
+  appointmentValidation() {
+    if (startTimeController.text.isEmpty &&
+        endTimeController.text.isEmpty &&
+        startDateController.text.isEmpty &&
+        endDateController.text.isEmpty &&
+        appointmentController.text.isEmpty) {
+      startDateErrorStatus = false;
+      endDateErrorStatus = false;
+      startTimeErrorStatus = false;
+      endTimeErrorStatus = false;
+      appointmentErrorStatus = false;
+      setState(() {});
+      return true;
+    }
+    bool validateDurations(String firstDurationStr, String secondDurationStr) {
+      if (firstDurationStr.isEmpty && secondDurationStr.isEmpty) {
+        return true;
+      }
+      log(secondDurationStr + "FIRST DUR");
+      // Parse the durations into hours and minutes
+      List<String> firstParts = firstDurationStr.split(':');
+      List<String> secondParts = secondDurationStr.split(':');
+      int firstHours = int.parse(firstParts[0]);
+      int firstMinutes = int.parse(firstParts[1]);
+      int secondHours = int.parse(secondParts[0]);
+      int secondMinutes = int.parse(secondParts[1]);
+
+      // Convert the durations to total minutes for comparison
+      int firstTotalMinutes = firstHours * 60 + firstMinutes;
+      int secondTotalMinutes = secondHours * 60 + secondMinutes;
+
+      // Compare the durations and return the result
+      return firstTotalMinutes < secondTotalMinutes;
+    }
+
+    bool status = true;
+
+    if (startDateController.text.isEmpty) {
+      startDateErrorMsg = "Start Date can't be empty";
+      startDateErrorStatus = true;
+      status = false;
+    } else {
+      startDateErrorStatus = false;
+    }
+
+    if (endDateController.text.isEmpty) {
+      endDateErrorMsg = "End Date can't be empty";
+      endDateErrorStatus = true;
+      status = false;
+    } else {
+      endDateErrorStatus = false;
+    }
+
+    if (startTimeController.text.isEmpty) {
+      startTimeErrorMsg = "Start Time can't be empty";
+      startTimeErrorStatus = true;
+      status = false;
+    } else {
+      startTimeErrorStatus = false;
+    }
+
+    if (endTimeController.text.isEmpty) {
+      endTimeErrorMsg = "End Time can't be empty";
+      endTimeErrorStatus = true;
+      status = false;
+    } else if (startTimeController.text.isNotEmpty &&
+        endTimeController.text.isNotEmpty &&
+        !validateDurations(startTimeToServer, endTimeToServer)) {
+      endTimeErrorMsg = "End Time should be valid";
+      endTimeErrorStatus = true;
+      status = false;
+    } else {
+      endTimeErrorStatus = false;
+    }
+
+    if (appointmentController.text.trim().isEmpty) {
+      appointmentErrorMsg = "Appointment note can't be empty";
+      appointmentErrorStatus = true;
+      status = false;
+    } else if (appointmentController.text.trim().length < 5) {
+      appointmentErrorMsg = "Appointment note should be atleast 5 characters";
+      appointmentErrorStatus = true;
+      status = false;
+    } else {
+      appointmentErrorStatus = false;
+    }
+    setState(() {});
+    return status;
   }
 
   Widget subTitleWidget(String subTitle) {
@@ -1462,14 +1557,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     "Start Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('HH:mm').format(
+                        ? DateFormat('hh : mm a').format(
                             appointmentDetailsModel!.data.data[0].startOn)
                         : ""),
                 appointmentLabelwithValue(
                     "End Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('HH:mm')
+                        ? DateFormat('hh : mm a')
                             .format(appointmentDetailsModel!.data.data[0].endOn)
                         : "")
               ],
@@ -1902,16 +1997,31 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     },
                   ));
                 } else if (label == "Service") {
-                  if (estimateNoteController.text.isEmpty &&
-                      startTimeController.text.isEmpty &&
-                      endTimeController.text.isEmpty &&
-                      startDateController.text.isEmpty &&
-                      endDateController.text.isEmpty &&
-                      appointmentController.text.isEmpty &&
+                  if (!appointmentValidation() && !noteValidation()) {
+                    return;
+                  }
+                  if (isCustomerEdit && isVehicleEdit) {
+                    CommonWidgets().showDialog(
+                        context, "Please select a customer and vehicle");
+                    return;
+                  } else if (isCustomerEdit) {
+                    CommonWidgets()
+                        .showDialog(context, "Please select a customer");
+                    return;
+                  } else if (isVehicleEdit) {
+                    CommonWidgets()
+                        .showDialog(context, "Please select a vehicle");
+                    return;
+                  }
+                  if ((appointmentValidation() &&
+                          startTimeController.text.isEmpty) &&
+                      (noteValidation() &&
+                          estimateNoteController.text.isEmpty) &&
                       networkImageList
                           .where((element) => element.isNotEmpty)
                           .toList()
                           .isEmpty) {
+                    log('here i am');
                     if (widget.estimateDetails.data.customer != null) {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
@@ -1928,8 +2038,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   } else {
                     // CommonWidgets().showDialog(context,
                     //     "Please save the unsaved changes before selecting the service");
-
-                    showPopUpBeforeService(context);
+                    // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isNotEmpty) ||
+                        (noteValidation() &&
+                            estimateNoteController.text.isNotEmpty)) {
+                      showPopUpBeforeService(context);
+                    }
                   }
                 }
               },
@@ -1947,6 +2062,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   suffix: label == "Amount To Pay"
                       ? GestureDetector(
                           onTap: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+
                             paymentAmountController.text =
                                 balanceDueAmount.toStringAsFixed(2);
                           },
@@ -2000,48 +2117,85 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           child: Column(
             children: [
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   CupertinoButton(
-                      child: const Text("Done"),
-                      onPressed: () {
-                        if (dateType == "payment") {
-                          if (selectedDate != "") {
-                            cashDateController.text = selectedDate;
-                          } else {
-                            cashDateController.text =
-                                "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
-                          }
-                        } else if (dateType == "start_date") {
-                          if (selectedDate != "") {
-                            startDateController.text = selectedDate;
-                          } else {
-                            startDateController.text =
-                                "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
-                          }
-                        } else if (dateType == "end_date") {
-                          if (selectedDate != "") {
-                            endDateController.text = selectedDate;
-                          } else {
-                            endDateController.text =
-                                "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
-                          }
-                        }
+                    child: const Text("Clear"),
+                    onPressed: () {
+                      if (dateType == "payment") {
+                        cashDateController.text = "";
+                        cashDateToServer = "";
+                      } else if (dateType == "start_date") {
+                        startDateController.text = "";
+                        startDateToServer = "";
+                      } else if (dateType == "end_date") {
+                        endDateController.text = "";
+                        endDateToServer = "";
+                      }
 
-                        Navigator.pop(context);
-                      })
+                      Navigator.pop(context);
+                    },
+                  ),
+                  CupertinoButton(
+                    child: const Text("Done"),
+                    onPressed: () {
+                      if (dateType == "payment") {
+                        if (selectedDate != "") {
+                          cashDateController.text = selectedDate;
+                          cashDateToServer = selectedDate;
+                        } else {
+                          cashDateController.text =
+                              "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
+                          cashDateToServer =
+                              "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                        }
+                      } else if (dateType == "start_date") {
+                        if (selectedDate != "") {
+                          startDateController.text = selectedDate;
+                          startDateToServer = selectedDate;
+                        } else {
+                          startDateController.text =
+                              "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
+
+                          startDateToServer =
+                              "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                        }
+                      } else if (dateType == "end_date") {
+                        if (selectedDate != "") {
+                          endDateController.text = selectedDate;
+                          endDateToServer = selectedDate;
+                        } else {
+                          endDateController.text =
+                              "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
+                          endDateToServer =
+                              "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                        }
+                      }
+
+                      Navigator.pop(context);
+                    },
+                  )
                 ],
               ),
               //   CommonWidgets().commonDividerLine(context),
               Flexible(
                 child: CupertinoDatePicker(
                   initialDateTime: isAppointmentEdit
-                      ? appointmentDetailsModel?.data.data[0].startOn
+                      ? dateType == "end_date"
+                          ? appointmentDetailsModel?.data.data[0].endOn
+                          : appointmentDetailsModel?.data.data[0].startOn
                       : DateTime.now(),
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =
                           "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
+                      if (dateType == "end_date") {
+                        endDateToServer = selectedDate;
+                      } else if (dateType == "start_date") {
+                        startDateToServer = selectedDate;
+                      } else if (dateType == "payment") {
+                        cashDateToServer = selectedDate;
+                      }
                     });
                   },
                   use24hFormat: true,
@@ -2058,7 +2212,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget halfTextBox(String placeHolder, TextEditingController controller,
-      String label, bool errorStatus, String whichTime) {
+      String label, bool errorStatus, String whichTime, String errorMsg) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2129,6 +2283,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             ),
           ),
         ),
+        errorWidget(errorMsg, errorStatus),
       ],
     );
   }
@@ -2145,13 +2300,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           .toString();
     }
     if (timeType == "start_time" && endTimeController.text.trim().isNotEmpty) {
-      selectedTime = startTimeController.text;
+      selectedTime = startTimeToServer;
     } else if (timeType == "end_time" &&
         endTimeController.text.trim().isNotEmpty) {
-      selectedTime = endTimeController.text;
+      selectedTime = endTimeToServer;
     } else if (timeType == "end_time" &&
         endTimeController.text.trim().isEmpty) {
-      selectedTime = startTimeController.text;
+      selectedTime = startTimeToServer;
     }
 
     return CupertinoPopupSurface(
@@ -2162,64 +2317,139 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         child: Column(
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                CupertinoButton(
+                  child: const Text("Clear"),
+                  onPressed: () {
+                    if (timeType == "start_time") {
+                      startTimeController.text = "";
+                      startTimeToServer = "";
+                    } else {
+                      endTimeController.text = "";
+                      endTimeToServer = "";
+                    }
+                    Navigator.pop(context);
+                  },
+                ),
                 CupertinoButton(
                     child: const Text("Done"),
                     onPressed: () {
                       if (timeType == "start_time") {
-                        startTimeController.text = selectedTime;
+                        log(selectedTime + "SELECTED");
+                        startTimeToServer = selectedTime;
+                        startTimeController
+                            .text = AppUtils.getTimeMinFormatted(Duration(
+                                hours: int.parse(
+                                  selectedTime.substring(0, 2),
+                                ),
+                                minutes: int.parse(selectedTime.substring(3)))
+                            .toString());
                       } else {
-                        endTimeController.text = selectedTime;
+                        endTimeToServer = selectedTime;
+                        endTimeController
+                            .text = AppUtils.getTimeMinFormatted(Duration(
+                                hours: int.parse(
+                                  selectedTime.substring(0, 2),
+                                ),
+                                minutes: int.parse(selectedTime.substring(3)))
+                            .toString());
                       }
                       Navigator.pop(context);
                     })
               ],
             ),
             Flexible(
-              child: CupertinoTimerPicker(
-                mode: CupertinoTimerPickerMode.hm,
+              child: CupertinoDatePicker(
+                // mode: CupertinoTimerPickerMode.hm,
+                mode: CupertinoDatePickerMode.time,
                 minuteInterval: 1,
-                secondInterval: 1,
-                initialTimerDuration: isAppointmentEdit &&
-                        timeType == "start_time"
-                    ? Duration(
-                        hours: appointmentDetailsModel?.data.data[0].startOn.hour ??
-                            0,
-                        minutes: appointmentDetailsModel
-                                ?.data.data[0].startOn.minute ??
+                initialDateTime: isAppointmentEdit && timeType == "start_time"
+                    ? DateTime(
+                        2023,
+                        1,
+                        1,
+                        appointmentDetailsModel?.data.data[0].startOn.hour ?? 0,
+                        appointmentDetailsModel?.data.data[0].startOn.minute ??
                             0)
                     : isAppointmentEdit && timeType == "end_time"
-                        ? Duration(
-                            hours: appointmentDetailsModel
-                                    ?.data.data[0].endOn.hour ??
+                        ? DateTime(
+                            2023,
+                            1,
+                            1,
+                            appointmentDetailsModel?.data.data[0].endOn.hour ??
                                 0,
-                            minutes: appointmentDetailsModel
+                            appointmentDetailsModel
                                     ?.data.data[0].endOn.minute ??
                                 0)
                         : timeType == 'end_time' &&
-                                    startTimeController.text.isNotEmpty ||
+                                    startTimeToServer.isNotEmpty ||
                                 timeType == 'start_time' &&
-                                    startTimeController.text.isNotEmpty
-                            ? Duration(
-                                hours: int.parse(startTimeController.text
-                                    .trim()
-                                    .substring(0, 2)),
-                                minutes: int.parse(startTimeController.text.trim().substring(3)))
-                            : Duration(),
-                onTimerDurationChanged: (Duration changeTimer) {
+                                    startTimeToServer.isNotEmpty
+                            ? DateTime(
+                                2023,
+                                1,
+                                1,
+                                int.parse(
+                                    startTimeToServer.trim().substring(0, 2)),
+                                int.parse(
+                                  startTimeToServer.trim().substring(3),
+                                ),
+                              )
+                            : DateTime.now(),
+
+                onDateTimeChanged: (DateTime dateTime) {
                   setState(() {
-                    // initialTimer = changeTimer;
-
                     selectedTime =
-                        ' ${changeTimer.inHours >= 10 ? changeTimer.inHours : "0${changeTimer.inHours}"}:${changeTimer.inMinutes % 60 >= 10 ? changeTimer.inMinutes % 60 : "0${changeTimer.inMinutes % 60}"}';
-
-                    print(
-                        '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
+                        '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
                   });
                 },
               ),
             ),
+            // Flexible(
+            //   child: CupertinoTimerPicker(
+            //     mode: CupertinoTimerPickerMode.hm,
+            //     minuteInterval: 1,
+            //     secondInterval: 1,
+            //     initialTimerDuration: isAppointmentEdit &&
+            //             timeType == "start_time"
+            //         ? Duration(
+            //             hours: appointmentDetailsModel?.data.data[0].startOn.hour ??
+            //                 0,
+            //             minutes: appointmentDetailsModel
+            //                     ?.data.data[0].startOn.minute ??
+            //                 0)
+            //         : isAppointmentEdit && timeType == "end_time"
+            //             ? Duration(
+            //                 hours: appointmentDetailsModel
+            //                         ?.data.data[0].endOn.hour ??
+            //                     0,
+            //                 minutes: appointmentDetailsModel
+            //                         ?.data.data[0].endOn.minute ??
+            //                     0)
+            //             : timeType == 'end_time' &&
+            //                         startTimeController.text.isNotEmpty ||
+            //                     timeType == 'start_time' &&
+            //                         startTimeController.text.isNotEmpty
+            //                 ? Duration(
+            //                     hours: int.parse(startTimeController.text
+            //                         .trim()
+            //                         .substring(0, 2)),
+            //                     minutes: int.parse(startTimeController.text.trim().substring(3)))
+            //                 : Duration(),
+            //     onTimerDurationChanged: (Duration changeTimer) {
+            //       setState(() {
+            //         // initialTimer = changeTimer;
+
+            //         selectedTime =
+            //             ' ${changeTimer.inHours >= 10 ? changeTimer.inHours : "0${changeTimer.inHours}"}:${changeTimer.inMinutes % 60 >= 10 ? changeTimer.inMinutes % 60 : "0${changeTimer.inMinutes % 60}"}';
+
+            //         print(
+            //             '${changeTimer.inHours} hrs ${changeTimer.inMinutes % 60} mins ${changeTimer.inSeconds % 60} secs');
+            //       });
+            //     },
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -2461,7 +2691,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     widget.estimateDetails.data.orderService?.forEach((element) {
       if (element.orderServiceItems!.isEmpty) {
         laborAmount += double.parse(element.servicePrice);
-        taxAmount += double.parse(element.tax);
+        taxAmount += double.parse(element.tax) *
+            double.parse(element.servicePrice) /
+            100;
       }
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
@@ -2791,7 +3023,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //     : tabController.index == 1
                                                   //         ? "Credit Card"
                                                   //         : "Check",
-                                                  date: cashDateController.text,
+                                                  date: cashDateToServer,
                                                   note:
                                                       cashNoteController.text),
                                             );
@@ -2887,7 +3119,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //     : tabController.index == 1
                                                   //         ? "Credit Card"
                                                   //         : "Check",
-                                                  date: cashDateController.text,
+                                                  date: cashDateToServer,
                                                   note:
                                                       creditCardNumberController
                                                           .text
@@ -2963,7 +3195,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //     : tabController.index == 1
                                                   //         ? "Credit Card"
                                                   //         : "Check",
-                                                  date: cashDateController.text,
+                                                  date: cashDateToServer,
                                                   note:
                                                       cashNoteController.text),
                                             );
@@ -3343,18 +3575,28 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 onTap: () {
                   setState(() {
                     isAppointmentEdit = true;
-                    startTimeController.text = DateFormat('HH:mm')
+                    startTimeController.text = DateFormat('hh : mm a')
+                        .format(appointmentDetails.startOn)
+                        .toString();
+                    startTimeToServer = DateFormat('HH:mm')
                         .format(appointmentDetails.startOn)
                         .toString();
 
-                    endTimeController.text = DateFormat('HH:mm')
+                    endTimeController.text = DateFormat('hh : mm a')
+                        .format(appointmentDetails.endOn)
+                        .toString();
+                    endTimeToServer = DateFormat('HH:mm')
                         .format(appointmentDetails.endOn)
                         .toString();
 
                     appointmentController.text = appointmentDetails.notes;
                     startDateController.text =
+                        "${appointmentDetails.startOn.month}-${appointmentDetails.startOn.day}-${appointmentDetails.startOn.year}";
+                    startDateToServer =
                         "${appointmentDetails.startOn.year}-${appointmentDetails.startOn.month}-${appointmentDetails.startOn.day}";
                     endDateController.text =
+                        "${appointmentDetails.endOn.month}-${appointmentDetails.endOn.day}-${appointmentDetails.endOn.year}";
+                    endDateToServer =
                         "${appointmentDetails.endOn.year}-${appointmentDetails.endOn.month}-${appointmentDetails.endOn.day}";
 
                     estimateAppointmentEditId =
@@ -3982,13 +4224,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             } else if (widget.navigation == 'search') {
               Navigator.pop(context);
             } else {
-              Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-                builder: (context) {
-                  return BottomBarScreen(
-                    currentIndex: 3,
-                  );
-                },
-              ), (route) => false);
+              Navigator.pop(context);
             }
           },
           child: Container(
@@ -4400,7 +4636,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               endDateController.clear();
               appointmentController.clear();
               estimateNoteController.clear();
-              log(state.toString() + "STATEs");
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
                   return SelectServiceScreen(
@@ -4434,199 +4669,138 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     "Save the unsaved changes before creating a service"),
                 actions: <Widget>[
                   CupertinoDialogAction(
-                      child: const Text("Yes"),
-                      onPressed: () {
-                        bool validateDurations(
-                            String firstDurationStr, String secondDurationStr) {
-                          if (firstDurationStr.isEmpty &&
-                              secondDurationStr.isEmpty) {
-                            return true;
-                          }
-                          // Parse the durations into hours and minutes
-                          List<String> firstParts = firstDurationStr.split(':');
-                          List<String> secondParts =
-                              secondDurationStr.split(':');
-                          int firstHours = int.parse(firstParts[0]);
-                          int firstMinutes = int.parse(firstParts[1]);
-                          int secondHours = int.parse(secondParts[0]);
-                          int secondMinutes = int.parse(secondParts[1]);
-
-                          // Convert the durations to total minutes for comparison
-                          int firstTotalMinutes =
-                              firstHours * 60 + firstMinutes;
-                          int secondTotalMinutes =
-                              secondHours * 60 + secondMinutes;
-
-                          // Compare the durations and return the result
-                          return firstTotalMinutes < secondTotalMinutes;
-                        }
-
-                        bool isError = false;
-
-                        if (startTimeController.text.isNotEmpty &&
-                            endTimeController.text.isNotEmpty &&
-                            startDateController.text.isNotEmpty &&
-                            endDateController.text.isNotEmpty &&
-                            appointmentController.text.isNotEmpty) {
-                          final validate = validateDurations(
-                              startTimeController.text.trim(),
-                              endTimeController.text.trim());
-
-                          if (!validate) {
-                            CommonWidgets().showDialog(context,
-                                'Start time should be less than end time');
-                            return;
-                          }
-
-                          if (isAppointmentEdit == false) {
-                            context.read<EstimateBloc>().add(
-                                  CreateAppointmentEstimateEvent(
-                                    startTime: startDateController.text +
-                                        " " +
-                                        startTimeController.text,
-                                    endTime: endDateController.text +
-                                        " " +
-                                        endTimeController.text,
-                                    orderId: widget.estimateDetails.data.id
-                                        .toString(),
-                                    appointmentNote: appointmentController.text,
-                                    customerId: widget
-                                        .estimateDetails.data.customerId
-                                        .toString(),
-                                    vehicleId: widget
-                                            .estimateDetails.data.vehicle?.id
-                                            .toString() ??
-                                        "0",
-                                  ),
-                                );
-
-                            context.read<EstimateBloc>().add(EditEstimateEvent(
-                                id: widget.estimateDetails.data.vehicle?.id
-                                        .toString() ??
-                                    "0",
-                                orderId:
-                                    widget.estimateDetails.data.id.toString(),
-                                which: "vehicle",
-                                customerId: widget
-                                        .estimateDetails.data.customer?.id
-                                        .toString() ??
-                                    "",
-                                dropScedule: startDateController.text));
-                          } else {
-                            print("editteeddd");
-                            // if (int.parse(startTimeController.text
-                            //         .substring(0, 2)) <
-                            //     int.parse(
-                            //         endTimeController.text.substring(0, 2))) {
-                            //   print(
-                            //       startTimeController.text + "starttt timee");
-
-                            //   print(endTimeController.text + "endddd timee");
-
-                            //   CommonWidgets().showDialog(context,
-                            //       'Appointment start time should be less than appointment end time');
-                            //   isError = true;
-                            // } else {
-                            context.read<EstimateBloc>().add(
-                                EditAppointmentEstimateEvent(
-                                    startTime: startDateController.text +
-                                        " " +
-                                        startTimeController.text,
-                                    endTime: endDateController.text +
-                                        " " +
-                                        endTimeController.text,
-                                    orderId: widget.estimateDetails.data.id
-                                        .toString(),
-                                    appointmentNote: appointmentController.text,
-                                    customerId: widget
-                                        .estimateDetails.data.customerId
-                                        .toString(),
-                                    vehicleId: widget
-                                            .estimateDetails.data.vehicle?.id
-                                            .toString() ??
-                                        "",
-                                    id: estimateAppointmentEditId));
-
-                            context.read<EstimateBloc>().add(EditEstimateEvent(
-                                id: widget.estimateDetails.data.vehicle?.id
-                                        .toString() ??
-                                    "0",
-                                orderId:
-                                    widget.estimateDetails.data.id.toString(),
-                                which: "vehicle",
-                                customerId: widget
-                                        .estimateDetails.data.customer?.id
-                                        .toString() ??
-                                    "",
-                                dropScedule: startDateController.text));
-                          }
-                        }
-
-                        final validate = validateDurations(
-                            startTimeController.text.trim(),
-                            endTimeController.text.trim());
-
-                        if (estimateNoteController.text.isNotEmpty &&
-                            validate) {
-                          if (!isEstimateNoteEdit) {
-                            context.read<EstimateBloc>().add(
-                                AddEstimateNoteEvent(
-                                    orderId: widget.estimateDetails.data.id
-                                        .toString(),
-                                    comment: estimateNoteController.text));
-                          } else {
-                            context.read<EstimateBloc>().add(
-                                EditEstimateNoteEvent(
-                                    orderId: widget.estimateDetails.data.id
-                                        .toString(),
-                                    comment: estimateNoteController.text,
-                                    id: estimateNoteEditId));
-                          }
-                        }
-                        //  }
-                        if (networkImageList.isNotEmpty) {
+                    child: const Text("Yes"),
+                    onPressed: () {
+                      if (appointmentValidation() &&
+                          noteValidation() &&
+                          startTimeController.text.isNotEmpty &&
+                          !isCustomerEdit &&
+                          !isVehicleEdit) {
+                        if (isAppointmentEdit == false) {
                           context.read<EstimateBloc>().add(
-                                CreateOrderImageEvent(
-                                  imageUrlList:
-                                      networkImageList.where((element) {
-                                    return element != "";
-                                  }).toList(),
-                                  inspectionId: "",
+                                CreateAppointmentEstimateEvent(
+                                  startTime: startDateToServer +
+                                      " " +
+                                      startTimeToServer,
+                                  endTime:
+                                      endDateToServer + " " + endTimeToServer,
                                   orderId:
                                       widget.estimateDetails.data.id.toString(),
+                                  appointmentNote: appointmentController.text,
+                                  customerId: widget
+                                      .estimateDetails.data.customerId
+                                      .toString(),
+                                  vehicleId: widget
+                                          .estimateDetails.data.vehicle?.id
+                                          .toString() ??
+                                      "0",
                                 ),
                               );
-                        }
 
-                        if (!isError) {
-                          if (isCustomerEdit) {
-                            CommonWidgets().showDialog(
-                                context, "Please select a customer");
-                          } else if (widget.navigation ==
-                              "customer_navigation") {
-                            final estimate = widget.estimateDetails.data;
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (context) => CustomerInformationScreen(
-                                  id: estimate.customerId.toString(),
-                                ),
+                          context.read<EstimateBloc>().add(EditEstimateEvent(
+                              id: widget.estimateDetails.data.vehicle?.id
+                                      .toString() ??
+                                  "0",
+                              orderId:
+                                  widget.estimateDetails.data.id.toString(),
+                              which: "vehicle",
+                              customerId: widget
+                                      .estimateDetails.data.customer?.id
+                                      .toString() ??
+                                  "",
+                              dropScedule: startDateController.text));
+                        } else {
+                          context
+                              .read<EstimateBloc>()
+                              .add(
+                                  EditAppointmentEstimateEvent(
+                                      startTime: startDateToServer +
+                                          " " +
+                                          startTimeToServer,
+                                      endTime: endDateToServer +
+                                          " " +
+                                          endTimeToServer,
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
+                                      appointmentNote:
+                                          appointmentController.text,
+                                      customerId: widget
+                                          .estimateDetails.data.customerId
+                                          .toString(),
+                                      vehicleId: widget
+                                              .estimateDetails.data.vehicle?.id
+                                              .toString() ??
+                                          "",
+                                      id: estimateAppointmentEditId));
+
+                          context.read<EstimateBloc>().add(EditEstimateEvent(
+                              id: widget.estimateDetails.data.vehicle?.id
+                                      .toString() ??
+                                  "0",
+                              orderId:
+                                  widget.estimateDetails.data.id.toString(),
+                              which: "vehicle",
+                              customerId: widget
+                                      .estimateDetails.data.customer?.id
+                                      .toString() ??
+                                  "",
+                              dropScedule: startDateController.text));
+                        }
+                      } else {
+                        Navigator.pop(context);
+                      }
+
+                      if ((noteValidation() &&
+                              appointmentValidation() &&
+                              estimateNoteController.text.trim().isNotEmpty) &&
+                          !isCustomerEdit &&
+                          !isVehicleEdit) {
+                        if (!isEstimateNoteEdit) {
+                          context.read<EstimateBloc>().add(AddEstimateNoteEvent(
+                              orderId:
+                                  widget.estimateDetails.data.id.toString(),
+                              comment: estimateNoteController.text));
+                        } else {
+                          context.read<EstimateBloc>().add(
+                              EditEstimateNoteEvent(
+                                  orderId:
+                                      widget.estimateDetails.data.id.toString(),
+                                  comment: estimateNoteController.text,
+                                  id: estimateNoteEditId));
+                        }
+                      }
+                      //  }
+                      if (networkImageList.isNotEmpty &&
+                          noteValidation() &&
+                          appointmentValidation() &&
+                          !isCustomerEdit &&
+                          !isVehicleEdit) {
+                        context.read<EstimateBloc>().add(
+                              CreateOrderImageEvent(
+                                imageUrlList: networkImageList.where((element) {
+                                  return element != "";
+                                }).toList(),
+                                inspectionId: "",
+                                orderId:
+                                    widget.estimateDetails.data.id.toString(),
                               ),
                             );
-                          }
-                          //  else {
-                          //   Navigator.pushAndRemoveUntil(context,
-                          //       MaterialPageRoute(
-                          //     builder: (context) {
-                          //       return BottomBarScreen(
-                          //         currentIndex: 3,
-                          //         tabControllerIndex: widget.controllerIndex,
-                          //       );
-                          //     },
-                          //   ), (route) => false);
-                          // }
+                      }
+
+                      if (appointmentValidation() && noteValidation()) {
+                        if (isCustomerEdit && isVehicleEdit) {
+                          CommonWidgets().showDialog(
+                              context, "Please select a customer and vehicle");
+                        } else if (isCustomerEdit) {
+                          CommonWidgets()
+                              .showDialog(context, "Please select a customer");
+                        } else if (isVehicleEdit) {
+                          CommonWidgets()
+                              .showDialog(context, "Please select a vehicle");
                         }
-                        // Navigator.pop(context);
-                      }),
+                      }
+                    },
+                  ),
                   CupertinoDialogAction(
                     child: const Text("No"),
                     onPressed: () => Navigator.of(context).pop(false),

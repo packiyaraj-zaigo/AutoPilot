@@ -49,8 +49,7 @@ class _UserTimeCardsScreenState extends State<UserTimeCardsScreen> {
           },
           child: BlocBuilder<TimeCardBloc, TimeCardState>(
             builder: (context, state) {
-              if (state is GetUserTimeCardsLoadingState &&
-                  context.read<TimeCardBloc>().isCurrentUserTimeCardLoading) {
+              if (state is GetUserTimeCardsLoadingState) {
                 return const Center(child: CupertinoActivityIndicator());
               } else {
                 return timeCards.isEmpty
@@ -70,6 +69,10 @@ class _UserTimeCardsScreenState extends State<UserTimeCardsScreen> {
                               shrinkWrap: true,
                               controller: controller
                                 ..addListener(() {
+                                  if (controller.offset ==
+                                      controller.position.maxScrollExtent) {
+                                    log(' ${BlocProvider.of<TimeCardBloc>(context).currentUserTimeCardIndex <= BlocProvider.of<TimeCardBloc>(context).totalUserTimeCardIndex}');
+                                  }
                                   if (controller.offset ==
                                           controller.position.maxScrollExtent &&
                                       !BlocProvider.of<TimeCardBloc>(context)

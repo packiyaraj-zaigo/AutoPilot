@@ -207,7 +207,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           'Notes',
                           laborDescriptionError.isNotEmpty,
                           context,
-                          true),
+                          false),
                       errorWidget(error: laborDescriptionError),
 
                       const SizedBox(height: 16),
@@ -847,7 +847,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price ' ||
                       label == "Quantity"
                   ? 10
-                  : 25,
+                  : label == "Description"
+                      ? 50
+                      : 25,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
@@ -913,11 +915,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       serviceNameError = '';
     }
 
-    if (laborDescriptionController.text.trim().isEmpty) {
-      laborDescriptionError = "Notes can't be empty";
-      status = false;
-    } else if (laborDescriptionController.text.trim().length < 2) {
+    if (laborDescriptionController.text.trim().isNotEmpty &&
+        laborDescriptionController.text.trim().length < 2) {
       laborDescriptionError = 'Notes should be atleast 2 characters';
+      status = false;
+    } else if (laborDescriptionController.text.trim().isNotEmpty &&
+        laborDescriptionController.text.trim().length > 50) {
+      laborDescriptionError = "Notes can't be more than 50 characters";
       status = false;
     } else {
       laborDescriptionError = '';
