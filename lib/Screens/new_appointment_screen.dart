@@ -398,13 +398,19 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                     onPressed: () {
                       if (startTimeController.text.isEmpty &&
                           controller == startTimeController) {
-                        startTime = Duration.zero;
-                        startTimeController.text = '0.0';
+                        startTime = Duration(
+                            hours: DateTime.now().hour,
+                            minutes: DateTime.now().minute);
+                        startTimeController.text =
+                            AppUtils.getTimeMinFormatted(startTime.toString());
                       }
                       if (endTimeController.text.isEmpty &&
                           controller == endTimeController) {
-                        endTime = Duration.zero;
-                        endTimeController.text = '0.0';
+                        endTime = Duration(
+                            hours: DateTime.now().hour,
+                            minutes: DateTime.now().minute);
+                        endTimeController.text =
+                            AppUtils.getTimeMinFormatted(endTime.toString());
                       }
                       if (isValidated) {
                         validate();
