@@ -266,8 +266,16 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                             vehicleId: createdVehicleId != ""
                                 ? int.parse(createdVehicleId)
                                 : vehicle!.id,
-                            startOn: startDateToServer!.add(startTime),
-                            endOn: endDateToServer!.add(endTime),
+                            startOn: DateTime(
+                                    startDateToServer!.year,
+                                    startDateToServer!.month,
+                                    startDateToServer!.day)
+                                .add(startTime),
+                            endOn: DateTime(
+                                    endDateToServer!.year,
+                                    endDateToServer!.month,
+                                    endDateToServer!.day)
+                                .add(endTime),
                             notes: notesController.text,
                           ),
                         ),
@@ -352,6 +360,7 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
     } else if (endTime.inMinutes <= startTime.inMinutes &&
         endDate == startDate) {
       endTimeErrorStatus = true;
+      status = false;
     } else {
       endTimeErrorMsg = false;
       endTimeErrorStatus = false;
