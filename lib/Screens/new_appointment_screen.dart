@@ -9,6 +9,7 @@ import 'package:auto_pilot/Screens/dummy_appointment_screen.dart';
 import 'package:auto_pilot/Screens/new_customer_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/bloc/appointment/appointment_bloc.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import '../Models/vechile_model.dart' as vm;
 
 import 'package:auto_pilot/utils/common_widgets.dart';
@@ -413,29 +414,35 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
               ],
             ),
             Flexible(
-              child: CupertinoTimerPicker(
-                mode: CupertinoTimerPickerMode.hm,
+              child: CupertinoDatePicker(
+                // mode: CupertinoTimerPickerMode.hm,
+                mode: CupertinoDatePickerMode.time,
                 minuteInterval: 1,
-                secondInterval: 1,
-                initialTimerDuration: startTimeController.text != '' &&
+                initialDateTime: startTimeController.text != '' &&
                         controller == startTimeController
-                    ? startTime
+                    ? DateTime(
+                        2023, 1, 1, startTime.inHours, startTime.inMinutes % 60)
                     : endTimeController.text != '' &&
                             controller == endTimeController
-                        ? endTime
-                        : const Duration(),
-                onTimerDurationChanged: (Duration changeTimer) {
-                  // setState(() {
-                  if (controller == startTimeController) {
-                    startTime = changeTimer;
-                    startTimeController.text =
-                        "${startTime.inHours}: ${startTime.inMinutes % 60}";
-                  } else {
-                    endTime = changeTimer;
-                    endTimeController.text =
-                        "${endTime.inHours}: ${endTime.inMinutes % 60}";
-                  }
-                  // });
+                        ? DateTime(
+                            2023, 1, 1, endTime.inHours, endTime.inMinutes % 60)
+                        : DateTime.now(),
+
+                onDateTimeChanged: (DateTime dateTime) {
+                  setState(() {
+                    if (controller == startTimeController) {
+                      startTime = Duration(
+                          hours: dateTime.hour, minutes: dateTime.minute);
+                      startTimeController.text =
+                          AppUtils.getTimeMinFormatted(startTime.toString());
+                    } else {
+                      endTime = Duration(
+                          hours: dateTime.hour, minutes: dateTime.minute);
+
+                      endTimeController.text =
+                          AppUtils.getTimeMinFormatted(endTime.toString());
+                    }
+                  });
                   if (isValidated) {
                     validate();
                   }
