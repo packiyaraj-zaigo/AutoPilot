@@ -28,7 +28,7 @@ class TimeCardCreate extends StatefulWidget {
 
 class _TimeCardCreateState extends State<TimeCardCreate> {
   List<Employee> employeeList = [];
-  final scrollController = ScrollController();
+  ScrollController scrollController = ScrollController();
   final TextEditingController employeeController = TextEditingController();
   String employeeError = '';
   final TextEditingController taskController = TextEditingController();
@@ -85,8 +85,8 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
-        title: const Text(
-          'New Time Card',
+        title: Text(
+          '${widget.timeCard != null ? "Edit" : "New"} Time Card',
           style: TextStyle(color: Colors.black87, fontSize: 16),
         ),
         centerTitle: true,
@@ -652,32 +652,34 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
       notesError = '';
     }
     if (clockInController.text.isEmpty && clockOutController.text.isEmpty) {
-      clockError = "Clock in and clock out cannot be empty";
+      clockError = "Clock in and clock out can't be empty";
       status = false;
     } else if (clockInController.text.isEmpty) {
-      clockError = "Clock in cannot be empty";
+      clockError = "Clock in can't be empty";
       status = false;
     } else if (clockOutController.text.isEmpty) {
-      clockError = "Clock out cannot be empty";
+      clockError = "Clock out can't be empty";
       status = false;
-    } else if (clockIn >
-            Duration(hours: selectedDate.hour, minutes: selectedDate.minute) &&
-        selectedDate.day == DateTime.now().day &&
-        selectedDate.month == DateTime.now().month &&
-        selectedDate.year == DateTime.now().year) {
-      clockError = "Clock in should be valid";
-      status = false;
-    } else if (clockOut < clockIn) {
+    }
+    // else if (clockIn >
+    //         Duration(hours: selectedDate.hour, minutes: selectedDate.minute) &&
+    //     selectedDate.day == DateTime.now().day &&
+    //     selectedDate.month == DateTime.now().month &&
+    //     selectedDate.year == DateTime.now().year) {
+    //   clockError = "Clock in should be valid";
+    //   status = false;
+    // }
+    else if (clockOut < clockIn) {
       clockError = "Clock out should be valid";
       status = false;
     } else {
       clockError = '';
     }
     if (taskController.text.trim().isEmpty) {
-      taskError = "Task cannot be empty";
+      taskError = "Task can't be empty";
       status = false;
-    } else if (taskController.text.length > 256) {
-      taskError = 'Task cannot be more than 256 characters';
+    } else if (taskController.text.length > 50) {
+      taskError = "Task can't be more than 50 characters";
       status = false;
     } else {
       taskError = '';
@@ -688,6 +690,8 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
   }
 
   Widget employeeListSheet() {
+    employeeList.clear();
+    scrollController = ScrollController();
     return BlocProvider(
       create: (context) => EmployeeBloc()..add(GetAllEmployees()),
       child: BlocListener<EmployeeBloc, EmployeeState>(
@@ -712,7 +716,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      "Vehicles",
+                      "Employees",
                       style: TextStyle(
                           color: AppColors.primaryTitleColor,
                           fontSize: 24,
