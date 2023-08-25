@@ -354,6 +354,8 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                       if (label == 'Employee' &&
                           widget.id == -1 &&
                           widget.timeCard == null) {
+                        employeeList.clear();
+
                         showModalBottomSheet(
                             context: context,
                             builder: (context) => employeeListSheet());
@@ -697,7 +699,6 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
   }
 
   Widget employeeListSheet() {
-    employeeList.clear();
     scrollController = ScrollController();
     return BlocProvider(
       create: (context) => EmployeeBloc()..add(GetAllEmployees()),

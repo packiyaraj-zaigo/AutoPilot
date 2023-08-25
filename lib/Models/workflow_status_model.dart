@@ -37,22 +37,26 @@ class ChildBucket {
   int id;
   String title;
   int parentId;
+  String color;
 
   ChildBucket({
     required this.id,
     required this.title,
     required this.parentId,
+    required this.color,
   });
 
   factory ChildBucket.fromJson(Map<String, dynamic> json) => ChildBucket(
         id: json["id"],
         title: json["title"],
         parentId: json["parent_id"],
+        color: json["color"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "title": title,
         "parent_id": parentId,
+        "color": color,
       };
 }

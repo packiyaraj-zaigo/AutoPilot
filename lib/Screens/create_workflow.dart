@@ -35,11 +35,46 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
   Color currentColor = Colors.transparent;
   List<String> statuses = [];
 
+  Map<Color, String> colorNames = {
+    Colors.red: 'Red',
+    Colors.pink: 'Pink',
+    Colors.purple: 'Purple',
+    Colors.deepPurple: 'Deep Purple',
+    Colors.indigo: 'Indigo',
+    Colors.blue: 'Blue',
+    Colors.lightBlue: 'Light Blue',
+    Colors.cyan: 'Cyan',
+    Colors.teal: 'Teal',
+    Colors.green: 'Green',
+    Colors.lightGreen: 'Light Green',
+    Colors.lime: 'Lime',
+    Colors.yellow: 'Yellow',
+    Colors.amber: 'Amber',
+    Colors.orange: 'Orange',
+    Colors.deepOrange: 'Deep Orange',
+    Colors.brown: 'Brown',
+    Colors.grey: 'Grey',
+    Colors.blueGrey: 'Blue Grey',
+    Colors.black: 'Black',
+  };
+
   @override
   void initState() {
     super.initState();
     if (widget.status != null) {
       titleController.text = widget.status!.title;
+      String str = widget.status!.color;
+      str = str.replaceAll('#', '0xFF');
+      code = Color(int.parse(str));
+      for (var element in colorNames.keys) {
+        if (element.value == code.value) {
+          code = element;
+        }
+      }
+      colorController.text = colorNames[code] ?? "";
+      if (colorController.text.isEmpty) {
+        colorController.text = ColorNames.guess(code);
+      }
     }
   }
 
@@ -242,25 +277,26 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                         onPressed: () {
                           if (validate()) {
                             if (widget.status != null) {
-                              BlocProvider.of<WorkflowBloc>(context).add(
-                                EditWorkflowBucketEvent(
-                                  id: widget.status!.id.toString(),
-                                  json: {
-                                    'id': widget.status!.id.toString(),
-                                    'workflow_type': "Shop",
-                                    'title': titleController.text,
-                                    'color': "#" +
-                                        code
-                                            .toString()
-                                            .replaceAll(
-                                                "${kReleaseMode ? "ColorSwatch" : "MaterialColor"}(primary value: Color(0xff",
-                                                "")
-                                            .replaceAll(")", ""),
-                                    'position': '0',
-                                    'parent_id': widget.id,
-                                  },
-                                ),
+                              final evnet = EditWorkflowBucketEvent(
+                                id: widget.status!.id.toString(),
+                                json: {
+                                  'id': widget.status!.id.toString(),
+                                  'workflow_type': "Shop",
+                                  'title': titleController.text,
+                                  'color': "#" +
+                                      code
+                                          .toString()
+                                          .replaceAll(
+                                              "${kReleaseMode ? "ColorSwatch" : "MaterialColor"}(primary value: Color(0xff",
+                                              "")
+                                          .replaceAll(")", "")
+                                          .replaceAll('Color(0xff', ""),
+                                  'position': '0',
+                                  'parent_id': widget.id,
+                                },
                               );
+                              BlocProvider.of<WorkflowBloc>(context).add(evnet);
+                              log(evnet.json.toString() + "TEST TEST TEST");
                             } else {
                               print(code.toString() + "COLOR");
                               BlocProvider.of<WorkflowBloc>(context).add(
@@ -274,7 +310,8 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                                             .replaceAll(
                                                 "${kReleaseMode ? "ColorSwatch" : "MaterialColor"}(primary value: Color(0xff",
                                                 "")
-                                            .replaceAll(")", ""),
+                                            .replaceAll(")", "")
+                                            .replaceAll('Color(0xff', ""),
                                     'position': '0',
                                     'parent_id': widget.id,
                                   },
@@ -384,7 +421,7 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                   : null,
               readOnly: label == 'Color',
               decoration: InputDecoration(
-                prefixIcon: label == 'Color' && controller.text.isNotEmpty
+                prefixIcon: label == 'Color' && code != Colors.transparent
                     ? Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: CircleAvatar(
@@ -467,28 +504,6 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                 CupertinoButton(
                   child: const Text("Done"),
                   onPressed: () {
-                    Map<Color, String> colorNames = {
-                      Colors.red: 'Red',
-                      Colors.pink: 'Pink',
-                      Colors.purple: 'Purple',
-                      Colors.deepPurple: 'Deep Purple',
-                      Colors.indigo: 'Indigo',
-                      Colors.blue: 'Blue',
-                      Colors.lightBlue: 'Light Blue',
-                      Colors.cyan: 'Cyan',
-                      Colors.teal: 'Teal',
-                      Colors.green: 'Green',
-                      Colors.lightGreen: 'Light Green',
-                      Colors.lime: 'Lime',
-                      Colors.yellow: 'Yellow',
-                      Colors.amber: 'Amber',
-                      Colors.orange: 'Orange',
-                      Colors.deepOrange: 'Deep Orange',
-                      Colors.brown: 'Brown',
-                      Colors.grey: 'Grey',
-                      Colors.blueGrey: 'Blue Grey',
-                      Colors.black: 'Black',
-                    };
                     colorController.text =
                         colorNames[currentColor] ?? "Unknown";
                     code = currentColor;
