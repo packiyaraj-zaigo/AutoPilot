@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/customer_model.dart';
-import 'package:auto_pilot/Screens/create_estimate.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/dummy_appointment_screen.dart';
@@ -86,8 +85,6 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
         startDateController.text = startDate.toString();
         completionDateController.text =
             endDate == null ? '' : endDate.toString();
-
-        print("${args.value.startDate}");
       }
     });
   }
@@ -137,8 +134,14 @@ class _CreateAppointmentScreenState extends State<CreateAppointmentScreen> {
                       ? createdVehicleId
                       : vehicle!.id.toString(),
                   appointmentId: state.id,
-                  startTime: startDateToServer!.add(startTime).toString(),
-                  endTime: endDateToServer!.add(endTime).toString(),
+                  startTime: DateTime(startDateToServer!.year,
+                          startDateToServer!.month, startDateToServer!.day)
+                      .add(startTime)
+                      .toString(),
+                  endTime: DateTime(endDateToServer!.year,
+                          endDateToServer!.month, endDateToServer!.day)
+                      .add(endTime)
+                      .toString(),
                   appointmentNote: notesController.text.trim(),
                 ),
               ));

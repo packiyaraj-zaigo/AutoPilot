@@ -44,7 +44,6 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
 
             calculateAmount();
           }
-          // TODO: implement listener
         },
         child: BlocBuilder<EstimateBloc, EstimateState>(
           builder: (context, state) {
@@ -71,7 +70,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                 //       ))
                 // ],
               ),
-              body: state is AppointmentDetailsLoadingState &&
+              body: state is AppointmentDetailsLoadingState ||
                       state is GetSingleEstimateLoadingState
                   ? const Center(
                       child: CupertinoActivityIndicator(),

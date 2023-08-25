@@ -1,7 +1,6 @@
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
-import 'package:auto_pilot/Screens/dummy_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/legal.dart';
 import 'package:auto_pilot/Screens/parts_list_screen.dart';
@@ -19,24 +18,52 @@ import 'package:shared_preferences/shared_preferences.dart';
 showDrawer(BuildContext context) {
   return Drawer(
     backgroundColor: Colors.white,
-    child: ListView(
-      padding: const EdgeInsets.all(0),
-      children: [
-        DrawerHeader(
-          // padding: EdgeInsets.zero,
-          decoration: const BoxDecoration(
-            color: Colors.transparent,
-          ), //BoxDecoration
-          child: UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(color: Colors.white),
-            accountName: const Text(
+    child: ScrollConfiguration(
+      behavior: const ScrollBehavior().copyWith(overscroll: false),
+      child: ListView(
+        padding: const EdgeInsets.all(0),
+        children: [
+          // DrawerHeader(
+          //   // padding: EdgeInsets.zero,
+          //   decoration: const BoxDecoration(
+          //     color: Colors.transparent,
+          //   ), //BoxDecoration
+          //   child: UserAccountsDrawerHeader(
+          //     decoration: const BoxDecoration(color: Colors.white),
+          //     accountName: const Text(
+          //       "Hello",
+          //       style: TextStyle(
+          //           fontSize: 18,
+          //           color: Colors.grey,
+          //           fontWeight: FontWeight.w600),
+          //     ),
+          //     accountEmail: Text(
+          //       userName.isNotEmpty
+          //           ? userName[0].toUpperCase() + userName.substring(1)
+          //           : "",
+          //       style: const TextStyle(
+          //           fontSize: 28,
+          //           color: AppColors.primaryTitleColor,
+          //           fontWeight: FontWeight.w600),
+          //     ),
+          //   ), //UserAccountDrawerHeader
+          // ),
+          const SizedBox(height: 100),
+          const Padding(
+            padding: EdgeInsets.only(left: 33.0),
+            child: Text(
               "Hello",
               style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey,
                   fontWeight: FontWeight.w600),
             ),
-            accountEmail: Text(
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              left: 33.0,
+            ),
+            child: Text(
               userName.isNotEmpty
                   ? userName[0].toUpperCase() + userName.substring(1)
                   : "",
@@ -45,57 +72,57 @@ showDrawer(BuildContext context) {
                   color: AppColors.primaryTitleColor,
                   fontWeight: FontWeight.w600),
             ),
-          ), //UserAccountDrawerHeader
-        ),
-        const SizedBox(
-          height: 16.5,
-        ),
-        drawerTileWidget("assets/images/dashboard_drawer_icon.svg", "Dashboard",
-            context, BottomBarScreen()),
-        drawerTileWidget("assets/images/employee_drawer_icon.svg", "Employees",
-            context, const EmployeeListScreen()),
-        drawerTileWidget(
-            "assets/images/customer_drawer_icon.svg",
-            "Customers",
-            context,
-            // DummyScreen(
-            //   name: "Customer Screen",
-            // )),
-            const CustomersScreen()),
-        drawerTileWidget(
-            "assets/images/vehicle_drawer_icon.svg",
-            "Vehicles",
-            context,
-            // DummyScreen(
-            //   name: "Vehicle Screen",
-            // )),
-            const VehiclesScreen()),
-        drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
-            context, const PartsScreen()),
-        drawerTileWidget(
-            "assets/images/service_drawer_icon.svg",
-            "Services",
-            context,
-            // DummyScreen(
-            // name: "Service Screen",
-            // )),
-            const ServicesListScreen()),
-        // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
-        //     context, BottomBarScreen()),
-        drawerTileWidget("assets/images/time_card_drawer_icon.svg",
-            "Time Cards", context, const TimeCardsScreen()),
-        // DummyScreen(name: "Time card")),
-        const SizedBox(
-          height: 52,
-        ),
-        drawerBottomTile("Settings", context, BottomBarScreen()),
-        drawerBottomTile("Legal", context, const LegalScreen()),
-        drawerBottomTile("About", context, BottomBarScreen()),
-        drawerBottomTile("Sign Out", context, BottomBarScreen()),
-        const SizedBox(
-          height: 20,
-        )
-      ],
+          ),
+          const SizedBox(
+            height: 44,
+          ),
+          drawerTileWidget("assets/images/dashboard_drawer_icon.svg",
+              "Dashboard", context, BottomBarScreen()),
+          drawerTileWidget("assets/images/employee_drawer_icon.svg",
+              "Employees", context, const EmployeeListScreen()),
+          drawerTileWidget(
+              "assets/images/customer_drawer_icon.svg",
+              "Customers",
+              context,
+              // DummyScreen(
+              //   name: "Customer Screen",
+              // )),
+              const CustomersScreen()),
+          drawerTileWidget(
+              "assets/images/vehicle_drawer_icon.svg",
+              "Vehicles",
+              context,
+              // DummyScreen(
+              //   name: "Vehicle Screen",
+              // )),
+              const VehiclesScreen()),
+          drawerTileWidget("assets/images/parts_drawer_icon.svg", "Parts",
+              context, const PartsScreen()),
+          drawerTileWidget(
+              "assets/images/service_drawer_icon.svg",
+              "Services",
+              context,
+              // DummyScreen(
+              // name: "Service Screen",
+              // )),
+              const ServicesListScreen()),
+          // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
+          //     context, BottomBarScreen()),
+          drawerTileWidget("assets/images/time_card_drawer_icon.svg",
+              "Time Cards", context, const TimeCardsScreen()),
+          // DummyScreen(name: "Time card")),
+          const SizedBox(
+            height: 52,
+          ),
+          drawerBottomTile("Settings", context, BottomBarScreen()),
+          drawerBottomTile("Legal", context, const LegalScreen()),
+          drawerBottomTile("About", context, BottomBarScreen()),
+          drawerBottomTile("Sign Out", context, BottomBarScreen()),
+          const SizedBox(
+            height: 20,
+          )
+        ],
+      ),
     ),
   );
 }
@@ -148,7 +175,6 @@ Future signOutPopUp(BuildContext ctx) {
   return showCupertinoDialog(
       context: ctx,
       builder: (context) {
-        print('here');
         return CupertinoAlertDialog(
           title: const Text("Sign Out?"),
           content: const Text("Are you sure you want to Sign Out"),

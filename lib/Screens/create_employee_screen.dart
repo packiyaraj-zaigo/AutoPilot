@@ -3,8 +3,6 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/employee_creation_model.dart';
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/role_model.dart';
-import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
-import 'package:auto_pilot/Screens/add_company_details.dart';
 import 'package:auto_pilot/Screens/employee_details_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
@@ -92,7 +90,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
             onTap: () {
               if (widget.navigation == "add_employee") {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => EmployeeListScreen(),
+                  builder: (context) => const EmployeeListScreen(),
                 ));
               } else if (widget.navigation == "edit_employee") {
                 Navigator.of(context).pushReplacement(
@@ -126,7 +124,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                     context, 'Something went wrong please try again later');
                 if (widget.navigation == "add_employee") {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => EmployeeListScreen(),
+                    builder: (context) => const EmployeeListScreen(),
                   ));
                 } else {
                   Navigator.of(context).pop(false);
@@ -141,8 +139,10 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
 
                 if (widget.navigation == "add_employee") {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => EmployeeListScreen(),
+                    builder: (context) => const EmployeeListScreen(),
                   ));
+                  CommonWidgets().showSuccessDialog(
+                      context, 'Employee created successfully');
                 } else {
                   Navigator.of(context).pop(true);
                 }
@@ -164,6 +164,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                 } else {
                   Navigator.of(context).pop(true);
                 }
+                CommonWidgets().showSuccessDialog(
+                    context, 'Employee updated successfully');
               }
             },
             child: BlocBuilder<EmployeeBloc, EmployeeState>(
@@ -285,7 +287,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     roles.isNotEmpty
                         ? Container(
                             width: double.infinity,
@@ -295,8 +297,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                 border:
                                     Border.all(color: const Color(0xffC1C4CD))),
                             child: DropdownButton<String>(
-                              padding:
-                                  EdgeInsets.only(top: 2, left: 16, right: 16),
+                              padding: const EdgeInsets.only(
+                                  top: 2, left: 16, right: 16),
                               isExpanded: true,
                               hint: const Text(
                                 "Select",
@@ -335,7 +337,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                               }).toList(),
                             ),
                           )
-                        : SizedBox(),
+                        : const SizedBox(),
                     Padding(
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Visibility(
@@ -360,10 +362,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                           if (!validate) {
                           } else if (value) {
                             final clientId = await AppUtils.getUserID();
-                            print(phoneController.text
-                                .trim()
-                                .replaceAll(RegExp(r'[^\w\s]+'), '')
-                                .replaceAll(" ", ""));
+
                             if (widget.employee == null) {
                               bloc.add(
                                 CreateEmployee(
@@ -406,14 +405,14 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         elevation: 0,
+                        backgroundColor: AppColors.primaryColors,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
                         fixedSize: Size(MediaQuery.of(context).size.width, 56),
-                        primary: AppColors.primaryColors,
                       ),
                       child: Text(
                         widget.employee != null ? "Update" : "Confirm",
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
                             color: Colors.white),
@@ -626,7 +625,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
     } else {
       positionError = '';
     }
-    log(dropdownValue + "ROLE");
+    log("${dropdownValue}ROLE");
     setState(() {});
     return status;
   }
