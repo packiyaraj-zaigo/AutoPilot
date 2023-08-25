@@ -655,7 +655,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
             notesController.text.trim().length < 2 ||
         notesController.text.isNotEmpty &&
             notesController.text.trim().length >= 256) {
-      notesError = "Notes should be between 2 and 256 characters";
+      notesError = "Notes should be between 2 and 255 characters";
       status = false;
     } else {
       notesError = '';
