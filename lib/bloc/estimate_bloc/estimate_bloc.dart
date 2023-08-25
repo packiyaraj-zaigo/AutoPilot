@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_pilot/Models/appointment_create_model.dart';
+import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_appointment_model.dart';
 import 'package:auto_pilot/Models/estimate_model.dart';
@@ -61,6 +62,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<AuthServiceByTechnicianEvent>(authServiceByTechnicianBloc);
     on<ChangeEstimateStatusEvent>(changeEstimateStateBloc);
     on<GetEventDetailsByIdEvent>(getEventDetailsByIdBloc);
+    on<GetClientByIdInEstimateEvent>(getClientByIdEstimate);
   }
 
   Future<void> createEstimateFromAppointment(
@@ -981,6 +983,26 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       print(s);
 
       print("thisss");
+    }
+  }
+
+  Future<void> getClientByIdEstimate(
+      GetClientByIdInEstimateEvent event, Emitter<EstimateState> emit) async {
+    try {
+      final response = await _apiRepository.getClientByClientId();
+      if (response.statusCode == 200) {
+        final body = await jsonDecode(response.body);
+        log(body.toString());
+        emit(GetClientByIdInEstimateState(
+            clientModel: ClientModel.fromJson(body['client'])));
+      } else {
+        emit(GetClientByIdInEstimateErrorState(
+            errorMessage: 'Something went wrong'));
+      }
+    } catch (e) {
+      log(e.toString() + " Get client bloc error");
+      emit(GetClientByIdInEstimateErrorState(
+          errorMessage: 'Something went wrong'));
     }
   }
 }

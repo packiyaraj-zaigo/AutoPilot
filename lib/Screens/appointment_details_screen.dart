@@ -23,11 +23,15 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   DateTime? endDate;
   String notes = "";
   double totalAmount = 0.00;
+  String laborTaxRate = "";
+  String laborRate = "";
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => EstimateBloc(apiRepository: ApiRepository())
-        ..add(GetEventDetailsByIdEvent(eventId: widget.eventId)),
+        ..add(GetEventDetailsByIdEvent(eventId: widget.eventId))
+        ..add(GetClientByIdInEstimateEvent()),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
           if (state is GetEventDetailsByIdState) {
@@ -43,6 +47,10 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
             createEstimateModel = state.createEstimateModel;
 
             calculateAmount();
+          }
+          if (state is GetClientByIdInEstimateState) {
+            laborTaxRate = state.clientModel.laborTaxRate ?? "0";
+            laborRate = state.clientModel.baseLaborCost ?? "0";
           }
           // TODO: implement listener
         },
@@ -71,7 +79,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                 //       ))
                 // ],
               ),
-              body: state is AppointmentDetailsLoadingState &&
+              body: state is AppointmentDetailsLoadingState ||
                       state is GetSingleEstimateLoadingState
                   ? const Center(
                       child: CupertinoActivityIndicator(),
@@ -311,6 +319,12 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
 
   calculateAmount() {
     createEstimateModel?.data.orderService?.forEach((element) {
+      if (element.orderServiceItems != null &&
+          element.orderServiceItems!.isEmpty) {
+        totalAmount = totalAmount +
+            double.parse(laborRate) +
+            ((double.parse(laborRate) * double.parse(laborTaxRate)) / 100);
+      }
       element.orderServiceItems?.forEach((element2) {
         totalAmount = totalAmount + double.parse(element2.subTotal);
       });

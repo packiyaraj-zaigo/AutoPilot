@@ -509,6 +509,7 @@ class ApiProvider {
       var request = http.MultipartRequest("GET", url);
       request.headers.addAll(getHeader(token));
       var response = await request.send();
+      inspect(request);
       print('callllllllllllllllll${response.statusCode.toString()}');
       return http.Response.fromStream(response);
     } catch (e) {

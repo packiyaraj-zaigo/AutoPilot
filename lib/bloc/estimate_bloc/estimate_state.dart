@@ -204,3 +204,13 @@ class GetEventDetailsByIdErrorState extends EstimateState {
 }
 
 class AppointmentDetailsLoadingState extends EstimateState {}
+
+class GetClientByIdInEstimateState extends EstimateState {
+  final ClientModel clientModel;
+  GetClientByIdInEstimateState({required this.clientModel});
+}
+
+class GetClientByIdInEstimateErrorState extends EstimateState {
+  final String errorMessage;
+  GetClientByIdInEstimateErrorState({required this.errorMessage});
+}
