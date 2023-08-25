@@ -354,6 +354,8 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                       if (label == 'Employee' &&
                           widget.id == -1 &&
                           widget.timeCard == null) {
+                        employeeList.clear();
+
                         showModalBottomSheet(
                             context: context,
                             builder: (context) => employeeListSheet());
@@ -653,7 +655,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
             notesController.text.trim().length < 2 ||
         notesController.text.isNotEmpty &&
             notesController.text.trim().length >= 256) {
-      notesError = "Notes should be between 2 and 256 characters";
+      notesError = "Notes should be between 2 and 255 characters";
       status = false;
     } else {
       notesError = '';
@@ -697,7 +699,6 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
   }
 
   Widget employeeListSheet() {
-    employeeList.clear();
     scrollController = ScrollController();
     return BlocProvider(
       create: (context) => EmployeeBloc()..add(GetAllEmployees()),

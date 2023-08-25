@@ -2145,9 +2145,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           cashDateToServer = cashDateToServer;
                         } else {
                           cashDateController.text =
-                              "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
+                              "${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().year}";
                           cashDateToServer =
-                              "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                              "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
                         }
                       } else if (dateType == "start_date") {
                         if (selectedDate != "") {
@@ -2155,10 +2155,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           startDateToServer = startDateToServer;
                         } else {
                           startDateController.text =
-                              "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
+                              "${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().year}";
 
                           startDateToServer =
-                              "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                              "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
                         }
                       } else if (dateType == "end_date") {
                         if (selectedDate != "") {
@@ -2166,9 +2166,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           endDateToServer = endDateToServer;
                         } else {
                           endDateController.text =
-                              "${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}-${DateTime.now().year}";
+                              "${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}-${DateTime.now().year}";
                           endDateToServer =
-                              "${DateTime.now().year}-${DateTime.now().month > 10 ? DateTime.now().month : "0${DateTime.now().month}"}-${DateTime.now().day > 10 ? DateTime.now().day : "0${DateTime.now().day}"}";
+                              "${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}";
                         }
                       }
 
@@ -2188,16 +2188,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =
-                          "${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}-${newdate.year}";
+                          "${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}-${newdate.year}";
                       if (dateType == "end_date") {
                         endDateToServer =
-                            "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
+                            "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       } else if (dateType == "start_date") {
                         startDateToServer =
-                            "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
+                            "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       } else if (dateType == "payment") {
                         cashDateToServer =
-                            "${newdate.year}-${newdate.month > 10 ? newdate.month : "0${newdate.month}"}-${newdate.day > 10 ? newdate.day : "0${newdate.day}"}";
+                            "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       }
                     });
                   },
@@ -2292,7 +2292,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget timerPicker(String timeType) {
-    String selectedTime = "00:00";
+    String selectedTime = "${DateTime.now().hour}:${DateTime.now().minute}";
     if (timeType == "start_time" && isAppointmentEdit) {
       selectedTime = DateFormat('hh:mm')
           .format(appointmentDetailsModel!.data.data[0].startOn)
@@ -2339,7 +2339,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     child: const Text("Done"),
                     onPressed: () {
                       if (timeType == "start_time") {
-                        log(selectedTime + "SELECTED");
                         startTimeToServer = selectedTime;
                         startTimeController
                             .text = AppUtils.getTimeMinFormatted(Duration(
@@ -3594,13 +3593,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
                     appointmentController.text = appointmentDetails.notes;
                     startDateController.text =
-                        "${appointmentDetails.startOn.month}-${appointmentDetails.startOn.day}-${appointmentDetails.startOn.year}";
+                        "${appointmentDetails.startOn.month.toString().padLeft(2, '0')}-${appointmentDetails.startOn.day.toString().padLeft(2, '0')}-${appointmentDetails.startOn.year}";
                     startDateToServer =
-                        "${appointmentDetails.startOn.year}-${appointmentDetails.startOn.month}-${appointmentDetails.startOn.day}";
+                        "${appointmentDetails.startOn.year}-${appointmentDetails.startOn.month.toString().padLeft(2, '0')}-${appointmentDetails.startOn.day.toString().padLeft(2, '0')}";
                     endDateController.text =
-                        "${appointmentDetails.endOn.month}-${appointmentDetails.endOn.day}-${appointmentDetails.endOn.year}";
+                        "${appointmentDetails.endOn.month.toString().padLeft(2, '0')}-${appointmentDetails.endOn.day.toString().padLeft(2, '0')}-${appointmentDetails.endOn.year}";
                     endDateToServer =
-                        "${appointmentDetails.endOn.year}-${appointmentDetails.endOn.month}-${appointmentDetails.endOn.day}";
+                        "${appointmentDetails.endOn.year}-${appointmentDetails.endOn.month.toString().padLeft(2, '0')}-${appointmentDetails.endOn.day.toString().padLeft(2, '0')}";
 
                     estimateAppointmentEditId =
                         appointmentDetails.id.toString();

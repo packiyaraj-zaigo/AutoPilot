@@ -121,7 +121,9 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
                             )
                           : Expanded(
                               child: ScrollConfiguration(
-                                behavior: const ScrollBehavior(),
+                                behavior: const ScrollBehavior().copyWith(
+                                  overscroll: false,
+                                ),
                                 child: ListView.builder(
                                   itemBuilder: (context, index) {
                                     final timeCard = timeCards[index];

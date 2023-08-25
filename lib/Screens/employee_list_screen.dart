@@ -205,7 +205,8 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                                             color: AppColors.primaryTextColors),
                                       ))
                                     : ScrollConfiguration(
-                                        behavior: const ScrollBehavior(),
+                                        behavior: const ScrollBehavior()
+                                            .copyWith(overscroll: false),
                                         child: ListView.separated(
                                             shrinkWrap: true,
                                             controller: controller
