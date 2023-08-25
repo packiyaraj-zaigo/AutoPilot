@@ -1564,7 +1564,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     "End Time",
                     appointmentDetailsModel?.data.data != null &&
                             appointmentDetailsModel?.data.data != []
-                        ? DateFormat('hh : mm a')
+                        ? DateFormat('hh: mm a')
                             .format(appointmentDetailsModel!.data.data[0].endOn)
                         : "")
               ],

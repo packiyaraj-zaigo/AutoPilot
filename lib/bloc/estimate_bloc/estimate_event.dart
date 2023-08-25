@@ -227,3 +227,5 @@ class GetEventDetailsByIdEvent extends EstimateEvent {
   final String eventId;
   GetEventDetailsByIdEvent({required this.eventId});
 }
+
+class GetClientByIdInEstimateEvent extends EstimateEvent {}
