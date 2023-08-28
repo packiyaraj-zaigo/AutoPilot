@@ -157,8 +157,8 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
       emit(AddCompanyLoadingState());
 
-      Response addCompanyResponse =
-          await _apiRepository.addCompany(event.dataMap, token, clientId!);
+      Response addCompanyResponse = await _apiRepository.addCompany(
+          event.dataMap, token, clientId!, event.imagePath);
       // var getChartData = _decoder.convert(getChartDataRes.body);
       log("res${addCompanyResponse.body}");
 

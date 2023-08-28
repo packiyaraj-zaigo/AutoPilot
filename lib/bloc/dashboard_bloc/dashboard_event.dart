@@ -7,16 +7,16 @@ abstract class DashboardEvent extends Equatable {
   List<Object> get props => [];
 }
 
+class GetRevenueChartDataEvent extends DashboardEvent {}
 
-class GetRevenueChartDataEvent extends DashboardEvent{}
+class GetUserProfileEvent extends DashboardEvent {}
 
-class GetUserProfileEvent extends DashboardEvent{}
+class GetProvinceEvent extends DashboardEvent {}
 
-class GetProvinceEvent extends DashboardEvent{}
-
-class AddCompanyEvent extends DashboardEvent{
-  final Map<String,dynamic>dataMap;
+class AddCompanyEvent extends DashboardEvent {
+  final Map<String, dynamic> dataMap;
+  final dynamic imagePath;
   final BuildContext context;
-  AddCompanyEvent({required this.dataMap,required this.context});
-
+  AddCompanyEvent(
+      {required this.dataMap, required this.context, required this.imagePath});
 }

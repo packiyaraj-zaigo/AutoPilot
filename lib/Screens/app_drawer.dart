@@ -177,7 +177,7 @@ Future signOutPopUp(BuildContext ctx) {
       builder: (context) {
         return CupertinoAlertDialog(
           title: const Text("Sign Out?"),
-          content: const Text("Are you sure you want to Sign Out"),
+          content: const Text("Are you sure want to Sign Out"),
           actions: <Widget>[
             CupertinoDialogAction(
               child: const Text("No"),
