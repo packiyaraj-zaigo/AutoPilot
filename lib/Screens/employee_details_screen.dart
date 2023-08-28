@@ -98,7 +98,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
               messageChatWidgetList.add(chatBubleWidget(
                   message.message,
                   AppUtils.getTimeFormattedForMessage(
-                      message.createdAt.toString()),
+                      message.createdAt.toLocal().toString()),
                   widget.employee.id == message.senderUserId));
             }
           }
@@ -457,20 +457,28 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: GestureDetector(
                                   onTap: () {
-                                    setState(() {
-                                      messageChatWidgetList.add(chatBubleWidget(
-                                          messageController.text,
-                                          AppUtils.getTimeFormattedForMessage(
-                                              DateTime.now().toString()),
-                                          false));
-                                      BlocProvider.of<EmployeeBloc>(context)
-                                          .add(SendEmployeeMessageEvent(
-                                              receiverUserId:
-                                                  widget.employee.id.toString(),
-                                              message: messageController.text
-                                                  .trim()));
-                                      messageController.clear();
-                                    });
+                                    if (messageController.text
+                                        .trim()
+                                        .isNotEmpty) {
+                                      setState(() {
+                                        messageChatWidgetList.add(
+                                            chatBubleWidget(
+                                                messageController.text,
+                                                AppUtils
+                                                    .getTimeFormattedForMessage(
+                                                        DateTime.now()
+                                                            .toString()),
+                                                false));
+                                        BlocProvider.of<EmployeeBloc>(context)
+                                            .add(SendEmployeeMessageEvent(
+                                                receiverUserId: widget
+                                                    .employee.id
+                                                    .toString(),
+                                                message: messageController.text
+                                                    .trim()));
+                                        messageController.clear();
+                                      });
+                                    }
                                   },
                                   child: CircleAvatar(
                                     backgroundColor: AppColors.primaryColors,

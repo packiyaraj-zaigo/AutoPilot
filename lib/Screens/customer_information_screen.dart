@@ -1352,7 +1352,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                 //   messageController.clear();
                                 // });
 
-                                if (messageController.text.isNotEmpty) {
+                                if (messageController.text.trim().isNotEmpty) {
                                   context.read<CustomerBloc>().add(
                                       SendCustomerMessageEvent(
                                           customerId:
