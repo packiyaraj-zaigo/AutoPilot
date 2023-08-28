@@ -167,7 +167,7 @@ class _EstimateScreenState extends State<EstimateScreen>
         child: BlocBuilder<EstimateBloc, EstimateState>(
           builder: (context, state) {
             return Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(0.0),
               child: state is GetEstimateState
                   ? recentData.isEmpty
                       ? const Center(
@@ -196,6 +196,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                             );
                           },
                           itemCount: recentData.length,
+                          padding: const EdgeInsets.all(16),
                         )
                   : const Center(
                       child: CupertinoActivityIndicator(),
@@ -243,80 +244,75 @@ class _EstimateScreenState extends State<EstimateScreen>
           },
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: state is GetEstimateState
-                    ? estimateData.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No Estimate Found!",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemBuilder: (context, index) {
-                              if (index == estimateData.length) {
-                                return BlocProvider.of<EstimateBloc>(context)
-                                                .currentPage <=
-                                            BlocProvider.of<EstimateBloc>(
-                                                    context)
-                                                .totalPages &&
-                                        BlocProvider.of<EstimateBloc>(context)
-                                                .currentPage !=
-                                            0
-                                    ? const SizedBox(
-                                        height: 40,
-                                        child: CupertinoActivityIndicator(
-                                          color: AppColors.primaryColors,
-                                        ))
-                                    : Container();
-                              }
+              return state is GetEstimateState
+                  ? estimateData.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "No Estimate Found!",
+                            style: TextStyle(fontSize: 16, color: Colors.black),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemBuilder: (context, index) {
+                            if (index == estimateData.length) {
+                              return BlocProvider.of<EstimateBloc>(context)
+                                              .currentPage <=
+                                          BlocProvider.of<EstimateBloc>(context)
+                                              .totalPages &&
+                                      BlocProvider.of<EstimateBloc>(context)
+                                              .currentPage !=
+                                          0
+                                  ? const SizedBox(
+                                      height: 40,
+                                      child: CupertinoActivityIndicator(
+                                        color: AppColors.primaryColors,
+                                      ))
+                                  : Container();
+                            }
 
-                              return GestureDetector(
-                                onTap: () {
-                                  context.read<EstimateBloc>().add(
-                                      GetSingleEstimateEvent(
-                                          orderId: estimateData[index]
-                                              .id
-                                              .toString()));
-                                },
-                                child: tileWidget(
-                                  estimateData[index].orderStatus,
-                                  estimateData[index].orderNumber ?? "",
-                                  estimateData[index].customer?.firstName ?? "",
-                                  "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleMake ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
-                                  estimateData[index].estimationName ?? "",
-                                  estimateData[index].dropSchedule ?? "",
-                                ),
-                              );
-                            },
-                            controller: estimateScrollController
-                              ..addListener(() {
-                                if ((BlocProvider.of<EstimateBloc>(context)
-                                            .currentPage <=
-                                        BlocProvider.of<EstimateBloc>(context)
-                                            .totalPages) &&
-                                    estimateScrollController.offset ==
-                                        estimateScrollController
-                                            .position.maxScrollExtent &&
-                                    BlocProvider.of<EstimateBloc>(context)
-                                            .currentPage !=
-                                        0 &&
-                                    !BlocProvider.of<EstimateBloc>(context)
-                                        .isFetching) {
-                                  context.read<EstimateBloc>()
-                                    ..isFetching = true
-                                    ..add(GetEstimateEvent(
-                                        orderStatus: "Estimate"));
-                                }
-                              }),
-                            itemCount: estimateData.length + 1,
-                          )
-                    : const Center(
-                        child: CupertinoActivityIndicator(),
-                      ),
-              );
+                            return GestureDetector(
+                              onTap: () {
+                                context.read<EstimateBloc>().add(
+                                    GetSingleEstimateEvent(
+                                        orderId:
+                                            estimateData[index].id.toString()));
+                              },
+                              child: tileWidget(
+                                estimateData[index].orderStatus,
+                                estimateData[index].orderNumber ?? "",
+                                estimateData[index].customer?.firstName ?? "",
+                                "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleMake ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
+                                estimateData[index].estimationName ?? "",
+                                estimateData[index].dropSchedule ?? "",
+                              ),
+                            );
+                          },
+                          padding: const EdgeInsets.all(16),
+                          controller: estimateScrollController
+                            ..addListener(() {
+                              if ((BlocProvider.of<EstimateBloc>(context)
+                                          .currentPage <=
+                                      BlocProvider.of<EstimateBloc>(context)
+                                          .totalPages) &&
+                                  estimateScrollController.offset ==
+                                      estimateScrollController
+                                          .position.maxScrollExtent &&
+                                  BlocProvider.of<EstimateBloc>(context)
+                                          .currentPage !=
+                                      0 &&
+                                  !BlocProvider.of<EstimateBloc>(context)
+                                      .isFetching) {
+                                context.read<EstimateBloc>()
+                                  ..isFetching = true
+                                  ..add(GetEstimateEvent(
+                                      orderStatus: "Estimate"));
+                              }
+                            }),
+                          itemCount: estimateData.length + 1,
+                        )
+                  : const Center(
+                      child: CupertinoActivityIndicator(),
+                    );
             },
           ),
         ),
@@ -360,80 +356,77 @@ class _EstimateScreenState extends State<EstimateScreen>
             builder: (context, state) {
               print(ordersData);
 
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: state is GetEstimateState
-                    ? ordersData.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No Orders Found!",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
+              return state is GetEstimateState
+                  ? ordersData.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "No Orders Found!",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
                             ),
-                          )
-                        : ListView.builder(
-                            itemBuilder: (context, index) {
-                              if (index == ordersData.length) {
-                                return BlocProvider.of<EstimateBloc>(context)
-                                                .currentPage <=
-                                            BlocProvider.of<EstimateBloc>(
-                                                    context)
-                                                .totalPages &&
-                                        BlocProvider.of<EstimateBloc>(context)
-                                                .currentPage !=
-                                            0
-                                    ? const SizedBox(
-                                        height: 40,
-                                        child: CupertinoActivityIndicator(
-                                          color: AppColors.primaryColors,
-                                        ))
-                                    : Container();
+                          ),
+                        )
+                      : ListView.builder(
+                          itemBuilder: (context, index) {
+                            if (index == ordersData.length) {
+                              return BlocProvider.of<EstimateBloc>(context)
+                                              .currentPage <=
+                                          BlocProvider.of<EstimateBloc>(context)
+                                              .totalPages &&
+                                      BlocProvider.of<EstimateBloc>(context)
+                                              .currentPage !=
+                                          0
+                                  ? const SizedBox(
+                                      height: 40,
+                                      child: CupertinoActivityIndicator(
+                                        color: AppColors.primaryColors,
+                                      ))
+                                  : Container();
+                            }
+                            return GestureDetector(
+                              onTap: () {
+                                context.read<EstimateBloc>().add(
+                                    GetSingleEstimateEvent(
+                                        orderId:
+                                            ordersData[index].id.toString()));
+                              },
+                              child: tileWidget(
+                                ordersData[index].orderStatus,
+                                ordersData[index].orderNumber ?? "",
+                                ordersData[index].customer?.firstName ?? "",
+                                "${ordersData[index].vehicle?.vehicleYear ?? ""} ${ordersData[index].vehicle?.vehicleMake ?? ""} ${ordersData[index].vehicle?.vehicleModel ?? ""}",
+                                ordersData[index].estimationName ?? "",
+                                ordersData[index].dropSchedule ?? "",
+                              ),
+                            );
+                          },
+                          padding: const EdgeInsets.all(16),
+                          controller: orderScrollController
+                            ..addListener(() {
+                              if ((BlocProvider.of<EstimateBloc>(context)
+                                          .currentPage <=
+                                      BlocProvider.of<EstimateBloc>(context)
+                                          .totalPages) &&
+                                  orderScrollController.offset ==
+                                      orderScrollController
+                                          .position.maxScrollExtent &&
+                                  BlocProvider.of<EstimateBloc>(context)
+                                          .currentPage !=
+                                      0 &&
+                                  !BlocProvider.of<EstimateBloc>(context)
+                                      .isFetching) {
+                                context.read<EstimateBloc>()
+                                  ..isFetching = true
+                                  ..add(
+                                      GetEstimateEvent(orderStatus: "Orders"));
                               }
-                              return GestureDetector(
-                                onTap: () {
-                                  context.read<EstimateBloc>().add(
-                                      GetSingleEstimateEvent(
-                                          orderId:
-                                              ordersData[index].id.toString()));
-                                },
-                                child: tileWidget(
-                                  ordersData[index].orderStatus,
-                                  ordersData[index].orderNumber ?? "",
-                                  ordersData[index].customer?.firstName ?? "",
-                                  "${ordersData[index].vehicle?.vehicleYear ?? ""} ${ordersData[index].vehicle?.vehicleMake ?? ""} ${ordersData[index].vehicle?.vehicleModel ?? ""}",
-                                  ordersData[index].estimationName ?? "",
-                                  ordersData[index].dropSchedule ?? "",
-                                ),
-                              );
-                            },
-                            controller: orderScrollController
-                              ..addListener(() {
-                                if ((BlocProvider.of<EstimateBloc>(context)
-                                            .currentPage <=
-                                        BlocProvider.of<EstimateBloc>(context)
-                                            .totalPages) &&
-                                    orderScrollController.offset ==
-                                        orderScrollController
-                                            .position.maxScrollExtent &&
-                                    BlocProvider.of<EstimateBloc>(context)
-                                            .currentPage !=
-                                        0 &&
-                                    !BlocProvider.of<EstimateBloc>(context)
-                                        .isFetching) {
-                                  context.read<EstimateBloc>()
-                                    ..isFetching = true
-                                    ..add(GetEstimateEvent(
-                                        orderStatus: "Orders"));
-                                }
-                              }),
-                            itemCount: ordersData.length + 1,
-                          )
-                    : const Center(
-                        child: CupertinoActivityIndicator(),
-                      ),
-              );
+                            }),
+                          itemCount: ordersData.length + 1,
+                        )
+                  : const Center(
+                      child: CupertinoActivityIndicator(),
+                    );
             },
           ),
         ),
@@ -475,81 +468,77 @@ class _EstimateScreenState extends State<EstimateScreen>
           },
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: state is GetEstimateLoadingState
-                    ? const Center(
-                        child: CupertinoActivityIndicator(),
-                      )
-                    : invoiceData.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No Invoice Found!",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                              ),
+              return state is GetEstimateLoadingState
+                  ? const Center(
+                      child: CupertinoActivityIndicator(),
+                    )
+                  : invoiceData.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "No Invoice Found!",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
                             ),
-                          )
-                        : ListView.builder(
-                            itemBuilder: (context, index) {
-                              if (index == invoiceData.length) {
-                                return BlocProvider.of<EstimateBloc>(context)
-                                                .currentPage <=
-                                            BlocProvider.of<EstimateBloc>(
-                                                    context)
-                                                .totalPages &&
-                                        BlocProvider.of<EstimateBloc>(context)
-                                                .currentPage !=
-                                            0
-                                    ? const SizedBox(
-                                        height: 40,
-                                        child: CupertinoActivityIndicator(
-                                          color: AppColors.primaryColors,
-                                        ))
-                                    : Container();
-                              }
-                              return GestureDetector(
-                                onTap: () {
-                                  context.read<EstimateBloc>().add(
-                                      GetSingleEstimateEvent(
-                                          orderId: invoiceData[index]
-                                              .id
-                                              .toString()));
-                                },
-                                child: tileWidget(
-                                  invoiceData[index].orderStatus,
-                                  invoiceData[index].orderNumber ?? "",
-                                  invoiceData[index].customer?.firstName ?? "",
-                                  "${invoiceData[index].vehicle?.vehicleYear ?? ""} ${invoiceData[index].vehicle?.vehicleMake ?? ""} ${invoiceData[index].vehicle?.vehicleModel ?? ""}",
-                                  invoiceData[index].estimationName ?? "",
-                                  invoiceData[index].dropSchedule ?? "",
-                                ),
-                              );
-                            },
-                            controller: invoiceScrollController
-                              ..addListener(() {
-                                if ((BlocProvider.of<EstimateBloc>(context)
-                                            .currentPage <=
-                                        BlocProvider.of<EstimateBloc>(context)
-                                            .totalPages) &&
-                                    invoiceScrollController.offset ==
-                                        invoiceScrollController
-                                            .position.maxScrollExtent &&
-                                    BlocProvider.of<EstimateBloc>(context)
-                                            .currentPage !=
-                                        0 &&
-                                    !BlocProvider.of<EstimateBloc>(context)
-                                        .isFetching) {
-                                  context.read<EstimateBloc>()
-                                    ..isFetching = true
-                                    ..add(GetEstimateEvent(
-                                        orderStatus: "Invoice"));
-                                }
-                              }),
-                            itemCount: invoiceData.length + 1,
                           ),
-              );
+                        )
+                      : ListView.builder(
+                          itemBuilder: (context, index) {
+                            if (index == invoiceData.length) {
+                              return BlocProvider.of<EstimateBloc>(context)
+                                              .currentPage <=
+                                          BlocProvider.of<EstimateBloc>(context)
+                                              .totalPages &&
+                                      BlocProvider.of<EstimateBloc>(context)
+                                              .currentPage !=
+                                          0
+                                  ? const SizedBox(
+                                      height: 40,
+                                      child: CupertinoActivityIndicator(
+                                        color: AppColors.primaryColors,
+                                      ))
+                                  : Container();
+                            }
+                            return GestureDetector(
+                              onTap: () {
+                                context.read<EstimateBloc>().add(
+                                    GetSingleEstimateEvent(
+                                        orderId:
+                                            invoiceData[index].id.toString()));
+                              },
+                              child: tileWidget(
+                                invoiceData[index].orderStatus,
+                                invoiceData[index].orderNumber ?? "",
+                                invoiceData[index].customer?.firstName ?? "",
+                                "${invoiceData[index].vehicle?.vehicleYear ?? ""} ${invoiceData[index].vehicle?.vehicleMake ?? ""} ${invoiceData[index].vehicle?.vehicleModel ?? ""}",
+                                invoiceData[index].estimationName ?? "",
+                                invoiceData[index].dropSchedule ?? "",
+                              ),
+                            );
+                          },
+                          padding: const EdgeInsets.all(16),
+                          controller: invoiceScrollController
+                            ..addListener(() {
+                              if ((BlocProvider.of<EstimateBloc>(context)
+                                          .currentPage <=
+                                      BlocProvider.of<EstimateBloc>(context)
+                                          .totalPages) &&
+                                  invoiceScrollController.offset ==
+                                      invoiceScrollController
+                                          .position.maxScrollExtent &&
+                                  BlocProvider.of<EstimateBloc>(context)
+                                          .currentPage !=
+                                      0 &&
+                                  !BlocProvider.of<EstimateBloc>(context)
+                                      .isFetching) {
+                                context.read<EstimateBloc>()
+                                  ..isFetching = true
+                                  ..add(
+                                      GetEstimateEvent(orderStatus: "Invoice"));
+                              }
+                            }),
+                          itemCount: invoiceData.length + 1,
+                        );
             },
           ),
         ),

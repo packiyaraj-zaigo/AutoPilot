@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:auto_pilot/Models/employee_response_model.dart';
 import 'package:auto_pilot/Models/province_model.dart';
@@ -10,6 +11,8 @@ import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:country_data/country_data.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:csc_picker/csc_picker.dart';
 
@@ -96,6 +99,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   String cityErrorMsg = '';
   String stateErrorMsg = '';
   String zipErrorMsg = '';
+
+  //Image variables
+  final ImagePicker imagePicker = ImagePicker();
+
+  File? selectedImage;
 
   String numberOfEmployeeErrorMsg = '';
   String timeZoneErrorMsg = '';
@@ -386,16 +394,40 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 children: [
                   Column(
                     children: [
-                      Container(
-                        height: 88,
-                        width: 88,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(157),
-                            color: const Color.fromARGB(255, 225, 225, 225)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(32.0),
-                          child:
-                              SvgPicture.asset("assets/images/upload_icon.svg"),
+                      GestureDetector(
+                        onTap: () {
+                          //show action sheet.
+                          showActionSheet(context, 0);
+                        },
+                        child: Container(
+                          height: 88,
+                          width: 88,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(157),
+                              color: const Color.fromARGB(255, 225, 225, 225),
+                              image: selectedImage != null ||
+                                      basicDetailsMap["company_logo"] != null
+                                  ? DecorationImage(
+                                      image: FileImage(selectedImage ??
+                                          File(
+                                              basicDetailsMap["company_logo"])),
+                                      fit: BoxFit.cover)
+                                  : null),
+                          child: Padding(
+                            padding: const EdgeInsets.all(32.0),
+                            child: selectedImage == null &&
+                                    basicDetailsMap["company_logo"] == null
+                                ? SvgPicture.asset(
+                                    "assets/images/upload_icon.svg")
+                                : const SizedBox(
+                                    height: 88,
+                                    width: 88,
+                                    // child: Image.file(
+                                    //   selectedImage!,
+                                    //   fit: BoxFit.cover,
+                                    //),
+                                  ),
+                          ),
                         ),
                       ),
                       const Padding(
@@ -1313,8 +1345,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "zipcode": zipController.text,
         "province_id": provinceId,
         "province_name": provinceController.text,
-        "website": businessWebsiteController.text
+        "website": businessWebsiteController.text,
+        "company_logo": selectedImage != null ? selectedImage!.path : null
       });
+
+      print(basicDetailsMap["company_logo"].toString() + "image path");
 
       Navigator.pop(context, basicDetailsMap);
     }
@@ -1788,6 +1823,130 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         ),
       ),
     );
+  }
+
+  void showActionSheet(BuildContext context, int index) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+          actions: <CupertinoActionSheetAction>[
+            CupertinoActionSheetAction(
+              onPressed: () {
+                // setState(() {
+                //   selectedImage = null;
+                // });
+                selectImages("camera");
+                Navigator.pop(context);
+                // .then((value) {
+                //   if (selectedImage != null) {
+                //     print("this works");
+                //     print(selectedImage);
+                //     // _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                //     //     EstimateUploadImageEvent(
+                //     //         imagePath: selectedImage!,
+                //     //         orderId: widget.estimateDetails.data.id.toString(),
+                //     //         index: index));
+                //   }
+                // });
+              },
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/camera.svg",
+                    width: 24,
+                    height: 24,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 12.0),
+                    child: Text('Camera'),
+                  ),
+                ],
+              ),
+            ),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                // setState(() {
+                //   selectedImage = null;
+                // });
+                selectImages("lib");
+                Navigator.pop(context);
+                // .then((value) {
+                //   if (selectedImage != null) {
+                //     print(selectedImage);
+                //     _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                //         EstimateUploadImageEvent(
+                //             imagePath: selectedImage!,
+                //             orderId: widget.estimateDetails.data.id.toString(),
+                //             index: index));
+                //   }
+                // });
+              },
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/folder.svg",
+                    width: 24,
+                    height: 24,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 12.0),
+                    child: Text('Choose from Library'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            // isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context, 'Cancel');
+            },
+            child: const Text('Cancel'),
+          )),
+    );
+  }
+
+  Future selectImages(source) async {
+    if (source == "camera") {
+      final tempImg = await imagePicker.pickImage(source: ImageSource.camera);
+      // if (imageFileList != null) {
+      if (tempImg != null) {
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          tempImg.path,
+          '${tempImg.path}.jpg',
+          quality: 80,
+        );
+        setState(() {
+          if (compressedImage != null) {
+            selectedImage = File(compressedImage.path);
+          }
+        });
+      } else {
+        return;
+      }
+
+      // }
+    } else {
+      final tempImg = await imagePicker.pickImage(source: ImageSource.gallery);
+      // if (imageFileList != null) {
+      if (tempImg != null) {
+        final compressedImage = await FlutterImageCompress.compressAndGetFile(
+          tempImg.path,
+          '${tempImg.path}.jpg',
+          quality: 80,
+        );
+        setState(() {
+          if (compressedImage != null) {
+            selectedImage = File(compressedImage.path);
+          }
+        });
+      } else {
+        return;
+      }
+
+      //  }
+    }
+    //  setState(() {});
   }
 
   populateBasicDetails() {

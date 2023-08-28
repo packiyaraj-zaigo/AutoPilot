@@ -2,6 +2,7 @@
 
 import 'dart:developer';
 
+import 'package:auto_pilot/Screens/add_company_details.dart';
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/appointment_details_screen.dart';
@@ -185,12 +186,10 @@ class _BottomBarScreenState extends State<BottomBarScreen>
                           )),
                       IconButton(
                           onPressed: () {
-                            // Navigator.of(context).push(
-                            //   MaterialPageRoute(
-                            //     builder: (context) =>
-                            //         const NotificationScreen(),
-                            //   ),
-                            // );
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) => AddCompanyScreen()),
+                            );
                           },
                           icon: SvgPicture.asset(
                             "assets/images/notification.svg",

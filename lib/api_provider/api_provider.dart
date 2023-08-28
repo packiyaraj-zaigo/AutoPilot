@@ -925,63 +925,67 @@ class ApiProvider {
   //     print(e.toString() + "provider error");
   //   }
 
-  Future<dynamic> addCompany(
-      Map<String, dynamic> dataMap, dynamic token, String clientId) async {
+  Future<dynamic> addCompany(Map<String, dynamic> dataMap, dynamic token,
+      String clientId, dynamic imagePath) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
     try {
       var url = Uri.parse("${BASE_URL}api/clients/$clientId");
-      // var request = http.MultipartRequest("PUT", url)
-      //   ..fields['company_name'] = dataMap['company_name']
-      //   ..fields['phone'] = dataMap['phone']
-      //   ..fields['address_1']=dataMap['address_1']
-      //   ..fields['town_city']=dataMap['town_city']
-      //   ..fields['province_id']=dataMap['province_id']
-      //   ..fields['zipcode']=dataMap['zipcode']
-      //   ..fields['employee_count']=dataMap['employee_count']
-      //   ..fields['service_type']=dataMap['service_type']
-      //   ..fields['time_zone']=dataMap['time_zone']
-      //   ..fields['sales_tax_rate']=dataMap['sales_tax_rate']
-      //   ..fields['base_labor_cost']=dataMap['base_labor_cost'];
+      var request = http.MultipartRequest("PUT", url)
+        ..fields['company_name'] = dataMap['company_name']
+        ..fields['phone'] = dataMap['phone']
+        ..fields['address_1'] = dataMap['address_1']
+        ..fields['town_city'] = dataMap['town_city']
+        ..fields['province_id'] = dataMap['province_id'].toString()
+        ..fields['zipcode'] = dataMap['zipcode']
+        ..fields['employee_count'] = dataMap['employee_count']
+        ..fields['service_type'] = "Full Service"
+        ..fields['time_zone'] = dataMap['time_zone']
+        ..fields['sales_tax_rate'] = dataMap['sales_tax_rate']
+        ..fields['base_labor_cost'] = dataMap['base_labor_cost'];
+      request.files.add(await http.MultipartFile.fromPath(
+          'company_logo', File(imagePath).path));
 
-      //  request.headers.addAll(getHeader(token));
-      // var response = await request.send();
-      Map bodyMap = {
-        "company_name": dataMap['company_name'],
-        "phone": dataMap['phone']
-            .toString()
-            .replaceAll(RegExp(r'[^\w\s]+'), '')
-            .replaceAll(" ", ""),
-        "address_1": dataMap['address_1'],
-        "town_city": dataMap['town_city'],
-        "province_id": dataMap['province_id'],
-        "zipcode": dataMap['zipcode'],
-        "employee_count": dataMap['employee_count'],
-        "service_type": "Full service",
-        "time_zone": dataMap['time_zone'],
-        "sales_tax_rate": dataMap['sales_tax_rate'],
-        "labor_tax_rate": dataMap["labor_tax_rate"],
-        "material_tax_rate": dataMap["material_tax_rate"],
-        "tax_on_parts": dataMap["tax_on_parts"],
-        "tax_on_material": dataMap["tax_on_material"],
-        "tax_on_labors": dataMap["tax_on_labors"],
-        "base_labor_cost":
-            dataMap['base_labor_cost'].toString().replaceAll("\$", "")
-      };
-      var encodedBody = json.encode(bodyMap);
-      log(bodyMap.toString());
-      log(clientId);
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      // Map bodyMap = {
+      //   "company_name": dataMap['company_name'],
+      //   "phone": dataMap['phone']
+      //       .toString()
+      //       .replaceAll(RegExp(r'[^\w\s]+'), '')
+      //       .replaceAll(" ", ""),
+      //   "address_1": dataMap['address_1'],
+      //   "town_city": dataMap['town_city'],
+      //   "province_id": dataMap['province_id'],
+      //   "zipcode": dataMap['zipcode'],
+      //   "employee_count": dataMap['employee_count'],
+      //   "service_type": "Full service",
+      //   "time_zone": dataMap['time_zone'],
+      //   "sales_tax_rate": dataMap['sales_tax_rate'],
+      //   "labor_tax_rate": dataMap["labor_tax_rate"],
+      //   "material_tax_rate": dataMap["material_tax_rate"],
+      //   "tax_on_parts": dataMap["tax_on_parts"],
+      //   "tax_on_material": dataMap["tax_on_material"],
+      //   "tax_on_labors": dataMap["tax_on_labors"],
+      //   "base_labor_cost":
+      //       dataMap['base_labor_cost'].toString().replaceAll("\$", ""),
+      //   "company_logo": imagePath
+      // };
+      // var encodedBody = json.encode(bodyMap);
+      // log(bodyMap.toString());
+      // log(clientId);
 
-      var response =
-          http.put(url, body: encodedBody, headers: getHeader(token));
+      // var response =
+      //     http.put(url, body: encodedBody, headers: getHeader(token));
       inspect(response);
       // print(response.statusCode.toString() + "provider status code");
       // print(response.toString() + "provider response");
-      // return http.Response.fromStream(response);
-      return response;
-    } catch (e) {
+      return http.Response.fromStream(response);
+      // return response;
+    } catch (e, s) {
       print(e.toString() + "provider error");
+      print(s);
     }
   }
 

@@ -81,8 +81,16 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                     Map<String, dynamic> finalDataMap = {}
                       ..addAll(widget.basicDetailsMap)
                       ..addAll(widget.operationDetailsMap);
+
+                    print(widget.basicDetailsMap["company_logo"].toString() +
+                        "basic");
+
+                    print(finalDataMap["company_logo"].toString() +
+                        "imagee pathhh");
                     context.read<DashboardBloc>().add(AddCompanyEvent(
-                        dataMap: finalDataMap, context: context));
+                        dataMap: finalDataMap,
+                        context: context,
+                        imagePath: finalDataMap['company_logo']));
                   },
                   style: ElevatedButton.styleFrom(
                       elevation: 0,

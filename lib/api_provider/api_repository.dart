@@ -302,9 +302,9 @@ class ApiRepository {
     return apiProvider.getProvince(token, currentPage);
   }
 
-  Future addCompany(
-      Map<String, dynamic> dataMap, dynamic token, String clientId) {
-    return apiProvider.addCompany(dataMap, token, clientId);
+  Future addCompany(Map<String, dynamic> dataMap, dynamic token,
+      String clientId, dynamic imagePath) {
+    return apiProvider.addCompany(dataMap, token, clientId, imagePath);
   }
 
   Future getCustomerMessages(String token, String clientId, int currentPage) {
