@@ -67,7 +67,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   List<CannedServiceAddModel> fee = [];
 
   dynamic _currentPricingModelSelectedValue;
-  List<String> pricingModelList = ['per Sqrt', 'per feet'];
+  List<String> pricingModelList = ['Per Sqrt', 'Per Roll'];
 
   String taxRateError = '';
   var dropdownValue;
@@ -610,17 +610,17 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         },
                       ),
 
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: textBox(
-                            "Enter Labor Rate",
-                            rateController,
-                            "Labor Rate *For this service",
-                            rateError.isNotEmpty,
-                            context,
-                            true),
-                      ),
-                      errorWidget(error: rateError),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 16.0),
+                      //   child: textBox(
+                      //       "Enter Labor Rate",
+                      //       rateController,
+                      //       "Labor Rate *For this service",
+                      //       rateError.isNotEmpty,
+                      //       context,
+                      //       true),
+                      // ),
+                      // errorWidget(error: rateError),
 
                       // Padding(
                       //   padding: const EdgeInsets.only(top: 16.0),
@@ -795,7 +795,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
             height: 56,
-            width: label == "Price" || label == "Cost" || label == "Quantity"
+            width: label == "Price" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
@@ -851,8 +851,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Quantity"
                   ? 10
                   : label == "Description"
-                      ? 50
-                      : 25,
+                      ? 150
+                      : label == "Service Name" || label == "Notes"
+                          ? 150
+                          : 25,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
@@ -923,8 +925,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       laborDescriptionError = 'Notes should be atleast 2 characters';
       status = false;
     } else if (laborDescriptionController.text.trim().isNotEmpty &&
-        laborDescriptionController.text.trim().length > 50) {
-      laborDescriptionError = "Notes can't be more than 50 characters";
+        laborDescriptionController.text.trim().length > 150) {
+      laborDescriptionError = "Notes can't be more than 150 characters";
       status = false;
     } else {
       laborDescriptionError = '';
@@ -1239,19 +1241,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       errorWidget(error: addMaterialPriceErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            textBox(
-                                "Amount",
-                                addMaterialCostController,
-                                "Cost",
-                                addMaterialCostErrorStatus.isNotEmpty,
-                                context,
-                                false),
-                            pricingModelDropDown()
-                          ],
-                        ),
+                        child: textBox(
+                            "Amount",
+                            addMaterialCostController,
+                            "Cost",
+                            addMaterialCostErrorStatus.isNotEmpty,
+                            context,
+                            false),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
                       Padding(
@@ -2178,7 +2174,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Cost ",
                           addLaborCostErrorStatus.isNotEmpty,
                           context,
-                          true,
+                          false,
                           newSetState),
                     ),
                     errorWidget(error: addLaborCostErrorStatus),
@@ -2796,7 +2792,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
                       child: textBox(
-                          "Enter SubContract Name",
+                          "Enter Subcontract Name",
                           addSubContractNameController,
                           "Name",
                           addSubContractNameErrorStatus.isNotEmpty,
@@ -2807,7 +2803,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
-                          "Enter SubContract Description",
+                          "Enter Subcontract Description",
                           addSubContractDescriptionController,
                           "Description",
                           addSubContractDescriptionErrorStatus.isNotEmpty,

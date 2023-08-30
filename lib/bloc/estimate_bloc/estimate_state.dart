@@ -92,6 +92,8 @@ class EstimateUploadImageState extends EstimateState {
   List<Object> get props => [imagePath, index];
 }
 
+class FirstOrderImageLoadingState extends EstimateState {}
+
 class EstimateCreateOrderImageState extends EstimateState {}
 
 class GetOrderImageState extends EstimateState {
