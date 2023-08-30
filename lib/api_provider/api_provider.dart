@@ -944,8 +944,10 @@ class ApiProvider {
         ..fields['time_zone'] = dataMap['time_zone']
         ..fields['sales_tax_rate'] = dataMap['sales_tax_rate']
         ..fields['base_labor_cost'] = dataMap['base_labor_cost'];
-      request.files.add(await http.MultipartFile.fromPath(
-          'company_logo', File(imagePath).path));
+      if (imagePath != null) {
+        request.files.add(await http.MultipartFile.fromPath(
+            'company_logo', File(imagePath).path));
+      }
 
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -1872,6 +1874,7 @@ class ApiProvider {
       final token = await AppUtils.getToken();
       final url = Uri.parse('${BASE_URL}api/clients/$clientId');
       final response = await http.get(url, headers: getHeader(token));
+      inspect(response);
       return response;
     } catch (e) {
       log(e.toString() + " Get client api error");
