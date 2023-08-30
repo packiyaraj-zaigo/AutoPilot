@@ -326,7 +326,8 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                 return DropdownMenuItem<String>(
                                   value: role.name,
                                   child: Text(
-                                    role.name.toString().toUpperCase(),
+                                    (role.name![0].toUpperCase() ?? '') +
+                                        (role.name! ?? ''),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: AppColors.greyText,

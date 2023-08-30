@@ -78,8 +78,8 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       } else {
         emit(GetClientErrorState(message: 'Something went wrong'));
       }
-    } catch (e) {
-      log(e.toString() + " Get client bloc error");
+    } catch (e, s) {
+      log(s.toString() + " Get client bloc error");
       emit(GetClientErrorState(message: 'Something went wrong'));
     }
   }

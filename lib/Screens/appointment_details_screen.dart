@@ -31,6 +31,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   double totalAmount = 0.00;
   String laborTaxRate = "";
   String laborRate = "";
+  String appointmentId = "";
   bool isAppointmentEdit = false;
 
   final startTimeController = TextEditingController();
@@ -56,6 +57,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
   String startDateToServer = "";
   String endDateToServer = "";
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -64,17 +67,27 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
         ..add(GetClientByIdInEstimateEvent()),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {
+          log(state.toString());
           if (state is GetEventDetailsByIdState) {
             beginDate = state.beginDate;
             endDate = state.endDate;
             notes = state.notes;
+            appointmentId = state.appointmentId;
 
             context
                 .read<EstimateBloc>()
                 .add(GetSingleEstimateEvent(orderId: state.orderId));
           }
-          if (state is EditAppointmentEstimateState) {
-            isAppointmentEdit = false;
+          if (state is DeleteAppointmentEstimateState) {
+            Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => BottomBarScreen(
+                    currentIndex: 2,
+                  ),
+                ),
+                (route) => false);
+            CommonWidgets()
+                .showSuccessDialog(context, 'Appointment deleted successfully');
           }
           if (state is GetSingleEstimateState) {
             createEstimateModel = state.createEstimateModel;
@@ -87,6 +100,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
             laborRate = state.clientModel.baseLaborCost ?? "0";
           }
           if (state is EditAppointmentEstimateState) {
+            isAppointmentEdit = false;
+
             CommonWidgets()
                 .showSuccessDialog(context, 'Appointment updated successfully');
             beginDate = DateTime.parse(
@@ -104,6 +119,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
         child: BlocBuilder<EstimateBloc, EstimateState>(
           builder: (context, state) {
             return Scaffold(
+              key: scaffoldKey,
               appBar: AppBar(
                 backgroundColor: Colors.transparent,
                 foregroundColor: AppColors.primaryColors,
@@ -120,10 +136,10 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                 actions: [
                   IconButton(
                     onPressed: () {
-                      // showModalBottomSheet(
-                      //   context: context,
-                      //   builder: (context) => editAppointmentSheet(),
-                      // );
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) => editAppointmentSheet(),
+                      );
                     },
                     icon: const Icon(
                       Icons.more_horiz,
@@ -246,7 +262,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                                                     ?.data.vehicleId
                                                     .toString() ??
                                                 '0',
-                                            id: widget.eventId,
+                                            id: appointmentId,
                                           ),
                                         );
                                       }
@@ -834,8 +850,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                 onTap: () {
                   Navigator.pop(context);
                   print("ontapped");
-                  deleteAppointmentPopup(
-                      context, "", widget.eventId.toString());
+                  deleteAppointmentPopup(context, "", appointmentId);
 
                   // Navigator.pop(context);
                 },
@@ -908,17 +923,7 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
       builder: (context) => BlocProvider(
         create: (context) => EstimateBloc(apiRepository: ApiRepository()),
         child: BlocListener<EstimateBloc, EstimateState>(
-          listener: (context, state) {
-            if (state is DeleteAppointmentEstimateState) {
-              Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => BottomBarScreen(
-                      currentIndex: 2,
-                    ),
-                  ),
-                  (route) => false);
-            }
-          },
+          listener: (context, state) {},
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
               return CupertinoAlertDialog(
@@ -928,8 +933,11 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
-                        context.read<EstimateBloc>().add(
-                            DeleteAppointmentEstimateEvent(appointmetId: id));
+                        log(widget.eventId.toString() + "EVENT ID");
+                        log(appointmentId.toString() + "Aoo ID");
+                        scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                            DeleteAppointmentEstimateEvent(
+                                appointmetId: id, eventId: widget.eventId));
                       }),
                   CupertinoDialogAction(
                     child: const Text("No"),

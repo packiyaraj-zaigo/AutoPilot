@@ -1941,13 +1941,12 @@ class ApiProvider {
 
     //  LoadingFormModel? loadingFormModel;
     try {
-      var url = Uri.parse("${BASE_URL}api/canendar_events/$id");
+      var url = Uri.parse("${BASE_URL}api/calendar_events/$id");
       var request = http.MultipartRequest("DELETE", url);
 
       request.headers.addAll(getHeader(token));
       inspect(request);
       var response = await request.send();
-      inspect(response);
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");

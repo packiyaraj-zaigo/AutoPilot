@@ -758,16 +758,21 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
 
       log("res${deleteAppointmentRes.body}");
 
-      if (deleteAppointmentRes.statusCode == 200) {
+      if (deleteAppointmentRes.statusCode == 200 || event.appointmetId == "0") {
         try {
           if (event.eventId != null) {
-            Response response =
+            final response =
                 await _apiRepository.deleteEvent(token, event.eventId!);
             emit(DeleteAppointmentEstimateState());
           }
-        } catch (e) {
+        } catch (e, s) {
           emit(DeleteAppointmentEstimateErrorState(
               errorMessage: "Something went wrong"));
+
+          print(e.toString());
+          print(s);
+
+          print("hereee");
         }
       } else {
         final decodedResponse = json.decode(deleteAppointmentRes.body);
@@ -780,8 +785,6 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
 
       print(e.toString());
       print(s);
-
-      print("hereee");
     }
   }
 
@@ -976,11 +979,15 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
 
       if (getEventDetailsRes.statusCode == 200) {
         final decodedBody = json.decode(getEventDetailsRes.body);
-        emit(GetEventDetailsByIdState(
-            orderId: decodedBody['data']['search_id'].toString(),
-            beginDate: DateTime.parse(decodedBody['data']['begin_date']),
-            endDate: DateTime.parse(decodedBody['data']['complete_date']),
-            notes: decodedBody['data']['notes']));
+        emit(
+          GetEventDetailsByIdState(
+              orderId: decodedBody['data']['search_id'].toString(),
+              beginDate: DateTime.parse(decodedBody['data']['begin_date']),
+              endDate: DateTime.parse(decodedBody['data']['complete_date']),
+              notes: decodedBody['data']['notes'],
+              appointmentId:
+                  (decodedBody['data']['appointment_id'] ?? 0).toString()),
+        );
         log(getEventDetailsRes.body.toString() + "TESTING I");
       } else {
         emit(GetEventDetailsByIdErrorState(
