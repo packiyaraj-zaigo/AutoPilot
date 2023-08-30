@@ -1071,7 +1071,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         adddMaterialNameErrorStatus = "Material name can't be empty";
         status = false;
       } else {
-        adddMaterialNameErrorStatus = '';
+        if (addMaterialNameController.text.trim().length < 2) {
+          adddMaterialNameErrorStatus =
+              "Material name must be alteast 2 characters";
+          status = false;
+        } else {
+          adddMaterialNameErrorStatus = '';
+        }
       }
       if (addMaterialDescriptionController.text.trim().isEmpty) {
         addMaterialDescriptionErrorStatus = "Description can't be empty";
@@ -1517,7 +1523,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addPartNameErrorStatus = "Part name can't be empty";
         status = false;
       } else {
-        addPartNameErrorStatus = '';
+        if (addPartNameController.text.trim().length < 2) {
+          addPartNameErrorStatus = "Part name must be atlest 2 characters";
+          status = false;
+        } else {
+          addPartNameErrorStatus = '';
+        }
       }
       if (addPartDescriptionController.text.trim().isEmpty) {
         addPartDescriptionErrorStatus = "Description can't be empty";
@@ -1987,7 +1998,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addLaborNameErrorStatus = "Labor name can't be empty";
         status = false;
       } else {
-        addLaborNameErrorStatus = '';
+        if (addLaborNameController.text.trim().length < 2) {
+          addLaborNameErrorStatus = "Labor name must be atleast 2 characters";
+          status = false;
+        } else {
+          addLaborNameErrorStatus = '';
+        }
       }
       if (addLaborCostController.text.trim().isEmpty) {
         addLaborCostErrorStatus = "Cost can't be empty";
@@ -2347,7 +2363,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addFeeNameErrorStatus = "Fee name can't be empty";
         status = false;
       } else {
-        addFeeNameErrorStatus = '';
+        if (addFeeNameController.text.trim().length < 2) {
+          addFeeNameErrorStatus = "Fee name must be atleast 2 characters";
+          status = false;
+        } else {
+          addFeeNameErrorStatus = '';
+        }
       }
       if (addFeePriceController.text.trim().isEmpty) {
         addFeePriceErrorStatus = "Price can't be empty";
@@ -2643,7 +2664,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addSubContractNameErrorStatus = "Sub Contract name can't be empty";
         status = false;
       } else {
-        addSubContractNameErrorStatus = '';
+        if (addSubContractNameController.text.trim().length < 2) {
+          addSubContractNameErrorStatus =
+              "Sub Contract name must be atleast 2 characters";
+          status = false;
+        } else {
+          addSubContractNameErrorStatus = '';
+        }
       }
       if (addSubContractPriceController.text.trim().isEmpty) {
         addSubContractPriceErrorStatus = "Price can't be empty";
