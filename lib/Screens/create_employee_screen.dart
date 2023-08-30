@@ -327,7 +327,7 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
                                   value: role.name,
                                   child: Text(
                                     (role.name![0].toUpperCase() ?? '') +
-                                        (role.name! ?? ''),
+                                        (role.name!.substring(1) ?? ''),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: AppColors.greyText,

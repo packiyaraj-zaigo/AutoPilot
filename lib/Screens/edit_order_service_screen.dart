@@ -68,7 +68,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
   final technicianController = TextEditingController();
   String technicianError = '';
 
-  String technicianId = '';
+  String technicianId = '0';
 
   CannedServiceCreateModel? service;
   List<CannedServiceAddModel> material = [];
@@ -250,7 +250,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           'Technician',
                           technicianError.isNotEmpty,
                           context,
-                          true),
+                          false),
                       errorWidget(error: technicianError),
 
                       // const Text(
@@ -982,12 +982,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     } else {
       taxError = '';
     }
-    if (technicianController.text.trim().isEmpty) {
-      technicianError = 'Technician cannot be empty';
-      status = false;
-    } else {
-      technicianError = '';
-    }
+    // if (technicianController.text.trim().isEmpty) {
+    //   technicianError = 'Technician cannot be empty';
+    //   status = false;
+    // } else {
+    //   technicianError = '';
+    // }
 
     setState(() {});
     return status;
@@ -1111,7 +1111,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
@@ -1301,116 +1300,58 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
-                      Padding(
-                        padding: EdgeInsets.only(top: 17),
-                        child: Stack(
-                          children: [
-                            textBox(
-                                "Enter Amount",
-                                addMaterialDiscountController,
-                                "Discount",
-                                addMaterialDiscountErrorStatus.isNotEmpty,
-                                context,
-                                false,
-                                newSetState),
-                            Positioned(
-                              right: 10,
-                              top: 42,
-                              child: Row(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      isPercentage = false;
-                                      newSetState(() {});
-                                    },
-                                    child: Icon(
-                                      CupertinoIcons.money_dollar,
-                                      color: isPercentage
-                                          ? AppColors.greyText
-                                          : AppColors.primaryColors,
-                                    ),
+                      Stack(
+                        children: [
+                          textBox(
+                              "Enter Amount",
+                              addMaterialDiscountController,
+                              "Discount",
+                              addMaterialDiscountErrorStatus.isNotEmpty,
+                              context,
+                              false,
+                              newSetState),
+                          Positioned(
+                            right: 10,
+                            top: 42,
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    isPercentage = false;
+                                    newSetState(() {});
+                                  },
+                                  child: Icon(
+                                    CupertinoIcons.money_dollar,
+                                    color: isPercentage
+                                        ? AppColors.greyText
+                                        : AppColors.primaryColors,
                                   ),
-                                  Text(
-                                    '  /  ',
-                                    style: TextStyle(
-                                      color: AppColors.greyText,
-                                      fontSize: 18,
-                                    ),
+                                ),
+                                Text(
+                                  '  /  ',
+                                  style: TextStyle(
+                                    color: AppColors.greyText,
+                                    fontSize: 18,
                                   ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      isPercentage = true;
-                                      newSetState(() {});
-                                    },
-                                    child: Icon(
-                                      Icons.percent,
-                                      color: !isPercentage
-                                          ? AppColors.greyText
-                                          : AppColors.primaryColors,
-                                    ),
+                                ),
+                                GestureDetector(
+                                  onTap: () {
+                                    isPercentage = true;
+                                    newSetState(() {});
+                                  },
+                                  child: Icon(
+                                    Icons.percent,
+                                    color: !isPercentage
+                                        ? AppColors.greyText
+                                        : AppColors.primaryColors,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       errorWidget(error: addMaterialDiscountErrorStatus),
-                      // Padding(
-                      //   padding: const EdgeInsets.only(top: 17),
-                      //   child: Row(
-                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      //     children: [
-                      //       const Text(
-                      //         "Label",
-                      //         style: TextStyle(
-                      //           fontSize: 14,
-                      //           fontWeight: FontWeight.w500,
-                      //           color: Color(0xff6A7187),
-                      //         ),
-                      //       ),
-                      //       GestureDetector(
-                      //         onTap: () {
-                      //           newSetState(() {
-                      //             tagDataList.add("Tag");
-                      //           });
-                      //         },
-                      //         child: const Row(
-                      //           children: [
-                      //             Icon(
-                      //               Icons.add,
-                      //               color: AppColors.primaryColors,
-                      //             ),
-                      //             Text(
-                      //               "Add New",
-                      //               style: TextStyle(
-                      //                 fontSize: 14,
-                      //                 fontWeight: FontWeight.w600,
-                      //                 color: AppColors.primaryColors,
-                      //               ),
-                      //             ),
-                      //           ],
-                      //         ),
-                      //       )
-                      //     ],
-                      //   ),
-                      // ),
-                      GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                                //  maxCrossAxisExtent: 150,
-                                mainAxisSpacing: 20,
-                                crossAxisCount: 3,
-                                crossAxisSpacing: 8,
-                                childAspectRatio: 3),
-                        itemBuilder: (context, index) {
-                          return tagWidget(
-                              tagDataList[index], index, newSetState);
-                        },
-                        itemCount: tagDataList.length,
-                        physics: ClampingScrollPhysics(),
-                        shrinkWrap: true,
-                      ),
                       Padding(
                         padding: EdgeInsets.only(top: 17),
                         child: textBox(
@@ -1467,7 +1408,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 17),
+                        padding: EdgeInsets.only(top: 17),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1492,11 +1433,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         padding: EdgeInsets.only(top: 31),
                         child: ElevatedButton(
                           onPressed: () {
-                            FocusManager.instance.primaryFocus?.unfocus();
-
                             final status = addMaterialValidation(newSetState);
                             if (status) {
-                              final focus = FocusNode().requestFocus();
                               material.add(CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
                                 note: addMaterialDescriptionController.text,
@@ -1515,6 +1453,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                     : "Fixed",
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
+                                tax: client!.taxOnMaterial == "Y"
+                                    ? client!.materialTaxRate ?? '0'
+                                    : '0',
                               ));
                               setState(() {});
                               Navigator.pop(context);
@@ -1553,23 +1494,22 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     final addPartNameController = TextEditingController();
     final addPartDescriptionController = TextEditingController();
     final addPartPriceController = TextEditingController();
-    final addPartQuantityController = TextEditingController(text: '1');
     final addPartCostController = TextEditingController();
     final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
+    final addPartQuantityController = TextEditingController(text: '1');
 
     //Add part errorstatus and error message variables
     String addPartNameErrorStatus = '';
     String addPartDescriptionErrorStatus = '';
-    String addPartPriceErrorStatus = '';
     String addPartQuantityErrorStatus = '';
+    String addPartPriceErrorStatus = '';
     String addPartCostErrorStatus = '';
     String addPartDiscountErrorStatus = '';
     String adddPartPartNumberErrorStatus = '';
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
@@ -1616,12 +1556,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
         status = false;
       } else {
         addPartDiscountErrorStatus = '';
-      }
-      if (addPartPartNumberController.text.trim().isEmpty) {
-        adddPartPartNumberErrorStatus = "Part Number can't be empty";
-        status = false;
-      } else {
-        adddPartPartNumberErrorStatus = '';
       }
 
       setState(() {});
@@ -1786,21 +1720,17 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                     errorWidget(error: addPartCostErrorStatus),
                     Stack(
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 17),
-                          child: textBox(
+                        textBox(
                             "Enter Amount",
                             addPartDiscountController,
                             "Discount",
                             addPartDiscountErrorStatus.isNotEmpty,
                             context,
                             false,
-                            newSetState,
-                          ),
-                        ),
+                            newSetState),
                         Positioned(
                           right: 10,
-                          top: 58,
+                          top: 42,
                           child: Row(
                             children: [
                               GestureDetector(
@@ -1840,61 +1770,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addPartDiscountErrorStatus),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 17),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       const Text(
-                    //         "Label",
-                    //         style: TextStyle(
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w500,
-                    //           color: Color(0xff6A7187),
-                    //         ),
-                    //       ),
-                    //       GestureDetector(
-                    //         onTap: () {
-                    //           newSetState(() {
-                    //             tagDataList.add("Tag");
-                    //           });
-                    //         },
-                    //         child: const Row(
-                    //           children: [
-                    //             Icon(
-                    //               Icons.add,
-                    //               color: AppColors.primaryColors,
-                    //             ),
-                    //             Text(
-                    //               "Add New",
-                    //               style: TextStyle(
-                    //                 fontSize: 14,
-                    //                 fontWeight: FontWeight.w600,
-                    //                 color: AppColors.primaryColors,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: textBox(
@@ -1976,18 +1851,15 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-
                           final status = addPartValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
-
                             part.add(CannedServiceAddModel(
                               cannedServiceId: int.parse(serviceId),
                               note: addPartDescriptionController.text,
                               part: addPartPartNumberController.text,
                               itemName: addPartNameController.text,
                               unitPrice: addPartPriceController.text,
+                              quanityHours: addPartQuantityController.text,
                               discount:
                                   addPartDiscountController.text.trim().isEmpty
                                       ? "0"
@@ -1996,9 +1868,11 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                       addPartDiscountController.text.isNotEmpty
                                   ? "Percentage"
                                   : "Fixed",
-                              quanityHours: addPartQuantityController.text,
                               itemType: "Part",
                               subTotal: subTotal.toStringAsFixed(2),
+                              tax: client!.taxOnParts == "Y"
+                                  ? client!.salesTaxRate ?? '0'
+                                  : '0',
                             ));
                             setState(() {});
                             Navigator.pop(context);
@@ -2051,7 +1925,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
@@ -2096,57 +1969,51 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     }
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
-      if (addLaborBaseCostController.text.isNotEmpty) {
+      if (addLaborCostController.text.isNotEmpty) {
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0);
+            subTotal = (double.tryParse(addLaborCostController.text) ?? 0);
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborBaseCostController.text) ??
-                          0) *
+              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
-            subTotal =
-                ((double.tryParse(addLaborBaseCostController.text) ?? 0) -
-                    discount);
+            subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
+                discount);
           }
           total = subTotal;
         } else {
-          log((client?.laborTaxRate).toString());
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborBaseCostController.text) ??
-                            0)) *
+                        (double.tryParse(addLaborCostController.text) ?? 0)) *
                     tax +
                 ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborBaseCostController.text) ?? 0));
+                    (double.tryParse(addLaborCostController.text) ?? 0));
             total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                (double.tryParse(addLaborBaseCostController.text) ?? 0));
+                (double.tryParse(addLaborCostController.text) ?? 0));
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborBaseCostController.text) ??
-                          0) *
+              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
                       (double.tryParse(addLaborHoursController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                            (double.tryParse(addLaborBaseCostController.text) ??
+                            (double.tryParse(addLaborCostController.text) ??
                                 0)) -
                         discount) *
                     tax +
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborBaseCostController.text) ??
-                            0)) -
+                        (double.tryParse(addLaborCostController.text) ?? 0)) -
                     discount);
             total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborBaseCostController.text) ?? 0)) -
+                    (double.tryParse(addLaborCostController.text) ?? 0)) -
                 discount);
           }
         }
@@ -2196,7 +2063,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Description",
                           addLaborDescriptionErrorStatus.isNotEmpty,
                           context,
-                          false),
+                          true),
                     ),
                     errorWidget(error: addLaborDescriptionErrorStatus),
                     Padding(
@@ -2231,26 +2098,23 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Cost ",
                           addLaborCostErrorStatus.isNotEmpty,
                           context,
-                          true,
+                          false,
                           newSetState),
                     ),
                     errorWidget(error: addLaborCostErrorStatus),
                     Stack(
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 17),
-                          child: textBox(
-                              "Enter Amount",
-                              addLaborDiscountController,
-                              "Discount",
-                              addLaborDiscountErrorStatus.isNotEmpty,
-                              context,
-                              false,
-                              newSetState),
-                        ),
+                        textBox(
+                            "Enter Amount",
+                            addLaborDiscountController,
+                            "Discount",
+                            addLaborDiscountErrorStatus.isNotEmpty,
+                            context,
+                            false,
+                            newSetState),
                         Positioned(
                           right: 10,
-                          top: 58,
+                          top: 42,
                           child: Row(
                             children: [
                               GestureDetector(
@@ -2360,19 +2224,15 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-
                           final status = addLaborValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
-
                             labor.add(CannedServiceAddModel(
                               cannedServiceId: int.parse(serviceId),
                               note: addLaborDescriptionController.text,
                               // part: addLaborLaborNumberController.text,
                               part: '',
                               itemName: addLaborNameController.text,
-                              unitPrice: addLaborCostController.text,
+                              unitPrice: addLaborBaseCostController.text,
                               discount:
                                   addLaborDiscountController.text.trim().isEmpty
                                       ? "0"
@@ -2384,6 +2244,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               quanityHours: addLaborHoursController.text,
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
+                              tax: client!.taxOnLabors == "Y"
+                                  ? client!.laborTaxRate ?? '0'
+                                  : '0',
                             ));
                             setState(() {});
                             Navigator.pop(context);
@@ -2435,18 +2298,13 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     addFeeValidation(StateSetter setState) {
       bool status = true;
       if (addFeeNameController.text.trim().isEmpty) {
-        addFeeNameErrorStatus = "Fee name can't be empty";
+        addFeeNameErrorStatus = 'Fee name cannot be empty';
         status = false;
       } else {
-        if (addFeeNameController.text.trim().length < 2) {
-          addFeeNameErrorStatus = "Fee name must be atleast 2 characters";
-          status = false;
-        } else {
-          addFeeNameErrorStatus = '';
-        }
+        addFeeNameErrorStatus = '';
       }
       if (addFeePriceController.text.trim().isEmpty) {
-        addFeePriceErrorStatus = "Price can't be empty";
+        addFeePriceErrorStatus = 'Price cannot be empty';
         status = false;
       } else {
         addFeePriceErrorStatus = '';
@@ -2534,61 +2392,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           addFeeCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 17),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       const Text(
-                    //         "Label",
-                    //         style: TextStyle(
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w500,
-                    //           color: Color(0xff6A7187),
-                    //         ),
-                    //       ),
-                    //       GestureDetector(
-                    //         onTap: () {
-                    //           newSetState(() {
-                    //             tagDataList.add("Tag");
-                    //           });
-                    //         },
-                    //         child: const Row(
-                    //           children: [
-                    //             Icon(
-                    //               Icons.add,
-                    //               color: AppColors.primaryColors,
-                    //             ),
-                    //             Text(
-                    //               "Add New",
-                    //               style: TextStyle(
-                    //                 fontSize: 14,
-                    //                 fontWeight: FontWeight.w600,
-                    //                 color: AppColors.primaryColors,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2659,12 +2462,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-
                           final status = addFeeValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
-
                             fee.add(CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
                                 note: addFeeDescriptionController.text,
@@ -2674,6 +2473,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 discount: '0',
                                 unitPrice: addFeePriceController.text,
                                 itemType: "Fee",
+                                tax: client!.taxOnLabors == "Y"
+                                    ? client!.laborTaxRate ?? '0'
+                                    : '0',
                                 subTotal: subTotal.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
@@ -2725,7 +2527,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
@@ -2891,22 +2692,33 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.center,
+                    //   children: [
+                    //     Checkbox(
+                    //         value: isTax,
+                    //         onChanged: (value) {
+                    //           newSetState(() {
+                    //             isTax = value!;
+                    //           });
+                    //         }),
+                    //     Text('Allow Tax Charges On Sub Contract',
+                    //         style: TextStyle(color: Color(0xFF6A7187))),
+                    //   ],
+                    // ),
                     Stack(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 17.0),
-                          child: textBox(
-                              "Amount",
-                              addSubContractDiscountController,
-                              "Discount",
-                              addSubContractDiscountErrorStatus.isNotEmpty,
-                              context,
-                              false,
-                              newSetState),
-                        ),
+                        textBox(
+                            "Enter Amount",
+                            addSubContractDiscountController,
+                            "Discount",
+                            addSubContractDiscountErrorStatus.isNotEmpty,
+                            context,
+                            false,
+                            newSetState),
                         Positioned(
                           right: 10,
-                          top: 58,
+                          top: 42,
                           child: Row(
                             children: [
                               GestureDetector(
@@ -2946,61 +2758,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addSubContractDiscountErrorStatus),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 17),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       const Text(
-                    //         "Label",
-                    //         style: TextStyle(
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w500,
-                    //           color: Color(0xff6A7187),
-                    //         ),
-                    //       ),
-                    //       GestureDetector(
-                    //         onTap: () {
-                    //           newSetState(() {
-                    //             tagDataList.add("Tag");
-                    //           });
-                    //         },
-                    //         child: const Row(
-                    //           children: [
-                    //             Icon(
-                    //               Icons.add,
-                    //               color: AppColors.primaryColors,
-                    //             ),
-                    //             Text(
-                    //               "Add New",
-                    //               style: TextStyle(
-                    //                 fontSize: 14,
-                    //                 fontWeight: FontWeight.w600,
-                    //                 color: AppColors.primaryColors,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
+
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -3012,6 +2770,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractVendorErrorStatus),
+
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -3082,12 +2841,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-
                           final status = addSubContractValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
-
                             subContract.add(
                               CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
@@ -3095,6 +2850,10 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 // part: addSubContractSubContractNumberController.text,
                                 part: '',
                                 itemName: addSubContractNameController.text,
+                                // discount: addSubContractDiscountController.text,
+                                //tax: isTax == true ? 'Y' : 'N',
+                                vendorId: vendorId,
+                                unitPrice: addSubContractPriceController.text,
                                 discount: addSubContractDiscountController.text
                                         .trim()
                                         .isEmpty
@@ -3107,11 +2866,11 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                     ? "Percentage"
                                     : "Fixed",
 
-                                tax: isTax == true ? 'Y' : 'N',
-                                vendorId: vendorId,
-                                unitPrice: addSubContractPriceController.text,
                                 itemType: "SubContract",
                                 subTotal: subTotal.toStringAsFixed(2),
+                                tax: client!.taxOnLabors == "Y"
+                                    ? client!.laborTaxRate ?? '0'
+                                    : '0',
                               ),
                             );
                             setState(() {});

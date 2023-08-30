@@ -118,7 +118,7 @@ class _EmployeeCard extends StatelessWidget {
               const SizedBox(height: 3),
               Text(
                 (item.roles?[0].name![0].toUpperCase() ?? '') +
-                    (item.roles?[0].name! ?? ''),
+                    (item.roles?[0].name!.substring(1) ?? ''),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
                 style: const TextStyle(

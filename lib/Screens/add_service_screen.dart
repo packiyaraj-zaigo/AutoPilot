@@ -1570,12 +1570,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addPartDiscountErrorStatus = '';
       }
-      if (addPartPartNumberController.text.trim().isEmpty) {
-        adddPartPartNumberErrorStatus = "Part Number can't be empty";
-        status = false;
-      } else {
-        adddPartPartNumberErrorStatus = '';
-      }
 
       setState(() {});
       return status;
@@ -2325,7 +2319,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               // part: addLaborLaborNumberController.text,
                               part: '',
                               itemName: addLaborNameController.text,
-                              unitPrice: addLaborCostController.text,
+                              unitPrice: addLaborBaseCostController.text,
                               discount:
                                   addLaborDiscountController.text.trim().isEmpty
                                       ? "0"
