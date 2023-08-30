@@ -188,14 +188,16 @@ class ChangeEstimateStatusErrorState extends EstimateState {
 }
 
 class GetEventDetailsByIdState extends EstimateState {
-  final String orderId, notes;
+  final String orderId, notes, appointmentId;
   final DateTime beginDate, endDate;
 
-  GetEventDetailsByIdState(
-      {required this.orderId,
-      required this.notes,
-      required this.beginDate,
-      required this.endDate});
+  GetEventDetailsByIdState({
+    required this.orderId,
+    required this.notes,
+    required this.beginDate,
+    required this.endDate,
+    required this.appointmentId,
+  });
 }
 
 class GetEventDetailsByIdErrorState extends EstimateState {
