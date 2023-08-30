@@ -557,6 +557,10 @@ class ApiRepository {
     return apiProvider.deleteAppointment(token, appointmentId);
   }
 
+  Future<dynamic> deleteEvent(dynamic token, String id) async {
+    return apiProvider.deleteEvent(token, id);
+  }
+
   Future<dynamic> collectPayment(
       dynamic token,
       String customerId,

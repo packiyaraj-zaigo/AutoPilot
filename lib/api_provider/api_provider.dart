@@ -699,7 +699,7 @@ class ApiProvider {
     try {
       final clientId = await AppUtils.getUserID();
       String url =
-          '${BASE_URL}api/inventory_parts?order_by=id&sort=DESC&client_id=$clientId';
+          '${BASE_URL}api/inventory_parts?order_by=id&sort=DESC&client_id=$clientId&order_by=id&sort=DESC';
       if (page != 1) {
         url = '$url&page=$page';
       }
@@ -1923,6 +1923,24 @@ class ApiProvider {
       inspect(response);
       print(response.statusCode.toString() + "provider status code");
       print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
+    }
+  }
+
+  Future<dynamic> deleteEvent(dynamic token, String id) async {
+    print("into provider");
+
+    //  LoadingFormModel? loadingFormModel;
+    try {
+      var url = Uri.parse("${BASE_URL}api/canendar_events/$id");
+      var request = http.MultipartRequest("DELETE", url);
+
+      request.headers.addAll(getHeader(token));
+      inspect(request);
+      var response = await request.send();
+      inspect(response);
       return http.Response.fromStream(response);
     } catch (e) {
       print(e.toString() + "provider error");

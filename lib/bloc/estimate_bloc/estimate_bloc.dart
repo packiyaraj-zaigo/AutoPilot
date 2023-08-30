@@ -759,7 +759,16 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       log("res${deleteAppointmentRes.body}");
 
       if (deleteAppointmentRes.statusCode == 200) {
-        emit(DeleteAppointmentEstimateState());
+        try {
+          if (event.eventId != null) {
+            Response response =
+                await _apiRepository.deleteEvent(token, event.eventId!);
+            emit(DeleteAppointmentEstimateState());
+          }
+        } catch (e) {
+          emit(DeleteAppointmentEstimateErrorState(
+              errorMessage: "Something went wrong"));
+        }
       } else {
         final decodedResponse = json.decode(deleteAppointmentRes.body);
         emit(DeleteAppointmentEstimateErrorState(
@@ -972,6 +981,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
             beginDate: DateTime.parse(decodedBody['data']['begin_date']),
             endDate: DateTime.parse(decodedBody['data']['complete_date']),
             notes: decodedBody['data']['notes']));
+        log(getEventDetailsRes.body.toString() + "TESTING I");
       } else {
         emit(GetEventDetailsByIdErrorState(
             errorMessage: "Something went wrong"));
