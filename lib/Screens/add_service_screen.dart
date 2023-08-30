@@ -2665,7 +2665,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         status = false;
       } else {
         if (addSubContractNameController.text.trim().length < 2) {
-          addSubContractNameErrorStatus = "Sub Contract name can't be empty";
+          addSubContractNameErrorStatus =
+              "Sub Contract name must be atleast 2 characters";
           status = false;
         } else {
           addSubContractNameErrorStatus = '';

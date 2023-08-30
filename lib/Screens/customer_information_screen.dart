@@ -1333,14 +1333,14 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                           contentPadding: const EdgeInsets.symmetric(
                               horizontal: 22, vertical: 18),
                           hintText: "Enter your messsage..",
-                          prefixIcon: Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: SvgPicture.asset(
-                                    "assets/images/attachment_icon.svg")),
-                          ),
+                          // prefixIcon: Padding(
+                          //   padding: const EdgeInsets.all(12.0),
+                          //   child: SizedBox(
+                          //       height: 20,
+                          //       width: 20,
+                          //       child: SvgPicture.asset(
+                          //           "assets/images/attachment_icon.svg")),
+                          // ),
                           suffixIcon: Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: GestureDetector(
