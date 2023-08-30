@@ -435,13 +435,27 @@ class ApiProvider {
         ..fields['first_name'] = firstName
         ..fields['last_name'] = lastName
         ..fields['email'] = email
-        ..fields['phone'] = mobileNo
-        ..fields['notes'] = customerNotes
-        ..fields['address_line_1'] = address
-        ..fields['province_name'] = state
-        ..fields['province_id'] = stateId
-        ..fields['town_city'] = city
-        ..fields['zipcode'] = pinCode;
+        ..fields['phone'] = mobileNo;
+
+      if (customerNotes.isNotEmpty) {
+        request.fields['notes'] = customerNotes;
+      }
+      if (address.isNotEmpty) {
+        request.fields['address_line_1'] = address;
+      }
+      if (state.isNotEmpty) {
+        request.fields['province_name'] = state;
+      }
+      if (stateId.isNotEmpty) {
+        request.fields['province_id'] = stateId;
+      }
+      if (city.isNotEmpty) {
+        request.fields['town_city'] = city;
+      }
+      if (pinCode.isNotEmpty) {
+        request.fields['zipcode'] = pinCode;
+      }
+      log(request.fields.toString());
 
       var response = await request.send();
       print('object========id: ${stateId}=name:=${state}=====================');
@@ -470,11 +484,26 @@ class ApiProvider {
   ) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var url = Uri.parse(
-          '${BASE_URL}api/customers/$id?email=$email&first_name=$firstName&last_name=$lastName&phone=$mobileNo&notes=$customerNotes&address_line_1=$address&province_name=$state&province_id=$stateId&town_city=$city&zipcode=$pinCode&client_id=${prefs.getString(AppConstants.USER_ID)}');
+      var url =
+          '${BASE_URL}api/customers/$id?email=$email&first_name=$firstName&last_name=$lastName&phone=$mobileNo&notes=$customerNotes&address_line_1=$address&province_name=$state&province_id=$stateId&town_city=$city&zipcode=$pinCode&client_id=${prefs.getString(AppConstants.USER_ID)}';
       print('hjjjjjjjjjjjjjjjj${token}');
 
-      var request = http.MultipartRequest("PUT", url)
+      if (address.isNotEmpty) {
+        url = url + "&address_line_1=$address";
+      }
+      if (state.isNotEmpty) {
+        url = url + "&province_name=$state";
+      }
+      if (stateId.isNotEmpty) {
+        url = url + "&province_id=$stateId";
+      }
+      if (city.isNotEmpty) {
+        url = url + "&town_city=$city";
+      }
+      if (pinCode.isNotEmpty) {
+        url = url + "&zipcode=$pinCode";
+      }
+      var request = http.MultipartRequest("PUT", Uri.parse(url))
         ..headers['Authorization'] = "Bearer $token";
 
       var response = await request.send();

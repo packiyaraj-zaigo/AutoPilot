@@ -43,7 +43,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
   List<ProvinceData> proviceList = [];
   ScrollController provinceScrollController = ScrollController();
   final TextEditingController provinceController = TextEditingController();
-  int? provinceId;
+  int provinceId = 0;
   bool firstNameErrorStatus = false;
   bool lastNameErrorStatus = false;
   bool emailErrorStatus = false;
@@ -469,9 +469,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             label == 'First Name' ||
                     label == 'Last Name' ||
                     label == 'Email' ||
-                    label == 'Phone' ||
-                    label == 'Address' ||
-                    label == 'City'
+                    label == 'Phone'
                 ? const Text(
                     " *",
                     style: TextStyle(
@@ -550,13 +548,13 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
-            const Text(
-              "*",
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xffD80027)),
-            ),
+            // const Text(
+            //   "*",
+            //   style: TextStyle(
+            //       fontSize: 14,
+            //       fontWeight: FontWeight.w400,
+            //       color: Color(0xffD80027)),
+            // ),
           ],
         ),
         Padding(
@@ -804,13 +802,13 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   fontWeight: FontWeight.w500,
                   color: Color(0xff6A7187)),
             ),
-            Text(
-              "*",
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xffD80027)),
-            ),
+            // Text(
+            //   "*",
+            //   style: TextStyle(
+            //       fontSize: 14,
+            //       fontWeight: FontWeight.w400,
+            //       color: Color(0xffD80027)),
+            // ),
           ],
         ),
         Padding(
@@ -940,59 +938,59 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         phoneNumberErrorStatus = false;
       });
     }
-    if (address.trim().isEmpty) {
-      setState(() {
-        addressErrorStatus = true;
-        addressErrorMsg = "Address can't be empty";
-      });
-    } else if (address.trim().length < 2) {
-      setState(() {
-        addressErrorMsg = "Enter a valid address";
-        addressErrorStatus = true;
-      });
-    } else {
-      setState(() {
-        addressErrorStatus = false;
-      });
-    }
-    if (city.trim().isEmpty) {
-      setState(() {
-        cityErrorStatus = true;
-        cityErrorMsg = "City can't be empty";
-      });
-    } else if (city.length < 2) {
-      setState(() {
-        cityErrorStatus = true;
-        cityErrorMsg = "City must be at least 2 characters.";
-      });
-    } else {
-      setState(() {
-        cityErrorStatus = false;
-      });
-    }
-    if (state.trim().isEmpty) {
-      stateErrorMsg = "State can't be empty";
-      stateErrorStatus = true;
-    } else {
-      setState(() {
-        stateErrorStatus = false;
-      });
-    }
-    if (zipCode.trim().isEmpty) {
-      setState(() {
-        zipCodeErrorStatus = true;
-        zipCodeErrorMsg = "Zipcode can't be empty";
-      });
-    } else if (zipCode.length < 5) {
-      setState(() {
-        zipCodeErrorStatus = true;
-        zipCodeErrorMsg = "Please enter a valid zipcode";
-      });
-    } else {
-      setState(() {
-        zipCodeErrorStatus = false;
-      });
-    }
+    // if (address.trim().isEmpty) {
+    //   setState(() {
+    //     addressErrorStatus = true;
+    //     addressErrorMsg = "Address can't be empty";
+    //   });
+    // } else if (address.trim().length < 2) {
+    //   setState(() {
+    //     addressErrorMsg = "Enter a valid address";
+    //     addressErrorStatus = true;
+    //   });
+    // } else {
+    //   setState(() {
+    //     addressErrorStatus = false;
+    //   });
+    // }
+    // if (city.trim().isEmpty) {
+    //   setState(() {
+    //     cityErrorStatus = true;
+    //     cityErrorMsg = "City can't be empty";
+    //   });
+    // } else if (city.length < 2) {
+    //   setState(() {
+    //     cityErrorStatus = true;
+    //     cityErrorMsg = "City must be at least 2 characters.";
+    //   });
+    // } else {
+    //   setState(() {
+    //     cityErrorStatus = false;
+    //   });
+    // }
+    // if (state.trim().isEmpty) {
+    //   stateErrorMsg = "State can't be empty";
+    //   stateErrorStatus = true;
+    // } else {
+    //   setState(() {
+    //     stateErrorStatus = false;
+    //   });
+    // }
+    // if (zipCode.trim().isEmpty) {
+    //   setState(() {
+    //     zipCodeErrorStatus = true;
+    //     zipCodeErrorMsg = "Zipcode can't be empty";
+    //   });
+    // } else if (zipCode.length < 5) {
+    //   setState(() {
+    //     zipCodeErrorStatus = true;
+    //     zipCodeErrorMsg = "Please enter a valid zipcode";
+    //   });
+    // } else {
+    //   setState(() {
+    //     zipCodeErrorStatus = false;
+    //   });
+    // }
 
     networkCheck().then((value) {
       if (!value &&
