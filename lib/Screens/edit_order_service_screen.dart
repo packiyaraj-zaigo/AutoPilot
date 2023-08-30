@@ -880,17 +880,18 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == "Quantity"
                   ? TextInputType.number
                   : null,
-              inputFormatters: label == 'Discount' ||
-                      label == 'Cost' ||
-                      label == 'Cost ' ||
-                      label == 'Price' ||
-                      label == 'Tax' ||
-                      label.contains('Labor Rate') ||
-                      label == "Hours" ||
-                      label == 'Price ' ||
-                      label == "Quantity"
+              inputFormatters: label == "Hours"
                   ? [FilteringTextInputFormatter.digitsOnly]
-                  : [],
+                  : label == 'Discount' ||
+                          label == 'Cost' ||
+                          label == 'Cost ' ||
+                          label == 'Price' ||
+                          label == 'Tax' ||
+                          label.contains('Labor Rate') ||
+                          label == 'Price ' ||
+                          label == "Quantity"
+                      ? [NumberInputFormatter()]
+                      : [],
               maxLength: 50,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
@@ -1110,42 +1111,52 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
       if (addMaterialNameController.text.trim().isEmpty) {
-        adddMaterialNameErrorStatus = 'Material name cannot be empty';
+        adddMaterialNameErrorStatus = "Material name can't be empty";
         status = false;
       } else {
-        adddMaterialNameErrorStatus = '';
+        if (addMaterialNameController.text.trim().length < 2) {
+          adddMaterialNameErrorStatus =
+              "Material name must be alteast 2 characters";
+          status = false;
+        } else {
+          adddMaterialNameErrorStatus = '';
+        }
       }
-      if (addMaterialDescriptionController.text.trim().isEmpty) {
-        addMaterialDescriptionErrorStatus = 'Description cannot be empty';
-        status = false;
-      } else {
-        addMaterialDescriptionErrorStatus = '';
-      }
+      // if (addMaterialDescriptionController.text.trim().isEmpty) {
+      //   addMaterialDescriptionErrorStatus = "Description can't be empty";
+      //   status = false;
+      // } else {
+      //   addMaterialDescriptionErrorStatus = '';
+      // }
       if (addMaterialPriceController.text.trim().isEmpty) {
-        addMaterialPriceErrorStatus = 'Price cannot be empty';
+        addMaterialPriceErrorStatus = "Price can't be empty";
         status = false;
       } else {
         addMaterialPriceErrorStatus = '';
       }
-      if (addMaterialDiscountController.text.trim().isEmpty) {
-        addMaterialDiscountErrorStatus = 'Discount cannot be empty';
+      if (addMaterialDiscountController.text.trim().isNotEmpty &&
+          isPercentage &&
+          double.parse(addMaterialDiscountController.text) > 100) {
+        addMaterialDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else if (subTotal < 0) {
+      } else if (addMaterialDiscountController.text.trim().isNotEmpty &&
+          subTotal < 0) {
         addMaterialDiscountErrorStatus = 'Discount should be less than price';
         status = false;
       } else {
         addMaterialDiscountErrorStatus = '';
       }
-      if (addMaterialBatchController.text.trim().isEmpty) {
-        adddMaterialBatchErrorStatus = 'Part/Batch Number cannot be empty';
-        status = false;
-      } else {
-        adddMaterialBatchErrorStatus = '';
-      }
+      // if (addMaterialBatchController.text.trim().isEmpty) {
+      //   adddMaterialBatchErrorStatus = "Part Batch Number can't be empty";
+      //   status = false;
+      // } else {
+      //   adddMaterialBatchErrorStatus = '';
+      // }
 
       setState(() {});
       return status;
@@ -1251,7 +1262,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                             "Description",
                             addMaterialDescriptionErrorStatus.isNotEmpty,
                             context,
-                            true),
+                            false),
                       ),
                       errorWidget(error: addMaterialDescriptionErrorStatus),
                       Padding(
@@ -1290,58 +1301,116 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
-                      Stack(
-                        children: [
-                          textBox(
-                              "Enter Amount",
-                              addMaterialDiscountController,
-                              "Discount",
-                              addMaterialDiscountErrorStatus.isNotEmpty,
-                              context,
-                              true,
-                              newSetState),
-                          Positioned(
-                            right: 10,
-                            top: 42,
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    isPercentage = false;
-                                    newSetState(() {});
-                                  },
-                                  child: Icon(
-                                    CupertinoIcons.money_dollar,
-                                    color: isPercentage
-                                        ? AppColors.greyText
-                                        : AppColors.primaryColors,
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Stack(
+                          children: [
+                            textBox(
+                                "Enter Amount",
+                                addMaterialDiscountController,
+                                "Discount",
+                                addMaterialDiscountErrorStatus.isNotEmpty,
+                                context,
+                                false,
+                                newSetState),
+                            Positioned(
+                              right: 10,
+                              top: 42,
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      isPercentage = false;
+                                      newSetState(() {});
+                                    },
+                                    child: Icon(
+                                      CupertinoIcons.money_dollar,
+                                      color: isPercentage
+                                          ? AppColors.greyText
+                                          : AppColors.primaryColors,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  '  /  ',
-                                  style: TextStyle(
-                                    color: AppColors.greyText,
-                                    fontSize: 18,
+                                  Text(
+                                    '  /  ',
+                                    style: TextStyle(
+                                      color: AppColors.greyText,
+                                      fontSize: 18,
+                                    ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    isPercentage = true;
-                                    newSetState(() {});
-                                  },
-                                  child: Icon(
-                                    Icons.percent,
-                                    color: !isPercentage
-                                        ? AppColors.greyText
-                                        : AppColors.primaryColors,
+                                  GestureDetector(
+                                    onTap: () {
+                                      isPercentage = true;
+                                      newSetState(() {});
+                                    },
+                                    child: Icon(
+                                      Icons.percent,
+                                      color: !isPercentage
+                                          ? AppColors.greyText
+                                          : AppColors.primaryColors,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       errorWidget(error: addMaterialDiscountErrorStatus),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 17),
+                      //   child: Row(
+                      //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      //     children: [
+                      //       const Text(
+                      //         "Label",
+                      //         style: TextStyle(
+                      //           fontSize: 14,
+                      //           fontWeight: FontWeight.w500,
+                      //           color: Color(0xff6A7187),
+                      //         ),
+                      //       ),
+                      //       GestureDetector(
+                      //         onTap: () {
+                      //           newSetState(() {
+                      //             tagDataList.add("Tag");
+                      //           });
+                      //         },
+                      //         child: const Row(
+                      //           children: [
+                      //             Icon(
+                      //               Icons.add,
+                      //               color: AppColors.primaryColors,
+                      //             ),
+                      //             Text(
+                      //               "Add New",
+                      //               style: TextStyle(
+                      //                 fontSize: 14,
+                      //                 fontWeight: FontWeight.w600,
+                      //                 color: AppColors.primaryColors,
+                      //               ),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       )
+                      //     ],
+                      //   ),
+                      // ),
+                      GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                //  maxCrossAxisExtent: 150,
+                                mainAxisSpacing: 20,
+                                crossAxisCount: 3,
+                                crossAxisSpacing: 8,
+                                childAspectRatio: 3),
+                        itemBuilder: (context, index) {
+                          return tagWidget(
+                              tagDataList[index], index, newSetState);
+                        },
+                        itemCount: tagDataList.length,
+                        physics: ClampingScrollPhysics(),
+                        shrinkWrap: true,
+                      ),
                       Padding(
                         padding: EdgeInsets.only(top: 17),
                         child: textBox(
@@ -1350,7 +1419,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                             "Part/Batch Number",
                             adddMaterialBatchErrorStatus.isNotEmpty,
                             context,
-                            true),
+                            false),
                       ),
                       errorWidget(error: adddMaterialBatchErrorStatus),
                       Padding(
@@ -1398,7 +1467,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 17),
+                        padding: const EdgeInsets.only(top: 17),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1423,22 +1492,29 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         padding: EdgeInsets.only(top: 31),
                         child: ElevatedButton(
                           onPressed: () {
+                            FocusManager.instance.primaryFocus?.unfocus();
+
                             final status = addMaterialValidation(newSetState);
                             if (status) {
+                              final focus = FocusNode().requestFocus();
                               material.add(CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
                                 note: addMaterialDescriptionController.text,
                                 part: addMaterialBatchController.text,
                                 itemName: addMaterialNameController.text,
                                 unitPrice: addMaterialPriceController.text,
-                                discount: addMaterialDiscountController.text,
-                                discountType:
-                                    isPercentage ? "Percentage" : "Fixed",
+                                discount: addMaterialDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addMaterialDiscountController.text.trim(),
+                                discountType: isPercentage &&
+                                        addMaterialDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
-                                tax: client!.taxOnMaterial == "Y"
-                                    ? client!.materialTaxRate ?? '0'
-                                    : '0',
                               ));
                               setState(() {});
                               Navigator.pop(context);
@@ -1477,60 +1553,75 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     final addPartNameController = TextEditingController();
     final addPartDescriptionController = TextEditingController();
     final addPartPriceController = TextEditingController();
+    final addPartQuantityController = TextEditingController(text: '1');
     final addPartCostController = TextEditingController();
     final addPartDiscountController = TextEditingController(text: '0');
     final addPartPartNumberController = TextEditingController();
-    final addPartQuantityController = TextEditingController(text: '1');
 
     //Add part errorstatus and error message variables
     String addPartNameErrorStatus = '';
     String addPartDescriptionErrorStatus = '';
-    String addPartQuantityErrorStatus = '';
     String addPartPriceErrorStatus = '';
+    String addPartQuantityErrorStatus = '';
     String addPartCostErrorStatus = '';
     String addPartDiscountErrorStatus = '';
     String adddPartPartNumberErrorStatus = '';
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
       if (addPartNameController.text.trim().isEmpty) {
-        addPartNameErrorStatus = 'Part name cannot be empty';
+        addPartNameErrorStatus = "Part name can't be empty";
         status = false;
       } else {
-        addPartNameErrorStatus = '';
+        if (addPartNameController.text.trim().length < 2) {
+          addPartNameErrorStatus = "Part name must be atlest 2 characters";
+          status = false;
+        } else {
+          addPartNameErrorStatus = '';
+        }
       }
-      if (addPartDescriptionController.text.trim().isEmpty) {
-        addPartDescriptionErrorStatus = 'Description cannot be empty';
-        status = false;
-      } else {
-        addPartDescriptionErrorStatus = '';
-      }
+      // if (addPartDescriptionController.text.trim().isEmpty) {
+      //   addPartDescriptionErrorStatus = "Description can't be empty";
+      //   status = false;
+      // } else {
+      //   addPartDescriptionErrorStatus = '';
+      // }
       if (addPartPriceController.text.trim().isEmpty) {
-        addPartPriceErrorStatus = 'Price cannot be empty';
+        addPartPriceErrorStatus = "Price can't be empty";
         status = false;
       } else {
         addPartPriceErrorStatus = '';
       }
-      if (addPartDiscountController.text.trim().isEmpty) {
-        addPartDiscountErrorStatus = 'Discount cannot be empty';
+      if (addPartQuantityController.text.trim().isEmpty) {
+        addPartQuantityErrorStatus = "Quantity can't be empty";
+        status = false;
+      } else if (double.parse(addPartQuantityController.text.trim()) < 1) {
+        addPartQuantityErrorStatus = "Enter a valid quantity";
+        status = false;
+      } else {
+        addPartQuantityErrorStatus = '';
+      }
+      if (addPartDiscountController.text.trim().isNotEmpty &&
+          isPercentage &&
+          double.parse(addPartDiscountController.text) > 100) {
+        addPartDiscountErrorStatus = 'Discount should be less than 100';
+        status = false;
+      } else if (addPartDiscountController.text.trim().isNotEmpty &&
+          subTotal < 0) {
+        addPartDiscountErrorStatus = "Discount cannot be greater than price";
         status = false;
       } else {
         addPartDiscountErrorStatus = '';
       }
       if (addPartPartNumberController.text.trim().isEmpty) {
-        adddPartPartNumberErrorStatus = 'Part Number cannot be empty';
+        adddPartPartNumberErrorStatus = "Part Number can't be empty";
         status = false;
       } else {
         adddPartPartNumberErrorStatus = '';
-      }
-      if (addPartQuantityController.text.trim().isEmpty) {
-        addPartQuantityErrorStatus = "Quantity can't be empty";
-        status = false;
-      } else {
-        addPartQuantityErrorStatus = '';
       }
 
       setState(() {});
@@ -1643,7 +1734,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Description",
                           addPartDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addPartDescriptionErrorStatus),
                     Padding(
@@ -1695,17 +1786,21 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                     errorWidget(error: addPartCostErrorStatus),
                     Stack(
                       children: [
-                        textBox(
+                        Padding(
+                          padding: EdgeInsets.only(top: 17),
+                          child: textBox(
                             "Enter Amount",
                             addPartDiscountController,
                             "Discount",
                             addPartDiscountErrorStatus.isNotEmpty,
                             context,
-                            true,
-                            newSetState),
+                            false,
+                            newSetState,
+                          ),
+                        ),
                         Positioned(
                           right: 10,
-                          top: 42,
+                          top: 58,
                           child: Row(
                             children: [
                               GestureDetector(
@@ -1745,6 +1840,61 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addPartDiscountErrorStatus),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 17),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         "Label",
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Color(0xff6A7187),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           newSetState(() {
+                    //             tagDataList.add("Tag");
+                    //           });
+                    //         },
+                    //         child: const Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.add,
+                    //               color: AppColors.primaryColors,
+                    //             ),
+                    //             Text(
+                    //               "Add New",
+                    //               style: TextStyle(
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: AppColors.primaryColors,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              //  maxCrossAxisExtent: 150,
+                              mainAxisSpacing: 20,
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 8,
+                              childAspectRatio: 3),
+                      itemBuilder: (context, index) {
+                        return tagWidget(
+                            tagDataList[index], index, newSetState);
+                      },
+                      itemCount: tagDataList.length,
+                      physics: ClampingScrollPhysics(),
+                      shrinkWrap: true,
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: textBox(
@@ -1753,7 +1903,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Part Number",
                           adddPartPartNumberErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: adddPartPartNumberErrorStatus),
                     Padding(
@@ -1826,23 +1976,29 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addPartValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             part.add(CannedServiceAddModel(
                               cannedServiceId: int.parse(serviceId),
                               note: addPartDescriptionController.text,
                               part: addPartPartNumberController.text,
                               itemName: addPartNameController.text,
                               unitPrice: addPartPriceController.text,
+                              discount:
+                                  addPartDiscountController.text.trim().isEmpty
+                                      ? "0"
+                                      : addPartDiscountController.text.trim(),
+                              discountType: isPercentage &&
+                                      addPartDiscountController.text.isNotEmpty
+                                  ? "Percentage"
+                                  : "Fixed",
                               quanityHours: addPartQuantityController.text,
-                              discount: addPartDiscountController.text,
-                              discountType:
-                                  isPercentage ? "Percentage" : "Fixed",
                               itemType: "Part",
                               subTotal: subTotal.toStringAsFixed(2),
-                              tax: client!.taxOnParts == "Y"
-                                  ? client!.salesTaxRate ?? '0'
-                                  : '0',
                             ));
                             setState(() {});
                             Navigator.pop(context);
@@ -1882,6 +2038,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     final addLaborCostController = TextEditingController();
     final addLaborDiscountController = TextEditingController(text: '0');
     final addLaborHoursController = TextEditingController(text: '1');
+    final addLaborBaseCostController =
+        TextEditingController(text: client?.baseLaborCost ?? '');
 
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
@@ -1889,38 +2047,45 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String addLaborCostErrorStatus = '';
     String addLaborDiscountErrorStatus = '';
     String addLaborHoursErrorStatus = '';
+    String addLaborBaseCostStatus = '';
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
       if (addLaborNameController.text.trim().isEmpty) {
-        addLaborNameErrorStatus = 'Labor name cannot be empty';
+        addLaborNameErrorStatus = "Labor name can't be empty";
         status = false;
       } else {
-        addLaborNameErrorStatus = '';
+        if (addLaborNameController.text.trim().length < 2) {
+          addLaborNameErrorStatus = "Labor name must be atleast 2 characters";
+          status = false;
+        } else {
+          addLaborNameErrorStatus = '';
+        }
       }
-      if (addLaborCostController.text.trim().isEmpty) {
-        addLaborCostErrorStatus = 'Cost cannot be empty';
+      if (addLaborBaseCostController.text.trim().isEmpty) {
+        addLaborBaseCostStatus = "Base Cost can't be empty";
         status = false;
       } else {
-        addLaborCostErrorStatus = '';
+        addLaborBaseCostStatus = '';
       }
       if (addLaborHoursController.text.trim().isEmpty) {
-        addLaborHoursErrorStatus = 'Hours cannot be empty';
+        addLaborHoursErrorStatus = "Hours can't be empty";
         status = false;
       } else {
         addLaborHoursErrorStatus = '';
       }
-      if (addLaborDescriptionController.text.trim().isEmpty) {
-        addLaborDescriptionErrorStatus = 'Description cannot be empty';
+
+      if (addLaborDiscountController.text.isNotEmpty &&
+          isPercentage &&
+          double.parse(addLaborDiscountController.text) > 100) {
+        addLaborDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else {
-        addLaborDescriptionErrorStatus = '';
-      }
-      if (addLaborDiscountController.text.trim().isEmpty) {
-        addLaborDiscountErrorStatus = 'Discount cannot be empty';
+      } else if (addLaborDiscountController.text.isNotEmpty && subTotal < 0) {
+        addLaborDiscountErrorStatus = "Discount cannot be greater than price";
         status = false;
       } else {
         addLaborDiscountErrorStatus = '';
@@ -1931,51 +2096,57 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     }
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
-      if (addLaborCostController.text.isNotEmpty) {
+      if (addLaborBaseCostController.text.isNotEmpty) {
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addLaborCostController.text) ?? 0);
+            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0);
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+              discount = ((double.tryParse(addLaborBaseCostController.text) ??
+                          0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
-            subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
-                discount);
+            subTotal =
+                ((double.tryParse(addLaborBaseCostController.text) ?? 0) -
+                    discount);
           }
           total = subTotal;
         } else {
+          log((client?.laborTaxRate).toString());
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborCostController.text) ?? 0)) *
+                        (double.tryParse(addLaborBaseCostController.text) ??
+                            0)) *
                     tax +
                 ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborCostController.text) ?? 0));
+                    (double.tryParse(addLaborBaseCostController.text) ?? 0));
             total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                (double.tryParse(addLaborCostController.text) ?? 0));
+                (double.tryParse(addLaborBaseCostController.text) ?? 0));
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+              discount = ((double.tryParse(addLaborBaseCostController.text) ??
+                          0) *
                       (double.tryParse(addLaborHoursController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                            (double.tryParse(addLaborCostController.text) ??
+                            (double.tryParse(addLaborBaseCostController.text) ??
                                 0)) -
                         discount) *
                     tax +
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborCostController.text) ?? 0)) -
+                        (double.tryParse(addLaborBaseCostController.text) ??
+                            0)) -
                     discount);
             total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborCostController.text) ?? 0)) -
+                    (double.tryParse(addLaborBaseCostController.text) ?? 0)) -
                 discount);
           }
         }
@@ -2025,7 +2196,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Description",
                           addLaborDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addLaborDescriptionErrorStatus),
                     Padding(
@@ -2044,6 +2215,18 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
                           "Amount",
+                          addLaborBaseCostController,
+                          "Base Cost",
+                          addLaborBaseCostStatus.isNotEmpty,
+                          context,
+                          true,
+                          newSetState),
+                    ),
+                    errorWidget(error: addLaborBaseCostStatus),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 17.0),
+                      child: textBox(
+                          "Amount",
                           addLaborCostController,
                           "Cost ",
                           addLaborCostErrorStatus.isNotEmpty,
@@ -2054,17 +2237,20 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                     errorWidget(error: addLaborCostErrorStatus),
                     Stack(
                       children: [
-                        textBox(
-                            "Enter Amount",
-                            addLaborDiscountController,
-                            "Discount",
-                            addLaborDiscountErrorStatus.isNotEmpty,
-                            context,
-                            true,
-                            newSetState),
+                        Padding(
+                          padding: EdgeInsets.only(top: 17),
+                          child: textBox(
+                              "Enter Amount",
+                              addLaborDiscountController,
+                              "Discount",
+                              addLaborDiscountErrorStatus.isNotEmpty,
+                              context,
+                              false,
+                              newSetState),
+                        ),
                         Positioned(
                           right: 10,
-                          top: 42,
+                          top: 58,
                           child: Row(
                             children: [
                               GestureDetector(
@@ -2174,8 +2360,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addLaborValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             labor.add(CannedServiceAddModel(
                               cannedServiceId: int.parse(serviceId),
                               note: addLaborDescriptionController.text,
@@ -2183,15 +2373,17 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               part: '',
                               itemName: addLaborNameController.text,
                               unitPrice: addLaborCostController.text,
-                              discount: addLaborDiscountController.text,
-                              discountType:
-                                  isPercentage ? "Percentage" : "Fixed",
+                              discount:
+                                  addLaborDiscountController.text.trim().isEmpty
+                                      ? "0"
+                                      : addLaborDiscountController.text.trim(),
+                              discountType: isPercentage &&
+                                      addLaborDiscountController.text.isNotEmpty
+                                  ? "Percentage"
+                                  : "Fixed",
                               quanityHours: addLaborHoursController.text,
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
-                              tax: client!.taxOnLabors == "Y"
-                                  ? client!.laborTaxRate ?? '0'
-                                  : '0',
                             ));
                             setState(() {});
                             Navigator.pop(context);
@@ -2243,22 +2435,21 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     addFeeValidation(StateSetter setState) {
       bool status = true;
       if (addFeeNameController.text.trim().isEmpty) {
-        addFeeNameErrorStatus = 'Fee name cannot be empty';
+        addFeeNameErrorStatus = "Fee name can't be empty";
         status = false;
       } else {
-        addFeeNameErrorStatus = '';
+        if (addFeeNameController.text.trim().length < 2) {
+          addFeeNameErrorStatus = "Fee name must be atleast 2 characters";
+          status = false;
+        } else {
+          addFeeNameErrorStatus = '';
+        }
       }
       if (addFeePriceController.text.trim().isEmpty) {
-        addFeePriceErrorStatus = 'Price cannot be empty';
+        addFeePriceErrorStatus = "Price can't be empty";
         status = false;
       } else {
         addFeePriceErrorStatus = '';
-      }
-      if (addFeeDescriptionController.text.trim().isEmpty) {
-        addFeeDescriptionErrorStatus = 'Description cannot be empty';
-        status = false;
-      } else {
-        addFeeDescriptionErrorStatus = '';
       }
 
       setState(() {});
@@ -2322,7 +2513,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Description",
                           addFeeDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addFeeDescriptionErrorStatus),
                     Padding(
@@ -2343,6 +2534,61 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           addFeeCostErrorStatus.isNotEmpty, context, false),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 17),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         "Label",
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Color(0xff6A7187),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           newSetState(() {
+                    //             tagDataList.add("Tag");
+                    //           });
+                    //         },
+                    //         child: const Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.add,
+                    //               color: AppColors.primaryColors,
+                    //             ),
+                    //             Text(
+                    //               "Add New",
+                    //               style: TextStyle(
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: AppColors.primaryColors,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              //  maxCrossAxisExtent: 150,
+                              mainAxisSpacing: 20,
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 8,
+                              childAspectRatio: 3),
+                      itemBuilder: (context, index) {
+                        return tagWidget(
+                            tagDataList[index], index, newSetState);
+                      },
+                      itemCount: tagDataList.length,
+                      physics: ClampingScrollPhysics(),
+                      shrinkWrap: true,
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2413,8 +2659,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addFeeValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             fee.add(CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
                                 note: addFeeDescriptionController.text,
@@ -2424,9 +2674,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 discount: '0',
                                 unitPrice: addFeePriceController.text,
                                 itemType: "Fee",
-                                tax: client!.taxOnLabors == "Y"
-                                    ? client!.laborTaxRate ?? '0'
-                                    : '0',
                                 subTotal: subTotal.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
@@ -2478,29 +2725,38 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = false;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
       if (addSubContractNameController.text.trim().isEmpty) {
-        addSubContractNameErrorStatus = 'Sub Contract name cannot be empty';
+        addSubContractNameErrorStatus = "Sub Contract name can't be empty";
         status = false;
       } else {
-        addSubContractNameErrorStatus = '';
+        if (addSubContractNameController.text.trim().length < 2) {
+          addSubContractNameErrorStatus =
+              "Sub Contract name must be atleast 2 characters";
+          status = false;
+        } else {
+          addSubContractNameErrorStatus = '';
+        }
       }
       if (addSubContractPriceController.text.trim().isEmpty) {
-        addSubContractPriceErrorStatus = 'Price cannot be empty';
+        addSubContractPriceErrorStatus = "Price can't be empty";
         status = false;
       } else {
         addSubContractPriceErrorStatus = '';
       }
-      if (addSubContractDescriptionController.text.trim().isEmpty) {
-        addSubContractDescriptionErrorStatus = 'Description cannot be empty';
+
+      if (addSubContractDiscountController.text.isNotEmpty &&
+          isPercentage &&
+          double.parse(addSubContractDiscountController.text) > 100) {
+        addSubContractDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else {
-        addSubContractDescriptionErrorStatus = '';
-      }
-      if (addSubContractDiscountController.text.trim().isEmpty) {
-        addSubContractDiscountErrorStatus = 'Discount cannot be empty';
+      } else if (addSubContractDiscountController.text.isNotEmpty &&
+          subTotal < 0) {
+        addSubContractDiscountErrorStatus =
+            "Discount cannot be greater than price";
         status = false;
       } else {
         addSubContractDiscountErrorStatus = '';
@@ -2609,7 +2865,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Description",
                           addSubContractDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addSubContractDescriptionErrorStatus),
                     Padding(
@@ -2635,33 +2891,22 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.center,
-                    //   children: [
-                    //     Checkbox(
-                    //         value: isTax,
-                    //         onChanged: (value) {
-                    //           newSetState(() {
-                    //             isTax = value!;
-                    //           });
-                    //         }),
-                    //     Text('Allow Tax Charges On Sub Contract',
-                    //         style: TextStyle(color: Color(0xFF6A7187))),
-                    //   ],
-                    // ),
                     Stack(
                       children: [
-                        textBox(
-                            "Enter Amount",
-                            addSubContractDiscountController,
-                            "Discount",
-                            addSubContractDiscountErrorStatus.isNotEmpty,
-                            context,
-                            true,
-                            newSetState),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 17.0),
+                          child: textBox(
+                              "Amount",
+                              addSubContractDiscountController,
+                              "Discount",
+                              addSubContractDiscountErrorStatus.isNotEmpty,
+                              context,
+                              false,
+                              newSetState),
+                        ),
                         Positioned(
                           right: 10,
-                          top: 42,
+                          top: 58,
                           child: Row(
                             children: [
                               GestureDetector(
@@ -2701,7 +2946,61 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       ],
                     ),
                     errorWidget(error: addSubContractDiscountErrorStatus),
-
+                    // Padding(
+                    //   padding: const EdgeInsets.only(top: 17),
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //     children: [
+                    //       const Text(
+                    //         "Label",
+                    //         style: TextStyle(
+                    //           fontSize: 14,
+                    //           fontWeight: FontWeight.w500,
+                    //           color: Color(0xff6A7187),
+                    //         ),
+                    //       ),
+                    //       GestureDetector(
+                    //         onTap: () {
+                    //           newSetState(() {
+                    //             tagDataList.add("Tag");
+                    //           });
+                    //         },
+                    //         child: const Row(
+                    //           children: [
+                    //             Icon(
+                    //               Icons.add,
+                    //               color: AppColors.primaryColors,
+                    //             ),
+                    //             Text(
+                    //               "Add New",
+                    //               style: TextStyle(
+                    //                 fontSize: 14,
+                    //                 fontWeight: FontWeight.w600,
+                    //                 color: AppColors.primaryColors,
+                    //               ),
+                    //             ),
+                    //           ],
+                    //         ),
+                    //       )
+                    //     ],
+                    //   ),
+                    // ),
+                    GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                              //  maxCrossAxisExtent: 150,
+                              mainAxisSpacing: 20,
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 8,
+                              childAspectRatio: 3),
+                      itemBuilder: (context, index) {
+                        return tagWidget(
+                            tagDataList[index], index, newSetState);
+                      },
+                      itemCount: tagDataList.length,
+                      physics: ClampingScrollPhysics(),
+                      shrinkWrap: true,
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2713,7 +3012,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           false),
                     ),
                     errorWidget(error: addSubContractVendorErrorStatus),
-
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2784,8 +3082,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+
                           final status = addSubContractValidation(newSetState);
                           if (status) {
+                            final focus = FocusNode().requestFocus();
+
                             subContract.add(
                               CannedServiceAddModel(
                                 cannedServiceId: int.parse(serviceId),
@@ -2793,17 +3095,23 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 // part: addSubContractSubContractNumberController.text,
                                 part: '',
                                 itemName: addSubContractNameController.text,
-                                discount: addSubContractDiscountController.text,
-                                //tax: isTax == true ? 'Y' : 'N',
+                                discount: addSubContractDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addSubContractDiscountController.text
+                                        .trim(),
+                                discountType: isPercentage &&
+                                        addSubContractDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
+
+                                tax: isTax == true ? 'Y' : 'N',
                                 vendorId: vendorId,
                                 unitPrice: addSubContractPriceController.text,
-                                discountType:
-                                    isPercentage ? "Percentage" : "Fixed",
                                 itemType: "SubContract",
                                 subTotal: subTotal.toStringAsFixed(2),
-                                tax: client!.taxOnLabors == "Y"
-                                    ? client!.laborTaxRate ?? '0'
-                                    : '0',
                               ),
                             );
                             setState(() {});
@@ -3216,5 +3524,26 @@ class errorWidget extends StatelessWidget {
             ),
           )),
     );
+  }
+}
+
+class NumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // If the new value is empty, allow it
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Use a regular expression to check for valid input
+    final regExp = RegExp(r'^\d*\.?\d*$');
+    if (!regExp.hasMatch(newValue.text)) {
+      // If the input doesn't match the pattern, return the old value
+      return oldValue;
+    }
+
+    // If the input is valid, allow it
+    return newValue;
   }
 }

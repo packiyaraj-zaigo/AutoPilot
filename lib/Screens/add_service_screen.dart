@@ -829,17 +829,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Quantity"
                   ? TextInputType.number
                   : null,
-              inputFormatters: label == 'Discount' ||
-                      label == 'Cost' ||
-                      label == 'Cost ' ||
-                      label == 'Price' ||
-                      label == 'Tax' ||
-                      label.contains('Labor Rate') ||
-                      label == "Hours" ||
-                      label == 'Price ' ||
-                      label == "Quantity"
+              inputFormatters: label == "Hours"
                   ? [FilteringTextInputFormatter.digitsOnly]
-                  : [],
+                  : label == 'Discount' ||
+                          label == 'Cost' ||
+                          label == 'Cost ' ||
+                          label == 'Price' ||
+                          label == 'Tax' ||
+                          label.contains('Labor Rate') ||
+                          label == 'Price ' ||
+                          label == "Quantity"
+                      ? [NumberInputFormatter()]
+                      : [],
               maxLength: label == 'Cost' ||
                       label == 'Cost ' ||
                       label == 'Price' ||
@@ -1079,37 +1080,36 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           adddMaterialNameErrorStatus = '';
         }
       }
-      if (addMaterialDescriptionController.text.trim().isEmpty) {
-        addMaterialDescriptionErrorStatus = "Description can't be empty";
-        status = false;
-      } else {
-        addMaterialDescriptionErrorStatus = '';
-      }
+      // if (addMaterialDescriptionController.text.trim().isEmpty) {
+      //   addMaterialDescriptionErrorStatus = "Description can't be empty";
+      //   status = false;
+      // } else {
+      //   addMaterialDescriptionErrorStatus = '';
+      // }
       if (addMaterialPriceController.text.trim().isEmpty) {
         addMaterialPriceErrorStatus = "Price can't be empty";
         status = false;
       } else {
         addMaterialPriceErrorStatus = '';
       }
-      if (addMaterialDiscountController.text.trim().isEmpty) {
-        addMaterialDiscountErrorStatus = "Discount can't be empty";
-        status = false;
-      } else if (isPercentage &&
+      if (addMaterialDiscountController.text.trim().isNotEmpty &&
+          isPercentage &&
           double.parse(addMaterialDiscountController.text) > 100) {
         addMaterialDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else if (subTotal < 0) {
+      } else if (addMaterialDiscountController.text.trim().isNotEmpty &&
+          subTotal < 0) {
         addMaterialDiscountErrorStatus = 'Discount should be less than price';
         status = false;
       } else {
         addMaterialDiscountErrorStatus = '';
       }
-      if (addMaterialBatchController.text.trim().isEmpty) {
-        adddMaterialBatchErrorStatus = "Part Batch Number can't be empty";
-        status = false;
-      } else {
-        adddMaterialBatchErrorStatus = '';
-      }
+      // if (addMaterialBatchController.text.trim().isEmpty) {
+      //   adddMaterialBatchErrorStatus = "Part Batch Number can't be empty";
+      //   status = false;
+      // } else {
+      //   adddMaterialBatchErrorStatus = '';
+      // }
 
       setState(() {});
       return status;
@@ -1215,7 +1215,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             "Description",
                             addMaterialDescriptionErrorStatus.isNotEmpty,
                             context,
-                            true),
+                            false),
                       ),
                       errorWidget(error: addMaterialDescriptionErrorStatus),
                       Padding(
@@ -1264,7 +1264,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 "Discount",
                                 addMaterialDiscountErrorStatus.isNotEmpty,
                                 context,
-                                true,
+                                false,
                                 newSetState),
                             Positioned(
                               right: 10,
@@ -1372,7 +1372,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             "Part/Batch Number",
                             adddMaterialBatchErrorStatus.isNotEmpty,
                             context,
-                            true),
+                            false),
                       ),
                       errorWidget(error: adddMaterialBatchErrorStatus),
                       Padding(
@@ -1456,9 +1456,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 part: addMaterialBatchController.text,
                                 itemName: addMaterialNameController.text,
                                 unitPrice: addMaterialPriceController.text,
-                                discount: addMaterialDiscountController.text,
-                                discountType:
-                                    isPercentage ? "Percentage" : "Fixed",
+                                discount: addMaterialDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addMaterialDiscountController.text.trim(),
+                                discountType: isPercentage &&
+                                        addMaterialDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
                               ));
@@ -1530,12 +1537,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           addPartNameErrorStatus = '';
         }
       }
-      if (addPartDescriptionController.text.trim().isEmpty) {
-        addPartDescriptionErrorStatus = "Description can't be empty";
-        status = false;
-      } else {
-        addPartDescriptionErrorStatus = '';
-      }
+      // if (addPartDescriptionController.text.trim().isEmpty) {
+      //   addPartDescriptionErrorStatus = "Description can't be empty";
+      //   status = false;
+      // } else {
+      //   addPartDescriptionErrorStatus = '';
+      // }
       if (addPartPriceController.text.trim().isEmpty) {
         addPartPriceErrorStatus = "Price can't be empty";
         status = false;
@@ -1551,14 +1558,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addPartQuantityErrorStatus = '';
       }
-      if (addPartDiscountController.text.trim().isEmpty) {
-        addPartDiscountErrorStatus = "Discount can't be empty";
-        status = false;
-      } else if (isPercentage &&
+      if (addPartDiscountController.text.trim().isNotEmpty &&
+          isPercentage &&
           double.parse(addPartDiscountController.text) > 100) {
         addPartDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else if (subTotal < 0) {
+      } else if (addPartDiscountController.text.trim().isNotEmpty &&
+          subTotal < 0) {
         addPartDiscountErrorStatus = "Discount cannot be greater than price";
         status = false;
       } else {
@@ -1681,7 +1687,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Description",
                           addPartDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addPartDescriptionErrorStatus),
                     Padding(
@@ -1741,7 +1747,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             "Discount",
                             addPartDiscountErrorStatus.isNotEmpty,
                             context,
-                            true,
+                            false,
                             newSetState,
                           ),
                         ),
@@ -1850,7 +1856,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Part Number",
                           adddPartPartNumberErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: adddPartPartNumberErrorStatus),
                     Padding(
@@ -1935,10 +1941,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               part: addPartPartNumberController.text,
                               itemName: addPartNameController.text,
                               unitPrice: addPartPriceController.text,
-                              discount: addPartDiscountController.text,
+                              discount:
+                                  addPartDiscountController.text.trim().isEmpty
+                                      ? "0"
+                                      : addPartDiscountController.text.trim(),
+                              discountType: isPercentage &&
+                                      addPartDiscountController.text.isNotEmpty
+                                  ? "Percentage"
+                                  : "Fixed",
                               quanityHours: addPartQuantityController.text,
-                              discountType:
-                                  isPercentage ? "Percentage" : "Fixed",
                               itemType: "Part",
                               subTotal: subTotal.toStringAsFixed(2),
                             ));
@@ -1980,6 +1991,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addLaborCostController = TextEditingController();
     final addLaborDiscountController = TextEditingController(text: '0');
     final addLaborHoursController = TextEditingController(text: '1');
+    final addLaborBaseCostController =
+        TextEditingController(text: client?.baseLaborCost ?? '');
 
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
@@ -1987,6 +2000,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String addLaborCostErrorStatus = '';
     String addLaborDiscountErrorStatus = '';
     String addLaborHoursErrorStatus = '';
+    String addLaborBaseCostStatus = '';
 
     double subTotal = 0;
     double total = 0;
@@ -2005,11 +2019,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           addLaborNameErrorStatus = '';
         }
       }
-      if (addLaborCostController.text.trim().isEmpty) {
-        addLaborCostErrorStatus = "Cost can't be empty";
+      if (addLaborBaseCostController.text.trim().isEmpty) {
+        addLaborBaseCostStatus = "Base Cost can't be empty";
         status = false;
       } else {
-        addLaborCostErrorStatus = '';
+        addLaborBaseCostStatus = '';
       }
       if (addLaborHoursController.text.trim().isEmpty) {
         addLaborHoursErrorStatus = "Hours can't be empty";
@@ -2017,20 +2031,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addLaborHoursErrorStatus = '';
       }
-      if (addLaborDescriptionController.text.trim().isEmpty) {
-        addLaborDescriptionErrorStatus = "Description can't be empty";
-        status = false;
-      } else {
-        addLaborDescriptionErrorStatus = '';
-      }
-      if (addLaborDiscountController.text.trim().isEmpty) {
-        addLaborDiscountErrorStatus = "Discount can't be empty";
-        status = false;
-      } else if (isPercentage &&
+
+      if (addLaborDiscountController.text.isNotEmpty &&
+          isPercentage &&
           double.parse(addLaborDiscountController.text) > 100) {
         addLaborDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else if (subTotal < 0) {
+      } else if (addLaborDiscountController.text.isNotEmpty && subTotal < 0) {
         addLaborDiscountErrorStatus = "Discount cannot be greater than price";
         status = false;
       } else {
@@ -2042,20 +2049,22 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     }
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
-      if (addLaborCostController.text.isNotEmpty) {
+      if (addLaborBaseCostController.text.isNotEmpty) {
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addLaborCostController.text) ?? 0);
+            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0);
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+              discount = ((double.tryParse(addLaborBaseCostController.text) ??
+                          0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
-            subTotal = ((double.tryParse(addLaborCostController.text) ?? 0) -
-                discount);
+            subTotal =
+                ((double.tryParse(addLaborBaseCostController.text) ?? 0) -
+                    discount);
           }
           total = subTotal;
         } else {
@@ -2063,31 +2072,34 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborCostController.text) ?? 0)) *
+                        (double.tryParse(addLaborBaseCostController.text) ??
+                            0)) *
                     tax +
                 ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborCostController.text) ?? 0));
+                    (double.tryParse(addLaborBaseCostController.text) ?? 0));
             total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                (double.tryParse(addLaborCostController.text) ?? 0));
+                (double.tryParse(addLaborBaseCostController.text) ?? 0));
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborCostController.text) ?? 0) *
+              discount = ((double.tryParse(addLaborBaseCostController.text) ??
+                          0) *
                       (double.tryParse(addLaborHoursController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                            (double.tryParse(addLaborCostController.text) ??
+                            (double.tryParse(addLaborBaseCostController.text) ??
                                 0)) -
                         discount) *
                     tax +
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborCostController.text) ?? 0)) -
+                        (double.tryParse(addLaborBaseCostController.text) ??
+                            0)) -
                     discount);
             total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborCostController.text) ?? 0)) -
+                    (double.tryParse(addLaborBaseCostController.text) ?? 0)) -
                 discount);
           }
         }
@@ -2137,7 +2149,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Description",
                           addLaborDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addLaborDescriptionErrorStatus),
                     Padding(
@@ -2152,6 +2164,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           newSetState),
                     ),
                     errorWidget(error: addLaborHoursErrorStatus),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 17.0),
+                      child: textBox(
+                          "Amount",
+                          addLaborBaseCostController,
+                          "Base Cost",
+                          addLaborBaseCostStatus.isNotEmpty,
+                          context,
+                          true,
+                          newSetState),
+                    ),
+                    errorWidget(error: addLaborBaseCostStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2174,7 +2198,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               "Discount",
                               addLaborDiscountErrorStatus.isNotEmpty,
                               context,
-                              true,
+                              false,
                               newSetState),
                         ),
                         Positioned(
@@ -2302,10 +2326,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               part: '',
                               itemName: addLaborNameController.text,
                               unitPrice: addLaborCostController.text,
-                              discount: addLaborDiscountController.text,
-                              discountType:
-                                  isPercentage ? "Percentage" : "Fixed",
-
+                              discount:
+                                  addLaborDiscountController.text.trim().isEmpty
+                                      ? "0"
+                                      : addLaborDiscountController.text.trim(),
+                              discountType: isPercentage &&
+                                      addLaborDiscountController.text.isNotEmpty
+                                  ? "Percentage"
+                                  : "Fixed",
                               quanityHours: addLaborHoursController.text,
                               itemType: "Labor",
                               subTotal: subTotal.toStringAsFixed(2),
@@ -2376,12 +2404,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addFeePriceErrorStatus = '';
       }
-      if (addFeeDescriptionController.text.trim().isEmpty) {
-        addFeeDescriptionErrorStatus = "Description can't be empty";
-        status = false;
-      } else {
-        addFeeDescriptionErrorStatus = '';
-      }
 
       setState(() {});
       return status;
@@ -2444,7 +2466,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Description",
                           addFeeDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addFeeDescriptionErrorStatus),
                     Padding(
@@ -2678,20 +2700,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addSubContractPriceErrorStatus = '';
       }
-      if (addSubContractDescriptionController.text.trim().isEmpty) {
-        addSubContractDescriptionErrorStatus = "Description can't be empty";
-        status = false;
-      } else {
-        addSubContractDescriptionErrorStatus = '';
-      }
-      if (addSubContractDiscountController.text.trim().isEmpty) {
-        addSubContractDiscountErrorStatus = "Discount can't be empty";
-        status = false;
-      } else if (isPercentage &&
+
+      if (addSubContractDiscountController.text.isNotEmpty &&
+          isPercentage &&
           double.parse(addSubContractDiscountController.text) > 100) {
         addSubContractDiscountErrorStatus = 'Discount should be less than 100';
         status = false;
-      } else if (subTotal < 0) {
+      } else if (addSubContractDiscountController.text.isNotEmpty &&
+          subTotal < 0) {
         addSubContractDiscountErrorStatus =
             "Discount cannot be greater than price";
         status = false;
@@ -2802,7 +2818,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Description",
                           addSubContractDescriptionErrorStatus.isNotEmpty,
                           context,
-                          true),
+                          false),
                     ),
                     errorWidget(error: addSubContractDescriptionErrorStatus),
                     Padding(
@@ -2838,7 +2854,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               "Discount",
                               addSubContractDiscountErrorStatus.isNotEmpty,
                               context,
-                              true,
+                              false,
                               newSetState),
                         ),
                         Positioned(
@@ -3032,9 +3048,17 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 // part: addSubContractSubContractNumberController.text,
                                 part: '',
                                 itemName: addSubContractNameController.text,
-                                discount: addSubContractDiscountController.text,
-                                discountType:
-                                    isPercentage ? "Percentage" : "Fixed",
+                                discount: addSubContractDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addSubContractDiscountController.text
+                                        .trim(),
+                                discountType: isPercentage &&
+                                        addSubContractDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
 
                                 tax: isTax == true ? 'Y' : 'N',
                                 vendorId: vendorId,
@@ -3349,5 +3373,26 @@ class errorWidget extends StatelessWidget {
             ),
           )),
     );
+  }
+}
+
+class NumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // If the new value is empty, allow it
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Use a regular expression to check for valid input
+    final regExp = RegExp(r'^\d*\.?\d*$');
+    if (!regExp.hasMatch(newValue.text)) {
+      // If the input doesn't match the pattern, return the old value
+      return oldValue;
+    }
+
+    // If the input is valid, allow it
+    return newValue;
   }
 }

@@ -98,7 +98,9 @@ class ClientModel {
         detConfirm: json["det_confirm"],
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
-        provinceName: ProvinceName.fromJson(json["province_name"]),
+        provinceName: json["province_name"] == null
+            ? null
+            : ProvinceName.fromJson(json["province_name"]),
       );
 
   Map<String, dynamic> toJson() => {

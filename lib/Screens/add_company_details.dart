@@ -611,21 +611,21 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     : TextCapitalization.none,
                 inputFormatters: label == "Business Phone"
                     ? [PhoneInputFormatter()]
-                    : label == "Number of Employees" ||
-                            label == 'Zip' ||
-                            label == "Labor Tax Rate" ||
-                            label == "Labor Tax Rate" ||
-                            label == "Parts Tax Rate" ||
-                            label == "Material Tax Rate"
+                    : label == "Number of Employees" || label == 'Zip'
                         ? [
                             FilteringTextInputFormatter.digitsOnly,
                           ]
-                        : label == "Shop Hourly Labor Rate"
-                            ? [
-                                FilteringTextInputFormatter.digitsOnly,
-                                DollarInputFormatter()
-                              ]
-                            : [],
+                        : label == "Labor Tax Rate" ||
+                                label == "Labor Tax Rate" ||
+                                label == "Parts Tax Rate" ||
+                                label == "Material Tax Rate"
+                            ? [NumberInputFormatter()]
+                            : label == "Shop Hourly Labor Rate"
+                                ? [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    DollarInputFormatter()
+                                  ]
+                                : [],
                 keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
                         label == "Shop Hourly Labor Rate" ||
@@ -1778,9 +1778,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                               ),
                                               const SizedBox(height: 3),
                                               Text(
-                                                item.roles?[0].name!
-                                                        .toUpperCase() ??
-                                                    '',
+                                                (item.roles?[0].name![0]
+                                                            .toUpperCase() ??
+                                                        '') +
+                                                    (item.roles?[0].name! ??
+                                                        ''),
                                                 overflow: TextOverflow.ellipsis,
                                                 maxLines: 1,
                                                 style: const TextStyle(
@@ -2099,6 +2101,27 @@ class DollarInputFormatter extends TextInputFormatter {
       );
     }
 
+    return newValue;
+  }
+}
+
+class NumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // If the new value is empty, allow it
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Use a regular expression to check for valid input
+    final regExp = RegExp(r'^\d*\.?\d*$');
+    if (!regExp.hasMatch(newValue.text)) {
+      // If the input doesn't match the pattern, return the old value
+      return oldValue;
+    }
+
+    // If the input is valid, allow it
     return newValue;
   }
 }

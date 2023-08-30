@@ -337,7 +337,9 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          '${widget.employee.roles?[0].name?.toUpperCase() ?? ''}',
+                          (widget.employee.roles?[0].name![0].toUpperCase() ??
+                                  '') +
+                              (widget.employee.roles?[0].name! ?? ''),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
