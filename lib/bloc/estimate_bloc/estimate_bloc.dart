@@ -478,6 +478,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     Emitter<EstimateState> emit,
   ) async {
     try {
+      emit(FirstOrderImageLoadingState());
+
       final token = await AppUtils.getToken();
       final Response uploadImageRes =
           await _apiRepository.uploadImage(token, event.imagePath);

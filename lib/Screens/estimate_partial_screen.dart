@@ -1403,7 +1403,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${widget.estimateDetails.data.vehicle?.kilometers ?? '0'} km",
+                  "${widget.estimateDetails.data.vehicle?.kilometers ?? '0'} mi",
                   style: TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryTitleColor,
@@ -1688,14 +1688,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    widget.estimateDetails.data.orderService?[serviceIndex]
-                            .serviceName ??
-                        "",
-                    style: const TextStyle(
-                        color: AppColors.primaryTitleColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600),
+                  Flexible(
+                    child: Text(
+                      widget.estimateDetails.data.orderService?[serviceIndex]
+                              .serviceName ??
+                          "",
+                      style: const TextStyle(
+                          color: AppColors.primaryTitleColor,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
                   Row(
                     children: [
@@ -1764,6 +1766,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   )
                 ],
               ),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  widget.estimateDetails.data.orderService?[serviceIndex]
+                          .serviceNote ??
+                      "",
+                  style: const TextStyle(
+                      color: AppColors.primaryTitleColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500),
+                ),
+              ),
               ListView.builder(
                 itemBuilder: (context, index) {
                   return Padding(
@@ -1772,19 +1786,70 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Flexible(
-                          child: Text(
-                            widget
-                                    .estimateDetails
-                                    .data
-                                    .orderService?[serviceIndex]
-                                    .orderServiceItems?[index]
-                                    .itemName ??
-                                "",
-                            style: const TextStyle(
-                                color: AppColors.primaryTitleColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                overflow: TextOverflow.ellipsis),
+                          child: Row(
+                            children: [
+                              Text(
+                                widget
+                                        .estimateDetails
+                                        .data
+                                        .orderService?[serviceIndex]
+                                        .orderServiceItems?[index]
+                                        .itemName ??
+                                    "",
+                                style: const TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    overflow: TextOverflow.ellipsis),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 8.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService?[serviceIndex]
+                                              .orderServiceItems?[index]
+                                              .quanityHours ??
+                                          "",
+                                      style: const TextStyle(
+                                          color: AppColors.primaryTitleColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                    widget
+                                                .estimateDetails
+                                                .data
+                                                .orderService?[serviceIndex]
+                                                .orderServiceItems?[index]
+                                                .itemType ==
+                                            "Labor"
+                                        ? const Padding(
+                                            padding: EdgeInsets.only(left: 8.0),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  "hrs",
+                                                  style: TextStyle(
+                                                      color: AppColors
+                                                          .primaryTitleColor,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      overflow: TextOverflow
+                                                          .ellipsis),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : const SizedBox()
+                                  ],
+                                ),
+                              )
+                            ],
                           ),
                         ),
                         Text(
@@ -2053,9 +2118,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   : null,
               maxLength: label == 'Phone Number'
                   ? 16
-                  : label == 'Password'
-                      ? 12
-                      : 50,
+                  : label == "Note" ||
+                          label == "Appointment Note" ||
+                          label == "Notes"
+                      ? 150
+                      : label == 'Password'
+                          ? 12
+                          : 50,
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
@@ -2936,7 +3005,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       height: 50,
                                       child: Center(
                                         child: Text(
-                                          'Cheque',
+                                          'Check',
                                           style: TextStyle(
                                               fontWeight: FontWeight.w600),
                                         ),
