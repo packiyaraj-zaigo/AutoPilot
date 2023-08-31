@@ -123,6 +123,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         create: (context) => CustomerBloc(),
         child: BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
+            log(state.toString());
             if (state is AddCustomerError) {
               CommonWidgets().showDialog(context, state.message);
 
@@ -176,6 +177,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                 child: CupertinoActivityIndicator(),
               );
               // Navigator.pop(context, true);
+            } else if (state is EditCustomerError) {
+              CommonWidgets().showDialog(context, state.message);
             }
           },
           child: BlocBuilder<CustomerBloc, CustomerState>(
@@ -468,7 +471,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
             ),
             label == 'First Name' ||
                     label == 'Last Name' ||
-                    label == 'Email' ||
+                    // label == 'Email' ||
                     label == 'Phone'
                 ? const Text(
                     " *",
@@ -902,14 +905,15 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         lastNameErrorStatus = false;
       });
     }
-    if (email.trim().isEmpty) {
-      setState(() {
-        emailErrorMsg = "Email can't be empty";
-        emailErrorStatus = true;
-      });
-    } else if (!RegExp(
-            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-        .hasMatch(email)) {
+    // if (email.trim().isEmpty) {
+    //   setState(() {
+    //     emailErrorMsg = "Email can't be empty";
+    //     emailErrorStatus = true;
+    //   });
+    // } else
+    if (email.trim().isNotEmpty &&
+        !RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+            .hasMatch(email)) {
       setState(() {
         emailErrorMsg = "Enter a valid email address";
         emailErrorStatus = true;

@@ -1216,7 +1216,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
             ),
           ],
         ),
-        onPressed: title == "New Vehicle" || title == "New Estimate"
+        onPressed: title == "New Vehicle" ||
+                title == "New Estimate" ||
+                title == "Edit Customer"
             ? () async {
                 Navigator.pop(context);
                 await Navigator.of(context).push(
