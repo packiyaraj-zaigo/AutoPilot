@@ -765,7 +765,6 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           if (event.eventId != null) {
             final response =
                 await _apiRepository.deleteEvent(token, event.eventId!);
-            emit(DeleteAppointmentEstimateState());
           }
         } catch (e, s) {
           emit(DeleteAppointmentEstimateErrorState(
@@ -781,6 +780,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
         emit(DeleteAppointmentEstimateErrorState(
             errorMessage: "Something went wrong"));
       }
+      emit(DeleteAppointmentEstimateState());
     } catch (e, s) {
       emit(DeleteAppointmentEstimateErrorState(
           errorMessage: "Something went wrong"));

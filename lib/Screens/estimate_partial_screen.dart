@@ -227,6 +227,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           if (state is GetOrderImageState) {
             networkImageList.clear();
             networkImageList.addAll(["", "", "", ""]);
+            newOrderImageData.clear();
             newOrderImageData.addAll(state.orderImageModel.data);
           }
           if (state is EditEstimateNoteErrorState) {
@@ -298,7 +299,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           Navigator.of(context).pushReplacement(
                             MaterialPageRoute(
                               builder: (context) => CustomerInformationScreen(
-                                id: widget.customerId!.toString(),
+                                id: widget.estimateDetails.data.customerId
+                                    .toString(),
                               ),
                             ),
                           );
@@ -2031,16 +2033,55 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   //       return customerBottomSheet();
                   //     },
                   //     backgroundColor: Colors.transparent);
-
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return SelectCustomerScreen(
-                        navigation: "partial",
-                        subNavigation: widget.navigation,
-                        orderId: widget.estimateDetails.data.id.toString(),
-                      );
-                    },
-                  ));
+                  if (isVehicleEdit) {
+                    CommonWidgets()
+                        .showDialog(context, "Please select a vehicle");
+                    return;
+                  }
+                  if ((appointmentValidation() &&
+                          startTimeController.text.isEmpty) &&
+                      (noteValidation() &&
+                          estimateNoteController.text.isEmpty) &&
+                      networkImageList
+                          .where((element) => element.isNotEmpty)
+                          .toList()
+                          .isEmpty) {
+                    log('here i am');
+                    if (widget.estimateDetails.data.customer != null) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) {
+                          return SelectCustomerScreen(
+                            navigation: "partial",
+                            subNavigation: widget.navigation,
+                            orderId: widget.estimateDetails.data.id.toString(),
+                          );
+                        },
+                      ));
+                    } else {
+                      CommonWidgets().showDialog(context,
+                          "Please select a customer before adding a service");
+                    }
+                  } else {
+                    // CommonWidgets().showDialog(context,
+                    //     "Please save the unsaved changes before selecting the service");
+                    // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isNotEmpty) ||
+                        (noteValidation() &&
+                            estimateNoteController.text.isNotEmpty) ||
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isNotEmpty) {
+                      showPopUpBeforeService(
+                          context,
+                          SelectCustomerScreen(
+                            navigation: "partial",
+                            subNavigation: widget.navigation,
+                            orderId: widget.estimateDetails.data.id.toString(),
+                          ));
+                    }
+                  }
                 } else if (label == 'Vehicle') {
                   // showModalBottomSheet(
                   //   context: context,
@@ -2050,17 +2091,59 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   //     return SelectVehiclesScreen();
                   //   },
                   // );
-                  await Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) {
-                      return SelectVehiclesScreen(
-                        navigation: "partial",
-                        subNavigation: widget.navigation,
-                        orderId: widget.estimateDetails.data.id.toString(),
-                        customerId:
-                            widget.estimateDetails.data.customerId.toString(),
-                      );
-                    },
-                  ));
+                  if (isCustomerEdit) {
+                    CommonWidgets()
+                        .showDialog(context, "Please select a customer");
+                    return;
+                  }
+                  if ((appointmentValidation() &&
+                          startTimeController.text.isEmpty) &&
+                      (noteValidation() &&
+                          estimateNoteController.text.isEmpty) &&
+                      networkImageList
+                          .where((element) => element.isNotEmpty)
+                          .toList()
+                          .isEmpty) {
+                    log('here i am');
+                    if (widget.estimateDetails.data.customer != null) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) {
+                          return SelectVehiclesScreen(
+                            navigation: "partial",
+                            subNavigation: widget.navigation,
+                            orderId: widget.estimateDetails.data.id.toString(),
+                            customerId: widget.estimateDetails.data.customerId
+                                .toString(),
+                          );
+                        },
+                      ));
+                    } else {
+                      CommonWidgets().showDialog(context,
+                          "Please select a customer before adding a service");
+                    }
+                  } else {
+                    // CommonWidgets().showDialog(context,
+                    //     "Please save the unsaved changes before selecting the service");
+                    // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isNotEmpty) ||
+                        (noteValidation() &&
+                            estimateNoteController.text.isNotEmpty) ||
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isNotEmpty) {
+                      showPopUpBeforeService(
+                          context,
+                          SelectVehiclesScreen(
+                            navigation: "partial",
+                            subNavigation: widget.navigation,
+                            orderId: widget.estimateDetails.data.id.toString(),
+                            customerId: widget.estimateDetails.data.customerId
+                                .toString(),
+                          ));
+                    }
+                  }
                 } else if (label == "Service") {
                   if (!appointmentValidation() && !noteValidation()) {
                     return;
@@ -2107,8 +2190,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     if ((appointmentValidation() &&
                             startTimeController.text.isNotEmpty) ||
                         (noteValidation() &&
-                            estimateNoteController.text.isNotEmpty)) {
-                      showPopUpBeforeService(context);
+                            estimateNoteController.text.isNotEmpty) ||
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isNotEmpty) {
+                      showPopUpBeforeService(
+                          context,
+                          SelectServiceScreen(
+                            orderId: widget.estimateDetails.data.id.toString(),
+                            navigation: widget.navigation,
+                          ));
                     }
                   }
                 }
@@ -4661,7 +4753,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 ), (route) => false);
               }
             }
-            // TODO: implement listener
           },
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
@@ -4689,7 +4780,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
-  Future showPopUpBeforeService(BuildContext ctx) {
+  Future showPopUpBeforeService(BuildContext ctx, constructor) {
     return showCupertinoDialog(
       context: ctx,
       builder: (context) => BlocProvider(
@@ -4707,12 +4798,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               endDateController.clear();
               appointmentController.clear();
               estimateNoteController.clear();
+              networkImageList.clear();
+              networkImageList.addAll(["", "", "", ""]);
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
-                  return SelectServiceScreen(
-                    orderId: widget.estimateDetails.data.id.toString(),
-                    navigation: widget.navigation,
-                  );
+                  return constructor;
                 },
               )).then((value) {
                 _scaffoldKey.currentContext!.read<EstimateBloc>().add(
@@ -4742,6 +4832,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   CupertinoDialogAction(
                     child: const Text("Yes"),
                     onPressed: () {
+                      if (!appointmentValidation() || !noteValidation()) {
+                        Navigator.pop(context);
+                        return;
+                      }
                       if (appointmentValidation() &&
                           noteValidation() &&
                           startTimeController.text.isNotEmpty &&
@@ -4817,8 +4911,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   "",
                               dropScedule: startDateController.text));
                         }
-                      } else {
-                        Navigator.pop(context);
                       }
 
                       if ((noteValidation() &&

@@ -877,7 +877,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
                       label == 'Price ' ||
-                      label == "Quantity"
+                      label == "Quantity" ||
+                      label == "Base Cost"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == "Hours"
@@ -889,7 +890,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           label == 'Tax' ||
                           label.contains('Labor Rate') ||
                           label == 'Price ' ||
-                          label == "Quantity"
+                          label == "Quantity" ||
+                          label == "Base Cost"
                       ? [NumberInputFormatter()]
                       : [],
               maxLength: label == "Service Name" ||
@@ -1913,7 +1915,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     //Add Labor popup controllers
     final addLaborNameController = TextEditingController();
     final addLaborDescriptionController = TextEditingController();
-    //  final addLaborBaseCostController = TextEditingController();
+    final addLaborCostController = TextEditingController();
     final addLaborDiscountController = TextEditingController(text: '0');
     final addLaborHoursController = TextEditingController(text: '1');
     final addLaborBaseCostController =
@@ -2103,7 +2105,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
                           "Amount",
-                          addLaborBaseCostController,
+                          addLaborCostController,
                           "Cost ",
                           addLaborCostErrorStatus.isNotEmpty,
                           context,
@@ -3304,8 +3306,8 @@ class NumberInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    // Use a regular expression to check for valid input
-    final regExp = RegExp(r'^\d*\.?\d*$');
+    // Use a regular expression to check for valid input with up to 2 decimal places
+    final regExp = RegExp(r'^\d*\.?\d{0,2}$');
     if (!regExp.hasMatch(newValue.text)) {
       // If the input doesn't match the pattern, return the old value
       return oldValue;

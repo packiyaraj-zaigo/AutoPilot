@@ -172,6 +172,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 }
                 if (state is GetClientSuccessState) {
                   client = state.client;
+                  log(client!.toJson().toString());
                   rateController.text = client?.baseLaborCost ?? '0';
                 }
               },
@@ -826,7 +827,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
                       label == 'Price ' ||
-                      label == "Quantity"
+                      label == "Quantity" ||
+                      label == "Base Cost"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == "Hours"
@@ -838,7 +840,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           label == 'Tax' ||
                           label.contains('Labor Rate') ||
                           label == 'Price ' ||
-                          label == "Quantity"
+                          label == "Quantity" ||
+                          label == "Base Cost"
                       ? [NumberInputFormatter()]
                       : [],
               maxLength: label == 'Cost' ||
@@ -3375,8 +3378,8 @@ class NumberInputFormatter extends TextInputFormatter {
       return newValue;
     }
 
-    // Use a regular expression to check for valid input
-    final regExp = RegExp(r'^\d*\.?\d*$');
+    // Use a regular expression to check for valid input with up to 2 decimal places
+    final regExp = RegExp(r'^\d*\.?\d{0,2}$');
     if (!regExp.hasMatch(newValue.text)) {
       // If the input doesn't match the pattern, return the old value
       return oldValue;

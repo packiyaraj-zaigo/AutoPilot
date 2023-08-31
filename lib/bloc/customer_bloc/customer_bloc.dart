@@ -383,7 +383,7 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           event.pinCode,
           event.stateId,
           event.id);
-      var unloadData = _decoder.convert(loadedResponse.body);
+      final Map<String, dynamic> unloadData = json.decode(loadedResponse.body);
       if (loadedResponse.statusCode == 200 ||
           loadedResponse.statusCode == 201) {
         CommonWidgets()
@@ -395,7 +395,14 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           (route) => false,
         );
       } else {
-        emit(EditCustomerError(message: unloadData));
+        if (unloadData.containsKey('message')) {
+          emit(EditCustomerError(message: unloadData['message']));
+        } else if (unloadData.containsKey('error')) {
+          emit(EditCustomerError(message: unloadData['error']));
+        } else {
+          emit(
+              EditCustomerError(message: unloadData[unloadData.keys.first][0]));
+        }
       }
     } catch (e) {
       showLoading = 0;
