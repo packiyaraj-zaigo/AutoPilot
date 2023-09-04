@@ -110,7 +110,10 @@ class CreateOrderServiceState extends EstimateState {
 
 class CreateOrderServiceLoadingState extends EstimateState {}
 
-class CreateOrderServiceItemState extends EstimateState {}
+class CreateOrderServiceItemState extends EstimateState {
+  @override
+  List<Object> get props => [];
+}
 
 class CreateOrderServiceItemLoadingState extends EstimateState {}
 
