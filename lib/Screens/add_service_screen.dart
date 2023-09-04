@@ -67,7 +67,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   List<CannedServiceAddModel> fee = [];
 
   dynamic _currentPricingModelSelectedValue;
-  List<String> pricingModelList = ['Per Sqrt', 'Per Roll'];
+  List<String> pricingModelList = ['Per Sqft', 'Per Roll'];
 
   String taxRateError = '';
   var dropdownValue;
@@ -831,19 +831,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Base Cost"
                   ? TextInputType.number
                   : null,
-              inputFormatters: label == "Hours"
-                  ? [FilteringTextInputFormatter.digitsOnly]
-                  : label == 'Discount' ||
-                          label == 'Cost' ||
-                          label == 'Cost ' ||
-                          label == 'Price' ||
-                          label == 'Tax' ||
-                          label.contains('Labor Rate') ||
-                          label == 'Price ' ||
-                          label == "Quantity" ||
-                          label == "Base Cost"
-                      ? [NumberInputFormatter()]
-                      : [],
+              inputFormatters: label == "Hours" ||
+                      label == 'Discount' ||
+                      label == 'Cost' ||
+                      label == 'Cost ' ||
+                      label == 'Price' ||
+                      label == 'Tax' ||
+                      label.contains('Labor Rate') ||
+                      label == 'Price ' ||
+                      label == "Quantity" ||
+                      label == "Base Cost"
+                  ? [NumberInputFormatter()]
+                  : [],
               maxLength: label == 'Cost' ||
                       label == 'Cost ' ||
                       label == 'Price' ||
@@ -2045,18 +2044,21 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       if (addLaborBaseCostController.text.isNotEmpty) {
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0);
+            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0) *
+                (double.tryParse(addLaborHoursController.text) ?? 1);
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
               discount = ((double.tryParse(addLaborBaseCostController.text) ??
                           0) *
+                      (double.tryParse(addLaborHoursController.text) ?? 1) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
             subTotal =
-                ((double.tryParse(addLaborBaseCostController.text) ?? 0) -
+                (((double.tryParse(addLaborBaseCostController.text) ?? 0) *
+                        (double.tryParse(addLaborHoursController.text) ?? 1)) -
                     discount);
           }
           total = subTotal;
@@ -2772,7 +2774,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Add SubContract",
+                "Add Subcontract",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
