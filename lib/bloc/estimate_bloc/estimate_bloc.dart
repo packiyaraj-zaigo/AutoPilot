@@ -623,7 +623,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           event.serviceNotes,
           event.laborRate,
           event.tax,
-          event.servicePrice);
+          event.servicePrice,
+          event.technicianId);
 
       log("orderserviceres${createOrderServiceRes.body}");
 

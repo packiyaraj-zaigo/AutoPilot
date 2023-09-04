@@ -577,7 +577,8 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                                   serviceNotes: item.serviceNote.toString(),
                                   laborRate: item.serviceEpa,
                                   tax: item.tax,
-                                  servicePrice: item.servicePrice));
+                                  servicePrice: item.servicePrice,
+                                  technicianId: "0"));
                         }
                         //  });
 

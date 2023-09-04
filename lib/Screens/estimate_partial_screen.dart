@@ -8,6 +8,7 @@ import 'package:auto_pilot/Models/estimate_note_model.dart' as en;
 import 'package:auto_pilot/Models/order_image_model.dart' as oi;
 import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
 import 'package:auto_pilot/Models/customer_model.dart' as cm;
+import 'package:auto_pilot/Screens/add_order_service_scree.dart';
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/create_vehicle_screen.dart';
@@ -1974,9 +1975,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         showModalBottomSheet(
                             context: context,
                             builder: (context) {
-                              return AddServiceScreen(
-                                navigation: "partial_estimate",
-                              );
+                              // return AddServiceScreen(
+                              //   navigation: "partial_estimate",
+                              // );
+
+                              return AddOrderServiceScreen(
+                                  orderId: widget.estimateDetails.data.id
+                                      .toString());
                             },
                             isScrollControlled: true,
                             useSafeArea: true);

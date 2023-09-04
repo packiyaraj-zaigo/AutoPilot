@@ -484,10 +484,17 @@ class ApiRepository {
     return apiProvider.deleteOrderImage(token, imageId);
   }
 
-  Future createOrderService(String token, String orderId, String serviceName,
-      String serviceNotes, String laborRate, String tax, String servicePrice) {
+  Future createOrderService(
+      String token,
+      String orderId,
+      String serviceName,
+      String serviceNotes,
+      String laborRate,
+      String tax,
+      String servicePrice,
+      String technicianId) {
     return apiProvider.createOrderService(token, orderId, serviceName,
-        serviceNotes, laborRate, tax, servicePrice);
+        serviceNotes, laborRate, tax, servicePrice, technicianId);
   }
 
   Future createOrderServiceItem(
