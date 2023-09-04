@@ -936,6 +936,32 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             "Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget("Balance due",
                             "\$ ${balanceDueAmount.toStringAsFixed(2)}"),
+
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  return PaymentListScreen(
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString());
+                                },
+                              ));
+                            },
+                            child: const Row(
+                              children: [
+                                Text(
+                                  "View Payment History",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      color: AppColors.primaryColors,
+                                      decoration: TextDecoration.underline),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
