@@ -6,6 +6,7 @@ import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
 import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
+import 'package:auto_pilot/Screens/add_vendor_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -768,6 +769,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: label == "Vendor"
+              ? MainAxisAlignment.spaceBetween
+              : MainAxisAlignment.start,
           children: [
             Text(
               label,
@@ -786,6 +790,33 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       color: Color(
                         0xffD80027,
                       ),
+                    ),
+                  )
+                : SizedBox(),
+            label == "Vendor"
+                ? GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                          isScrollControlled: true,
+                          useSafeArea: true,
+                          context: context,
+                          builder: (context) => AddVendorScreen());
+                    },
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: AppColors.primaryColors,
+                        ),
+                        Text(
+                          "Add New",
+                          style: TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        )
+                      ],
                     ),
                   )
                 : SizedBox(),
@@ -828,6 +859,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Hours" ||
                       label == 'Price ' ||
                       label == "Quantity" ||
+                      label == "Quantity " ||
                       label == "Base Cost"
                   ? TextInputType.number
                   : null,
@@ -840,6 +872,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == 'Price ' ||
                       label == "Quantity" ||
+                      label == "Quantity " ||
                       label == "Base Cost"
                   ? [NumberInputFormatter()]
                   : [],
@@ -850,6 +883,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
                       label == 'Price ' ||
+                      label == "Quantity " ||
                       label == "Quantity"
                   ? 10
                   : label == "Description"
@@ -1054,6 +1088,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addMaterialNameController = TextEditingController();
     final addMaterialDescriptionController = TextEditingController();
     final addMaterialPriceController = TextEditingController();
+    final addMaterialQuantityController = TextEditingController(text: '1');
     final addMaterialCostController = TextEditingController();
     final addMaterialDiscountController = TextEditingController(text: '0');
     final addMaterialBatchController = TextEditingController();
@@ -1062,6 +1097,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String adddMaterialNameErrorStatus = '';
     String addMaterialDescriptionErrorStatus = '';
     String addMaterialPriceErrorStatus = '';
+    String addMaterialQuantityErrorStatus = '';
     String addMaterialCostErrorStatus = '';
     String addMaterialDiscountErrorStatus = '';
     String adddMaterialBatchErrorStatus = '';
@@ -1096,6 +1132,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addMaterialPriceErrorStatus = '';
       }
+      if (addMaterialQuantityController.text.trim().isEmpty) {
+        addMaterialQuantityErrorStatus = "Quantity can't be empty";
+        status = false;
+      } else {
+        addMaterialPriceErrorStatus = '';
+      }
       if (addMaterialDiscountController.text.trim().isNotEmpty &&
           isPercentage &&
           double.parse(addMaterialDiscountController.text) > 100) {
@@ -1121,23 +1163,35 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(
       builder: (context, StateSetter newSetState) {
-        if (addMaterialPriceController.text.isNotEmpty) {
+        if (addMaterialPriceController.text.isNotEmpty &&
+            addMaterialQuantityController.text.isNotEmpty) {
           if (client?.taxOnMaterial == 'N') {
             if (addMaterialDiscountController.text.isEmpty) {
-              subTotal =
-                  (double.tryParse(addMaterialPriceController.text) ?? 0);
+              subTotal = (double.tryParse(addMaterialPriceController.text) ??
+                      0) *
+                  (double.tryParse(addMaterialQuantityController.text) ?? 1);
             } else {
               if (isPercentage) {
-                subTotal = (double.tryParse(addMaterialPriceController.text) ??
-                        0) -
+                subTotal =
                     ((double.tryParse(addMaterialPriceController.text) ?? 0) *
                             (double.tryParse(
-                                    addMaterialDiscountController.text) ??
-                                0)) /
-                        100;
+                                    addMaterialQuantityController.text) ??
+                                1)) -
+                        ((double.tryParse(addMaterialPriceController.text) ??
+                                    0) *
+                                (double.tryParse(
+                                        addMaterialQuantityController.text) ??
+                                    1) *
+                                (double.tryParse(
+                                        addMaterialDiscountController.text) ??
+                                    0)) /
+                            100;
               } else {
-                subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                        0) -
+                subTotal = (((double.tryParse(
+                                addMaterialPriceController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialQuantityController.text) ??
+                            1)) -
                     (double.tryParse(addMaterialDiscountController.text) ?? 0));
               }
             }
@@ -1147,29 +1201,40 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
 
             if (addMaterialDiscountController.text.isEmpty) {
-              subTotal =
+              subTotal = (double.tryParse(addMaterialPriceController.text) ??
+                          0) *
+                      (double.tryParse(addMaterialQuantityController.text) ??
+                          1) *
+                      tax +
                   (double.tryParse(addMaterialPriceController.text) ?? 0) *
-                          tax +
-                      (double.tryParse(addMaterialPriceController.text) ?? 0);
-              total = (double.tryParse(addMaterialPriceController.text) ?? 0);
+                      (double.tryParse(addMaterialQuantityController.text) ??
+                          1);
+              total = (double.tryParse(addMaterialPriceController.text) ?? 0) *
+                  (double.tryParse(addMaterialQuantityController.text) ?? 1);
             } else {
               double discount =
                   double.tryParse(addMaterialDiscountController.text) ?? 0;
               if (isPercentage) {
                 discount = ((double.tryParse(addMaterialPriceController.text) ??
                             0) *
+                        (double.tryParse(addMaterialQuantityController.text) ??
+                            1) *
                         (double.tryParse(addMaterialDiscountController.text) ??
                             0)) /
                     100;
               }
 
-              subTotal =
+              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+                              0) -
+                          discount) *
+                      (double.tryParse(addMaterialQuantityController.text) ??
+                          1) *
+                      tax +
                   ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                              discount) *
-                          tax +
-                      ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                          discount);
-              total = (double.tryParse(addMaterialPriceController.text) ?? 0) -
+                      discount);
+              total = ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+                      (double.tryParse(addMaterialQuantityController.text) ??
+                          1)) -
                   (discount);
             }
           }
@@ -1241,6 +1306,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ),
                       errorWidget(error: addMaterialPriceErrorStatus),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 17.0),
+                        child: textBox(
+                            "Amount",
+                            addMaterialQuantityController,
+                            "Quantity ",
+                            addMaterialQuantityErrorStatus.isNotEmpty,
+                            context,
+                            true,
+                            newSetState),
+                      ),
+                      errorWidget(error: addMaterialQuantityErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
                         child: textBox(
@@ -1370,7 +1447,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             "Part/Batch Number",
                             adddMaterialBatchErrorStatus.isNotEmpty,
                             context,
-                            false),
+                            false,
+                            newSetState),
                       ),
                       errorWidget(error: adddMaterialBatchErrorStatus),
                       Padding(
@@ -1464,6 +1542,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                             .text.isNotEmpty
                                     ? "Percentage"
                                     : "Fixed",
+                                quanityHours:
+                                    addMaterialQuantityController.text.trim(),
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
                               ));

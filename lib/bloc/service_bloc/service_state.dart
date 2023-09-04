@@ -124,3 +124,15 @@ class GetClientSuccessState extends ServiceState {
   final ClientModel client;
   const GetClientSuccessState({required this.client});
 }
+
+class CreateVendorLoadingState extends ServiceState {}
+
+class CreateVendorErrorState extends ServiceState {
+  final String message;
+  const CreateVendorErrorState({required this.message});
+
+  @override
+  List<Object> get props => [message];
+}
+
+class CreateVendorSuccessState extends ServiceState {}

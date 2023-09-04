@@ -10,6 +10,7 @@ import 'package:auto_pilot/bloc/dashboard_bloc/dashboard_bloc.dart';
 import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:country_data/country_data.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';
@@ -1703,6 +1704,11 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
                 //   print(employeeDetailsMap);
                 // }
+              } else if (state is DeleteEmployeeSuccessState) {
+                bloc.currentPage = 1;
+                bloc.add(GetAllEmployees());
+              } else if (state is DeleteEmployeeErrorState) {
+                CommonWidgets().showDialog(context, "Employee deletion failed");
               }
             },
             child: BlocBuilder<EmployeeBloc, EmployeeState>(
@@ -1731,15 +1737,23 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                   children: [
                                     GestureDetector(
                                       behavior: HitTestBehavior.opaque,
-                                      onTap: () {
-                                        // Navigator.of(context).push(
-                                        //   MaterialPageRoute(
-                                        //     builder: (context) =>
-                                        //         EmployeeDetailsScreen(
-                                        //       employee: item,
-                                        //     ),
-                                        //   ),
-                                        // );
+                                      onTap: () async {
+                                        await Navigator.of(context)
+                                            .push(
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                CreateEmployeeScreen(
+                                              navigation: 'add_company',
+                                              employee: item,
+                                            ),
+                                          ),
+                                        )
+                                            .then((value) {
+                                          if (value != null && value) {
+                                            bloc.currentPage = 1;
+                                            bloc.add(GetAllEmployees());
+                                          }
+                                        });
                                       },
                                       child: Container(
                                         height: 77,
@@ -1760,36 +1774,61 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                         child: Padding(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16.0),
-                                          child: Column(
+                                          child: Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                '${item.firstName ?? ""} ${item.lastName ?? ""} ',
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF061237),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${item.firstName ?? ""} ${item.lastName ?? ""} ',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF061237),
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 3),
+                                                  Text(
+                                                    (item.roles?[0].name![0]
+                                                                .toUpperCase() ??
+                                                            '') +
+                                                        (item.roles?[0].name!
+                                                                .substring(1) ??
+                                                            ''),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    maxLines: 1,
+                                                    style: const TextStyle(
+                                                      color: Color(0xFF6A7187),
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
-                                              const SizedBox(height: 3),
-                                              Text(
-                                                (item.roles?[0].name![0]
-                                                            .toUpperCase() ??
-                                                        '') +
-                                                    (item.roles?[0].name!.substring(1) ??
-                                                        ''),
-                                                overflow: TextOverflow.ellipsis,
-                                                maxLines: 1,
-                                                style: const TextStyle(
-                                                  color: Color(0xFF6A7187),
-                                                  fontWeight: FontWeight.w400,
+                                              IconButton(
+                                                icon: Icon(
+                                                  CupertinoIcons.clear,
+                                                  color:
+                                                      AppColors.primaryColors,
                                                 ),
-                                              ),
+                                                onPressed: () {
+                                                  if (state
+                                                      is! DeleteEmployeeLoadingState) {
+                                                    deleteEmployeePopUp(
+                                                        context, item);
+                                                  }
+                                                },
+                                              )
                                             ],
                                           ),
                                         ),
@@ -1824,6 +1863,36 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Future deleteEmployeePopUp(BuildContext ctx, Employee employee) {
+    return showCupertinoDialog(
+      context: ctx,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text("Delete Employee?"),
+          content: const Text("Are you sure want to delete this employee"),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: const Text("No"),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            CupertinoDialogAction(
+              child: const Text("Yes"),
+              onPressed: () async {
+                bloc.add(
+                  DeleteEmployee(
+                    id: employee.id ?? 0,
+                    context: context,
+                  ),
+                );
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
