@@ -36,6 +36,32 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     on<DeleteCannedServiceEvent>(deleteCannedService);
     on<GetClientByIdEvent>(getClientById);
     on<EditOrderServiceEvent>(editOrderService);
+    on<CreateVendorEvent>(createVendorEvent);
+  }
+
+  Future<void> createVendorEvent(
+    CreateVendorEvent event,
+    Emitter<ServiceState> emit,
+  ) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final token = await AppUtils.getToken();
+      final response = await apiRepo.createVendor(
+          clientId, event.name, event.email, event.contactPerson, token);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(CreateVendorSuccessState());
+      } else {
+        final body = await json.decode(response.body);
+        if (body.containsKey('message')) {
+          emit(CreateVendorErrorState(message: body['message']));
+        } else {
+          emit(CreateVendorErrorState(message: body[body.keys.first][0]));
+        }
+      }
+    } catch (e) {
+      log(e.toString() + "Create vendor event");
+      emit(CreateVendorErrorState(message: "Something went wrong"));
+    }
   }
 
   // createEmployee(

@@ -647,6 +647,12 @@ class ApiRepository {
       String token, String recieverUserId, String message) async {
     return apiProvider.sendEmployeeMessage(token, recieverUserId, message);
   }
+
+  Future<dynamic> createVendor(String clientId, String name, String email,
+      String contactPerson, String token) {
+    return apiProvider.createVendor(
+        clientId, name, email, contactPerson, token);
+  }
 }
 
 class NetworkError extends Error {}

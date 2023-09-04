@@ -2215,4 +2215,24 @@ class ApiProvider {
       log(e.toString() + 'Delete part provider error');
     }
   }
+
+  Future<dynamic> createVendor(String clientId, String name, String email,
+      String contactPerson, String token) async {
+    try {
+      final url = Uri.parse("${BASE_URL}api/vendors");
+      final body = {
+        'client_id': clientId,
+        'vendor_name': name,
+        'email': email,
+        'contact_person': contactPerson,
+      };
+
+      final response =
+          http.post(url, body: json.encode(body), headers: getHeader(token));
+      inspect(response);
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Create vendor provider error');
+    }
+  }
 }

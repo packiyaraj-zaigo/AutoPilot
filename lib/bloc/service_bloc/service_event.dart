@@ -89,3 +89,14 @@ class DeleteCannedServiceEvent extends ServiceEvent {
 }
 
 class GetClientByIdEvent extends ServiceEvent {}
+
+class CreateVendorEvent extends ServiceEvent {
+  final String name;
+  final String email;
+  final String contactPerson;
+  const CreateVendorEvent({
+    required this.name,
+    required this.email,
+    required this.contactPerson,
+  });
+}
