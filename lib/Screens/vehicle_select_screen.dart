@@ -396,17 +396,15 @@ class _SelectVehiclesScreenState extends State<SelectVehiclesScreen> {
               context.read<EstimateBloc>().add(GetSingleEstimateEvent(
                   orderId: state.createEstimateModel.data.id.toString()));
             } else if (state is GetSingleEstimateState) {
-              Navigator.pop(context);
-              Navigator.pushReplacement(context, MaterialPageRoute(
+              Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(
                 builder: (context) {
                   return EstimatePartialScreen(
                     estimateDetails: state.createEstimateModel,
                     navigation: widget.subNavigation,
                   );
                 },
-              ));
+              ), (route) => false);
             }
-            // TODO: implement listener
           },
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {

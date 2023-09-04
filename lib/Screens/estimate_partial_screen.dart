@@ -3479,10 +3479,35 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               padding: const EdgeInsets.only(top: 18.0),
               child: GestureDetector(
                 onTap: () {
-                  setState(() {
-                    isCustomerEdit = true;
-                  });
-                  Navigator.pop(context);
+                  if ((appointmentValidation() &&
+                          startTimeController.text.isEmpty) &&
+                      (noteValidation() &&
+                          estimateNoteController.text.isEmpty) &&
+                      networkImageList
+                          .where((element) => element.isNotEmpty)
+                          .toList()
+                          .isEmpty) {
+                    if (widget.estimateDetails.data.vehicle != null) {
+                      setState(() {
+                        isCustomerEdit = true;
+                      });
+                      Navigator.pop(context);
+                    }
+                  } else {
+                    // CommonWidgets().showDialog(context,
+                    //     "Please save the unsaved changes before selecting the service");
+                    // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isNotEmpty) ||
+                        (noteValidation() &&
+                            estimateNoteController.text.isNotEmpty) ||
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isNotEmpty) {
+                      showPopUpBeforeService(context, null, false);
+                    }
+                  }
                 },
                 child: Container(
                   alignment: Alignment.center,
@@ -3514,12 +3539,35 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 padding: const EdgeInsets.only(top: 18.0),
                 child: GestureDetector(
                   onTap: () {
-                    if (widget.estimateDetails.data.vehicle != null) {
-                      setState(() {
-                        isVehicleEdit = true;
-                      });
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isEmpty) &&
+                        (noteValidation() &&
+                            estimateNoteController.text.isEmpty) &&
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isEmpty) {
+                      if (widget.estimateDetails.data.vehicle != null) {
+                        setState(() {
+                          isVehicleEdit = true;
+                        });
 
-                      Navigator.pop(context);
+                        Navigator.pop(context);
+                      }
+                    } else {
+                      // CommonWidgets().showDialog(context,
+                      //     "Please save the unsaved changes before selecting the service");
+                      // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                      if ((appointmentValidation() &&
+                              startTimeController.text.isNotEmpty) ||
+                          (noteValidation() &&
+                              estimateNoteController.text.isNotEmpty) ||
+                          networkImageList
+                              .where((element) => element.isNotEmpty)
+                              .toList()
+                              .isNotEmpty) {
+                        showPopUpBeforeService(context, null, true);
+                      }
                     }
                   },
                   child: Container(
@@ -4780,7 +4828,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
-  Future showPopUpBeforeService(BuildContext ctx, constructor) {
+  Future showPopUpBeforeService(BuildContext ctx, constructor,
+      [bool? isVehicle]) {
     return showCupertinoDialog(
       context: ctx,
       builder: (context) => BlocProvider(
@@ -4800,6 +4849,33 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               estimateNoteController.clear();
               networkImageList.clear();
               networkImageList.addAll(["", "", "", ""]);
+              if (constructor == null) {
+                if (widget.estimateDetails.data.vehicle != null) {
+                  setState(() {
+                    if (isVehicle == true) {
+                      isVehicleEdit = true;
+                    } else if (isVehicle == false) {
+                      isCustomerEdit = true;
+                    }
+                  });
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetEstimateAppointmentEvent(
+                          orderId: widget.estimateDetails.data.id.toString()));
+
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetEstimateNoteEvent(
+                          orderId: widget.estimateDetails.data.id.toString()));
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetAllOrderImageEvent(
+                          orderId: widget.estimateDetails.data.id.toString()));
+
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                }
+
+                return;
+              }
+
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
                   return constructor;
@@ -4938,6 +5014,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           appointmentValidation() &&
                           !isCustomerEdit &&
                           !isVehicleEdit) {
+                        log("Heree");
                         context.read<EstimateBloc>().add(
                               CreateOrderImageEvent(
                                 imageUrlList: networkImageList.where((element) {
