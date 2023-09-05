@@ -28,7 +28,7 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
       child: BlocListener<ServiceBloc, ServiceState>(
         listener: (context, state) {
           if (state is CreateVendorSuccessState) {
-            Navigator.of(context).pop();
+            Navigator.pop(context, [state.vendorId, nameController.text]);
             CommonWidgets()
                 .showSuccessDialog(context, 'Vendor created successfully');
           } else if (state is CreateVendorErrorState) {
@@ -141,14 +141,16 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
                       onPressed: () async {
                         final status = validate();
                         if (status) {
-                          BlocProvider.of<ServiceBloc>(context).add(
-                            CreateVendorEvent(
-                              name: nameController.text.trim(),
-                              email: emailController.text.trim(),
-                              contactPerson:
-                                  contactPersonController.text.trim(),
-                            ),
-                          );
+                          if (state is! CreateVendorLoadingState) {
+                            BlocProvider.of<ServiceBloc>(context).add(
+                              CreateVendorEvent(
+                                name: nameController.text.trim(),
+                                email: emailController.text.trim(),
+                                contactPerson:
+                                    contactPersonController.text.trim(),
+                              ),
+                            );
+                          }
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -209,6 +211,8 @@ class _AddVendorScreenState extends State<AddVendorScreen> {
     } else {
       contactPersonError = '';
     }
+
+    setState(() {});
     return status;
   }
 

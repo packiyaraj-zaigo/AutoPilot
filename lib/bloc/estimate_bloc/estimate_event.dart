@@ -239,3 +239,20 @@ class GetEventDetailsByIdEvent extends EstimateEvent {
 }
 
 class GetClientByIdInEstimateEvent extends EstimateEvent {}
+
+class CreateCannedOrderServiceEstimateEvent extends EstimateEvent {
+  final CannedServiceCreateModel service;
+  final List<CannedServiceAddModel>? material;
+  final List<CannedServiceAddModel>? part;
+  final List<CannedServiceAddModel>? labor;
+  final List<CannedServiceAddModel>? subcontract;
+  final List<CannedServiceAddModel>? fee;
+  const CreateCannedOrderServiceEstimateEvent({
+    required this.service,
+    this.material,
+    this.part,
+    this.labor,
+    this.subcontract,
+    this.fee,
+  });
+}

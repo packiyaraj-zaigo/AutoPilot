@@ -80,8 +80,12 @@ class _CreateEmployeeScreenState extends State<CreateEmployeeScreen> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
-        title: const Text(
-          'New Employee',
+        title: Text(
+          widget.navigation == "add_company" && widget.employee != null
+              ? "Edit Employee"
+              : widget.navigation == "edit_employee" && widget.employee != null
+                  ? "Edit Employee"
+                  : 'New Employee',
           style: TextStyle(color: Colors.black87, fontSize: 16),
         ),
         centerTitle: true,

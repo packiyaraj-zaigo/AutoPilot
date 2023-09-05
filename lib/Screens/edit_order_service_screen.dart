@@ -809,7 +809,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-       Row(
+        Row(
           mainAxisAlignment: label == "Vendor"
               ? MainAxisAlignment.spaceBetween
               : MainAxisAlignment.start,
@@ -843,7 +843,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           context: context,
                           builder: (context) => const AddVendorScreen());
                     },
-                    child:const  Row(
+                    child: const Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Icon(
@@ -868,7 +868,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
             height: 56,
-            width: label == "Price" || label == "Cost" || label == "Quantity"
+            width: label == "Price" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
             child: TextField(
@@ -909,7 +909,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == "Hours" ||
                       label == 'Price ' ||
                       label == "Quantity" ||
-                      label == "Base Cost"
+                      label == "Base Cost" ||
+                      label == "Quantity"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == "Hours" ||
@@ -1208,53 +1209,89 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     return StatefulBuilder(
       builder: (context, StateSetter newSetState) {
+        // if (addMaterialPriceController.text.isNotEmpty &&
+        //     addMaterialQuantityController.text.isNotEmpty) {
+        //   if (client?.taxOnMaterial == 'N') {
+        //     if (addMaterialDiscountController.text.isEmpty) {
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //               0) *
+        //           (double.tryParse(addMaterialQuantityController.text) ?? 1);
+        //     } else {
+        //       if (isPercentage) {
+        //         subTotal =
+        //             ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //                     (double.tryParse(
+        //                             addMaterialQuantityController.text) ??
+        //                         1)) -
+        //                 ((double.tryParse(addMaterialPriceController.text) ??
+        //                             0) *
+        //                         (double.tryParse(
+        //                                 addMaterialQuantityController.text) ??
+        //                             1) *
+        //                         (double.tryParse(
+        //                                 addMaterialDiscountController.text) ??
+        //                             0)) /
+        //                     100;
+        //       } else {
+        //         subTotal = (((double.tryParse(
+        //                         addMaterialPriceController.text) ??
+        //                     0) *
+        //                 (double.tryParse(addMaterialQuantityController.text) ??
+        //                     1)) -
+        //             (double.tryParse(addMaterialDiscountController.text) ?? 0));
+        //       }
+        //     }
+        //     total = subTotal;
+        //   } else {
+        //     final tax =
+        //         (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
+
+        //     if (addMaterialDiscountController.text.isEmpty) {
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //                   0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1) *
+        //               tax +
+        //           (double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1);
+        //       total = (double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //           (double.tryParse(addMaterialQuantityController.text) ?? 1);
+        //     } else {
+        //       double discount =
+        //           double.tryParse(addMaterialDiscountController.text) ?? 0;
+        //       if (isPercentage) {
+        //         discount = ((double.tryParse(addMaterialPriceController.text) ??
+        //                     0) *
+        //                 (double.tryParse(addMaterialQuantityController.text) ??
+        //                     1) *
+        //                 (double.tryParse(addMaterialDiscountController.text) ??
+        //                     0)) /
+        //             100;
+        //       }
+
+        //       subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+        //                       0) -
+        //                   discount) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1) *
+        //               tax +
+        //           ((double.tryParse(addMaterialPriceController.text) ?? 0) -
+        //               discount);
+        //       total = ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1)) -
+        //           (discount);
+        //     }
+        //   }
+        // }
+
         if (addMaterialPriceController.text.isNotEmpty &&
             addMaterialQuantityController.text.isNotEmpty) {
           if (client?.taxOnMaterial == 'N') {
             if (addMaterialDiscountController.text.isEmpty) {
               subTotal = (double.tryParse(addMaterialPriceController.text) ??
                       0) *
-                  (double.tryParse(addMaterialQuantityController.text) ?? 1);
-            } else {
-              if (isPercentage) {
-                subTotal =
-                    ((double.tryParse(addMaterialPriceController.text) ?? 0) *
-                            (double.tryParse(
-                                    addMaterialQuantityController.text) ??
-                                1)) -
-                        ((double.tryParse(addMaterialPriceController.text) ??
-                                    0) *
-                                (double.tryParse(
-                                        addMaterialQuantityController.text) ??
-                                    1) *
-                                (double.tryParse(
-                                        addMaterialDiscountController.text) ??
-                                    0)) /
-                            100;
-              } else {
-                subTotal = (((double.tryParse(
-                                addMaterialPriceController.text) ??
-                            0) *
-                        (double.tryParse(addMaterialQuantityController.text) ??
-                            1)) -
-                    (double.tryParse(addMaterialDiscountController.text) ?? 0));
-              }
-            }
-            total = subTotal;
-          } else {
-            final tax =
-                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
-
-            if (addMaterialDiscountController.text.isEmpty) {
-              subTotal = (double.tryParse(addMaterialPriceController.text) ??
-                          0) *
-                      (double.tryParse(addMaterialQuantityController.text) ??
-                          1) *
-                      tax +
-                  (double.tryParse(addMaterialPriceController.text) ?? 0) *
-                      (double.tryParse(addMaterialQuantityController.text) ??
-                          1);
-              total = (double.tryParse(addMaterialPriceController.text) ?? 0) *
                   (double.tryParse(addMaterialQuantityController.text) ?? 1);
             } else {
               double discount =
@@ -1268,19 +1305,57 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                             0)) /
                     100;
               }
-
-              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                              0) -
-                          discount) *
-                      (double.tryParse(addMaterialQuantityController.text) ??
-                          1) *
-                      tax +
-                  ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                      discount);
-              total = ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+              subTotal = (((double.tryParse(addMaterialPriceController.text) ??
+                          0) *
                       (double.tryParse(addMaterialQuantityController.text) ??
                           1)) -
-                  (discount);
+                  discount);
+            }
+            total = subTotal;
+          } else {
+            //  log((client?.laborTaxRate).toString());
+            final tax =
+                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
+            if (addMaterialDiscountController.text.isEmpty) {
+              subTotal = ((double.tryParse(
+                                  addMaterialQuantityController.text) ??
+                              1) *
+                          (double.tryParse(addMaterialPriceController.text) ??
+                              0)) *
+                      tax +
+                  ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0));
+              total =
+                  ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0));
+            } else {
+              double discount =
+                  double.tryParse(addMaterialDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount = ((double.tryParse(addMaterialPriceController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialQuantityController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialDiscountController.text) ??
+                            0)) /
+                    100;
+              }
+              subTotal = (((double.tryParse(
+                                      addMaterialQuantityController.text) ??
+                                  1) *
+                              (double.tryParse(
+                                      addMaterialPriceController.text) ??
+                                  0)) -
+                          discount) *
+                      tax +
+                  (((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                          (double.tryParse(addMaterialPriceController.text) ??
+                              0)) -
+                      discount);
+              total = (((double.tryParse(addMaterialQuantityController.text) ??
+                          1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0)) -
+                  discount);
             }
           }
         }
@@ -1365,71 +1440,68 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       errorWidget(error: addMaterialQuantityErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            textBox(
-                                "Amount",
-                                addMaterialCostController,
-                                "Cost",
-                                addMaterialCostErrorStatus.isNotEmpty,
-                                context,
-                                false),
-                            pricingModelDropDown()
-                          ],
-                        ),
+                        child: textBox(
+                            "Amount",
+                            addMaterialCostController,
+                            "Cost",
+                            addMaterialCostErrorStatus.isNotEmpty,
+                            context,
+                            false),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
-                      Stack(
-                        children: [
-                          textBox(
-                              "Enter Amount",
-                              addMaterialDiscountController,
-                              "Discount",
-                              addMaterialDiscountErrorStatus.isNotEmpty,
-                              context,
-                              false,
-                              newSetState),
-                          Positioned(
-                            right: 10,
-                            top: 42,
-                            child: Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    isPercentage = false;
-                                    newSetState(() {});
-                                  },
-                                  child: Icon(
-                                    CupertinoIcons.money_dollar,
-                                    color: isPercentage
-                                        ? AppColors.greyText
-                                        : AppColors.primaryColors,
+                      Padding(
+                        padding: const EdgeInsets.only(top:8.0),
+                        child: Stack(
+                          children: [
+                            textBox(
+                                "Enter Amount",
+                                addMaterialDiscountController,
+                                "Discount",
+                                addMaterialDiscountErrorStatus.isNotEmpty,
+                                context,
+                                false,
+                                newSetState),
+                            Positioned(
+                              right: 10,
+                              top: 42,
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      isPercentage = false;
+                                      newSetState(() {});
+                                    },
+                                    child: Icon(
+                                      CupertinoIcons.money_dollar,
+                                      color: isPercentage
+                                          ? AppColors.greyText
+                                          : AppColors.primaryColors,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  '  /  ',
-                                  style: TextStyle(
-                                    color: AppColors.greyText,
-                                    fontSize: 18,
+                                  Text(
+                                    '  /  ',
+                                    style: TextStyle(
+                                      color: AppColors.greyText,
+                                      fontSize: 18,
+                                    ),
                                   ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    isPercentage = true;
-                                    newSetState(() {});
-                                  },
-                                  child: Icon(
-                                    Icons.percent,
-                                    color: !isPercentage
-                                        ? AppColors.greyText
-                                        : AppColors.primaryColors,
+                                  GestureDetector(
+                                    onTap: () {
+                                      isPercentage = true;
+                                      newSetState(() {});
+                                    },
+                                    child: Icon(
+                                      Icons.percent,
+                                      color: !isPercentage
+                                          ? AppColors.greyText
+                                          : AppColors.primaryColors,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       errorWidget(error: addMaterialDiscountErrorStatus),
                       Padding(

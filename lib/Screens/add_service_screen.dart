@@ -56,6 +56,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final TextEditingController taxController = TextEditingController();
   String taxError = '';
   String serviceId = '1';
+  final addSubContractVendorController = TextEditingController();
 
   int? vendorId;
   bool isTax = false;
@@ -797,10 +798,19 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                 ? GestureDetector(
                     onTap: () {
                       showModalBottomSheet(
-                          isScrollControlled: true,
-                          useSafeArea: true,
-                          context: context,
-                          builder: (context) => AddVendorScreen());
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              context: context,
+                              builder: (context) => AddVendorScreen())
+                          .then((value) {
+                        //do something
+                        if (value != null) {
+                          setState!(() {
+                            addSubContractVendorController.text = value[1];
+                            vendorId = int.parse(value[0]);
+                          });
+                        }
+                      });
                     },
                     child: const Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -859,8 +869,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Hours" ||
                       label == 'Price ' ||
                       label == "Quantity" ||
-                      label == "Quantity " ||
-                      label == "Base Cost"
+                      label == "Quantity" ||
+                      label == "Base Cost" ||
+                      label == "Quantity"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == "Hours" ||
@@ -871,8 +882,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == 'Price ' ||
-                      label == "Quantity" ||
                       label == "Quantity " ||
+                      label == "Quantity" ||
                       label == "Base Cost"
                   ? [NumberInputFormatter()]
                   : [],
@@ -1049,6 +1060,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   },
                 );
               } else {
+                addSubContractVendorController.clear();
                 showDialog(
                   context: context,
                   builder: (context) {
@@ -1163,53 +1175,90 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(
       builder: (context, StateSetter newSetState) {
+        // if (addMaterialPriceController.text.isNotEmpty &&
+        //     addMaterialQuantityController.text.isNotEmpty) {
+        //   if (client?.taxOnMaterial == 'N') {
+        //     if (addMaterialDiscountController.text.isEmpty) {
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //               0) *
+        //           (double.tryParse(addMaterialQuantityController.text) ?? 1);
+        //     } else {
+        //       if (isPercentage) {
+        //         subTotal =
+        //             ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //                     (double.tryParse(
+        //                             addMaterialQuantityController.text) ??
+        //                         1)) -
+        //                 ((double.tryParse(addMaterialPriceController.text) ??
+        //                             0) *
+        //                         (double.tryParse(
+        //                                 addMaterialQuantityController.text) ??
+        //                             1) *
+        //                         (double.tryParse(
+        //                                 addMaterialDiscountController.text) ??
+        //                             0)) /
+        //                     100;
+        //       } else {
+        //         subTotal = (((double.tryParse(
+        //                         addMaterialPriceController.text) ??
+        //                     0) *
+        //                 (double.tryParse(addMaterialQuantityController.text) ??
+        //                     1)) -
+        //             (double.tryParse(addMaterialDiscountController.text) ?? 0));
+        //       }
+        //     }
+        //     total = subTotal;
+        //   } else {
+        //     final tax = (double.tryParse(client?.materialTaxRate ?? '') ?? 0) *
+        //         (double.tryParse(addMaterialQuantityController.text) ?? 1) /
+        //         100;
+
+        //     if (addMaterialDiscountController.text.isEmpty) {
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //                   0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1) *
+        //               tax +
+        //           (double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1);
+        //       total = (double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //           (double.tryParse(addMaterialQuantityController.text) ?? 1);
+        //     } else {
+        //       double discount =
+        //           double.tryParse(addMaterialDiscountController.text) ?? 0;
+        //       if (isPercentage) {
+        //         discount = ((double.tryParse(addMaterialPriceController.text) ??
+        //                     0) *
+        //                 (double.tryParse(addMaterialQuantityController.text) ??
+        //                     1) *
+        //                 (double.tryParse(addMaterialDiscountController.text) ??
+        //                     0)) /
+        //             100;
+        //       }
+
+        //       subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+        //                       0) -
+        //                   discount) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1) *
+        //               tax +
+        //           ((double.tryParse(addMaterialPriceController.text) ?? 0) -
+        //               discount);
+        //       total = ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1)) -
+        //           (discount);
+        //     }
+        //   }
+        // }
+
         if (addMaterialPriceController.text.isNotEmpty &&
             addMaterialQuantityController.text.isNotEmpty) {
           if (client?.taxOnMaterial == 'N') {
             if (addMaterialDiscountController.text.isEmpty) {
               subTotal = (double.tryParse(addMaterialPriceController.text) ??
                       0) *
-                  (double.tryParse(addMaterialQuantityController.text) ?? 1);
-            } else {
-              if (isPercentage) {
-                subTotal =
-                    ((double.tryParse(addMaterialPriceController.text) ?? 0) *
-                            (double.tryParse(
-                                    addMaterialQuantityController.text) ??
-                                1)) -
-                        ((double.tryParse(addMaterialPriceController.text) ??
-                                    0) *
-                                (double.tryParse(
-                                        addMaterialQuantityController.text) ??
-                                    1) *
-                                (double.tryParse(
-                                        addMaterialDiscountController.text) ??
-                                    0)) /
-                            100;
-              } else {
-                subTotal = (((double.tryParse(
-                                addMaterialPriceController.text) ??
-                            0) *
-                        (double.tryParse(addMaterialQuantityController.text) ??
-                            1)) -
-                    (double.tryParse(addMaterialDiscountController.text) ?? 0));
-              }
-            }
-            total = subTotal;
-          } else {
-            final tax =
-                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
-
-            if (addMaterialDiscountController.text.isEmpty) {
-              subTotal = (double.tryParse(addMaterialPriceController.text) ??
-                          0) *
-                      (double.tryParse(addMaterialQuantityController.text) ??
-                          1) *
-                      tax +
-                  (double.tryParse(addMaterialPriceController.text) ?? 0) *
-                      (double.tryParse(addMaterialQuantityController.text) ??
-                          1);
-              total = (double.tryParse(addMaterialPriceController.text) ?? 0) *
                   (double.tryParse(addMaterialQuantityController.text) ?? 1);
             } else {
               double discount =
@@ -1223,19 +1272,57 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             0)) /
                     100;
               }
-
-              subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                              0) -
-                          discount) *
-                      (double.tryParse(addMaterialQuantityController.text) ??
-                          1) *
-                      tax +
-                  ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                      discount);
-              total = ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+              subTotal = (((double.tryParse(addMaterialPriceController.text) ??
+                          0) *
                       (double.tryParse(addMaterialQuantityController.text) ??
                           1)) -
-                  (discount);
+                  discount);
+            }
+            total = subTotal;
+          } else {
+            //  log((client?.laborTaxRate).toString());
+            final tax =
+                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
+            if (addMaterialDiscountController.text.isEmpty) {
+              subTotal = ((double.tryParse(
+                                  addMaterialQuantityController.text) ??
+                              1) *
+                          (double.tryParse(addMaterialPriceController.text) ??
+                              0)) *
+                      tax +
+                  ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0));
+              total =
+                  ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0));
+            } else {
+              double discount =
+                  double.tryParse(addMaterialDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount = ((double.tryParse(addMaterialPriceController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialQuantityController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialDiscountController.text) ??
+                            0)) /
+                    100;
+              }
+              subTotal = (((double.tryParse(
+                                      addMaterialQuantityController.text) ??
+                                  1) *
+                              (double.tryParse(
+                                      addMaterialPriceController.text) ??
+                                  0)) -
+                          discount) *
+                      tax +
+                  (((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                          (double.tryParse(addMaterialPriceController.text) ??
+                              0)) -
+                      discount);
+              total = (((double.tryParse(addMaterialQuantityController.text) ??
+                          1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0)) -
+                  discount);
             }
           }
         }
@@ -2741,7 +2828,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addSubContractCostController = TextEditingController();
     final addSubContractPriceController = TextEditingController();
     final addSubContractDiscountController = TextEditingController(text: '0');
-    final addSubContractVendorController = TextEditingController();
 
     //Add SubContract errorstatus and error message variables
     String addSubContractNameErrorStatus = '';
@@ -3032,12 +3118,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
-                          "Select existing",
+                          "Select Existing",
                           addSubContractVendorController,
                           "Vendor",
                           addSubContractVendorErrorStatus.isNotEmpty,
                           context,
-                          false),
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addSubContractVendorErrorStatus),
                     Padding(
@@ -3381,7 +3468,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                             vendors[index].vendorName ?? '',
                                             style: const TextStyle(
                                                 fontSize: 18,
+                                                overflow: TextOverflow.ellipsis,
                                                 fontWeight: FontWeight.w500),
+                                            maxLines: 1,
                                           ),
                                         ),
                                       ),
