@@ -1587,7 +1587,8 @@ class ApiProvider {
   Future<dynamic> getAllVendors(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse('${BASE_URL}api/vendors?client_id=');
+      final url =
+          Uri.parse('${BASE_URL}api/vendors?client_id=$clientId&page=$page');
 
       final response = await http.get(
         url,

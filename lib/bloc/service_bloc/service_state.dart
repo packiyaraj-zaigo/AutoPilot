@@ -135,4 +135,7 @@ class CreateVendorErrorState extends ServiceState {
   List<Object> get props => [message];
 }
 
-class CreateVendorSuccessState extends ServiceState {}
+class CreateVendorSuccessState extends ServiceState {
+  final String vendorId;
+  CreateVendorSuccessState({required this.vendorId});
+}

@@ -27,6 +27,7 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/svg.dart';
@@ -149,7 +150,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   bool isPaidFull = false;
   List<String> authorizedValues = [
     "Not Yet Authorized",
-    "Authorized",
+    "Authorize",
   ];
   int authorizedIndex = 0;
 
@@ -1907,7 +1908,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   widget.estimateDetails.data.orderService?[serviceIndex]
                               .isAuthorized ==
                           "Y"
-                      ? "Authorized"
+                      ? "Authorize"
                       : "Not Yet Authorized",
                   style: TextStyle(
                       color: widget.estimateDetails.data
@@ -1982,21 +1983,42 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             isScrollControlled: true,
                             useSafeArea: true);
                       } else if (label == "Vehicle") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return CreateVehicleScreen(
-                                navigation: "partial_estimate",
-                                customerId: widget
-                                        .estimateDetails.data.customer?.id
-                                        .toString() ??
-                                    "0",
+                        if ((appointmentValidation() &&
+                                startTimeController.text.isNotEmpty) ||
+                            (noteValidation() &&
+                                estimateNoteController.text.isNotEmpty) ||
+                            networkImageList
+                                .where((element) => element.isNotEmpty)
+                                .toList()
+                                .isEmpty) {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return CreateVehicleScreen(
+                                  navigation: "partial_estimate",
+                                  customerId: widget
+                                          .estimateDetails.data.customer?.id
+                                          .toString() ??
+                                      "0",
+                                  orderId:
+                                      widget.estimateDetails.data.id.toString(),
+                                );
+                              },
+                              isScrollControlled: true,
+                              useSafeArea: true);
+                        } else {
+                          showPopUpBeforeService(
+                              context,
+                              SelectVehiclesScreen(
+                                navigation: "partial",
+                                subNavigation: widget.navigation,
                                 orderId:
                                     widget.estimateDetails.data.id.toString(),
-                              );
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
+                                customerId: widget
+                                    .estimateDetails.data.customerId
+                                    .toString(),
+                              ));
+                        }
                       } else if (label == "Service") {
                         showModalBottomSheet(
                             context: context,
@@ -2040,8 +2062,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             child: TextField(
               controller: controller,
               textCapitalization: TextCapitalization.sentences,
-              inputFormatters:
-                  label == "Card Number" ? [CardNumberInputFormatter()] : [],
+              inputFormatters: label == "Card Number"
+                  ? [CardNumberInputFormatter()]
+                  : label == "Amount To Pay"
+                      ? [FilteringTextInputFormatter.deny(RegExp(r'[,-]'))]
+                      : [],
               readOnly: label == 'Date' ||
                       label == "Vehicle" ||
                       label == "Customer" ||
@@ -2385,6 +2410,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         endDateToServer =
                             "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       } else if (dateType == "start_date") {
+                        endDateController.text = "";
+                        endDateToServer = "";
+
                         startDateToServer =
                             "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       } else if (dateType == "payment") {
@@ -2398,6 +2426,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   minimumYear: 2009,
                   maximumYear: 2030,
                   minuteInterval: 1,
+                  minimumDate:
+                      dateType == "end_date" && startDateController.text != ""
+                          ? DateTime.parse(startDateToServer)
+                          : null,
                   mode: CupertinoDatePickerMode.date,
                 ),
               ),
@@ -2892,7 +2924,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
           setState(() {
-            materialAmount = materialAmount + double.parse(element2.unitPrice);
+            materialAmount = materialAmount +
+                (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours));
           });
         }
         if (element2.itemType.toLowerCase() == "labor") {
@@ -2925,7 +2959,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           double tempPrice = 0.00;
           if (element2.discountType == "Fixed") {
             if (element2.itemType.toLowerCase() == "part" ||
-                element2.itemType.toLowerCase() == "labor") {
+                element2.itemType.toLowerCase() == "labor" ||
+                element2.itemType.toLowerCase() == "material") {
               tempPrice = (double.parse(element2.unitPrice) *
                       double.parse(element2.quanityHours)) -
                   double.parse(element2.discount);
@@ -2937,7 +2972,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             log(tempPrice.toString() + "tempp");
           } else {
             if (element2.itemType.toLowerCase() == "part" ||
-                element2.itemType.toLowerCase() == "labor") {
+                element2.itemType.toLowerCase() == "labor" ||
+                element2.itemType.toLowerCase() == "material") {
               tempPrice = (double.parse(element2.unitPrice) *
                       double.parse(element2.quanityHours)) -
                   (double.parse(element2.discount) *
@@ -2953,7 +2989,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           }
 
           if (element2.itemType.toLowerCase() == "part" ||
-              element2.itemType.toLowerCase() == "labor") {
+              element2.itemType.toLowerCase() == "labor" ||
+              element2.itemType.toLowerCase() == "material") {
             taxAmount =
                 taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
           } else {
@@ -3134,6 +3171,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         ),
                                       ),
                                     ),
+                                    // SizedBox(
+                                    //   height: 50,
+                                    //   child: Center(
+                                    //     child: Text(
+                                    //       'Others',
+                                    //       style: TextStyle(
+                                    //           fontWeight: FontWeight.w600),
+                                    //     ),
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -3146,7 +3193,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                     children: [
                                       cashTabWidget(),
                                       creditTabWidget(),
-                                      cashTabWidget()
+                                      cashTabWidget(),
+                                      //  cashTabWidget(),
                                     ]),
                               ),
                               Padding(
@@ -4740,14 +4788,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       });
 
                       showAuthPopup(
-                          authStatus == "Authorized"
+                          authStatus == "Authorize"
                               ? "Authorize Service?"
                               : "Unauthorize Service?",
-                          authStatus == "Authorized"
+                          authStatus == "Authorize"
                               ? "Do you want to authorize this service"
                               : "Do you want to unauthorize this service?",
                           context,
-                          authStatus == "Authorized" ? "Y" : "N",
+                          authStatus == "Authorize" ? "Y" : "N",
                           serviceId,
                           technicianId,
                           serviceName);

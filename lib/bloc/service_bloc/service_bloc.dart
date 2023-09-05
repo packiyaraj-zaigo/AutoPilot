@@ -44,12 +44,16 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
     Emitter<ServiceState> emit,
   ) async {
     try {
+      emit(CreateVendorLoadingState());
       final clientId = await AppUtils.getUserID();
       final token = await AppUtils.getToken();
       final response = await apiRepo.createVendor(
           clientId, event.name, event.email, event.contactPerson, token);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        emit(CreateVendorSuccessState());
+        log(response.body);
+        final decodedBody = json.decode(response.body);
+        emit(CreateVendorSuccessState(
+            vendorId: decodedBody['created_id'].toString()));
       } else {
         final body = await json.decode(response.body);
         if (body.containsKey('message')) {

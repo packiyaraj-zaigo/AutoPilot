@@ -6,6 +6,7 @@ import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
 import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/vendor_response_model.dart';
+import 'package:auto_pilot/Screens/add_vendor_screen.dart';
 import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
@@ -75,6 +76,9 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
   List<CannedServiceAddModel> labor = [];
   List<CannedServiceAddModel> subContract = [];
   List<CannedServiceAddModel> fee = [];
+
+  final addSubContractVendorController = TextEditingController();
+  bool isCannedService = false;
 
   dynamic _currentPricingModelSelectedValue;
   List<String> pricingModelList = ['Per Sqrt', 'Per Roll'];
@@ -186,6 +190,26 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                   log(client!.toJson().toString());
                   rateController.text = client?.baseLaborCost ?? '0';
                 } else if (state is CreateOrderServiceState) {
+                  if (material.isEmpty &&
+                      part.isEmpty &&
+                      labor.isEmpty &&
+                      subContract.isEmpty &&
+                      fee.isEmpty) {
+                    if (!isCannedService) {
+                      context
+                          .read<EstimateBloc>()
+                          .add(GetSingleEstimateEvent(orderId: widget.orderId));
+                    } else {
+                      context.read<EstimateBloc>().add(
+                          CreateCannedOrderServiceEstimateEvent(
+                              service: service!,
+                              fee: fee,
+                              labor: labor,
+                              material: material,
+                              part: part,
+                              subcontract: subContract));
+                    }
+                  }
                   if (material.isNotEmpty) {
                     material.forEach((element) {
                       context.read<EstimateBloc>().add(
@@ -267,9 +291,20 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                     });
                   }
                 } else if (state is CreateOrderServiceItemState) {
-                  context
-                      .read<EstimateBloc>()
-                      .add(GetSingleEstimateEvent(orderId: widget.orderId));
+                  if (isCannedService) {
+                    context.read<EstimateBloc>().add(
+                        CreateCannedOrderServiceEstimateEvent(
+                            service: service!,
+                            fee: fee,
+                            labor: labor,
+                            material: material,
+                            part: part,
+                            subcontract: subContract));
+                  } else {
+                    context
+                        .read<EstimateBloc>()
+                        .add(GetSingleEstimateEvent(orderId: widget.orderId));
+                  }
                 } else if (state is GetSingleEstimateState) {
                   Navigator.pushReplacement(context, MaterialPageRoute(
                     builder: (context) {
@@ -278,6 +313,10 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                       );
                     },
                   ));
+                } else if (state is CreateCannedServiceEstimateState) {
+                  context
+                      .read<EstimateBloc>()
+                      .add(GetSingleEstimateEvent(orderId: widget.orderId));
                 }
               },
               child: BlocBuilder<EstimateBloc, EstimateState>(
@@ -724,6 +763,22 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                         },
                       ),
 
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: Row(
+                          children: [
+                            Checkbox(
+                                value: isCannedService,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isCannedService = value!;
+                                  });
+                                }),
+                            Text("Create a canned service with these details")
+                          ],
+                        ),
+                      ),
+
                       // Padding(
                       //   padding: const EdgeInsets.only(top: 16.0),
                       //   child: textBox(
@@ -743,8 +798,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                       // ),
                       // errorWidget(error: taxError),
 
-                      const SizedBox(height: 16),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 20),
+                      // const SizedBox(height: 16),
                       GestureDetector(
                         onTap: () async {
                           FocusManager.instance.primaryFocus?.unfocus();
@@ -850,13 +905,18 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                             borderRadius: BorderRadius.circular(12),
                             color: AppColors.primaryColors,
                           ),
-                          child: Text(
-                            widget.service != null ? 'Update' : "Confirm",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white),
-                          ),
+                          child: state is CreateOrderServiceLoadingState ||
+                                  state is CreateOrderServiceItemLoadingState
+                              ? const Center(
+                                  child: CupertinoActivityIndicator(),
+                                )
+                              : Text(
+                                  widget.service != null ? 'Update' : "Confirm",
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
                         ),
                       ),
                       CupertinoButton(
@@ -883,27 +943,70 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff6A7187),
-              ),
+            Row(
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xff6A7187),
+                  ),
+                ),
+                isRequired
+                    ? const Text(
+                        " *",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: Color(
+                            0xffD80027,
+                          ),
+                        ),
+                      )
+                    : SizedBox(),
+              ],
             ),
-            isRequired
-                ? const Text(
-                    " *",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: Color(
-                        0xffD80027,
-                      ),
+            label == "Vendor"
+                ? GestureDetector(
+                    onTap: () {
+                      showModalBottomSheet(
+                              isScrollControlled: true,
+                              useSafeArea: true,
+                              context: context,
+                              builder: (context) => const AddVendorScreen())
+                          .then((value) {
+                        // do something
+                        if (value != null) {
+                          print(value.toString() + "heloooo");
+
+                          setState!(() {
+                            addSubContractVendorController.text = value[1];
+                            vendorId = int.parse(value[0]);
+                          });
+                        }
+                      });
+                    },
+                    child: const Row(
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: AppColors.primaryColors,
+                        ),
+                        Text(
+                          "Add New",
+                          style: TextStyle(
+                            color: AppColors.primaryColors,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox()
           ],
         ),
         const SizedBox(height: 3),
@@ -951,8 +1054,9 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
                       label == 'Price ' ||
-                      label == "Quantity" ||
-                      label == "Base Cost"
+                      label == "Quantity " ||
+                      label == "Base Cost" ||
+                      label == "Quantity"
                   ? TextInputType.number
                   : null,
               inputFormatters: label == "Hours"
@@ -1140,6 +1244,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                   },
                 );
               } else {
+                addSubContractVendorController.clear();
                 showDialog(
                   context: context,
                   builder: (context) {
@@ -1179,6 +1284,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
     final addMaterialNameController = TextEditingController();
     final addMaterialDescriptionController = TextEditingController();
     final addMaterialPriceController = TextEditingController();
+    final addMaterialQuantityController = TextEditingController(text: '1');
     final addMaterialCostController = TextEditingController();
     final addMaterialDiscountController = TextEditingController(text: '0');
     final addMaterialBatchController = TextEditingController();
@@ -1187,6 +1293,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
     String adddMaterialNameErrorStatus = '';
     String addMaterialDescriptionErrorStatus = '';
     String addMaterialPriceErrorStatus = '';
+    String addMaterialQuantityErrorStatus = '';
     String addMaterialCostErrorStatus = '';
     String addMaterialDiscountErrorStatus = '';
     String adddMaterialBatchErrorStatus = '';
@@ -1221,6 +1328,12 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
       } else {
         addMaterialPriceErrorStatus = '';
       }
+      if (addMaterialQuantityController.text.trim().isEmpty) {
+        addMaterialQuantityErrorStatus = "Quantity can't be empty";
+        status = false;
+      } else {
+        addMaterialPriceErrorStatus = '';
+      }
       if (addMaterialDiscountController.text.trim().isNotEmpty &&
           isPercentage &&
           double.parse(addMaterialDiscountController.text) > 100) {
@@ -1246,56 +1359,155 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
 
     return StatefulBuilder(
       builder: (context, StateSetter newSetState) {
-        if (addMaterialPriceController.text.isNotEmpty) {
+        // if (addMaterialPriceController.text.isNotEmpty &&
+        //     addMaterialQuantityController.text.isNotEmpty) {
+        //   if (client?.taxOnMaterial == 'N') {
+        //     if (addMaterialDiscountController.text.isEmpty) {
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //               0) *
+        //           (double.tryParse(addMaterialQuantityController.text) ?? 1);
+        //     } else {
+        //       if (isPercentage) {
+        //         subTotal =
+        //             ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //                     (double.tryParse(
+        //                             addMaterialQuantityController.text) ??
+        //                         1)) -
+        //                 ((double.tryParse(addMaterialPriceController.text) ??
+        //                             0) *
+        //                         (double.tryParse(
+        //                                 addMaterialQuantityController.text) ??
+        //                             1) *
+        //                         (double.tryParse(
+        //                                 addMaterialDiscountController.text) ??
+        //                             0)) /
+        //                     100;
+        //       } else {
+        //         subTotal = ((double.tryParse(addMaterialPriceController.text) ??
+        //                     0) *
+        //                 (double.tryParse(addMaterialQuantityController.text) ??
+        //                     1)) -
+        //             (double.tryParse(addMaterialDiscountController.text) ?? 0);
+        //       }
+        //     }
+        //     total = subTotal;
+        //   } else {
+        //     final tax =
+        //         (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
+
+        //     if (addMaterialDiscountController.text.isEmpty) {
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //                   0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1) *
+        //               tax +
+        //           (double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1);
+        //       total = (double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //           (double.tryParse(addMaterialQuantityController.text) ?? 1);
+        //     } else {
+        //       double discount =
+        //           double.tryParse(addMaterialDiscountController.text) ?? 0;
+        //       if (isPercentage) {
+        //         discount = ((double.tryParse(addMaterialPriceController.text) ??
+        //                     0) *
+        //                 (double.tryParse(addMaterialQuantityController.text) ??
+        //                     1) *
+        //                 (double.tryParse(addMaterialDiscountController.text) ??
+        //                     0)) /
+        //             100;
+        //       }
+
+        //       subTotal = (double.tryParse(addMaterialPriceController.text) ??
+        //               0) -
+        //           discount *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1) *
+        //               tax +
+        //           ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //                   (double.tryParse(
+        //                           addMaterialQuantityController.text) ??
+        //                       1) -
+        //               discount);
+        //       total = ((double.tryParse(addMaterialPriceController.text) ?? 0) *
+        //               (double.tryParse(addMaterialQuantityController.text) ??
+        //                   1)) -
+        //           (discount);
+        //     }
+        //   }
+        // }
+
+        if (addMaterialPriceController.text.isNotEmpty &&
+            addMaterialQuantityController.text.isNotEmpty) {
           if (client?.taxOnMaterial == 'N') {
             if (addMaterialDiscountController.text.isEmpty) {
-              subTotal =
-                  (double.tryParse(addMaterialPriceController.text) ?? 0);
-            } else {
-              if (isPercentage) {
-                subTotal = (double.tryParse(addMaterialPriceController.text) ??
-                        0) -
-                    ((double.tryParse(addMaterialPriceController.text) ?? 0) *
-                            (double.tryParse(
-                                    addMaterialDiscountController.text) ??
-                                0)) /
-                        100;
-              } else {
-                subTotal = ((double.tryParse(addMaterialPriceController.text) ??
-                        0) -
-                    (double.tryParse(addMaterialDiscountController.text) ?? 0));
-              }
-            }
-            total = subTotal;
-          } else {
-            final tax =
-                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
-
-            if (addMaterialDiscountController.text.isEmpty) {
-              subTotal =
-                  (double.tryParse(addMaterialPriceController.text) ?? 0) *
-                          tax +
-                      (double.tryParse(addMaterialPriceController.text) ?? 0);
-              total = (double.tryParse(addMaterialPriceController.text) ?? 0);
+              subTotal = (double.tryParse(addMaterialPriceController.text) ??
+                      0) *
+                  (double.tryParse(addMaterialQuantityController.text) ?? 1);
             } else {
               double discount =
                   double.tryParse(addMaterialDiscountController.text) ?? 0;
               if (isPercentage) {
                 discount = ((double.tryParse(addMaterialPriceController.text) ??
                             0) *
+                        (double.tryParse(addMaterialQuantityController.text) ??
+                            1) *
                         (double.tryParse(addMaterialDiscountController.text) ??
                             0)) /
                     100;
               }
-
-              subTotal =
-                  ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                              discount) *
-                          tax +
-                      ((double.tryParse(addMaterialPriceController.text) ?? 0) -
-                          discount);
-              total = (double.tryParse(addMaterialPriceController.text) ?? 0) -
-                  (discount);
+              subTotal = (((double.tryParse(addMaterialPriceController.text) ??
+                          0) *
+                      (double.tryParse(addMaterialQuantityController.text) ??
+                          1)) -
+                  discount);
+            }
+            total = subTotal;
+          } else {
+            //  log((client?.laborTaxRate).toString());
+            final tax =
+                (double.tryParse(client?.materialTaxRate ?? '') ?? 0) / 100;
+            if (addMaterialDiscountController.text.isEmpty) {
+              subTotal = ((double.tryParse(
+                                  addMaterialQuantityController.text) ??
+                              1) *
+                          (double.tryParse(addMaterialPriceController.text) ??
+                              0)) *
+                      tax +
+                  ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0));
+              total =
+                  ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0));
+            } else {
+              double discount =
+                  double.tryParse(addMaterialDiscountController.text) ?? 0;
+              if (isPercentage) {
+                discount = ((double.tryParse(addMaterialPriceController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialQuantityController.text) ??
+                            0) *
+                        (double.tryParse(addMaterialDiscountController.text) ??
+                            0)) /
+                    100;
+              }
+              subTotal = (((double.tryParse(
+                                      addMaterialQuantityController.text) ??
+                                  1) *
+                              (double.tryParse(
+                                      addMaterialPriceController.text) ??
+                                  0)) -
+                          discount) *
+                      tax +
+                  (((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                          (double.tryParse(addMaterialPriceController.text) ??
+                              0)) -
+                      discount);
+              total = (((double.tryParse(addMaterialQuantityController.text) ??
+                          1) *
+                      (double.tryParse(addMaterialPriceController.text) ?? 0)) -
+                  discount);
             }
           }
         }
@@ -1366,6 +1578,18 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                         ),
                       ),
                       errorWidget(error: addMaterialPriceErrorStatus),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 17.0),
+                        child: textBox(
+                            "Amount",
+                            addMaterialQuantityController,
+                            "Quantity ",
+                            addMaterialQuantityErrorStatus.isNotEmpty,
+                            context,
+                            true,
+                            newSetState),
+                      ),
+                      errorWidget(error: addMaterialQuantityErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
                         child: textBox(
@@ -1495,7 +1719,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                             "Part/Batch Number",
                             adddMaterialBatchErrorStatus.isNotEmpty,
                             context,
-                            false),
+                            false,
+                            newSetState),
                       ),
                       errorWidget(error: adddMaterialBatchErrorStatus),
                       Padding(
@@ -1589,6 +1814,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                             .text.isNotEmpty
                                     ? "Percentage"
                                     : "Fixed",
+                                quanityHours:
+                                    addMaterialQuantityController.text.trim(),
                                 itemType: "Material",
                                 subTotal: subTotal.toStringAsFixed(2),
                               ));
@@ -2169,18 +2396,21 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
       if (addLaborBaseCostController.text.isNotEmpty) {
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0);
+            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0) *
+                (double.tryParse(addLaborHoursController.text) ?? 1);
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
               discount = ((double.tryParse(addLaborBaseCostController.text) ??
                           0) *
+                      (double.tryParse(addLaborHoursController.text) ?? 1) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
             subTotal =
-                ((double.tryParse(addLaborBaseCostController.text) ?? 0) -
+                (((double.tryParse(addLaborBaseCostController.text) ?? 0) *
+                        (double.tryParse(addLaborHoursController.text) ?? 1)) -
                     discount);
           }
           total = subTotal;
@@ -2783,7 +3013,6 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
     final addSubContractCostController = TextEditingController();
     final addSubContractPriceController = TextEditingController();
     final addSubContractDiscountController = TextEditingController(text: '0');
-    final addSubContractVendorController = TextEditingController();
 
     //Add SubContract errorstatus and error message variables
     String addSubContractNameErrorStatus = '';
@@ -2890,327 +3119,361 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
           }
         }
       }
-      return Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Add SubContract",
-                style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryTitleColor),
-              ),
-              IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  })
-            ],
-          ),
-          Expanded(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: textBox(
-                          "Enter Subcontract Name",
-                          addSubContractNameController,
-                          "Name",
-                          addSubContractNameErrorStatus.isNotEmpty,
-                          context,
-                          true),
-                    ),
-                    errorWidget(error: addSubContractNameErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox(
-                          "Enter Subcontract Description",
-                          addSubContractDescriptionController,
-                          "Description",
-                          addSubContractDescriptionErrorStatus.isNotEmpty,
-                          context,
-                          false),
-                    ),
-                    errorWidget(error: addSubContractDescriptionErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox(
-                          "Amount",
-                          addSubContractPriceController,
-                          "Price ",
-                          addSubContractPriceErrorStatus.isNotEmpty,
-                          context,
-                          true,
-                          newSetState),
-                    ),
-                    errorWidget(error: addSubContractPriceErrorStatus),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox(
-                          "Amount",
-                          addSubContractCostController,
-                          "Cost ",
-                          addSubContractCostErrorStatus.isNotEmpty,
-                          context,
-                          false),
-                    ),
-                    errorWidget(error: addSubContractCostErrorStatus),
-                    Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 17.0),
-                          child: textBox(
-                              "Amount",
-                              addSubContractDiscountController,
-                              "Discount",
-                              addSubContractDiscountErrorStatus.isNotEmpty,
-                              context,
-                              false,
-                              newSetState),
-                        ),
-                        Positioned(
-                          right: 10,
-                          top: 58,
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  isPercentage = false;
-                                  newSetState(() {});
-                                },
-                                child: Icon(
-                                  CupertinoIcons.money_dollar,
-                                  color: isPercentage
-                                      ? AppColors.greyText
-                                      : AppColors.primaryColors,
-                                ),
-                              ),
-                              Text(
-                                '  /  ',
-                                style: TextStyle(
-                                  color: AppColors.greyText,
-                                  fontSize: 18,
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  isPercentage = true;
-                                  newSetState(() {});
-                                },
-                                child: Icon(
-                                  Icons.percent,
-                                  color: !isPercentage
-                                      ? AppColors.greyText
-                                      : AppColors.primaryColors,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    errorWidget(error: addSubContractDiscountErrorStatus),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(top: 17),
-                    //   child: Row(
-                    //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //     children: [
-                    //       const Text(
-                    //         "Label",
-                    //         style: TextStyle(
-                    //           fontSize: 14,
-                    //           fontWeight: FontWeight.w500,
-                    //           color: Color(0xff6A7187),
-                    //         ),
-                    //       ),
-                    //       GestureDetector(
-                    //         onTap: () {
-                    //           newSetState(() {
-                    //             tagDataList.add("Tag");
-                    //           });
-                    //         },
-                    //         child: const Row(
-                    //           children: [
-                    //             Icon(
-                    //               Icons.add,
-                    //               color: AppColors.primaryColors,
-                    //             ),
-                    //             Text(
-                    //               "Add New",
-                    //               style: TextStyle(
-                    //                 fontSize: 14,
-                    //                 fontWeight: FontWeight.w600,
-                    //                 color: AppColors.primaryColors,
-                    //               ),
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       )
-                    //     ],
-                    //   ),
-                    // ),
-                    GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                              //  maxCrossAxisExtent: 150,
-                              mainAxisSpacing: 20,
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 8,
-                              childAspectRatio: 3),
-                      itemBuilder: (context, index) {
-                        return tagWidget(
-                            tagDataList[index], index, newSetState);
-                      },
-                      itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox(
-                          "Select existing",
-                          addSubContractVendorController,
-                          "Vendor",
-                          addSubContractVendorErrorStatus.isNotEmpty,
-                          context,
-                          false),
-                    ),
-                    errorWidget(error: addSubContractVendorErrorStatus),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Total :",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTitleColor),
-                          ),
-                          Text(
-                            "\$${total.toStringAsFixed(2)}",
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTitleColor),
-                          )
-                        ],
+      return BlocProvider(
+        create: (context) => ServiceBloc()..add(GetAllVendorsEvent()),
+        child: BlocListener<ServiceBloc, ServiceState>(
+          listener: (context, state) {
+            if (state is GetAllVendorsSuccessState) {
+              if (context.read<ServiceBloc>().currentPage == 2 ||
+                  context.read<ServiceBloc>().currentPage == 1) {
+                vendors.clear();
+              }
+              vendors.addAll(state.vendors);
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<ServiceBloc, ServiceState>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        "Add SubContract",
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryTitleColor),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Tax :",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTitleColor),
-                          ),
-                          Text(
-                            "\$${(subTotal - total).toStringAsFixed(2)}",
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTitleColor),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 17),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            "Sub Total :",
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTitleColor),
-                          ),
-                          Text(
-                            "\$${subTotal.toStringAsFixed(2)}",
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryTitleColor),
-                          )
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 31),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-
-                          final status = addSubContractValidation(newSetState);
-                          if (status) {
-                            final focus = FocusNode().requestFocus();
-
-                            subContract.add(
-                              CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addSubContractDescriptionController.text,
-                                // part: addSubContractSubContractNumberController.text,
-                                part: '',
-                                itemName: addSubContractNameController.text,
-                                discount: addSubContractDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addSubContractDiscountController.text
-                                        .trim(),
-                                discountType: isPercentage &&
-                                        addSubContractDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-
-                                tax: isTax == true ? 'Y' : 'N',
-                                vendorId: vendorId,
-                                unitPrice: addSubContractPriceController.text,
-                                itemType: "SubContract",
-                                subTotal: subTotal.toStringAsFixed(2),
-                              ),
-                            );
-                            setState(() {});
+                      IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () {
                             Navigator.pop(context);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          fixedSize:
-                              Size(MediaQuery.of(context).size.width, 56),
-                          primary: AppColors.primaryColors,
-                        ),
-                        child: const Text(
-                          "Continue",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white),
+                          })
+                    ],
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: textBox(
+                                  "Enter Subcontract Name",
+                                  addSubContractNameController,
+                                  "Name",
+                                  addSubContractNameErrorStatus.isNotEmpty,
+                                  context,
+                                  true),
+                            ),
+                            errorWidget(error: addSubContractNameErrorStatus),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 17.0),
+                              child: textBox(
+                                  "Enter Subcontract Description",
+                                  addSubContractDescriptionController,
+                                  "Description",
+                                  addSubContractDescriptionErrorStatus
+                                      .isNotEmpty,
+                                  context,
+                                  false),
+                            ),
+                            errorWidget(
+                                error: addSubContractDescriptionErrorStatus),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 17.0),
+                              child: textBox(
+                                  "Amount",
+                                  addSubContractPriceController,
+                                  "Price ",
+                                  addSubContractPriceErrorStatus.isNotEmpty,
+                                  context,
+                                  true,
+                                  newSetState),
+                            ),
+                            errorWidget(error: addSubContractPriceErrorStatus),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 17.0),
+                              child: textBox(
+                                  "Amount",
+                                  addSubContractCostController,
+                                  "Cost ",
+                                  addSubContractCostErrorStatus.isNotEmpty,
+                                  context,
+                                  false),
+                            ),
+                            errorWidget(error: addSubContractCostErrorStatus),
+                            Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 17.0),
+                                  child: textBox(
+                                      "Amount",
+                                      addSubContractDiscountController,
+                                      "Discount",
+                                      addSubContractDiscountErrorStatus
+                                          .isNotEmpty,
+                                      context,
+                                      false,
+                                      newSetState),
+                                ),
+                                Positioned(
+                                  right: 10,
+                                  top: 58,
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: () {
+                                          isPercentage = false;
+                                          newSetState(() {});
+                                        },
+                                        child: Icon(
+                                          CupertinoIcons.money_dollar,
+                                          color: isPercentage
+                                              ? AppColors.greyText
+                                              : AppColors.primaryColors,
+                                        ),
+                                      ),
+                                      Text(
+                                        '  /  ',
+                                        style: TextStyle(
+                                          color: AppColors.greyText,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () {
+                                          isPercentage = true;
+                                          newSetState(() {});
+                                        },
+                                        child: Icon(
+                                          Icons.percent,
+                                          color: !isPercentage
+                                              ? AppColors.greyText
+                                              : AppColors.primaryColors,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            errorWidget(
+                                error: addSubContractDiscountErrorStatus),
+                            // Padding(
+                            //   padding: const EdgeInsets.only(top: 17),
+                            //   child: Row(
+                            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //     children: [
+                            //       const Text(
+                            //         "Label",
+                            //         style: TextStyle(
+                            //           fontSize: 14,
+                            //           fontWeight: FontWeight.w500,
+                            //           color: Color(0xff6A7187),
+                            //         ),
+                            //       ),
+                            //       GestureDetector(
+                            //         onTap: () {
+                            //           newSetState(() {
+                            //             tagDataList.add("Tag");
+                            //           });
+                            //         },
+                            //         child: const Row(
+                            //           children: [
+                            //             Icon(
+                            //               Icons.add,
+                            //               color: AppColors.primaryColors,
+                            //             ),
+                            //             Text(
+                            //               "Add New",
+                            //               style: TextStyle(
+                            //                 fontSize: 14,
+                            //                 fontWeight: FontWeight.w600,
+                            //                 color: AppColors.primaryColors,
+                            //               ),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       )
+                            //     ],
+                            //   ),
+                            // ),
+                            GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                      //  maxCrossAxisExtent: 150,
+                                      mainAxisSpacing: 20,
+                                      crossAxisCount: 3,
+                                      crossAxisSpacing: 8,
+                                      childAspectRatio: 3),
+                              itemBuilder: (context, index) {
+                                return tagWidget(
+                                    tagDataList[index], index, newSetState);
+                              },
+                              itemCount: tagDataList.length,
+                              physics: ClampingScrollPhysics(),
+                              shrinkWrap: true,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 17.0),
+                              child: textBox(
+                                  "Select Existing",
+                                  addSubContractVendorController,
+                                  "Vendor",
+                                  addSubContractVendorErrorStatus.isNotEmpty,
+                                  context,
+                                  false,
+                                  newSetState),
+                            ),
+                            errorWidget(error: addSubContractVendorErrorStatus),
+                            Padding(
+                              padding: EdgeInsets.only(top: 17),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Total :",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  Text(
+                                    "\$${total.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryTitleColor),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 17),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Tax :",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  Text(
+                                    "\$${(subTotal - total).toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryTitleColor),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 17),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    "Sub Total :",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryTitleColor),
+                                  ),
+                                  Text(
+                                    "\$${subTotal.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primaryTitleColor),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 31),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  FocusManager.instance.primaryFocus?.unfocus();
+
+                                  final status =
+                                      addSubContractValidation(newSetState);
+                                  if (status) {
+                                    final focus = FocusNode().requestFocus();
+
+                                    subContract.add(
+                                      CannedServiceAddModel(
+                                        cannedServiceId: int.parse(serviceId),
+                                        note:
+                                            addSubContractDescriptionController
+                                                .text,
+                                        // part: addSubContractSubContractNumberController.text,
+                                        part: '',
+                                        itemName:
+                                            addSubContractNameController.text,
+                                        discount: addSubContractDiscountController
+                                                .text
+                                                .trim()
+                                                .isEmpty
+                                            ? "0"
+                                            : addSubContractDiscountController
+                                                .text
+                                                .trim(),
+                                        discountType: isPercentage &&
+                                                addSubContractDiscountController
+                                                    .text.isNotEmpty
+                                            ? "Percentage"
+                                            : "Fixed",
+
+                                        tax: isTax == true ? 'Y' : 'N',
+                                        vendorId: vendorId,
+                                        unitPrice:
+                                            addSubContractPriceController.text,
+                                        itemType: "SubContract",
+                                        subTotal: subTotal.toStringAsFixed(2),
+                                      ),
+                                    );
+                                    setState(() {});
+                                    Navigator.pop(context);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  fixedSize: Size(
+                                      MediaQuery.of(context).size.width, 56),
+                                  primary: AppColors.primaryColors,
+                                ),
+                                child: const Text(
+                                  "Continue",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white),
+                                ),
+                              ),
+                            )
+                          ],
                         ),
                       ),
-                    )
-                  ],
-                ),
-              ),
-            ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-        ],
+        ),
       );
     });
   }
@@ -3423,7 +3686,9 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                             vendors[index].vendorName ?? '',
                                             style: const TextStyle(
                                                 fontSize: 18,
+                                                overflow: TextOverflow.ellipsis,
                                                 fontWeight: FontWeight.w500),
+                                            maxLines: 1,
                                           ),
                                         ),
                                       ),

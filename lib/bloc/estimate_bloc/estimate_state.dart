@@ -221,3 +221,5 @@ class GetClientByIdInEstimateErrorState extends EstimateState {
   final String errorMessage;
   GetClientByIdInEstimateErrorState({required this.errorMessage});
 }
+
+class CreateCannedServiceEstimateState extends EstimateState {}
