@@ -51,6 +51,22 @@ class EditPartEvent extends PartsEvent {
     required this.id,
   });
 }
+
+class GetPartsNotesEvent extends PartsEvent {
+  final String partsId;
+  GetPartsNotesEvent({required this.partsId});
+}
+
+class DeletePartsNoteEvent extends PartsEvent {
+  final String partsId;
+  DeletePartsNoteEvent({required this.partsId});
+}
+
+class AddPartsNoteEvent extends PartsEvent {
+  final String partsId;
+  final String notes;
+  AddPartsNoteEvent({required this.notes, required this.partsId});
+}
 // class AddPart extends PartsEvent {
 //   final BuildContext context;
 //   final String itemname, serialnumber, quantity, fee, supplies, epa, cost;

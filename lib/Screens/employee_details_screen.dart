@@ -203,7 +203,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                         scheme: 'sms',
                                         path: widget.employee.phone!,
                                         queryParameters: <String, String>{
-                                          'body': Uri.encodeComponent(' '),
+                                          'body': Uri.encodeComponent(''),
                                         },
                                       );
                                       launchUrl(smsLaunchUri);

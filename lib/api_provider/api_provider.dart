@@ -1764,7 +1764,8 @@ class ApiProvider {
       String discountType,
       String position,
       String subTotal,
-      String tax) async {
+      String tax,
+      String cost) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -1780,7 +1781,8 @@ class ApiProvider {
         ..fields['discount_type'] = discountType
         ..fields['position'] = position
         ..fields['sub_total'] = subTotal
-        ..fields['tax'] = tax;
+        ..fields['tax'] = tax
+        ..fields['markup'] = cost;
 
       request.headers.addAll(getHeader(token));
       inspect(request);
@@ -2234,6 +2236,43 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + 'Create vendor provider error');
+    }
+  }
+
+  Future<dynamic> getPartsNotes(String token, String partsId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/inventory_notes?parts_id=$partsId');
+      final response = http.get(url, headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  Future<dynamic> deletePartsNotes(String id, String token) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${BASE_URL}api/inventory_notes/$id'),
+        headers: getHeader(token),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
+    }
+  }
+
+  Future<dynamic> addPartsNote(
+      String partsId, String token, String notes) async {
+    try {
+      final body = {"parts_id": partsId, "notes": notes};
+      final response = await http.post(
+          Uri.parse('${BASE_URL}api/inventory_notes'),
+          headers: getHeader(token),
+          body: json.encode(body));
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
     }
   }
 }

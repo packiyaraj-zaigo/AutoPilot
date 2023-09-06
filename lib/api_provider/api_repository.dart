@@ -508,7 +508,8 @@ class ApiRepository {
       String discountType,
       String position,
       String subTotal,
-      String tax) {
+      String tax,
+      String cost) {
     return apiProvider.createOrderServiceItem(
         token,
         cannedServiceId,
@@ -520,7 +521,8 @@ class ApiRepository {
         discountType,
         position,
         subTotal,
-        tax);
+        tax,
+        cost);
   }
 
   Future deleteCannedService(String token, String serviceId) {
@@ -652,6 +654,18 @@ class ApiRepository {
       String contactPerson, String token) {
     return apiProvider.createVendor(
         clientId, name, email, contactPerson, token);
+  }
+
+  Future<dynamic> getPartsNotes(String token, String partsId) {
+    return apiProvider.getPartsNotes(token, partsId);
+  }
+
+  Future<dynamic> deletePartsNote(String token, String partsId) {
+    return apiProvider.deletePartsNotes(partsId, token);
+  }
+
+  Future<dynamic> addPartsNote(String token, String partsId, String notes) {
+    return apiProvider.addPartsNote(partsId, token, notes);
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/parts_notes_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -52,3 +53,33 @@ class DeletePartErrorState extends PartsState {
 }
 
 class DeletePartSuccessState extends PartsState {}
+
+class GetPartsNoteState extends PartsState {
+  final PartsNotesModel partsNotesModel;
+  GetPartsNoteState({required this.partsNotesModel});
+}
+
+class GetPartsNoteLoadingState extends PartsState {}
+
+class GetPartsNoteErrorState extends PartsState {
+  final String errorMessage;
+  GetPartsNoteErrorState({required this.errorMessage});
+}
+
+class DeletePartsNoteState extends PartsState {}
+
+class DeletePartsNoteErrorState extends PartsState {
+  final String errorMessage;
+  DeletePartsNoteErrorState({required this.errorMessage});
+}
+
+class DeletePartsNoteLoadingState extends PartsState {}
+
+class AddPartsNoteState extends PartsState {}
+
+class AddPartsNoteLoadingState extends PartsState {}
+
+class AddPartsNoteErrorState extends PartsState {
+  final String errorMessage;
+  AddPartsNoteErrorState({required this.errorMessage});
+}

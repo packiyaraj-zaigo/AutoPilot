@@ -1,9 +1,9 @@
 import 'package:auto_pilot/Models/parts_model.dart';
 import 'package:auto_pilot/Models/vechile_dropdown_model.dart';
 import 'package:auto_pilot/Screens/parts_list_screen.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_bloc.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_event.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_state.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_bloc.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_event.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_state.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';

@@ -522,7 +522,8 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                           ? materialTax
                           : item.cannedServiceItems![i].itemType == "Part"
                               ? partTax
-                              : laborTax));
+                              : laborTax,
+                      cost: item.cannedServiceItems![i].markup));
                 }
               } else {
                 context

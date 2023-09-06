@@ -669,7 +669,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
               event.discountType,
               event.position,
               event.subTotal,
-              event.tax);
+              event.tax,
+              event.cost);
 
       log("res${createOrderServiceItem.body}");
 

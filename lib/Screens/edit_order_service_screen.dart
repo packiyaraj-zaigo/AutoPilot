@@ -1151,6 +1151,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    double materialCost = 0;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
@@ -1288,6 +1289,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
         if (addMaterialPriceController.text.isNotEmpty &&
             addMaterialQuantityController.text.isNotEmpty) {
+          materialCost =
+              ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                  (double.tryParse(addMaterialCostController.text) ?? 0));
           if (client?.taxOnMaterial == 'N') {
             if (addMaterialDiscountController.text.isEmpty) {
               subTotal = (double.tryParse(addMaterialPriceController.text) ??
@@ -1446,11 +1450,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                             "Cost",
                             addMaterialCostErrorStatus.isNotEmpty,
                             context,
-                            false),
+                            false,
+                            newSetState),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
                       Padding(
-                        padding: const EdgeInsets.only(top:8.0),
+                        padding: const EdgeInsets.only(top: 8.0),
                         child: Stack(
                           children: [
                             textBox(
@@ -1543,6 +1548,28 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text(
+                              "Cost :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${materialCost.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
                               "Tax :",
                               style: TextStyle(
                                   fontSize: 16,
@@ -1588,29 +1615,30 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                             final status = addMaterialValidation(newSetState);
                             if (status) {
                               material.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addMaterialDescriptionController.text,
-                                part: addMaterialBatchController.text,
-                                itemName: addMaterialNameController.text,
-                                unitPrice: addMaterialPriceController.text,
-                                discount: addMaterialDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addMaterialDiscountController.text.trim(),
-                                discountType: isPercentage &&
-                                        addMaterialDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-                                quanityHours:
-                                    addMaterialQuantityController.text.trim(),
-                                itemType: "Material",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                tax: client!.taxOnMaterial == "Y"
-                                    ? client!.materialTaxRate ?? '0'
-                                    : '0',
-                              ));
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addMaterialDescriptionController.text,
+                                  part: addMaterialBatchController.text,
+                                  itemName: addMaterialNameController.text,
+                                  unitPrice: addMaterialPriceController.text,
+                                  discount: addMaterialDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addMaterialDiscountController.text
+                                          .trim(),
+                                  discountType: isPercentage &&
+                                          addMaterialDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours:
+                                      addMaterialQuantityController.text.trim(),
+                                  itemType: "Material",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  tax: client!.taxOnMaterial == "Y"
+                                      ? client!.materialTaxRate ?? '0'
+                                      : '0',
+                                  cost: materialCost.toStringAsFixed(2)));
                               setState(() {});
                               Navigator.pop(context);
                             }
@@ -1664,6 +1692,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    double partCost = 0;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
@@ -1719,6 +1748,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addPartPriceController.text.isNotEmpty) {
         if (addPartQuantityController.text.isNotEmpty) {
+          partCost = ((double.tryParse(addPartQuantityController.text) ?? 1) *
+              (double.tryParse(addPartCostController.text) ?? 0));
           double quantity =
               double.tryParse(addPartQuantityController.text) ?? 1;
           if (client?.taxOnParts == "N") {
@@ -1868,8 +1899,14 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox("Amount", addPartCostController, "Cost ",
-                          addPartCostErrorStatus.isNotEmpty, context, false),
+                      child: textBox(
+                          "Amount",
+                          addPartCostController,
+                          "Cost ",
+                          addPartCostErrorStatus.isNotEmpty,
+                          context,
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addPartCostErrorStatus),
                     Stack(
@@ -1963,6 +2000,28 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${partCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Tax :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -2008,26 +2067,28 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           final status = addPartValidation(newSetState);
                           if (status) {
                             part.add(CannedServiceAddModel(
-                              cannedServiceId: int.parse(serviceId),
-                              note: addPartDescriptionController.text,
-                              part: addPartPartNumberController.text,
-                              itemName: addPartNameController.text,
-                              unitPrice: addPartPriceController.text,
-                              quanityHours: addPartQuantityController.text,
-                              discount:
-                                  addPartDiscountController.text.trim().isEmpty
-                                      ? "0"
-                                      : addPartDiscountController.text.trim(),
-                              discountType: isPercentage &&
-                                      addPartDiscountController.text.isNotEmpty
-                                  ? "Percentage"
-                                  : "Fixed",
-                              itemType: "Part",
-                              subTotal: subTotal.toStringAsFixed(2),
-                              tax: client!.taxOnParts == "Y"
-                                  ? client!.salesTaxRate ?? '0'
-                                  : '0',
-                            ));
+                                cannedServiceId: int.parse(serviceId),
+                                note: addPartDescriptionController.text,
+                                part: addPartPartNumberController.text,
+                                itemName: addPartNameController.text,
+                                unitPrice: addPartPriceController.text,
+                                quanityHours: addPartQuantityController.text,
+                                discount: addPartDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addPartDiscountController.text.trim(),
+                                discountType: isPercentage &&
+                                        addPartDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
+                                itemType: "Part",
+                                subTotal: subTotal.toStringAsFixed(2),
+                                tax: client!.taxOnParts == "Y"
+                                    ? client!.salesTaxRate ?? '0'
+                                    : '0',
+                                cost: partCost.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2079,6 +2140,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    double laborCost = 0;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
@@ -2124,6 +2186,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addLaborBaseCostController.text.isNotEmpty) {
+        laborCost = ((double.tryParse(addLaborHoursController.text) ?? 1) *
+            (double.tryParse(addLaborCostController.text) ?? 0));
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = (double.tryParse(addLaborHoursController.text) ?? 1) *
@@ -2342,6 +2406,28 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${laborCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Tax :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -2387,27 +2473,29 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           final status = addLaborValidation(newSetState);
                           if (status) {
                             labor.add(CannedServiceAddModel(
-                              cannedServiceId: int.parse(serviceId),
-                              note: addLaborDescriptionController.text,
-                              // part: addLaborLaborNumberController.text,
-                              part: '',
-                              itemName: addLaborNameController.text,
-                              unitPrice: addLaborBaseCostController.text,
-                              discount:
-                                  addLaborDiscountController.text.trim().isEmpty
-                                      ? "0"
-                                      : addLaborDiscountController.text.trim(),
-                              discountType: isPercentage &&
-                                      addLaborDiscountController.text.isNotEmpty
-                                  ? "Percentage"
-                                  : "Fixed",
-                              quanityHours: addLaborHoursController.text,
-                              itemType: "Labor",
-                              subTotal: subTotal.toStringAsFixed(2),
-                              tax: client!.taxOnLabors == "Y"
-                                  ? client!.laborTaxRate ?? '0'
-                                  : '0',
-                            ));
+                                cannedServiceId: int.parse(serviceId),
+                                note: addLaborDescriptionController.text,
+                                // part: addLaborLaborNumberController.text,
+                                part: '',
+                                itemName: addLaborNameController.text,
+                                unitPrice: addLaborBaseCostController.text,
+                                discount: addLaborDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addLaborDiscountController.text.trim(),
+                                discountType: isPercentage &&
+                                        addLaborDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
+                                quanityHours: addLaborHoursController.text,
+                                itemType: "Labor",
+                                subTotal: subTotal.toStringAsFixed(2),
+                                tax: client!.taxOnLabors == "Y"
+                                    ? client!.laborTaxRate ?? '0'
+                                    : '0',
+                                cost: laborCost.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2454,6 +2542,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    double feeCost = 0;
 
     addFeeValidation(StateSetter setState) {
       bool status = true;
@@ -2476,6 +2565,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addFeePriceController.text.isNotEmpty) {
+        feeCost = double.tryParse(addFeeCostController.text) ?? 0;
         final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
 
         if (client?.taxOnLabors == "N") {
@@ -2548,10 +2638,60 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                     errorWidget(error: addFeePriceErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox("Amount", addFeeCostController, "Cost ",
-                          addFeeCostErrorStatus.isNotEmpty, context, false),
+                      child: textBox(
+                          "Amount",
+                          addFeeCostController,
+                          "Cost ",
+                          addFeeCostErrorStatus.isNotEmpty,
+                          context,
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Total :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${total.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${feeCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2636,7 +2776,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 tax: client!.taxOnLabors == "Y"
                                     ? client!.laborTaxRate ?? '0'
                                     : '0',
-                                subTotal: subTotal.toStringAsFixed(2)));
+                                subTotal: subTotal.toStringAsFixed(2),
+                                cost: feeCost.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2687,6 +2828,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    double subContractCost = 0;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
@@ -2729,6 +2871,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addSubContractPriceController.text.isNotEmpty) {
+        subContractCost =
+            double.tryParse(addSubContractCostController.text) ?? 0;
         if (client?.taxOnLabors == 'N') {
           if (addSubContractDiscountController.text.isEmpty) {
             subTotal =
@@ -2849,7 +2993,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           "Cost ",
                           addSubContractCostErrorStatus.isNotEmpty,
                           context,
-                          false),
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
                     // Row(
@@ -2959,6 +3104,28 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${subContractCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Tax :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -3005,33 +3172,34 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           if (status) {
                             subContract.add(
                               CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addSubContractDescriptionController.text,
-                                // part: addSubContractSubContractNumberController.text,
-                                part: '',
-                                itemName: addSubContractNameController.text,
-                                // discount: addSubContractDiscountController.text,
-                                //tax: isTax == true ? 'Y' : 'N',
-                                vendorId: vendorId,
-                                unitPrice: addSubContractPriceController.text,
-                                discount: addSubContractDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addSubContractDiscountController.text
-                                        .trim(),
-                                discountType: isPercentage &&
-                                        addSubContractDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-
-                                itemType: "SubContract",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                tax: client!.taxOnLabors == "Y"
-                                    ? client!.laborTaxRate ?? '0'
-                                    : '0',
-                              ),
+                                  cannedServiceId: int.parse(serviceId),
+                                  note:
+                                      addSubContractDescriptionController.text,
+                                  // part: addSubContractSubContractNumberController.text,
+                                  part: '',
+                                  itemName: addSubContractNameController.text,
+                                  // discount: addSubContractDiscountController.text,
+                                  //tax: isTax == true ? 'Y' : 'N',
+                                  vendorId: vendorId,
+                                  unitPrice: addSubContractPriceController.text,
+                                  discount: addSubContractDiscountController
+                                          .text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addSubContractDiscountController.text
+                                          .trim(),
+                                  discountType: isPercentage &&
+                                          addSubContractDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  itemType: "SubContract",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  tax: client!.taxOnLabors == "Y"
+                                      ? client!.laborTaxRate ?? '0'
+                                      : '0',
+                                  cost: subContractCost.toStringAsFixed(2)),
                             );
                             setState(() {});
                             Navigator.pop(context);

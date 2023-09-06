@@ -504,7 +504,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                   scheme: 'sms',
                                   path: customerData!.phone,
                                   queryParameters: <String, String>{
-                                    'body': Uri.encodeComponent(' '),
+                                    'body': Uri.encodeComponent(''),
                                   },
                                 );
                                 launchUrl(smsLaunchUri);
@@ -1609,7 +1609,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                 .add(GetAllCustomerNotesEvent(id: widget.id));
                             Navigator.of(context).pop();
                             CommonWidgets().showSuccessDialog(
-                                context, 'Note Crated Successfully');
+                                context, 'Note Created Successfully');
                           }
                         },
                         child: BlocBuilder<CustomerBloc, CustomerState>(
