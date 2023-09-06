@@ -3033,7 +3033,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
       balanceDueAmount =
           totalAmount - double.parse(widget.estimateDetails.data.paidAmount);
-      profitAmount = totalAmount - costAmount;
+      double tempProfit = (materialAmount +
+              laborAmount +
+              partAmount +
+              subContractAmount +
+              feeAmount) -
+          discountAmount;
+      profitAmount = tempProfit - costAmount;
 
       log(widget.estimateDetails.data.paidAmount);
       log(totalAmount.toString());
