@@ -923,6 +923,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                   textAlignVertical: TextAlignVertical.top,
                                   maxLines: null,
                                   expands: true,
+                                  maxLength: 299,
                                   controller: addNoteController,
                                   decoration: InputDecoration(
                                       hintText: "Enter Notes",
@@ -955,7 +956,7 @@ class _VechileInformationState extends State<VechileInformation> {
                               padding: const EdgeInsets.only(top: 24.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  if (addNoteController.text.isEmpty) {
+                                  if (addNoteController.text.trim().isEmpty) {
                                     newSetState(() {
                                       addNoteErrorStatus = true;
                                       addNoteErrorMessage =

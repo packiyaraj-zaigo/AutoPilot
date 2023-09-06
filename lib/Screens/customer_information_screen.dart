@@ -574,37 +574,40 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             ),
                           ],
                         ),
-                        IconButton(
-                          onPressed: () {
-                            String? encodeQueryParameters(
-                                Map<String, String> params) {
-                              return params.entries
-                                  .map((MapEntry<String, String> e) =>
-                                      '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-                                  .join('&');
-                            }
+                        customerData?.email != null && customerData?.email != ""
+                            ? IconButton(
+                                onPressed: () {
+                                  String? encodeQueryParameters(
+                                      Map<String, String> params) {
+                                    return params.entries
+                                        .map((MapEntry<String, String> e) =>
+                                            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                                        .join('&');
+                                  }
 
-                            final Uri emailLaunchUri = Uri(
-                              scheme: 'mailto',
-                              path: customerData!.email,
-                              query: encodeQueryParameters(<String, String>{
-                                'subject': ' ',
-                              }),
-                            );
+                                  final Uri emailLaunchUri = Uri(
+                                    scheme: 'mailto',
+                                    path: customerData!.email,
+                                    query:
+                                        encodeQueryParameters(<String, String>{
+                                      'subject': ' ',
+                                    }),
+                                  );
 
-                            launchUrl(emailLaunchUri);
-                          },
-                          icon: Container(
-                            // color: Colors.red,
-                            height: 18,
-                            width: 18,
-                            child: SvgPicture.asset(
-                              'assets/images/mail_icons.svg',
-                              height: 27,
-                              color: AppColors.primaryColors,
-                            ),
-                          ),
-                        ),
+                                  launchUrl(emailLaunchUri);
+                                },
+                                icon: Container(
+                                  // color: Colors.red,
+                                  height: 18,
+                                  width: 18,
+                                  child: SvgPicture.asset(
+                                    'assets/images/mail_icons.svg',
+                                    height: 27,
+                                    color: AppColors.primaryColors,
+                                  ),
+                                ),
+                              )
+                            : const SizedBox(),
                       ],
                     ),
                     AppUtils.verticalDivider(),
@@ -1623,7 +1626,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                             }
                             return GestureDetector(
                               onTap: () {
-                                if (addNoteController.text.isEmpty) {
+                                if (addNoteController.text.trim().isEmpty) {
                                   addNoteErrorStatus = "Note can't be empty";
                                 } else {
                                   addNoteErrorStatus = '';
@@ -1776,6 +1779,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           controller: addNoteController,
           maxLines: null,
           expands: true,
+          maxLength: 299,
           textAlignVertical: TextAlignVertical.top,
           decoration: InputDecoration(
             hintText: "Enter Notes",

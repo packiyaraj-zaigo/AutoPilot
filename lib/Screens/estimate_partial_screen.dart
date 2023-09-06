@@ -3071,6 +3071,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             Navigator.pop(context);
             CommonWidgets().showSuccessDialog(
                 _scaffoldKey.currentContext!, "Payment Successful");
+          } else if (state is CollectPaymentEstimateErrorState) {
+            CommonWidgets()
+                .showDialog(_scaffoldKey.currentContext!, "Payment Failed");
           }
         },
         child: BlocBuilder<EstimateBloc, EstimateState>(
