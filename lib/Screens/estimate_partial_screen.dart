@@ -3444,7 +3444,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   orderId: widget
                                                       .estimateDetails.data.id
                                                       .toString(),
-                                                  paymentMode: "Check",
+                                                  paymentMode: "DebitCard",
                                                   // tabController.index == 0
                                                   //     ? "Cash"
                                                   //     : tabController.index == 1
