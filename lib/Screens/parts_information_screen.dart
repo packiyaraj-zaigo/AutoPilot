@@ -228,19 +228,37 @@ class _PartsInformationState extends State<PartsInformation> {
                                 Expanded(
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 24.0),
-                                    child: ListView.builder(
-                                      itemBuilder: (context, index) {
-                                        return noteTileWidget(
-                                            partsNotesData[index].notes,
-                                            partsNotesData[index].createdAt,
-                                            partsNotesData[index]
-                                                .id
-                                                .toString());
-                                      },
-                                      itemCount: partsNotesData.length,
-                                      shrinkWrap: true,
-                                      physics: const ClampingScrollPhysics(),
-                                    ),
+                                    child: state is GetPartsNoteLoadingState
+                                        ? const Center(
+                                            child: CupertinoActivityIndicator(),
+                                          )
+                                        : partsNotesData.isNotEmpty
+                                            ? ListView.builder(
+                                                itemBuilder: (context, index) {
+                                                  return noteTileWidget(
+                                                      partsNotesData[index]
+                                                          .notes,
+                                                      partsNotesData[index]
+                                                          .createdAt,
+                                                      partsNotesData[index]
+                                                          .id
+                                                          .toString());
+                                                },
+                                                itemCount:
+                                                    partsNotesData.length,
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const ClampingScrollPhysics(),
+                                              )
+                                            : const Center(
+                                                child: Text("No Notes Found",
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: AppColors
+                                                            .greyText)),
+                                              ),
                                   ),
                                 )
                               ],

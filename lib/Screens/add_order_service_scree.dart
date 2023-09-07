@@ -883,21 +883,25 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                 );
                                 log(deletedItems.toString());
                               } else {
-                                BlocProvider.of<EstimateBloc>(context).add(
-                                  CreateOrderServiceEvent(
-                                      serviceName: serviceNameController.text,
-                                      orderId: widget.orderId,
-                                      serviceNotes:
-                                          laborDescriptionController.text,
-                                      laborRate: client?.baseLaborCost ?? "0",
-                                      servicePrice: rateController.text,
-                                      tax: client!.taxOnLabors == "Y"
-                                          ? client!.laborTaxRate ?? '0'
-                                          : '0',
-                                      technicianId: technicianId == ""
-                                          ? "0"
-                                          : technicianId),
-                                );
+                                if (state is! CreateOrderServiceLoadingState &&
+                                    state
+                                        is! CreateOrderServiceItemLoadingState) {
+                                  BlocProvider.of<EstimateBloc>(context).add(
+                                    CreateOrderServiceEvent(
+                                        serviceName: serviceNameController.text,
+                                        orderId: widget.orderId,
+                                        serviceNotes:
+                                            laborDescriptionController.text,
+                                        laborRate: client?.baseLaborCost ?? "0",
+                                        servicePrice: rateController.text,
+                                        tax: client!.taxOnLabors == "Y"
+                                            ? client!.laborTaxRate ?? '0'
+                                            : '0',
+                                        technicianId: technicianId == ""
+                                            ? "0"
+                                            : technicianId),
+                                  );
+                                }
                               }
                             });
                           }
@@ -1085,7 +1089,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                       label == "Hours" ||
                       label == 'Price ' ||
                       label == "Quantity"
-                  ? 10
+                  ? 7
                   : label == "Description"
                       ? 150
                       : label == "Service Name" || label == "Notes"
@@ -2114,8 +2118,13 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox("Amount", addPartCostController, "Cost ",
-                          addPartCostErrorStatus.isNotEmpty, context, false,
+                      child: textBox(
+                          "Amount",
+                          addPartCostController,
+                          "Cost ",
+                          addPartCostErrorStatus.isNotEmpty,
+                          context,
+                          false,
                           newSetState),
                     ),
                     errorWidget(error: addPartCostErrorStatus),
@@ -2922,8 +2931,14 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                     errorWidget(error: addFeePriceErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox("Amount", addFeeCostController, "Cost ",
-                          addFeeCostErrorStatus.isNotEmpty, context, false,newSetState),
+                      child: textBox(
+                          "Amount",
+                          addFeeCostController,
+                          "Cost ",
+                          addFeeCostErrorStatus.isNotEmpty,
+                          context,
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
                     // Padding(
@@ -3323,7 +3338,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   "Cost ",
                                   addSubContractCostErrorStatus.isNotEmpty,
                                   context,
-                                  false,newSetState),
+                                  false,
+                                  newSetState),
                             ),
                             errorWidget(error: addSubContractCostErrorStatus),
                             Stack(

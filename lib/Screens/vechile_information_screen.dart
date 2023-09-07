@@ -344,7 +344,15 @@ class _VechileInformationState extends State<VechileInformation> {
                                                     : noteList.isEmpty
                                                         ? const Center(
                                                             child: Text(
-                                                                "No Notes Found"),
+                                                                "No Notes Found",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: AppColors
+                                                                        .greyText)),
                                                           )
                                                         : ListView.builder(
                                                             itemBuilder:

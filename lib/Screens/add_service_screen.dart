@@ -896,7 +896,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price ' ||
                       label == "Quantity " ||
                       label == "Quantity"
-                  ? 10
+                  ? 7
                   : label == "Description"
                       ? 150
                       : label == "Service Name" || label == "Notes"

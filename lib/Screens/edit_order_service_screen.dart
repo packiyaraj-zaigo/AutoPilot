@@ -929,7 +929,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == "Notes" ||
                       label == "Description"
                   ? 150
-                  : 50,
+                  : label == "Price" || label == "Cost"
+                      ? 7
+                      : 50,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
