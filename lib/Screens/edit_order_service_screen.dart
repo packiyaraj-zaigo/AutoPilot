@@ -1485,7 +1485,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                           : AppColors.primaryColors,
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     '  /  ',
                                     style: TextStyle(
                                       color: AppColors.greyText,

@@ -760,6 +760,9 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       var token = prefs.getString(AppConstants.USER_TOKEN);
       // emit(CreateEstimateLoadingState());
 
+      Response detailsResponse = await _apiRepository.getAppointmentDetails(
+          token!, event.appointmetId);
+
       Response deleteAppointmentRes = await _apiRepository
           .deleteAppointmentEstimate(token, event.appointmetId);
 
@@ -770,6 +773,19 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           if (event.eventId != null) {
             final response =
                 await _apiRepository.deleteEvent(token, event.eventId!);
+          } else {
+            print("executed");
+
+            log(detailsResponse.body + "detaillss");
+            if (detailsResponse.statusCode == 200 ||
+                detailsResponse.statusCode == 201) {
+              final decodedBody = json.decode(detailsResponse.body);
+              Response deleteResponse = await _apiRepository.deleteEvent(
+                  token, decodedBody['data']['event_id'].toString());
+
+              print(deleteResponse.statusCode.toString() + "coddeee");
+              print(deleteResponse.body + "deleteddd");
+            }
           }
         } catch (e, s) {
           emit(DeleteAppointmentEstimateErrorState(

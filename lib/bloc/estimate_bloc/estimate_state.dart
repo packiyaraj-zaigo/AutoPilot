@@ -223,3 +223,5 @@ class GetClientByIdInEstimateErrorState extends EstimateState {
 }
 
 class CreateCannedServiceEstimateState extends EstimateState {}
+
+class GetAppointmentDetailsState extends EstimateState {}

@@ -667,6 +667,10 @@ class ApiRepository {
   Future<dynamic> addPartsNote(String token, String partsId, String notes) {
     return apiProvider.addPartsNote(partsId, token, notes);
   }
+
+  Future<dynamic> getAppointmentDetails(String token, String appointmentId) {
+    return apiProvider.getAppointmentDetails(token, appointmentId);
+  }
 }
 
 class NetworkError extends Error {}

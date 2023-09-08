@@ -2408,7 +2408,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       ? dateType == "end_date"
                           ? appointmentDetailsModel?.data.data[0].endOn
                           : appointmentDetailsModel?.data.data[0].startOn
-                      : DateTime.now(),
+                      : dateType == "end_date" && startDateController.text != ""
+                          ? DateTime.parse(startDateToServer)
+                          : DateTime.now(),
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =

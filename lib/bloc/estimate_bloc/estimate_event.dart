@@ -258,3 +258,8 @@ class CreateCannedOrderServiceEstimateEvent extends EstimateEvent {
     this.fee,
   });
 }
+
+class GetAppointmentDetailsEvent extends EstimateEvent {
+  final String appointmentId;
+  GetAppointmentDetailsEvent({required this.appointmentId});
+}

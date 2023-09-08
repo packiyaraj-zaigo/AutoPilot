@@ -150,6 +150,21 @@ class _CalendarScreenState extends State<CalendarScreen>
                               // ));
                               _selectedDate = (await showDatePicker(
                                       context: context,
+                                      builder: (context, child) {
+                                        return Theme(
+                                          data: Theme.of(context).copyWith(
+                                              colorScheme:
+                                                  const ColorScheme.light(
+                                            primary: AppColors
+                                                .primaryColors, // header background color
+                                            onPrimary: Colors
+                                                .white, // header text color
+                                            onSurface:
+                                                Colors.black, // body text color
+                                          )),
+                                          child: child!,
+                                        );
+                                      },
                                       initialDate: _selectedDate,
                                       firstDate: DateTime(1950),
                                       lastDate: DateTime(2100))) ??

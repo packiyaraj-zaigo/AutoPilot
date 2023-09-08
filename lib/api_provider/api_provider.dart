@@ -1361,7 +1361,7 @@ class ApiProvider {
         "notes": notes,
         "start_on": startTime,
         "end_on": endTime,
-        "createEvent": 1,
+        "createEvent": "1",
         "order_id": orderId
       };
       final url = Uri.parse('${BASE_URL}api/appointments');
@@ -1403,6 +1403,8 @@ class ApiProvider {
         headers: getHeader(token),
         body: json.encode(body),
       );
+
+      inspect(response);
 
       log(body.toString() + "APPOINTMENT BODY");
       log(id.toString() + "APPOINTMENT ID");
@@ -2212,6 +2214,8 @@ class ApiProvider {
         headers: getHeader(token),
       );
 
+      log("test $eventId");
+
       inspect(response);
       return response;
     } catch (e) {
@@ -2273,6 +2277,18 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + 'Delete part provider error');
+    }
+  }
+
+  Future<dynamic> getAppointmentDetails(
+      String token, String appointmentId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/appointments/$appointmentId');
+      final response = http.get(url, headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
     }
   }
 }
