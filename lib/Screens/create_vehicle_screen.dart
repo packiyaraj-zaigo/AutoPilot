@@ -105,6 +105,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     makeController.text = widget.editVehicle!.vehicleMake;
     modelController.text = widget.editVehicle!.vehicleModel;
     subModelController.text = widget.editVehicle!.subModel ?? "";
+    mileageController.text = widget.editVehicle!.kilometers ?? "";
     engineController.text = widget.editVehicle!.engineSize ?? "";
     colorController.text = widget.editVehicle!.vehicleColor ?? "";
     licController.text = widget.editVehicle!.licencePlate ?? "";
@@ -628,19 +629,19 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
           if (widget.editVehicle != null) {
             scaffoldKey.currentContext!.read<VechileBloc>().add(
                   EditVehicleEvent(
-                    id: widget.editVehicle!.id.toString(),
-                    email: nameController.text,
-                    year: yearController.text,
-                    model: modelController.text,
-                    submodel: subModelController.text,
-                    engine: engineController.text,
-                    color: colorController.text,
-                    vinNumber: vinController.text,
-                    licNumber: licController.text,
-                    make: makeController.text,
-                    type: typeController.text,
-                    customerId: customerId.toString(),
-                  ),
+                      id: widget.editVehicle!.id.toString(),
+                      email: nameController.text,
+                      year: yearController.text,
+                      model: modelController.text,
+                      submodel: subModelController.text,
+                      engine: engineController.text,
+                      color: colorController.text,
+                      vinNumber: vinController.text,
+                      licNumber: licController.text,
+                      make: makeController.text,
+                      type: typeController.text,
+                      customerId: customerId.toString(),
+                      mileage: mileageController.text),
                 );
           } else {
             scaffoldKey.currentContext!.read<VechileBloc>().add(

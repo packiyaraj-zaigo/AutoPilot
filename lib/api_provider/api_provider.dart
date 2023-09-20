@@ -342,20 +342,20 @@ class ApiProvider {
   }
 
   Future<dynamic> editVechile(
-    String token,
-    String id,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) async {
+      String token,
+      String id,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) async {
     try {
       var url = Uri.parse("${BASE_URL}api/vehicles/$id");
       final map = {};
@@ -370,7 +370,7 @@ class ApiProvider {
       map['engine_size'] = engine;
       map['licence_plate'] = licNumber;
       map['customer_id'] = customerId;
-      map['kilometers'] = '0';
+      map['kilometers'] = mileage;
 
       var response =
           await http.put(url, body: jsonEncode(map), headers: getHeader(token));

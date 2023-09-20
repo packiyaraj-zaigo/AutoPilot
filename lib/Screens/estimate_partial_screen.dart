@@ -1709,6 +1709,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget serviceTileWidget(int serviceIndex) {
+    double sumAmount = 0;
+    widget.estimateDetails.data.orderService![serviceIndex].orderServiceItems!
+        .forEach((element) {
+      sumAmount += double.tryParse(element.subTotal) ?? 0;
+    });
+
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Container(
@@ -1823,6 +1829,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ),
               ListView.builder(
                 itemBuilder: (context, index) {
+                  dynamic parsedValue = double.parse(widget
+                      .estimateDetails
+                      .data
+                      .orderService![serviceIndex]
+                      .orderServiceItems![index]
+                      .subTotal);
+                  sumAmount = sumAmount + parsedValue;
+                  print(parsedValue.toString() + "SDJFSLDKJF");
                   return Padding(
                     padding: EdgeInsets.only(top: 5.0),
                     child: Row(
@@ -1917,18 +1931,31 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
-                child: Text(
-                  widget.estimateDetails.data.orderService?[serviceIndex]
-                              .isAuthorized ==
-                          "Y"
-                      ? "Authorized"
-                      : "Not Yet Authorized",
-                  style: TextStyle(
-                      color: widget.estimateDetails.data
-                                  .orderService?[serviceIndex].isAuthorized ==
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.estimateDetails.data.orderService?[serviceIndex]
+                                  .isAuthorized ==
                               "Y"
-                          ? Color(0xff12A58C)
-                          : Color(0xffFF5C5C)),
+                          ? "Authorized"
+                          : "Not Yet Authorized",
+                      style: TextStyle(
+                          color: widget
+                                      .estimateDetails
+                                      .data
+                                      .orderService?[serviceIndex]
+                                      .isAuthorized ==
+                                  "Y"
+                              ? Color(0xff12A58C)
+                              : Color(0xffFF5C5C)),
+                    ),
+                    Text(sumAmount.toString(),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: AppColors.primaryTitleColor)),
+                  ],
                 ),
               )
             ],

@@ -185,20 +185,20 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       emit(EditVehicleLoadingState());
       final token = await AppUtils.getToken();
       final response = await apiRepo.editVechile(
-        token,
-        event.id,
-        event.email,
-        event.year,
-        event.model,
-        event.submodel,
-        event.engine,
-        event.color,
-        event.vinNumber,
-        event.licNumber,
-        event.type,
-        event.make,
-        event.customerId,
-      );
+          token,
+          event.id,
+          event.email,
+          event.year,
+          event.model,
+          event.submodel,
+          event.engine,
+          event.color,
+          event.vinNumber,
+          event.licNumber,
+          event.type,
+          event.make,
+          event.customerId,
+          event.mileage);
 
       final body = await jsonDecode(response.body);
       log(body[body.keys.first][0].toString());

@@ -164,35 +164,22 @@ class ApiRepository {
   }
 
   Future editVechile(
-    String token,
-    String id,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) {
-    return apiProvider.editVechile(
-      token,
-      id,
-      email,
-      year,
-      model,
-      submodel,
-      engine,
-      color,
-      vinNumber,
-      licNumber,
-      type,
-      make,
-      customerId,
-    );
+      String token,
+      String id,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) {
+    return apiProvider.editVechile(token, id, email, year, model, submodel,
+        engine, color, vinNumber, licNumber, type, make, customerId, mileage);
   }
 
   Future dropdownVechile(String token) {
