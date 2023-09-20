@@ -298,17 +298,17 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                                                               FontWeight.w400,
                                                         ),
                                                       ),
-                                                      const Text(
-                                                        'QTY: 0',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                        style: TextStyle(
-                                                          color:
-                                                              Color(0xFF6A7187),
-                                                          fontWeight:
-                                                              FontWeight.w400,
-                                                        ),
-                                                      ),
+                                                      // const Text(
+                                                      //   'QTY: 0',
+                                                      //   overflow: TextOverflow
+                                                      //       .ellipsis,
+                                                      //   style: TextStyle(
+                                                      //     color:
+                                                      //         Color(0xFF6A7187),
+                                                      //     fontWeight:
+                                                      //         FontWeight.w400,
+                                                      //   ),
+                                                      // ),
                                                       Text(
                                                         'MSRP: \$ ${serviceList[index].subTotal}',
                                                         overflow: TextOverflow

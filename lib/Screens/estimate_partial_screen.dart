@@ -546,8 +546,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             'Follow the step to create an estimate.',
                             style: TextStyle(
                                 color: AppColors.greyText,
-                                fontSize: 14,
-                                letterSpacing: 1.1,
+                                fontSize: 14.5,
+                                // letterSpacing: 1.5,
                                 fontWeight: FontWeight.w400),
                           ),
                         ),
@@ -1271,6 +1271,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget customerDetailsWidget() {
+    print(widget.estimateDetails.data.customer?.email);
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Column(
@@ -1301,48 +1302,54 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   fontWeight: FontWeight.w400),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.estimateDetails.data.customer?.email ?? "",
-                  style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.primaryTitleColor,
-                      fontWeight: FontWeight.w400),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    if (widget.estimateDetails.data.customer?.email != null) {
-                      String? encodeQueryParameters(
-                          Map<String, String> params) {
-                        return params.entries
-                            .map((MapEntry<String, String> e) =>
-                                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-                            .join('&');
-                      }
+          widget.estimateDetails.data.customer?.email != null &&
+                  widget.estimateDetails.data.customer?.email != ""
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.estimateDetails.data.customer?.email ?? "",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: AppColors.primaryTitleColor,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          if (widget.estimateDetails.data.customer?.email !=
+                              null) {
+                            String? encodeQueryParameters(
+                                Map<String, String> params) {
+                              return params.entries
+                                  .map((MapEntry<String, String> e) =>
+                                      '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                                  .join('&');
+                            }
 
-                      final Uri emailLaunchUri = Uri(
-                        scheme: 'mailto',
-                        path: widget.estimateDetails.data.customer?.email ?? "",
-                        query: encodeQueryParameters(<String, String>{
-                          'subject': ' ',
-                        }),
-                      );
+                            final Uri emailLaunchUri = Uri(
+                              scheme: 'mailto',
+                              path:
+                                  widget.estimateDetails.data.customer?.email ??
+                                      "",
+                              query: encodeQueryParameters(<String, String>{
+                                'subject': ' ',
+                              }),
+                            );
 
-                      launchUrl(emailLaunchUri);
-                    }
-                  },
-                  child: SvgPicture.asset(
-                    "assets/images/mail_icons.svg",
-                    color: AppColors.primaryColors,
+                            launchUrl(emailLaunchUri);
+                          }
+                        },
+                        child: SvgPicture.asset(
+                          "assets/images/mail_icons.svg",
+                          color: AppColors.primaryColors,
+                        ),
+                      )
+                    ],
                   ),
                 )
-              ],
-            ),
-          ),
+              : const SizedBox(),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
@@ -1914,7 +1921,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   widget.estimateDetails.data.orderService?[serviceIndex]
                               .isAuthorized ==
                           "Y"
-                      ? "Authorize"
+                      ? "Authorized"
                       : "Not Yet Authorized",
                   style: TextStyle(
                       color: widget.estimateDetails.data
@@ -2063,7 +2070,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: 56,
+            height: label == "Note" || label == "Appointment Note" ? null : 56,
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
@@ -2271,15 +2278,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               keyboardType: label == 'Phone Number' || label == "Amount To Pay"
                   ? TextInputType.number
                   : null,
+              maxLines: label == "Note" || label == "Appointment Note" ? 6 : 1,
+              minLines:
+                  label == "Note" || label == "Appointment Note" ? 1 : null,
               maxLength: label == 'Phone Number'
                   ? 16
-                  : label == "Note" ||
-                          label == "Appointment Note" ||
-                          label == "Notes"
+                  : label == "Notes"
                       ? 150
                       : label == 'Password'
                           ? 12
-                          : 50,
+                          : label == "Note"
+                              ? null
+                              : label == "Appointment Note"
+                                  ? null
+                                  : 50,
+              // expands: label == "Note" ? true : false,
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",

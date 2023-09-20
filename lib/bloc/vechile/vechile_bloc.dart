@@ -101,19 +101,19 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       final token = await AppUtils.getToken();
 
       final response = await apiRepo.addVechile(
-        token,
-        event.email,
-        event.year,
-        event.model,
-        event.submodel,
-        event.engine,
-        event.color,
-        event.vinNumber,
-        event.licNumber,
-        event.type,
-        event.make,
-        event.customerId,
-      );
+          token,
+          event.email,
+          event.year,
+          event.model,
+          event.submodel,
+          event.engine,
+          event.color,
+          event.vinNumber,
+          event.licNumber,
+          event.type,
+          event.make,
+          event.customerId,
+          event.mileage);
       var vechileAdd = _decoder.convert(response.body);
       if (response.statusCode == 200 || response.statusCode == 201) {
         isVechileLoading = false;

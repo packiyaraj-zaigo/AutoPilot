@@ -302,19 +302,19 @@ class ApiProvider {
   // }
 
   Future<dynamic> addVechile(
-    String token,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) async {
+      String token,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) async {
     try {
       final clientId = await AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/vehicles?client_id=$clientId");
@@ -329,7 +329,8 @@ class ApiProvider {
         ..fields['sub_model'] = submodel
         ..fields['engine_size'] = engine
         ..fields['licence_plate'] = licNumber
-        ..fields['customer_id'] = customerId;
+        ..fields['customer_id'] = customerId
+        ..fields['kilometers'] = mileage;
 
       // final map = {};
       var response = await request.send();

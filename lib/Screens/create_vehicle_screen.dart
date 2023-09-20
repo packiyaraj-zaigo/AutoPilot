@@ -53,6 +53,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   final TextEditingController makeController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
   final TextEditingController customerController = TextEditingController();
+  final TextEditingController mileageController = TextEditingController();
 
   bool yearErrorStaus = false;
   bool modelErrorStatus = false;
@@ -66,6 +67,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   bool makeErrorStatus = false;
   bool customerErrorStatus = false;
   bool isChecked = false;
+  bool mileageErrorStatus = false;
 
   bool isVechileLoading = false;
 
@@ -79,6 +81,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   String licErrorMsg = '';
   String engineErrorMsg = '';
   String customerErrorMsg = '';
+  String mileageErrorMsg = "";
 
   final List<Datum> vechile = [];
 
@@ -426,12 +429,20 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                                   //     makeController,
                                                   //     "Make",
                                                   //     makeErrorStatus),
+
+                                                  textBox(
+                                                    "Enter Mileage",
+                                                    mileageController,
+                                                    "Mileage",
+                                                    mileageErrorStatus,
+                                                  ),
                                                   textBox(
                                                     "Enter Color",
                                                     colorController,
                                                     "Color",
                                                     colorErrorStatus,
                                                   ),
+
                                                   textBox(
                                                       "Enter Number",
                                                       licController,
@@ -634,18 +645,18 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
           } else {
             scaffoldKey.currentContext!.read<VechileBloc>().add(
                   AddVechile(
-                    email: nameController.text,
-                    year: yearController.text,
-                    model: modelController.text,
-                    submodel: subModelController.text,
-                    engine: engineController.text,
-                    color: colorController.text,
-                    vinNumber: vinController.text,
-                    licNumber: licController.text,
-                    make: makeController.text,
-                    type: typeController.text,
-                    customerId: customerId.toString(),
-                  ),
+                      email: nameController.text,
+                      year: yearController.text,
+                      model: modelController.text,
+                      submodel: subModelController.text,
+                      engine: engineController.text,
+                      color: colorController.text,
+                      vinNumber: vinController.text,
+                      licNumber: licController.text,
+                      make: makeController.text,
+                      type: typeController.text,
+                      customerId: customerId.toString(),
+                      mileage: mileageController.text),
                 );
           }
         }

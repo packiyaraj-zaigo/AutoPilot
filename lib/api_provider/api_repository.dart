@@ -146,33 +146,21 @@ class ApiRepository {
   }
 
   Future addVechile(
-    String token,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) {
-    return apiProvider.addVechile(
-      token,
-      email,
-      year,
-      model,
-      submodel,
-      engine,
-      color,
-      vinNumber,
-      licNumber,
-      type,
-      make,
-      customerId,
-    );
+      String token,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) {
+    return apiProvider.addVechile(token, email, year, model, submodel, engine,
+        color, vinNumber, licNumber, type, make, customerId, mileage);
   }
 
   Future editVechile(
