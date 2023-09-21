@@ -543,7 +543,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         const Padding(
                           padding: EdgeInsets.only(top: 8.0),
                           child: Text(
-                            'Follow the step to create an estimate.',
+                            'Follow the steps to create an estimate.',
                             style: TextStyle(
                                 color: AppColors.greyText,
                                 fontSize: 14.5,
@@ -1446,7 +1446,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${widget.estimateDetails.data.vehicle?.kilometers ?? '0'} mi",
+                  "${widget.estimateDetails.data.vehicle?.kilometers.split(".").first ?? '0'} mi",
                   style: TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryTitleColor,
@@ -2315,9 +2315,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       : label == 'Password'
                           ? 12
                           : label == "Note"
-                              ? null
+                              ? 299
                               : label == "Appointment Note"
-                                  ? null
+                                  ? 299
                                   : 50,
               // expands: label == "Note" ? true : false,
               decoration: InputDecoration(

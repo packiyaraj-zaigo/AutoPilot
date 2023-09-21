@@ -725,7 +725,11 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
               inputFormatters: label == "Year"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : null,
-              keyboardType: label == 'Year' ? TextInputType.number : null,
+              keyboardType: label == 'Year'
+                  ? TextInputType.number
+                  : label == "Mileage"
+                      ? const TextInputType.numberWithOptions(decimal: true)
+                      : null,
               maxLength: label == 'Year'
                   ? 4
                   : label == "Make" || label == "Model" || label == "Sub-Model"

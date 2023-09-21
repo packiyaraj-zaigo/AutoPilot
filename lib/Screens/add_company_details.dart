@@ -624,14 +624,15 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         : label == "Labor Tax Rate" ||
                                 label == "Labor Tax Rate" ||
                                 label == "Parts Tax Rate" ||
-                                label == "Material Tax Rate"
+                                label == "Material Tax Rate" ||
+                                label == "Shop Hourly Labor Rate"
                             ? [NumberInputFormatter()]
-                            : label == "Shop Hourly Labor Rate"
-                                ? [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                    DollarInputFormatter()
-                                  ]
-                                : [],
+                            // : label == "Shop Hourly Labor Rate"
+                            //     ? [
+                            //         FilteringTextInputFormatter.digitsOnly,
+                            //         DollarInputFormatter()
+                            //       ]
+                            : [],
                 keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
                         label == "Shop Hourly Labor Rate" ||
@@ -641,7 +642,13 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         label == "Parts Tax Rate" ||
                         label == "Material Tax Rate"
                     ? TextInputType.number
-                    : null,
+                    : label == "Shop Hourly Labor Rate" ||
+                            label == "Labor Tax Rate" ||
+                            label == "Labor Tax Rate" ||
+                            label == "Parts Tax Rate" ||
+                            label == "Material Tax Rate"
+                        ? const TextInputType.numberWithOptions(decimal: true)
+                        : null,
                 readOnly: readOnlyFun(label),
                 maxLength: label == 'Business Phone'
                     ? 14
@@ -657,14 +664,15 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     //     : null,
                     contentPadding: label == "Shop Hourly Labor Rate" ||
                             label == "Labor Tax Rate"
-                        ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
+                        ? const EdgeInsets.symmetric(
+                            vertical: 18, horizontal: 12)
                         : null,
                     hintText: placeHolder,
                     counterText: "",
                     suffixStyle: const TextStyle(
                         fontSize: 16, color: AppColors.primaryTitleColor),
                     suffix: label == "Shop Hourly Labor Rate"
-                        ? Text(
+                        ? const Text(
                             "Per Hour",
                           )
                         // : label == "Labor Tax Rate"

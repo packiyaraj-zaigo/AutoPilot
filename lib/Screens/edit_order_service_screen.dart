@@ -696,11 +696,11 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                               fee.forEach((element) {
                                 subT += double.parse(element.subTotal);
                               });
-                              subT += double.tryParse(rateController.text) ?? 0;
-                              subT += (double.tryParse(rateController.text) ??
-                                      0) *
-                                  (double.tryParse(taxController.text) ?? 0) /
-                                  100;
+                              // subT += double.tryParse(rateController.text) ?? 0;
+                              // subT += (double.tryParse(rateController.text) ??
+                              //         0) *
+                              //     (double.tryParse(taxController.text) ?? 0) /
+                              //     100;
 
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),

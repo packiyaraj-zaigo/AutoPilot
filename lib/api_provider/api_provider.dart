@@ -329,8 +329,12 @@ class ApiProvider {
         ..fields['sub_model'] = submodel
         ..fields['engine_size'] = engine
         ..fields['licence_plate'] = licNumber
-        ..fields['customer_id'] = customerId
-        ..fields['kilometers'] = mileage;
+        ..fields['customer_id'] = customerId;
+      if (mileage != "") {
+        request.fields['kilometers'] = mileage;
+      } else {
+        request.fields['kilometers'] = "0";
+      }
 
       // final map = {};
       var response = await request.send();
@@ -370,7 +374,11 @@ class ApiProvider {
       map['engine_size'] = engine;
       map['licence_plate'] = licNumber;
       map['customer_id'] = customerId;
-      map['kilometers'] = mileage;
+      if (mileage != "") {
+        map['kilometers'] = mileage;
+      } else {
+        map['kilometers'] = "0";
+      }
 
       var response =
           await http.put(url, body: jsonEncode(map), headers: getHeader(token));

@@ -658,7 +658,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               fee.forEach((element) {
                                 subT += double.parse(element.subTotal);
                               });
-                              subT += double.tryParse(rateController.text) ?? 0;
+
+                              // subT += double.tryParse(rateController.text) ?? 0;
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),
                                 serviceName: serviceNameController.text,
@@ -836,7 +837,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: 56,
+            height: label == "Notes" ? null : 56,
             width: label == "Price" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
@@ -860,6 +861,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     }
                   : null,
               controller: controller,
+              maxLines: label == "Notes" ? 6 : 1,
+              minLines: 1,
               keyboardType: label == 'Discount' ||
                       label == 'Cost' ||
                       label == 'Cost ' ||
@@ -900,7 +903,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   : label == "Description"
                       ? 150
                       : label == "Service Name" || label == "Notes"
-                          ? 150
+                          ? 255
                           : 25,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
