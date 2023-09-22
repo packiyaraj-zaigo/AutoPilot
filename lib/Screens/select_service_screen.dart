@@ -314,19 +314,19 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                                                                       .w400,
                                                             ),
                                                           ),
-                                                          const Text(
-                                                            'QTY: 0',
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                            style: TextStyle(
-                                                              color: Color(
-                                                                  0xFF6A7187),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400,
-                                                            ),
-                                                          ),
+                                                          // const Text(
+                                                          //   'QTY: 0',
+                                                          //   overflow:
+                                                          //       TextOverflow
+                                                          //           .ellipsis,
+                                                          //   style: TextStyle(
+                                                          //     color: Color(
+                                                          //         0xFF6A7187),
+                                                          //     fontWeight:
+                                                          //         FontWeight
+                                                          //             .w400,
+                                                          //   ),
+                                                          // ),
                                                           Text(
                                                             'MSRP: \$ ${serviceList[index].subTotal}',
                                                             overflow:

@@ -867,7 +867,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: 56,
+            height: label == "Notes" || label == "Description" ? null : 56,
             width: label == "Price" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
@@ -900,6 +900,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         }
                       : null,
               controller: controller,
+              maxLines: label == "Notes" || label == "Description" ? 6 : 1,
+              minLines: 1,
               keyboardType: label == 'Discount' ||
                       label == 'Cost' ||
                       label == 'Cost ' ||
@@ -910,7 +912,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == 'Price ' ||
                       label == "Quantity" ||
                       label == "Base Cost" ||
-                      label == "Quantity"
+                      label == "Quantity "
                   ? TextInputType.number
                   : null,
               inputFormatters: label == "Hours" ||
@@ -925,13 +927,13 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label == "Base Cost"
                   ? [NumberInputFormatter()]
                   : [],
-              maxLength: label == "Service Name" ||
-                      label == "Notes" ||
-                      label == "Description"
+              maxLength: label == "Service Name"
                   ? 150
-                  : label == "Price" || label == "Cost"
-                      ? 7
-                      : 50,
+                  : label == "Notes" || label == "Description"
+                      ? 255
+                      : label == "Price" || label == "Cost"
+                          ? 7
+                          : 50,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(

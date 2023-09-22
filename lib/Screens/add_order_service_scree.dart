@@ -1022,7 +1022,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: label == "Notes" ? null : 56,
+            height: label == "Notes" || label == "Description" ? null : 56,
             width: label == "Price" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
@@ -1090,12 +1090,12 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                       label == 'Price ' ||
                       label == "Quantity"
                   ? 7
-                  : label == "Description"
-                      ? 150
-                      : label == "Service Name" || label == "Notes"
-                          ? 255
-                          : 25,
-              maxLines: label == "Notes" ? 6 : 1,
+                  : label == "Service Name" ||
+                          label == "Notes" ||
+                          label == "Description"
+                      ? 255
+                      : 25,
+              maxLines: label == "Notes" || label == "Description" ? 6 : 1,
               minLines: 1,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
