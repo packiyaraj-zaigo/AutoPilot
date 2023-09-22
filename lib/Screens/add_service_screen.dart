@@ -658,7 +658,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               fee.forEach((element) {
                                 subT += double.parse(element.subTotal);
                               });
-                              subT += double.tryParse(rateController.text) ?? 0;
+
+                              // subT += double.tryParse(rateController.text) ?? 0;
                               service = CannedServiceCreateModel(
                                 clientId: int.parse(clientId),
                                 serviceName: serviceNameController.text,
@@ -836,7 +837,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: 56,
+            height: label == "Notes" || label == "Description" ? null : 56,
             width: label == "Price" || label == "Quantity"
                 ? MediaQuery.of(context).size.width / 2.6
                 : MediaQuery.of(context).size.width,
@@ -860,6 +861,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     }
                   : null,
               controller: controller,
+              maxLines: label == "Notes" || label == "Description" ? 6 : 1,
+              minLines: 1,
               keyboardType: label == 'Discount' ||
                       label == 'Cost' ||
                       label == 'Cost ' ||
@@ -869,7 +872,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == "Hours" ||
                       label == 'Price ' ||
                       label == "Quantity" ||
-                      label == "Quantity" ||
+                      label == "Quantity " ||
                       label == "Base Cost" ||
                       label == "Quantity"
                   ? TextInputType.number
@@ -896,12 +899,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price ' ||
                       label == "Quantity " ||
                       label == "Quantity"
-                  ? 10
-                  : label == "Description"
-                      ? 150
-                      : label == "Service Name" || label == "Notes"
-                          ? 150
-                          : 25,
+                  ? 7
+                  : label == "Service Name" ||
+                          label == "Notes" ||
+                          label == "Description"
+                      ? 255
+                      : 25,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
@@ -1117,6 +1120,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     double subTotal = 0;
     double total = 0;
     bool isPercentage = false;
+    double materialCost = 0;
 
     addMaterialValidation(StateSetter setState) {
       bool status = true;
@@ -1255,6 +1259,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
         if (addMaterialPriceController.text.isNotEmpty &&
             addMaterialQuantityController.text.isNotEmpty) {
+          materialCost =
+              ((double.tryParse(addMaterialQuantityController.text) ?? 1) *
+                  (double.tryParse(addMaterialCostController.text) ?? 0));
           if (client?.taxOnMaterial == 'N') {
             if (addMaterialDiscountController.text.isEmpty) {
               subTotal = (double.tryParse(addMaterialPriceController.text) ??
@@ -1413,7 +1420,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             "Cost",
                             addMaterialCostErrorStatus.isNotEmpty,
                             context,
-                            false),
+                            false,
+                            newSetState),
                       ),
                       errorWidget(error: addMaterialCostErrorStatus),
                       Padding(
@@ -1560,6 +1568,29 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           ],
                         ),
                       ),
+
+                      Padding(
+                        padding: EdgeInsets.only(top: 17),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Cost :",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            ),
+                            Text(
+                              "\$${materialCost.toStringAsFixed(2)}",
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.primaryTitleColor),
+                            )
+                          ],
+                        ),
+                      ),
                       Padding(
                         padding: EdgeInsets.only(top: 17),
                         child: Row(
@@ -1614,26 +1645,27 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             if (status) {
                               final focus = FocusNode().requestFocus();
                               material.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addMaterialDescriptionController.text,
-                                part: addMaterialBatchController.text,
-                                itemName: addMaterialNameController.text,
-                                unitPrice: addMaterialPriceController.text,
-                                discount: addMaterialDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addMaterialDiscountController.text.trim(),
-                                discountType: isPercentage &&
-                                        addMaterialDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-                                quanityHours:
-                                    addMaterialQuantityController.text.trim(),
-                                itemType: "Material",
-                                subTotal: subTotal.toStringAsFixed(2),
-                              ));
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addMaterialDescriptionController.text,
+                                  part: addMaterialBatchController.text,
+                                  itemName: addMaterialNameController.text,
+                                  unitPrice: addMaterialPriceController.text,
+                                  discount: addMaterialDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addMaterialDiscountController.text
+                                          .trim(),
+                                  discountType: isPercentage &&
+                                          addMaterialDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours:
+                                      addMaterialQuantityController.text.trim(),
+                                  itemType: "Material",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: materialCost.toStringAsFixed(2)));
                               setState(() {});
                               Navigator.pop(context);
                             }
@@ -1688,6 +1720,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     double subTotal = 0;
     double total = 0;
     bool isPercentage = false;
+    double partCost = 0;
 
     addPartValidation(StateSetter setState) {
       bool status = true;
@@ -1743,6 +1776,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addPartPriceController.text.isNotEmpty) {
         if (addPartQuantityController.text.isNotEmpty) {
+          partCost = ((double.tryParse(addPartQuantityController.text) ?? 1) *
+              (double.tryParse(addPartCostController.text) ?? 0));
           double quantity =
               double.tryParse(addPartQuantityController.text) ?? 1;
           if (client?.taxOnParts == "N") {
@@ -1892,8 +1927,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox("Amount", addPartCostController, "Cost ",
-                          addPartCostErrorStatus.isNotEmpty, context, false),
+                      child: textBox(
+                          "Amount",
+                          addPartCostController,
+                          "Cost ",
+                          addPartCostErrorStatus.isNotEmpty,
+                          context,
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addPartCostErrorStatus),
                     Stack(
@@ -2040,6 +2081,29 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ],
                       ),
                     ),
+
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${partCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
                     Padding(
                       padding: EdgeInsets.only(top: 17),
                       child: Row(
@@ -2095,23 +2159,25 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             final focus = FocusNode().requestFocus();
 
                             part.add(CannedServiceAddModel(
-                              cannedServiceId: int.parse(serviceId),
-                              note: addPartDescriptionController.text,
-                              part: addPartPartNumberController.text,
-                              itemName: addPartNameController.text,
-                              unitPrice: addPartPriceController.text,
-                              discount:
-                                  addPartDiscountController.text.trim().isEmpty
-                                      ? "0"
-                                      : addPartDiscountController.text.trim(),
-                              discountType: isPercentage &&
-                                      addPartDiscountController.text.isNotEmpty
-                                  ? "Percentage"
-                                  : "Fixed",
-                              quanityHours: addPartQuantityController.text,
-                              itemType: "Part",
-                              subTotal: subTotal.toStringAsFixed(2),
-                            ));
+                                cannedServiceId: int.parse(serviceId),
+                                note: addPartDescriptionController.text,
+                                part: addPartPartNumberController.text,
+                                itemName: addPartNameController.text,
+                                unitPrice: addPartPriceController.text,
+                                discount: addPartDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addPartDiscountController.text.trim(),
+                                discountType: isPercentage &&
+                                        addPartDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
+                                quanityHours: addPartQuantityController.text,
+                                itemType: "Part",
+                                subTotal: subTotal.toStringAsFixed(2),
+                                cost: partCost.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2164,6 +2230,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     double subTotal = 0;
     double total = 0;
     bool isPercentage = false;
+    double laborCost = 0;
 
     addLaborValidation(StateSetter setState) {
       bool status = true;
@@ -2209,6 +2276,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addLaborBaseCostController.text.isNotEmpty) {
+        laborCost = ((double.tryParse(addLaborHoursController.text) ?? 1) *
+            (double.tryParse(addLaborCostController.text) ?? 0));
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0) *
@@ -2433,6 +2502,28 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${laborCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Tax :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -2482,24 +2573,26 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             final focus = FocusNode().requestFocus();
 
                             labor.add(CannedServiceAddModel(
-                              cannedServiceId: int.parse(serviceId),
-                              note: addLaborDescriptionController.text,
-                              // part: addLaborLaborNumberController.text,
-                              part: '',
-                              itemName: addLaborNameController.text,
-                              unitPrice: addLaborBaseCostController.text,
-                              discount:
-                                  addLaborDiscountController.text.trim().isEmpty
-                                      ? "0"
-                                      : addLaborDiscountController.text.trim(),
-                              discountType: isPercentage &&
-                                      addLaborDiscountController.text.isNotEmpty
-                                  ? "Percentage"
-                                  : "Fixed",
-                              quanityHours: addLaborHoursController.text,
-                              itemType: "Labor",
-                              subTotal: subTotal.toStringAsFixed(2),
-                            ));
+                                cannedServiceId: int.parse(serviceId),
+                                note: addLaborDescriptionController.text,
+                                // part: addLaborLaborNumberController.text,
+                                part: '',
+                                itemName: addLaborNameController.text,
+                                unitPrice: addLaborBaseCostController.text,
+                                discount: addLaborDiscountController.text
+                                        .trim()
+                                        .isEmpty
+                                    ? "0"
+                                    : addLaborDiscountController.text.trim(),
+                                discountType: isPercentage &&
+                                        addLaborDiscountController
+                                            .text.isNotEmpty
+                                    ? "Percentage"
+                                    : "Fixed",
+                                quanityHours: addLaborHoursController.text,
+                                itemType: "Labor",
+                                subTotal: subTotal.toStringAsFixed(2),
+                                cost: laborCost.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2546,6 +2639,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    double feeCost = 0;
 
     addFeeValidation(StateSetter setState) {
       bool status = true;
@@ -2573,6 +2667,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addFeePriceController.text.isNotEmpty) {
+        feeCost = double.tryParse(addFeeCostController.text) ?? 0;
         final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
 
         if (client?.taxOnLabors == "N") {
@@ -2645,8 +2740,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     errorWidget(error: addFeePriceErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
-                      child: textBox("Amount", addFeeCostController, "Cost ",
-                          addFeeCostErrorStatus.isNotEmpty, context, false),
+                      child: textBox(
+                          "Amount",
+                          addFeeCostController,
+                          "Cost ",
+                          addFeeCostErrorStatus.isNotEmpty,
+                          context,
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addFeeCostErrorStatus),
                     // Padding(
@@ -2732,6 +2833,28 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${feeCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Tax :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -2789,7 +2912,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 discount: '0',
                                 unitPrice: addFeePriceController.text,
                                 itemType: "Fee",
-                                subTotal: subTotal.toStringAsFixed(2)));
+                                subTotal: subTotal.toStringAsFixed(2),
+                                cost: feeCost.toStringAsFixed(2)));
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2840,6 +2964,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     double subTotal = 0;
     double total = 0;
     bool isPercentage = false;
+    double subContractCost = 0;
 
     addSubContractValidation(StateSetter setState) {
       bool status = true;
@@ -2882,6 +3007,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
       if (addSubContractPriceController.text.isNotEmpty) {
+        subContractCost =
+            double.tryParse(addSubContractCostController.text) ?? 0;
         if (client?.taxOnLabors == 'N') {
           if (addSubContractDiscountController.text.isEmpty) {
             subTotal =
@@ -3002,7 +3129,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           "Cost ",
                           addSubContractCostErrorStatus.isNotEmpty,
                           context,
-                          false),
+                          false,
+                          newSetState),
                     ),
                     errorWidget(error: addSubContractCostErrorStatus),
                     Stack(
@@ -3155,6 +3283,28 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
+                            "Cost :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          ),
+                          Text(
+                            "\$${subContractCost.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.primaryTitleColor),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
                             "Tax :",
                             style: TextStyle(
                                 fontSize: 16,
@@ -3205,29 +3355,30 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
                             subContract.add(
                               CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addSubContractDescriptionController.text,
-                                // part: addSubContractSubContractNumberController.text,
-                                part: '',
-                                itemName: addSubContractNameController.text,
-                                discount: addSubContractDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addSubContractDiscountController.text
-                                        .trim(),
-                                discountType: isPercentage &&
-                                        addSubContractDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-
-                                tax: isTax == true ? 'Y' : 'N',
-                                vendorId: vendorId,
-                                unitPrice: addSubContractPriceController.text,
-                                itemType: "SubContract",
-                                subTotal: subTotal.toStringAsFixed(2),
-                              ),
+                                  cannedServiceId: int.parse(serviceId),
+                                  note:
+                                      addSubContractDescriptionController.text,
+                                  // part: addSubContractSubContractNumberController.text,
+                                  part: '',
+                                  itemName: addSubContractNameController.text,
+                                  discount: addSubContractDiscountController
+                                          .text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addSubContractDiscountController.text
+                                          .trim(),
+                                  discountType: isPercentage &&
+                                          addSubContractDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  tax: isTax == true ? 'Y' : 'N',
+                                  vendorId: vendorId,
+                                  unitPrice: addSubContractPriceController.text,
+                                  itemType: "SubContract",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: subContractCost.toStringAsFixed(2)),
                             );
                             setState(() {});
                             Navigator.pop(context);

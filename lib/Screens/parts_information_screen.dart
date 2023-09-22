@@ -1,17 +1,19 @@
+import 'package:auto_pilot/Models/parts_notes_model.dart';
 import 'package:auto_pilot/Screens/create_parts.dart';
 import 'package:auto_pilot/Screens/parts_list_screen.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_bloc.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_event.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_state.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_bloc.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_event.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_state.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 import '../Models/parts_model.dart';
-import '../Models/vechile_model.dart';
+
 import '../utils/app_utils.dart';
 
 class PartsInformation extends StatefulWidget {
@@ -26,6 +28,8 @@ class PartsInformation extends StatefulWidget {
 
 class _PartsInformationState extends State<PartsInformation> {
   int _counter = 0;
+  List<Datum> partsNotesData = [];
+  final scaffoldKey = GlobalKey<ScaffoldState>();
 
   void _incrementCounter() {
     setState(() {
@@ -89,6 +93,10 @@ class _PartsInformationState extends State<PartsInformation> {
               context: context,
               builder: (context) => const CupertinoActivityIndicator());
         }
+        if (state is GetPartsNoteState) {
+          partsNotesData.clear();
+          partsNotesData.addAll(state.partsNotesModel.data);
+        }
       },
       child: WillPopScope(
         onWillPop: () async {
@@ -100,149 +108,161 @@ class _PartsInformationState extends State<PartsInformation> {
 
           return false;
         },
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            elevation: 0,
-            backgroundColor: Colors.white,
-            leading: IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(context, MaterialPageRoute(
-                  builder: (context) {
-                    return PartsScreen();
-                  },
-                ));
-              },
-              color: AppColors.primaryColors,
-              icon: const Icon(Icons.arrow_back),
-            ),
-            centerTitle: true,
-            title: const Text(
-              "Part's Information",
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.primaryBlackColors),
-            ),
-            actions: [
-              IconButton(
+        child: BlocBuilder<PartsBloc, PartsState>(
+          builder: (context, state) {
+            return Scaffold(
+              key: scaffoldKey,
+              backgroundColor: Colors.white,
+              appBar: AppBar(
+                elevation: 0,
+                backgroundColor: Colors.white,
+                leading: IconButton(
                   onPressed: () {
-                    showModalBottomSheet(
-                        context: context,
-                        builder: (context) => moreOptionsSheet());
+                    Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) {
+                        return PartsScreen();
+                      },
+                    ));
                   },
-                  icon: const Icon(
-                    Icons.more_horiz,
-                    color: AppColors.primaryColors,
-                  ))
-            ],
-          ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.parts.itemName,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: AppColors.primaryTitleColor),
+                  color: AppColors.primaryColors,
+                  icon: const Icon(Icons.arrow_back),
                 ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: CupertinoSlidingSegmentedControl(
-                    onValueChanged: (value) {
-                      setState(() {
-                        selectedIndex = value ?? 0;
-                      });
-                    },
-                    backgroundColor: AppColors.primarySegmentColors,
-                    groupValue: selectedIndex,
-                    children: {
-                      for (int i = 0; i < _segmentTitles.length; i++)
-                        i: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 65),
-                          child: _segmentTitles[i],
-                        )
-                    },
-                  ),
+                centerTitle: true,
+                title: const Text(
+                  "Part's Information",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryBlackColors),
                 ),
-                const SizedBox(height: 20),
-                Expanded(
-                    child: selectedIndex == 1
-                        ? Column(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                height: 50,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    print("object");
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.buttonColors,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                  ),
-                                  child: const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.add_circle_outline,
-                                        color: AppColors.primaryColors,
+                actions: [
+                  IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) => moreOptionsSheet());
+                      },
+                      icon: const Icon(
+                        Icons.more_horiz,
+                        color: AppColors.primaryColors,
+                      ))
+                ],
+              ),
+              body: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.parts.itemName,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                          color: AppColors.primaryTitleColor),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: CupertinoSlidingSegmentedControl(
+                        onValueChanged: (value) {
+                          setState(() {
+                            selectedIndex = value ?? 0;
+                          });
+
+                          if (selectedIndex == 1) {
+                            context.read<PartsBloc>().add(GetPartsNotesEvent(
+                                partsId: widget.parts.id.toString()));
+                          }
+                        },
+                        backgroundColor: AppColors.primarySegmentColors,
+                        groupValue: selectedIndex,
+                        children: {
+                          for (int i = 0; i < _segmentTitles.length; i++)
+                            i: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 65),
+                              child: _segmentTitles[i],
+                            )
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    selectedIndex == 1
+                        ? Expanded(
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 50,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      addNotePopup(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.buttonColors,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
                                       ),
-                                      Text(
-                                        'Add New Note',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
+                                    ),
+                                    child: const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_circle_outline,
                                           color: AppColors.primaryColors,
                                         ),
-                                      ),
-                                    ],
+                                        Text(
+                                          'Add New Note',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primaryColors,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 32),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        spreadRadius: 1,
-                                        blurRadius: 5,
-                                        offset: const Offset(
-                                            0, 7), // changes position of shadow
-                                      ),
-                                    ],
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 24.0),
+                                    child: state is GetPartsNoteLoadingState
+                                        ? const Center(
+                                            child: CupertinoActivityIndicator(),
+                                          )
+                                        : partsNotesData.isNotEmpty
+                                            ? ListView.builder(
+                                                itemBuilder: (context, index) {
+                                                  return noteTileWidget(
+                                                      partsNotesData[index]
+                                                          .notes,
+                                                      partsNotesData[index]
+                                                          .createdAt,
+                                                      partsNotesData[index]
+                                                          .id
+                                                          .toString());
+                                                },
+                                                itemCount:
+                                                    partsNotesData.length,
+                                                shrinkWrap: true,
+                                                physics:
+                                                    const ClampingScrollPhysics(),
+                                              )
+                                            : const Center(
+                                                child: Text("No Notes Found",
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: AppColors
+                                                            .greyText)),
+                                              ),
                                   ),
-                                  child: ListTile(
-                                    title: Text(
-                                      '${widget.parts.createdAt}',
-                                      style: const TextStyle(
-                                          color: AppColors.greyText,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
-                                    ),
-                                    subtitle: Text(
-                                      widget.parts.itemServiceNote,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 16,
-                                          color: AppColors.primaryTitleColor),
-                                    ),
-                                    // trailing: Icon(Icons.add),),
-                                  ),
-                                ),
-                              )
-                            ],
+                                )
+                              ],
+                            ),
                           )
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -398,28 +418,12 @@ class _PartsInformationState extends State<PartsInformation> {
                               ),
                               const SizedBox(height: 20),
                             ],
-                          )
-                    // : SingleChildScrollView(
-                    //     child: Column(
-                    //       children: [
-                    //         ListView.builder(
-                    //           itemBuilder: (context, index) {
-                    //             return Column(
-                    //               children: [Text("data")],
-                    //             );
-                    //           },
-                    //           // itemCount: equipmentFormList.length,
-                    //           shrinkWrap: true,
-                    //           padding: const EdgeInsets.all(0),
-                    //           physics: const ClampingScrollPhysics(),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    ),
-              ],
-            ),
-          ),
+                          ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
@@ -547,6 +551,282 @@ class _PartsInformationState extends State<PartsInformation> {
           ),
         ),
       ),
+    );
+  }
+
+  noteTileWidget(String note, DateTime date, String noteId) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16.0),
+      child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.07),
+                offset: const Offset(0, 4),
+                blurRadius: 10,
+              )
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${DateFormat("MM/dd/yyyy").format(date)} - ${DateFormat("HH:mm").format(date)}",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.greyText,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        deletePartsNotePopup(context, "", noteId);
+                        //  deleteVehicleNotePopup(context, "", noteId);
+                        // showNoteDeleteDialog(notes[index].id.toString());
+                      },
+                      child: const Icon(
+                        CupertinoIcons.clear,
+                        size: 18,
+                        color: AppColors.primaryColors,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  note,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    height: 1.5,
+                    color: AppColors.primaryTitleColor,
+                  ),
+                )
+              ],
+            ),
+          )),
+    );
+  }
+
+  Future deletePartsNotePopup(BuildContext context, message, String noteId) {
+    return showCupertinoDialog(
+      context: context,
+      builder: (context) => BlocProvider(
+        create: (context) => PartsBloc(),
+        child: BlocListener<PartsBloc, PartsState>(
+          listener: (context, state) {
+            if (state is DeletePartsNoteState) {
+              scaffoldKey.currentContext!
+                  .read<PartsBloc>()
+                  .add(GetPartsNotesEvent(partsId: widget.parts.id.toString()));
+
+              Navigator.pop(context);
+            }
+            if (state is GetPartsNoteState) {
+              partsNotesData.clear();
+              partsNotesData.addAll(state.partsNotesModel.data);
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<PartsBloc, PartsState>(
+            builder: (context, state) {
+              return CupertinoAlertDialog(
+                title: const Text("Remove Note?"),
+                content: Text("Do you really want to remove this note?"),
+                actions: <Widget>[
+                  CupertinoDialogAction(
+                      child: const Text("Yes"),
+                      onPressed: () {
+                        context
+                            .read<PartsBloc>()
+                            .add(DeletePartsNoteEvent(partsId: noteId));
+                      }),
+                  CupertinoDialogAction(
+                    child: const Text("No"),
+                    onPressed: () => Navigator.of(context).pop(false),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  addNotePopup(BuildContext context) {
+    bool addNoteErrorStatus = false;
+    final addNoteController = TextEditingController();
+    String addNoteErrorMessage = "";
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (context) {
+        return BlocProvider(
+          create: (context) => PartsBloc(),
+          child: BlocListener<PartsBloc, PartsState>(
+            listener: (context, state) {
+              if (state is AddPartsNoteState) {
+                print("listner worked");
+
+                scaffoldKey.currentContext!.read<PartsBloc>().add(
+                    GetPartsNotesEvent(partsId: widget.parts.id.toString()));
+
+                Navigator.pop(context);
+                addNoteController.clear();
+              }
+
+              // TODO: implement listener
+            },
+            child: BlocBuilder<PartsBloc, PartsState>(
+              builder: (context, state) {
+                return StatefulBuilder(builder: (context, newSetState) {
+                  return Scaffold(
+                    appBar: AppBar(
+                      backgroundColor: Colors.transparent,
+                      foregroundColor: AppColors.primaryTitleColor,
+                      centerTitle: true,
+                      automaticallyImplyLeading: false,
+                      elevation: 0,
+                      title: const Text(
+                        "Add Vehicle Note",
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                      actions: [
+                        IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.close,
+                              color: AppColors.primaryColors,
+                            ))
+                      ],
+                    ),
+                    body: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Text("Description"),
+                                Text(
+                                  " *",
+                                  style: TextStyle(
+                                      color: const Color(
+                                    0xffD80027,
+                                  )),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: SizedBox(
+                                width: MediaQuery.of(context).size.width,
+                                height: MediaQuery.of(context).size.height -
+                                    kToolbarHeight -
+                                    220,
+                                child: TextField(
+                                  textAlignVertical: TextAlignVertical.top,
+                                  maxLines: null,
+                                  maxLength: 299,
+                                  expands: true,
+                                  controller: addNoteController,
+                                  decoration: InputDecoration(
+                                      hintText: "Enter Notes",
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          borderSide: BorderSide(
+                                              color: addNoteErrorStatus
+                                                  ? const Color(
+                                                      0xffD80027,
+                                                    )
+                                                  : Colors.grey))),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                                visible: addNoteErrorStatus,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(addNoteErrorMessage,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(
+                                          0xffD80027,
+                                        ),
+                                      )),
+                                )),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 24.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  if (addNoteController.text.trim().isEmpty) {
+                                    newSetState(() {
+                                      addNoteErrorStatus = true;
+                                      addNoteErrorMessage =
+                                          "Note can't be empty";
+                                    });
+                                  } else {
+                                    newSetState(() {
+                                      addNoteErrorStatus = false;
+                                    });
+                                  }
+
+                                  if (!addNoteErrorStatus) {
+                                    context.read<PartsBloc>().add(
+                                        AddPartsNoteEvent(
+                                            notes: addNoteController.text,
+                                            partsId:
+                                                widget.parts.id.toString()));
+                                  }
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  height: 56,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: AppColors.primaryColors),
+                                  child: state is AddPartsNoteLoadingState
+                                      ? const Center(
+                                          child: CupertinoActivityIndicator(),
+                                        )
+                                      : const Text(
+                                          "Confirm",
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white),
+                                        ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                });
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }

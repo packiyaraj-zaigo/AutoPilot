@@ -280,7 +280,9 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               overflow: TextOverflow.ellipsis,
             ),
             Text(
-              '${workflow.orders?.customer?.firstName} ${workflow.orders?.customer?.lastName}',
+              workflow.orders?.customer?.firstName != null
+                  ? '${workflow.orders?.customer?.firstName} ${workflow.orders?.customer?.lastName}'
+                  : "NA",
               style: const TextStyle(
                 fontWeight: FontWeight.w400,
                 color: Color(0xFF333333),

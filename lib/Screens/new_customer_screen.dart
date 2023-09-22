@@ -489,18 +489,20 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 6.0, bottom: 2),
           child: SizedBox(
-            height: 56,
+            height: label == "Customer Notes" ? null : 56,
             width: MediaQuery.of(context).size.width,
             child: TextFormField(
               textCapitalization: TextCapitalization.sentences,
               controller: controller,
+              maxLines: label == "Customer Notes" ? 6 : 1,
+              minLines: 1,
               maxLength: label == "Phone"
                   ? 14
-                  : label == "Customer Notes" ||
-                          label == "Address" ||
-                          label == "Email"
-                      ? 50
-                      : 25,
+                  : label == "Address" || label == "Email"
+                      ? 150
+                      : label == "Customer Notes"
+                          ? 255
+                          : 25,
               keyboardType: label == "Phone"
                   ? TextInputType.phone
                   : label == "Email"

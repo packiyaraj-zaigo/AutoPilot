@@ -74,6 +74,8 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
             notes = state.notes;
             appointmentId = state.appointmentId;
 
+            print(appointmentId + "apppooiii");
+
             context
                 .read<EstimateBloc>()
                 .add(GetSingleEstimateEvent(orderId: state.orderId));
@@ -241,30 +243,67 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                               child: GestureDetector(
                                 onTap: isAppointmentEdit
                                     ? () {
-                                        BlocProvider.of<EstimateBloc>(context)
-                                            .add(
-                                          EditAppointmentEstimateEvent(
-                                            startTime:
-                                                "$startDateToServer $startTimeToServer",
-                                            endTime:
-                                                "$endDateToServer $endTimeToServer",
-                                            orderId: createEstimateModel
-                                                    ?.data.id
-                                                    .toString() ??
-                                                '0',
-                                            appointmentNote:
-                                                appointmentController.text,
-                                            customerId: createEstimateModel
-                                                    ?.data.customerId
-                                                    .toString() ??
-                                                '0',
-                                            vehicleId: createEstimateModel
-                                                    ?.data.vehicleId
-                                                    .toString() ??
-                                                '0',
-                                            id: appointmentId,
-                                          ),
-                                        );
+                                        if (Duration(
+                                                        hours: int.parse(
+                                                          endTimeToServer
+                                                              .substring(0, 2),
+                                                        ),
+                                                        minutes: int.parse(
+                                                            endTimeToServer
+                                                                .substring(3)))
+                                                    .inMinutes <=
+                                                Duration(
+                                                        hours: int.parse(
+                                                          startTimeToServer
+                                                              .substring(0, 2),
+                                                        ),
+                                                        minutes: int.parse(
+                                                            startTimeToServer
+                                                                .substring(3)))
+                                                    .inMinutes &&
+                                            DateTime.parse(startDateToServer) ==
+                                                DateTime.parse(
+                                                    endDateToServer)) {
+                                          setState(() {
+                                            endTimeErrorStatus = true;
+                                            startTimeErrorStatus = true;
+                                            endTimeErrorMsg =
+                                                "Please select a valid end time";
+                                            startTimeErrorMsg = "";
+                                          });
+                                        } else {
+                                          setState(() {
+                                            endTimeErrorStatus = false;
+                                            startTimeErrorStatus = false;
+                                          });
+                                        }
+
+                                        if (!endTimeErrorStatus) {
+                                          BlocProvider.of<EstimateBloc>(context)
+                                              .add(
+                                            EditAppointmentEstimateEvent(
+                                              startTime:
+                                                  "$startDateToServer $startTimeToServer",
+                                              endTime:
+                                                  "$endDateToServer $endTimeToServer",
+                                              orderId: createEstimateModel
+                                                      ?.data.id
+                                                      .toString() ??
+                                                  '0',
+                                              appointmentNote:
+                                                  appointmentController.text,
+                                              customerId: createEstimateModel
+                                                      ?.data.customerId
+                                                      .toString() ??
+                                                  '0',
+                                              vehicleId: createEstimateModel
+                                                      ?.data.vehicleId
+                                                      .toString() ??
+                                                  '0',
+                                              id: appointmentId,
+                                            ),
+                                          );
+                                        }
                                       }
                                     : () {
                                         if (createEstimateModel
@@ -663,9 +702,13 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
               //   CommonWidgets().commonDividerLine(context),
               Flexible(
                 child: CupertinoDatePicker(
-                  initialDateTime: dateType == "end_date"
-                      ? DateTime.parse(endDateToServer)
-                      : DateTime.parse(startDateToServer),
+                  initialDateTime: isAppointmentEdit
+                      ? dateType == "end_date" && startDateController.text != ""
+                          ? DateTime.parse(startDateToServer)
+                          : DateTime.now()
+                      : dateType == "end_date"
+                          ? DateTime.parse(endDateToServer)
+                          : DateTime.parse(startDateToServer),
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =
@@ -682,6 +725,10 @@ class _AppointmentDetailsScreenState extends State<AppointmentDetailsScreen> {
                   use24hFormat: true,
                   maximumDate: DateTime.now().add(const Duration(days: 3650)),
                   minimumYear: 2009,
+                  minimumDate:
+                      dateType == "end_date" && startDateController.text != ""
+                          ? DateTime.parse(startDateToServer)
+                          : null,
                   maximumYear: 2030,
                   minuteInterval: 1,
                   mode: CupertinoDatePickerMode.date,
