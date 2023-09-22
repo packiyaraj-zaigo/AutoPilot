@@ -23,8 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:timezone/timezone.dart' as tz;
-import 'package:timezone/data/latest.dart' as tz;
+
 import 'package:url_launcher/url_launcher_string.dart';
 
 class AddCompanyDetailsScreen extends StatefulWidget {
@@ -57,8 +56,14 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   dynamic _currentSelectedTimezoneValue;
   String selectedCountryString = '';
   String selectedStateString = '';
-  Iterable<tz.Location> timeZones = [];
-  List<tz.Location> timeZoneList = [];
+  // Iterable<tz.Location> timeZones = [];
+  // List<tz.Location> timeZoneList = [];
+  List<String> staticTimeZoneList = [
+    'Eastern Standard Time (EST) UTC -05:00',
+    'Central Standard Time (CST) UTC -06:00',
+    'Mountain Standard Time (MST) UTC -07:00',
+    'Pacific Standard Time (PST) UTC -08:00'
+  ];
   final busineesNameController = TextEditingController();
   final businessPhoneController = TextEditingController();
   final businessWebsiteController = TextEditingController();
@@ -145,12 +150,12 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   @override
   void initState() {
     initCountries();
-    tz.initializeTimeZones();
-    timeZones = tz.timeZoneDatabase.locations.values.where((element) {
-      return element.name.contains("America/");
-    });
-    timeZoneList = timeZones.toList();
-    print(timeZones);
+    // tz.initializeTimeZones();
+    // timeZones = tz.timeZoneDatabase.locations.values.where((element) {
+    // return element.name.contains("America/");
+    // });
+    // timeZoneList = timeZones.toList();
+    //  print(timeZones);
     bloc = BlocProvider.of<EmployeeBloc>(context);
     bloc.currentPage = 1;
     bloc.add(GetAllEmployees());
@@ -619,24 +624,26 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                         : label == "Labor Tax Rate" ||
                                 label == "Labor Tax Rate" ||
                                 label == "Parts Tax Rate" ||
-                                label == "Material Tax Rate"
+                                label == "Material Tax Rate" ||
+                                label == "Shop Hourly Labor Rate"
                             ? [NumberInputFormatter()]
-                            : label == "Shop Hourly Labor Rate"
-                                ? [
-                                    FilteringTextInputFormatter.digitsOnly,
-                                    DollarInputFormatter()
-                                  ]
-                                : [],
+                            // : label == "Shop Hourly Labor Rate"
+                            //     ? [
+                            //         FilteringTextInputFormatter.digitsOnly,
+                            //         DollarInputFormatter()
+                            //       ]
+                            : [],
                 keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
-                        label == "Shop Hourly Labor Rate" ||
-                        label == "Labor Tax Rate" ||
-                        label == 'Zip' ||
-                        label == "Labor Tax Rate" ||
-                        label == "Parts Tax Rate" ||
-                        label == "Material Tax Rate"
+                        label == 'Zip'
                     ? TextInputType.number
-                    : null,
+                    : label == "Shop Hourly Labor Rate" ||
+                            label == "Labor Tax Rate" ||
+                            label == "Labor Tax Rate" ||
+                            label == "Parts Tax Rate" ||
+                            label == "Material Tax Rate"
+                        ? const TextInputType.numberWithOptions(decimal: true)
+                        : null,
                 readOnly: readOnlyFun(label),
                 maxLength: label == 'Business Phone'
                     ? 14
@@ -652,14 +659,15 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                     //     : null,
                     contentPadding: label == "Shop Hourly Labor Rate" ||
                             label == "Labor Tax Rate"
-                        ? EdgeInsets.symmetric(vertical: 18, horizontal: 12)
+                        ? const EdgeInsets.symmetric(
+                            vertical: 18, horizontal: 12)
                         : null,
                     hintText: placeHolder,
                     counterText: "",
                     suffixStyle: const TextStyle(
                         fontSize: 16, color: AppColors.primaryTitleColor),
                     suffix: label == "Shop Hourly Labor Rate"
-                        ? Text(
+                        ? const Text(
                             "Per Hour",
                           )
                         // : label == "Labor Tax Rate"
@@ -1022,79 +1030,79 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
   //Timezone dropdown
 
-  Widget timeZoneDropdown() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Time Zone",
-            style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Color(0xff6A7187)),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: 56,
-              // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
-              // padding: const EdgeInsets.all(5),
-              decoration: BoxDecoration(
-                  border: Border.all(
-                      color: timeZoneErrorStatus
-                          ? const Color(0xffD80027)
-                          : const Color(0xffC1C4CD)),
-                  borderRadius: BorderRadius.circular(12)),
-              child: ButtonTheme(
-                alignedDropdown: true,
-                child: DropdownButtonFormField<tz.Location>(
-                  icon: const Icon(
-                    Icons.keyboard_arrow_down_sharp,
-                    color: AppColors.primaryColors,
-                  ),
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                  ),
-                  menuMaxHeight: 380,
-                  value: _currentSelectedTimezoneValue,
-                  style: const TextStyle(color: Color(0xff6A7187)),
-                  items: timeZones
-                      .map<DropdownMenuItem<tz.Location>>((tz.Location value) {
-                    return DropdownMenuItem<tz.Location>(
-                      alignment: AlignmentDirectional.centerStart,
-                      value: value,
-                      child: Text(value.name),
-                    );
-                  }).toList(),
-                  hint: const Text(
-                    "Select timezone",
-                    style: TextStyle(
-                        color: Color(0xff6A7187),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w400),
-                  ),
-                  onChanged: (tz.Location? value) {
-                    setState(() {
-                      _currentSelectedTimezoneValue = value;
-                      timeZoneString = value!.name.toString();
-                    });
-                  },
-                  //isExpanded: true,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget timeZoneDropdown() {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(top: 12.0),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         const Text(
+  //           "Time Zone",
+  //           style: TextStyle(
+  //               fontSize: 14,
+  //               fontWeight: FontWeight.w500,
+  //               color: Color(0xff6A7187)),
+  //         ),
+  //         Padding(
+  //           padding: const EdgeInsets.only(top: 8.0),
+  //           child: Container(
+  //             width: MediaQuery.of(context).size.width,
+  //             height: 56,
+  //             // margin: const EdgeInsets.only(left: 15, top: 10, right: 15),
+  //             // padding: const EdgeInsets.all(5),
+  //             decoration: BoxDecoration(
+  //                 border: Border.all(
+  //                     color: timeZoneErrorStatus
+  //                         ? const Color(0xffD80027)
+  //                         : const Color(0xffC1C4CD)),
+  //                 borderRadius: BorderRadius.circular(12)),
+  //             child: ButtonTheme(
+  //               alignedDropdown: true,
+  //               child: DropdownButtonFormField<tz.Location>(
+  //                 icon: const Icon(
+  //                   Icons.keyboard_arrow_down_sharp,
+  //                   color: AppColors.primaryColors,
+  //                 ),
+  //                 decoration: const InputDecoration(
+  //                   border: InputBorder.none,
+  //                   focusedBorder: InputBorder.none,
+  //                   enabledBorder: InputBorder.none,
+  //                   errorBorder: InputBorder.none,
+  //                   disabledBorder: InputBorder.none,
+  //                 ),
+  //                 menuMaxHeight: 380,
+  //                 value: _currentSelectedTimezoneValue,
+  //                 style: const TextStyle(color: Color(0xff6A7187)),
+  //                 items: timeZones
+  //                     .map<DropdownMenuItem<tz.Location>>((tz.Location value) {
+  //                   return DropdownMenuItem<tz.Location>(
+  //                     alignment: AlignmentDirectional.centerStart,
+  //                     value: value,
+  //                     child: Text(value.name),
+  //                   );
+  //                 }).toList(),
+  //                 hint: const Text(
+  //                   "Select timezone",
+  //                   style: TextStyle(
+  //                       color: Color(0xff6A7187),
+  //                       fontSize: 16,
+  //                       fontWeight: FontWeight.w400),
+  //                 ),
+  //                 onChanged: (tz.Location? value) {
+  //                   setState(() {
+  //                     _currentSelectedTimezoneValue = value;
+  //                     timeZoneString = value!.name.toString();
+  //                   });
+  //                 },
+  //                 //isExpanded: true,
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget taxSwitchWidget(String label, bool switchValue) {
     return Padding(
@@ -1521,13 +1529,14 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                       child: GestureDetector(
                         onTap: () {
                           print("heyy");
-                          timeZoneString = timeZoneList[index].name;
-                          timeZoneController.text = timeZoneList[index].name;
+                          timeZoneString = staticTimeZoneList[index];
+                          timeZoneController.text = staticTimeZoneList[index];
 
                           Navigator.pop(context);
                         },
                         child: Container(
                           height: 50,
+                          alignment: Alignment.centerLeft,
                           decoration: BoxDecoration(
                               color: Colors.grey[100],
                               borderRadius: BorderRadius.circular(8)),
@@ -1535,16 +1544,16 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Text(
-                              timeZoneList[index].name,
+                              staticTimeZoneList[index],
                               style: const TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w500),
+                                  fontSize: 15, fontWeight: FontWeight.w500),
                             ),
                           ),
                         ),
                       ),
                     );
                   },
-                  itemCount: timeZoneList.length,
+                  itemCount: staticTimeZoneList.length,
                 ),
               ),
             )
@@ -1738,22 +1747,24 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                     GestureDetector(
                                       behavior: HitTestBehavior.opaque,
                                       onTap: () async {
-                                        await Navigator.of(context)
-                                            .push(
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                CreateEmployeeScreen(
-                                              navigation: 'add_company',
-                                              employee: item,
+                                        if (item.roles?[0].name != "admin") {
+                                          await Navigator.of(context)
+                                              .push(
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CreateEmployeeScreen(
+                                                navigation: 'add_company',
+                                                employee: item,
+                                              ),
                                             ),
-                                          ),
-                                        )
-                                            .then((value) {
-                                          if (value != null && value) {
-                                            bloc.currentPage = 1;
-                                            bloc.add(GetAllEmployees());
-                                          }
-                                        });
+                                          )
+                                              .then((value) {
+                                            if (value != null && value) {
+                                              bloc.currentPage = 1;
+                                              bloc.add(GetAllEmployees());
+                                            }
+                                          });
+                                        }
                                       },
                                       child: Container(
                                         height: 77,
@@ -1778,57 +1789,63 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '${item.firstName ?? ""} ${item.lastName ?? ""} ',
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF061237),
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500,
+                                              Flexible(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      '${item.firstName ?? ""} ${item.lastName ?? ""} ',
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFF061237),
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                     ),
-                                                  ),
-                                                  const SizedBox(height: 3),
-                                                  Text(
-                                                    (item.roles?[0].name![0]
-                                                                .toUpperCase() ??
-                                                            '') +
-                                                        (item.roles?[0].name!
-                                                                .substring(1) ??
-                                                            ''),
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                    style: const TextStyle(
-                                                      color: Color(0xFF6A7187),
-                                                      fontWeight:
-                                                          FontWeight.w400,
+                                                    const SizedBox(height: 3),
+                                                    Text(
+                                                      (item.roles?[0].name![0]
+                                                                  .toUpperCase() ??
+                                                              '') +
+                                                          (item.roles?[0].name!
+                                                                  .substring(
+                                                                      1) ??
+                                                              ''),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      maxLines: 1,
+                                                      style: const TextStyle(
+                                                        color:
+                                                            Color(0xFF6A7187),
+                                                        fontWeight:
+                                                            FontWeight.w400,
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              IconButton(
-                                                icon: Icon(
-                                                  CupertinoIcons.clear,
-                                                  color:
-                                                      AppColors.primaryColors,
+                                                  ],
                                                 ),
-                                                onPressed: () {
-                                                  if (state
-                                                      is! DeleteEmployeeLoadingState) {
-                                                    deleteEmployeePopUp(
-                                                        context, item);
-                                                  }
-                                                },
-                                              )
+                                              ),
+                                              item.roles?[0].name == "admin"
+                                                  ? const SizedBox()
+                                                  : IconButton(
+                                                      icon: const Icon(
+                                                        CupertinoIcons.clear,
+                                                        color: AppColors
+                                                            .primaryColors,
+                                                      ),
+                                                      onPressed: () {
+                                                        if (state
+                                                            is! DeleteEmployeeLoadingState) {
+                                                          deleteEmployeePopUp(
+                                                              context, item);
+                                                        }
+                                                      },
+                                                    )
                                             ],
                                           ),
                                         ),
@@ -2046,14 +2063,14 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     isTaxMaterialRate = operationDetailsMap['tax_on_material'] == "Y";
     isTaxPartRate = operationDetailsMap['tax_on_parts'] == "Y";
 
-    timeZones.forEach((element) {
-      print(element.name);
-      if (element.name == operationDetailsMap?['time_zone']) {
+    staticTimeZoneList.forEach((element) {
+      //  print(element.name);
+      if (element == operationDetailsMap?['time_zone']) {
         print("in condition");
         setState(() {
           _currentSelectedTimezoneValue = element;
-          timeZoneString = element.name;
-          timeZoneController.text = element.name;
+          timeZoneString = element;
+          timeZoneController.text = element;
           print(timeZoneString + "tiiimme zoneee");
         });
       }

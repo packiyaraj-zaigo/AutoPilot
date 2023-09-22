@@ -27,6 +27,7 @@ import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/svg.dart';
@@ -121,6 +122,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   double feeAmount = 0;
   double subContractAmount = 0;
   double partAmount = 0;
+  double costAmount = 0;
+  double profitAmount = 0;
 
   //Payment popup variables
   final paymentAmountController = TextEditingController();
@@ -149,7 +152,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   bool isPaidFull = false;
   List<String> authorizedValues = [
     "Not Yet Authorized",
-    "Authorized",
+    "Authorize",
   ];
   int authorizedIndex = 0;
 
@@ -166,7 +169,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   void initState() {
     calculateAmount();
     print(materialAmount.toString() + "amount");
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 4, vsync: this);
 
     // TODO: implement initState
     super.initState();
@@ -540,11 +543,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         const Padding(
                           padding: EdgeInsets.only(top: 8.0),
                           child: Text(
-                            'Follow the step to create an estimate.',
+                            'Follow the steps to create an estimate.',
                             style: TextStyle(
                                 color: AppColors.greyText,
-                                fontSize: 14,
-                                letterSpacing: 1.1,
+                                fontSize: 14.5,
+                                // letterSpacing: 1.5,
                                 fontWeight: FontWeight.w400),
                           ),
                         ),
@@ -934,6 +937,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             "\$ ${discountAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget(
                             "Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget("Total Cost",
+                            "\$ ${costAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget(
+                            "Profit", "\$ ${profitAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget("Balance due",
                             "\$ ${balanceDueAmount.toStringAsFixed(2)}"),
 
@@ -1264,6 +1271,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget customerDetailsWidget() {
+    print(widget.estimateDetails.data.customer?.email);
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Column(
@@ -1294,48 +1302,54 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   fontWeight: FontWeight.w400),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  widget.estimateDetails.data.customer?.email ?? "",
-                  style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.primaryTitleColor,
-                      fontWeight: FontWeight.w400),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    if (widget.estimateDetails.data.customer?.email != null) {
-                      String? encodeQueryParameters(
-                          Map<String, String> params) {
-                        return params.entries
-                            .map((MapEntry<String, String> e) =>
-                                '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
-                            .join('&');
-                      }
+          widget.estimateDetails.data.customer?.email != null &&
+                  widget.estimateDetails.data.customer?.email != ""
+              ? Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        widget.estimateDetails.data.customer?.email ?? "",
+                        style: const TextStyle(
+                            fontSize: 16,
+                            color: AppColors.primaryTitleColor,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          if (widget.estimateDetails.data.customer?.email !=
+                              null) {
+                            String? encodeQueryParameters(
+                                Map<String, String> params) {
+                              return params.entries
+                                  .map((MapEntry<String, String> e) =>
+                                      '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+                                  .join('&');
+                            }
 
-                      final Uri emailLaunchUri = Uri(
-                        scheme: 'mailto',
-                        path: widget.estimateDetails.data.customer?.email ?? "",
-                        query: encodeQueryParameters(<String, String>{
-                          'subject': ' ',
-                        }),
-                      );
+                            final Uri emailLaunchUri = Uri(
+                              scheme: 'mailto',
+                              path:
+                                  widget.estimateDetails.data.customer?.email ??
+                                      "",
+                              query: encodeQueryParameters(<String, String>{
+                                'subject': ' ',
+                              }),
+                            );
 
-                      launchUrl(emailLaunchUri);
-                    }
-                  },
-                  child: SvgPicture.asset(
-                    "assets/images/mail_icons.svg",
-                    color: AppColors.primaryColors,
+                            launchUrl(emailLaunchUri);
+                          }
+                        },
+                        child: SvgPicture.asset(
+                          "assets/images/mail_icons.svg",
+                          color: AppColors.primaryColors,
+                        ),
+                      )
+                    ],
                   ),
                 )
-              ],
-            ),
-          ),
+              : const SizedBox(),
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Row(
@@ -1432,7 +1446,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${widget.estimateDetails.data.vehicle?.kilometers ?? '0'} mi",
+                  "${widget.estimateDetails.data.vehicle?.kilometers.split(".").first ?? '0'} mi",
                   style: TextStyle(
                       fontSize: 16,
                       color: AppColors.primaryTitleColor,
@@ -1695,6 +1709,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   }
 
   Widget serviceTileWidget(int serviceIndex) {
+    double sumAmount = 0;
+    widget.estimateDetails.data.orderService![serviceIndex].orderServiceItems!
+        .forEach((element) {
+      sumAmount += double.tryParse(element.subTotal) ?? 0;
+    });
+
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
       child: Container(
@@ -1809,6 +1829,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ),
               ListView.builder(
                 itemBuilder: (context, index) {
+                  dynamic parsedValue = double.parse(widget
+                      .estimateDetails
+                      .data
+                      .orderService![serviceIndex]
+                      .orderServiceItems![index]
+                      .subTotal);
+                  sumAmount = sumAmount + parsedValue;
+                  print(parsedValue.toString() + "SDJFSLDKJF");
                   return Padding(
                     padding: EdgeInsets.only(top: 5.0),
                     child: Row(
@@ -1903,18 +1931,31 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 12.0),
-                child: Text(
-                  widget.estimateDetails.data.orderService?[serviceIndex]
-                              .isAuthorized ==
-                          "Y"
-                      ? "Authorized"
-                      : "Not Yet Authorized",
-                  style: TextStyle(
-                      color: widget.estimateDetails.data
-                                  .orderService?[serviceIndex].isAuthorized ==
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      widget.estimateDetails.data.orderService?[serviceIndex]
+                                  .isAuthorized ==
                               "Y"
-                          ? Color(0xff12A58C)
-                          : Color(0xffFF5C5C)),
+                          ? "Authorized"
+                          : "Not Yet Authorized",
+                      style: TextStyle(
+                          color: widget
+                                      .estimateDetails
+                                      .data
+                                      .orderService?[serviceIndex]
+                                      .isAuthorized ==
+                                  "Y"
+                              ? Color(0xff12A58C)
+                              : Color(0xffFF5C5C)),
+                    ),
+                    Text(sumAmount.toString(),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: AppColors.primaryTitleColor)),
+                  ],
                 ),
               )
             ],
@@ -1982,21 +2023,42 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             isScrollControlled: true,
                             useSafeArea: true);
                       } else if (label == "Vehicle") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              return CreateVehicleScreen(
-                                navigation: "partial_estimate",
-                                customerId: widget
-                                        .estimateDetails.data.customer?.id
-                                        .toString() ??
-                                    "0",
+                        if ((appointmentValidation() &&
+                                startTimeController.text.isNotEmpty) ||
+                            (noteValidation() &&
+                                estimateNoteController.text.isNotEmpty) ||
+                            networkImageList
+                                .where((element) => element.isNotEmpty)
+                                .toList()
+                                .isEmpty) {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                return CreateVehicleScreen(
+                                  navigation: "partial_estimate",
+                                  customerId: widget
+                                          .estimateDetails.data.customer?.id
+                                          .toString() ??
+                                      "0",
+                                  orderId:
+                                      widget.estimateDetails.data.id.toString(),
+                                );
+                              },
+                              isScrollControlled: true,
+                              useSafeArea: true);
+                        } else {
+                          showPopUpBeforeService(
+                              context,
+                              SelectVehiclesScreen(
+                                navigation: "partial",
+                                subNavigation: widget.navigation,
                                 orderId:
                                     widget.estimateDetails.data.id.toString(),
-                              );
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
+                                customerId: widget
+                                    .estimateDetails.data.customerId
+                                    .toString(),
+                              ));
+                        }
                       } else if (label == "Service") {
                         showModalBottomSheet(
                             context: context,
@@ -2035,13 +2097,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         Padding(
           padding: const EdgeInsets.only(top: 6.0),
           child: SizedBox(
-            height: 56,
+            height: label == "Note" || label == "Appointment Note" ? null : 56,
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
               textCapitalization: TextCapitalization.sentences,
-              inputFormatters:
-                  label == "Card Number" ? [CardNumberInputFormatter()] : [],
+              inputFormatters: label == "Card Number"
+                  ? [CardNumberInputFormatter()]
+                  : label == "Amount To Pay"
+                      ? [FilteringTextInputFormatter.deny(RegExp(r'[,-]'))]
+                      : [],
               readOnly: label == 'Date' ||
                       label == "Vehicle" ||
                       label == "Customer" ||
@@ -2077,21 +2142,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           .where((element) => element.isNotEmpty)
                           .toList()
                           .isEmpty) {
-                    log('here i am');
-                    if (widget.estimateDetails.data.customer != null) {
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) {
-                          return SelectCustomerScreen(
-                            navigation: "partial",
-                            subNavigation: widget.navigation,
-                            orderId: widget.estimateDetails.data.id.toString(),
-                          );
-                        },
-                      ));
-                    } else {
-                      CommonWidgets().showDialog(context,
-                          "Please select a customer before adding a service");
-                    }
+                    log('here i am 1');
+                    //   if (widget.estimateDetails.data.customer != null) {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) {
+                        return SelectCustomerScreen(
+                          navigation: "partial",
+                          subNavigation: widget.navigation,
+                          orderId: widget.estimateDetails.data.id.toString(),
+                        );
+                      },
+                    ));
+                    //  } else {
+                    //   CommonWidgets().showDialog(context,
+                    //       "Please select a customer before adding a service");
+                    // }
                   } else {
                     // CommonWidgets().showDialog(context,
                     //     "Please save the unsaved changes before selecting the service");
@@ -2135,7 +2200,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           .where((element) => element.isNotEmpty)
                           .toList()
                           .isEmpty) {
-                    log('here i am');
+                    log('here i am her');
                     if (widget.estimateDetails.data.customer != null) {
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) {
@@ -2149,6 +2214,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         },
                       ));
                     } else {
+                      print("hereee");
                       CommonWidgets().showDialog(context,
                           "Please select a customer before adding a service");
                     }
@@ -2200,7 +2266,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           .where((element) => element.isNotEmpty)
                           .toList()
                           .isEmpty) {
-                    log('here i am');
+                    log('here i am 2');
                     if (widget.estimateDetails.data.customer != null) {
                       Navigator.push(context, MaterialPageRoute(
                         builder: (context) {
@@ -2236,18 +2302,26 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   }
                 }
               },
-              keyboardType: label == 'Phone Number' || label == "Amount To Pay"
+              keyboardType: label == 'Phone Number'
                   ? TextInputType.number
-                  : null,
+                  : label == "Amount To Pay"
+                      ? TextInputType.numberWithOptions(decimal: true)
+                      : null,
+              maxLines: label == "Note" || label == "Appointment Note" ? 6 : 1,
+              minLines:
+                  label == "Note" || label == "Appointment Note" ? 1 : null,
               maxLength: label == 'Phone Number'
                   ? 16
-                  : label == "Note" ||
-                          label == "Appointment Note" ||
-                          label == "Notes"
+                  : label == "Notes"
                       ? 150
                       : label == 'Password'
                           ? 12
-                          : 50,
+                          : label == "Note"
+                              ? 299
+                              : label == "Appointment Note"
+                                  ? 299
+                                  : 50,
+              // expands: label == "Note" ? true : false,
               decoration: InputDecoration(
                   hintText: placeHolder,
                   counterText: "",
@@ -2376,7 +2450,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       ? dateType == "end_date"
                           ? appointmentDetailsModel?.data.data[0].endOn
                           : appointmentDetailsModel?.data.data[0].startOn
-                      : DateTime.now(),
+                      : dateType == "end_date" && startDateController.text != ""
+                          ? DateTime.parse(startDateToServer)
+                          : DateTime.now(),
                   onDateTimeChanged: (DateTime newdate) {
                     setState(() {
                       selectedDate =
@@ -2385,6 +2461,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         endDateToServer =
                             "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       } else if (dateType == "start_date") {
+                        endDateController.text = "";
+                        endDateToServer = "";
+
                         startDateToServer =
                             "${newdate.year}-${newdate.month.toString().padLeft(2, '0')}-${newdate.day.toString().padLeft(2, '0')}";
                       } else if (dateType == "payment") {
@@ -2398,6 +2477,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   minimumYear: 2009,
                   maximumYear: 2030,
                   minuteInterval: 1,
+                  minimumDate:
+                      dateType == "end_date" && startDateController.text != ""
+                          ? DateTime.parse(startDateToServer)
+                          : null,
                   mode: CupertinoDatePickerMode.date,
                 ),
               ),
@@ -2882,6 +2965,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     discountAmount = 0;
     totalAmount = 0;
     balanceDueAmount = 0;
+    profitAmount = 0;
+    costAmount = 0;
     widget.estimateDetails.data.orderService?.forEach((element) {
       if (element.orderServiceItems!.isEmpty) {
         laborAmount += double.parse(element.servicePrice);
@@ -2892,7 +2977,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
           setState(() {
-            materialAmount = materialAmount + double.parse(element2.unitPrice);
+            materialAmount = materialAmount +
+                (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours));
           });
         }
         if (element2.itemType.toLowerCase() == "labor") {
@@ -2925,7 +3012,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           double tempPrice = 0.00;
           if (element2.discountType == "Fixed") {
             if (element2.itemType.toLowerCase() == "part" ||
-                element2.itemType.toLowerCase() == "labor") {
+                element2.itemType.toLowerCase() == "labor" ||
+                element2.itemType.toLowerCase() == "material") {
               tempPrice = (double.parse(element2.unitPrice) *
                       double.parse(element2.quanityHours)) -
                   double.parse(element2.discount);
@@ -2937,7 +3025,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             log(tempPrice.toString() + "tempp");
           } else {
             if (element2.itemType.toLowerCase() == "part" ||
-                element2.itemType.toLowerCase() == "labor") {
+                element2.itemType.toLowerCase() == "labor" ||
+                element2.itemType.toLowerCase() == "material") {
               tempPrice = (double.parse(element2.unitPrice) *
                       double.parse(element2.quanityHours)) -
                   (double.parse(element2.discount) *
@@ -2953,7 +3042,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           }
 
           if (element2.itemType.toLowerCase() == "part" ||
-              element2.itemType.toLowerCase() == "labor") {
+              element2.itemType.toLowerCase() == "labor" ||
+              element2.itemType.toLowerCase() == "material") {
             taxAmount =
                 taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
           } else {
@@ -2970,6 +3060,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                         double.parse(element2.quanityHours)) /
                     100;
           }
+
+          costAmount = costAmount + double.parse(element2.markup);
         });
       });
     });
@@ -2985,11 +3077,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
       balanceDueAmount =
           totalAmount - double.parse(widget.estimateDetails.data.paidAmount);
+      double tempProfit = (materialAmount +
+              laborAmount +
+              partAmount +
+              subContractAmount +
+              feeAmount) -
+          discountAmount;
+      profitAmount = tempProfit - costAmount;
 
       log(widget.estimateDetails.data.paidAmount);
       log(totalAmount.toString());
       log(balanceDueAmount.toString());
     });
+
     setState(() {});
   }
 
@@ -3015,6 +3115,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             Navigator.pop(context);
             CommonWidgets().showSuccessDialog(
                 _scaffoldKey.currentContext!, "Payment Successful");
+          } else if (state is CollectPaymentEstimateErrorState) {
+            CommonWidgets()
+                .showDialog(_scaffoldKey.currentContext!, "Payment Failed");
           }
         },
         child: BlocBuilder<EstimateBloc, EstimateState>(
@@ -3134,6 +3237,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         ),
                                       ),
                                     ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: Center(
+                                        child: Text(
+                                          'Others',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -3146,7 +3259,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                     children: [
                                       cashTabWidget(),
                                       creditTabWidget(),
-                                      cashTabWidget()
+                                      cashTabWidget(),
+                                      cashTabWidget(),
                                     ]),
                               ),
                               Padding(
@@ -3324,6 +3438,76 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                           .text),
                                             );
                                       }
+                                    } else if (tabController.index == 2) {
+                                      if (paymentAmountController
+                                          .text.isEmpty) {
+                                        newSetState(() {
+                                          paymentAmountErrorStatus = true;
+                                          paymentAmountErrorMessage =
+                                              "Amount can't be empty";
+                                        });
+                                      } else {
+                                        if (paymentAmountController.text ==
+                                            "0") {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Please enter a valid amount";
+                                          });
+                                        } else if (double.parse(
+                                                paymentAmountController.text) >
+                                            balanceDueAmount) {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = true;
+                                            paymentAmountErrorMessage =
+                                                "Amount can't be greater than balance due amount";
+                                          });
+                                        } else {
+                                          newSetState(() {
+                                            paymentAmountErrorStatus = false;
+                                          });
+                                        }
+                                      }
+                                      if (cashDateController.text.isEmpty) {
+                                        newSetState(() {
+                                          cashDateErrorStatus = true;
+                                          cashDateErrorMessage =
+                                              "Payment date can't be empty";
+                                        });
+                                      } else {
+                                        newSetState(() {
+                                          cashDateErrorStatus = false;
+                                        });
+                                      }
+
+                                      if (!paymentAmountErrorStatus &&
+                                          !cashDateErrorStatus) {
+                                        context.read<EstimateBloc>().add(
+                                              CollectPaymentEstimateEvent(
+                                                  amount:
+                                                      paymentAmountController
+                                                          .text,
+                                                  customerId: widget
+                                                          .estimateDetails
+                                                          .data
+                                                          .customer
+                                                          ?.id
+                                                          .toString() ??
+                                                      "",
+                                                  orderId: widget
+                                                      .estimateDetails.data.id
+                                                      .toString(),
+                                                  paymentMode: "DebitCard",
+                                                  // tabController.index == 0
+                                                  //     ? "Cash"
+                                                  //     : tabController.index == 1
+                                                  //         ? "Credit Card"
+                                                  //         : "Check",
+                                                  date: cashDateToServer,
+                                                  note:
+                                                      cashNoteController.text),
+                                            );
+                                      }
                                     } else {
                                       if (paymentAmountController
                                           .text.isEmpty) {
@@ -3383,7 +3567,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   orderId: widget
                                                       .estimateDetails.data.id
                                                       .toString(),
-                                                  paymentMode: "check",
+                                                  paymentMode: "Other",
                                                   // tabController.index == 0
                                                   //     ? "Cash"
                                                   //     : tabController.index == 1
@@ -3518,7 +3702,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           .where((element) => element.isNotEmpty)
                           .toList()
                           .isEmpty) {
-                    if (widget.estimateDetails.data.vehicle != null) {
+                    if (!isVehicleEdit) {
                       setState(() {
                         isCustomerEdit = true;
                       });
@@ -3550,13 +3734,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SvgPicture.asset("assets/images/edit_pen_icon.svg"),
-                      const Padding(
-                        padding: EdgeInsets.only(left: 8.0),
+                      SvgPicture.asset("assets/images/edit_pen_icon.svg",
+                          color: !isVehicleEdit
+                              ? AppColors.primaryColors
+                              : Colors.grey),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
                         child: Text(
                           "Edit Customer",
                           style: TextStyle(
-                              color: AppColors.primaryColors,
+                              color: !isVehicleEdit
+                                  ? AppColors.primaryColors
+                                  : Colors.grey,
                               fontSize: 18,
                               fontWeight: FontWeight.w600),
                         ),
@@ -3578,7 +3767,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             .where((element) => element.isNotEmpty)
                             .toList()
                             .isEmpty) {
-                      if (widget.estimateDetails.data.vehicle != null) {
+                      if (widget.estimateDetails.data.vehicle != null &&
+                          !isCustomerEdit) {
                         setState(() {
                           isVehicleEdit = true;
                         });
@@ -3613,7 +3803,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       children: [
                         SvgPicture.asset(
                           "assets/images/edit_pen_icon.svg",
-                          color: widget.estimateDetails.data.vehicle != null
+                          color: widget.estimateDetails.data.vehicle != null &&
+                                  !isCustomerEdit
                               ? AppColors.primaryColors
                               : Colors.grey,
                         ),
@@ -3622,10 +3813,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           child: Text(
                             "Edit Vehicle",
                             style: TextStyle(
-                                color:
-                                    widget.estimateDetails.data.vehicle != null
-                                        ? AppColors.primaryColors
-                                        : Colors.grey,
+                                color: widget.estimateDetails.data.vehicle !=
+                                            null &&
+                                        !isCustomerEdit
+                                    ? AppColors.primaryColors
+                                    : Colors.grey,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w600),
                           ),
@@ -4740,14 +4932,14 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       });
 
                       showAuthPopup(
-                          authStatus == "Authorized"
+                          authStatus == "Authorize"
                               ? "Authorize Service?"
                               : "Unauthorize Service?",
-                          authStatus == "Authorized"
+                          authStatus == "Authorize"
                               ? "Do you want to authorize this service"
                               : "Do you want to unauthorize this service?",
                           context,
-                          authStatus == "Authorized" ? "Y" : "N",
+                          authStatus == "Authorize" ? "Y" : "N",
                           serviceId,
                           technicianId,
                           serviceName);
