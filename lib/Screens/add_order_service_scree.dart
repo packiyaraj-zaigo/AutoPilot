@@ -1055,19 +1055,20 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                         }
                       : null,
               controller: controller,
-              keyboardType: label == 'Discount' ||
-                      label == 'Cost' ||
-                      label == 'Cost ' ||
-                      label == 'Price' ||
-                      label == 'Tax' ||
+              keyboardType: label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
-                      label == 'Price ' ||
                       label == "Quantity " ||
-                      label == "Base Cost" ||
                       label == "Quantity"
                   ? TextInputType.number
-                  : null,
+                  : label == "Base Cost" ||
+                          label == 'Discount' ||
+                          label == 'Cost' ||
+                          label == 'Cost ' ||
+                          label == 'Price' ||
+                          label == 'Price '
+                      ? TextInputType.numberWithOptions(decimal: true)
+                      : null,
               inputFormatters: label == "Hours"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : label == 'Discount' ||

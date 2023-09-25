@@ -2302,9 +2302,11 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   }
                 }
               },
-              keyboardType: label == 'Phone Number' || label == "Amount To Pay"
+              keyboardType: label == 'Phone Number'
                   ? TextInputType.number
-                  : null,
+                  : label == "Amount To Pay"
+                      ? TextInputType.numberWithOptions(decimal: true)
+                      : null,
               maxLines: label == "Note" || label == "Appointment Note" ? 6 : 1,
               minLines:
                   label == "Note" || label == "Appointment Note" ? 1 : null,

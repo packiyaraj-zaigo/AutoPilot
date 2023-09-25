@@ -863,20 +863,21 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               controller: controller,
               maxLines: label == "Notes" || label == "Description" ? 6 : 1,
               minLines: 1,
-              keyboardType: label == 'Discount' ||
-                      label == 'Cost' ||
-                      label == 'Cost ' ||
-                      label == 'Price' ||
-                      label == 'Tax' ||
+              keyboardType: label == 'Tax' ||
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
-                      label == 'Price ' ||
                       label == "Quantity" ||
                       label == "Quantity " ||
-                      label == "Base Cost" ||
                       label == "Quantity"
                   ? TextInputType.number
-                  : null,
+                  : label == 'Price ' ||
+                          label == "Base Cost" ||
+                          label == 'Discount' ||
+                          label == 'Cost' ||
+                          label == 'Cost ' ||
+                          label == 'Price'
+                      ? TextInputType.numberWithOptions(decimal: true)
+                      : null,
               inputFormatters: label == "Hours" ||
                       label == 'Discount' ||
                       label == 'Cost' ||

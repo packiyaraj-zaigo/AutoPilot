@@ -635,12 +635,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                             : [],
                 keyboardType: label == 'Business Phone' ||
                         label == "Number of Employees" ||
-                        label == "Shop Hourly Labor Rate" ||
-                        label == "Labor Tax Rate" ||
-                        label == 'Zip' ||
-                        label == "Labor Tax Rate" ||
-                        label == "Parts Tax Rate" ||
-                        label == "Material Tax Rate"
+                        label == 'Zip'
                     ? TextInputType.number
                     : label == "Shop Hourly Labor Rate" ||
                             label == "Labor Tax Rate" ||
