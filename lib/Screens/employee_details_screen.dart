@@ -219,7 +219,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 15),
+                                const SizedBox(width: 15),
                                 IconButton(
                                   onPressed: () {
                                     final Uri emailLaunchUri = Uri(
@@ -255,17 +255,17 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
+                                const Text(
                                   'Email',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w500,
                                     fontSize: 14,
                                   ),
                                 ),
-                                SizedBox(height: 5),
+                                const SizedBox(height: 5),
                                 Text(
                                   '${widget.employee.email}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -362,7 +362,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                         const SizedBox(height: 5),
                         Text(
                           '$date',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
@@ -421,7 +421,7 @@ class _EmployeeDetailsScreenState extends State<EmployeeDetailsScreen> {
                                   color: Colors.grey.shade300,
                                   blurRadius: 0.7,
                                   spreadRadius: 1.2,
-                                  offset: Offset(3, 2))
+                                  offset: const Offset(3, 2))
                             ]),
 
                         // child: Padding(
