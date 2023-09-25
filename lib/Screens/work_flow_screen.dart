@@ -254,6 +254,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                 builder: (context) => EstimatePartialScreen(
                   estimateDetails: state.createEstimateModel,
                   controllerIndex: 1,
+                  navigation: 'workflow',
                 ),
               ),
             );

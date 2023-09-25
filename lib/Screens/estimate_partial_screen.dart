@@ -272,6 +272,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   );
                 } else if (widget.navigation == 'search') {
                   Navigator.pop(context);
+                } else if (widget.navigation == 'workflow') {
+                  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                    builder: (context) {
+                      return BottomBarScreen(
+                        currentIndex: 1,
+                        tabControllerIndex: 0,
+                      );
+                    },
+                  ), (route) => false);
                 } else {
                   Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
                     builder: (context) {
@@ -323,6 +332,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           Navigator.pop(context);
                         } else if (widget.navigation == "appointment_details") {
                           Navigator.pop(context);
+                        } else if (widget.navigation == 'workflow') {
+                          Navigator.pushAndRemoveUntil(context,
+                              MaterialPageRoute(
+                            builder: (context) {
+                              return BottomBarScreen(
+                                currentIndex: 1,
+                                tabControllerIndex: 0,
+                              );
+                            },
+                          ), (route) => false);
                         } else {
                           Navigator.pushAndRemoveUntil(context,
                               MaterialPageRoute(
@@ -491,6 +510,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               );
                             } else if (widget.navigation == 'search') {
                               Navigator.pop(context);
+                            } else if (widget.navigation == 'workflow') {
+                              Navigator.pushAndRemoveUntil(context,
+                                  MaterialPageRoute(
+                                builder: (context) {
+                                  return BottomBarScreen(
+                                    currentIndex: 1,
+                                    tabControllerIndex: 0,
+                                  );
+                                },
+                              ), (route) => false);
                             } else {
                               Navigator.pushAndRemoveUntil(context,
                                   MaterialPageRoute(
@@ -1714,6 +1743,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         .forEach((element) {
       sumAmount += double.tryParse(element.subTotal) ?? 0;
     });
+
+    if (widget.estimateDetails.data.orderService![serviceIndex]
+        .orderServiceItems!.isEmpty) {
+      sumAmount = double.tryParse(widget
+              .estimateDetails.data.orderService![serviceIndex].servicePrice) ??
+          0;
+    }
 
     return Padding(
       padding: const EdgeInsets.only(top: 16.0),
@@ -5306,7 +5342,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 },
               ));
             }
-            // TODO: implement listener
           },
           child: BlocBuilder<EstimateBloc, EstimateState>(
             builder: (context, state) {
