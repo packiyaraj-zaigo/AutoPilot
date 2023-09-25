@@ -2,11 +2,16 @@ import 'dart:developer';
 
 import 'package:auto_pilot/Models/workflow_model.dart';
 import 'package:auto_pilot/Models/workflow_status_model.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/Screens/kanban_board.dart';
 import 'package:auto_pilot/Screens/create_workflow.dart';
+import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
+import 'package:auto_pilot/bloc/scanner/scanner_bloc.dart';
 import 'package:auto_pilot/bloc/workflow/workflow_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:boardview/boardview.dart';
@@ -221,7 +226,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  Container workflowCard(
+  Widget workflowCard(
       WorkflowModel workflow, bool isVehicle, WorkflowStatusModel status) {
     String str = workflow.bucketName!.color ?? '';
     str = str.replaceAll('#', '0xFF');
@@ -238,110 +243,145 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
       secondaryTitle =
           '${workflow.orders?.vehicle?.vehicleYear ?? ''} ${workflow.orders?.vehicle?.vehicleModel ?? ''}';
     }
-
-    return Container(
-      width: 200,
-      height: 200,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(7, 7), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Text(
-              '${AppUtils.getTimeFormatted(workflow.orders?.shopStart ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.shopFinish ?? DateTime.now())}',
-              style: const TextStyle(
-                color: Color(0xFF9A9A9A),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
+    final key = GlobalKey();
+    return BlocProvider(
+      create: (context) => EstimateBloc(apiRepository: ApiRepository()),
+      child: BlocListener<EstimateBloc, EstimateState>(
+        listener: (context, state) {
+          if (state is GetSingleEstimateState) {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => EstimatePartialScreen(
+                  estimateDetails: state.createEstimateModel,
+                  controllerIndex: 1,
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              mainTitle,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: Color(int.tryParse(str) ?? 0xFF1355FF),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              workflow.orders?.customer?.firstName != null
-                  ? '${workflow.orders?.customer?.firstName} ${workflow.orders?.customer?.lastName}'
-                  : "NA",
-              style: const TextStyle(
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF333333),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            Text(
-              secondaryTitle,
-              style: const TextStyle(
-                fontWeight: FontWeight.w400,
-                color: Color(0xFF333333),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            // Container(
-            //   height: 24,
-            //   decoration: BoxDecoration(
-            //       color: Color(0xFFF5F5F5),
-            //       borderRadius: BorderRadius.circular(12)),
-            //   child: const Padding(
-            //     padding: EdgeInsets.only(left: 14.0, right: 14, top: 5),
-            //     child: Text(
-            //       'Tag',
-            //       maxLines: 1,
-            //       textAlign: TextAlign.center,
-            //       style: TextStyle(fontWeight: FontWeight.w500),
-            //     ),
-            //   ),
-            // ),
-            GestureDetector(
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => dropDown(status, workflow),
+            );
+          } else if (state is GetEstimateErrorState) {
+            CommonWidgets().showDialog(context, state.errorMsg);
+          } else if (state is GetSingleEstimateLoadingState) {
+            showCupertinoDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (context) => const CupertinoActivityIndicator(),
+            );
+          }
+        },
+        child: GestureDetector(
+          key: key,
+          onTap: () {
+            key.currentContext!.read<EstimateBloc>().add(
+                  GetSingleEstimateEvent(
+                    orderId: workflow.orderId.toString(),
+                  ),
                 );
-              },
-              child: Container(
-                  height: 24,
-                  decoration: BoxDecoration(
-                      color: const Color(0xFFF5F5F5),
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Center(
-                    child: Text(
-                      workflow.bucketName?.title ?? '',
-                      maxLines: 1,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color:
-                              // str == '' ?
-                              AppColors.primaryColors
-                          // : Color(color),
-                          ),
+          },
+          child: Container(
+            width: 200,
+            height: 200,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: 10,
+                  offset: const Offset(7, 7), // changes position of shadow
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    '${AppUtils.getTimeFormatted(workflow.orders?.shopStart ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.shopFinish ?? DateTime.now())}',
+                    style: const TextStyle(
+                      color: Color(0xFF9A9A9A),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
-                  )),
-            )
-          ],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    mainTitle,
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Color(int.tryParse(str) ?? 0xFF1355FF),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    workflow.orders?.customer?.firstName != null
+                        ? '${workflow.orders?.customer?.firstName} ${workflow.orders?.customer?.lastName}'
+                        : "NA",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF333333),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    secondaryTitle,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF333333),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  // Container(
+                  //   height: 24,
+                  //   decoration: BoxDecoration(
+                  //       color: Color(0xFFF5F5F5),
+                  //       borderRadius: BorderRadius.circular(12)),
+                  //   child: const Padding(
+                  //     padding: EdgeInsets.only(left: 14.0, right: 14, top: 5),
+                  //     child: Text(
+                  //       'Tag',
+                  //       maxLines: 1,
+                  //       textAlign: TextAlign.center,
+                  //       style: TextStyle(fontWeight: FontWeight.w500),
+                  //     ),
+                  //   ),
+                  // ),
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => dropDown(status, workflow),
+                      );
+                    },
+                    child: Container(
+                        height: 24,
+                        decoration: BoxDecoration(
+                            color: const Color(0xFFF5F5F5),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Center(
+                          child: Text(
+                            workflow.bucketName?.title ?? '',
+                            maxLines: 1,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                                color:
+                                    // str == '' ?
+                                    AppColors.primaryColors
+                                // : Color(color),
+                                ),
+                          ),
+                        )),
+                  )
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
