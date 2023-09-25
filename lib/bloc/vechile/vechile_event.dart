@@ -31,20 +31,21 @@ class AddVechile extends VechileEvent {
       licNumber,
       type,
       make,
-      customerId;
-  AddVechile({
-    required this.email,
-    required this.year,
-    required this.model,
-    required this.submodel,
-    required this.engine,
-    required this.color,
-    required this.vinNumber,
-    required this.licNumber,
-    required this.type,
-    required this.make,
-    required this.customerId,
-  });
+      customerId,
+      mileage;
+  AddVechile(
+      {required this.email,
+      required this.year,
+      required this.model,
+      required this.submodel,
+      required this.engine,
+      required this.color,
+      required this.vinNumber,
+      required this.licNumber,
+      required this.type,
+      required this.make,
+      required this.customerId,
+      required this.mileage});
 }
 
 class DropDownVechile extends VechileEvent {}
@@ -61,21 +62,22 @@ class EditVehicleEvent extends VechileEvent {
       licNumber,
       type,
       make,
-      customerId;
-  const EditVehicleEvent({
-    required this.id,
-    required this.email,
-    required this.year,
-    required this.model,
-    required this.submodel,
-    required this.engine,
-    required this.color,
-    required this.vinNumber,
-    required this.licNumber,
-    required this.type,
-    required this.make,
-    required this.customerId,
-  });
+      customerId,
+      mileage;
+  const EditVehicleEvent(
+      {required this.id,
+      required this.email,
+      required this.year,
+      required this.model,
+      required this.submodel,
+      required this.engine,
+      required this.color,
+      required this.vinNumber,
+      required this.licNumber,
+      required this.type,
+      required this.make,
+      required this.customerId,
+      required this.mileage});
 }
 
 class DeleteVechile extends VechileEvent {

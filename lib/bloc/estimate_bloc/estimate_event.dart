@@ -143,7 +143,8 @@ class CreateOrderServiceItemEvent extends EstimateEvent {
       discountType,
       position,
       subTotal,
-      tax;
+      tax,
+      cost;
 
   CreateOrderServiceItemEvent(
       {required this.cannedServiceId,
@@ -155,7 +156,8 @@ class CreateOrderServiceItemEvent extends EstimateEvent {
       required this.quantityHours,
       required this.subTotal,
       required this.unitPrice,
-      required this.tax});
+      required this.tax,
+      required this.cost});
 }
 
 class DeleteOrderServiceEvent extends EstimateEvent {
@@ -239,3 +241,25 @@ class GetEventDetailsByIdEvent extends EstimateEvent {
 }
 
 class GetClientByIdInEstimateEvent extends EstimateEvent {}
+
+class CreateCannedOrderServiceEstimateEvent extends EstimateEvent {
+  final CannedServiceCreateModel service;
+  final List<CannedServiceAddModel>? material;
+  final List<CannedServiceAddModel>? part;
+  final List<CannedServiceAddModel>? labor;
+  final List<CannedServiceAddModel>? subcontract;
+  final List<CannedServiceAddModel>? fee;
+  const CreateCannedOrderServiceEstimateEvent({
+    required this.service,
+    this.material,
+    this.part,
+    this.labor,
+    this.subcontract,
+    this.fee,
+  });
+}
+
+class GetAppointmentDetailsEvent extends EstimateEvent {
+  final String appointmentId;
+  GetAppointmentDetailsEvent({required this.appointmentId});
+}

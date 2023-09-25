@@ -902,20 +902,19 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
               controller: controller,
               maxLines: label == "Notes" || label == "Description" ? 6 : 1,
               minLines: 1,
-              keyboardType: label.contains('Labor Rate') ||
+              keyboardType: label == 'Discount' ||
+                      label == 'Cost' ||
+                      label == 'Cost ' ||
+                      label == 'Price' ||
+                      label == 'Tax' ||
+                      label.contains('Labor Rate') ||
                       label == "Hours" ||
+                      label == 'Price ' ||
                       label == "Quantity" ||
+                      label == "Base Cost" ||
                       label == "Quantity "
                   ? TextInputType.number
-                  : label == 'Discount' ||
-                          label == 'Cost' ||
-                          label == 'Cost ' ||
-                          label == 'Price' ||
-                          label == 'Tax' ||
-                          label == 'Price ' ||
-                          label == "Base Cost"
-                      ? TextInputType.numberWithOptions(decimal: true)
-                      : null,
+                  : null,
               inputFormatters: label == "Hours" ||
                       label == 'Discount' ||
                       label == 'Cost' ||

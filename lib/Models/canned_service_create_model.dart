@@ -25,40 +25,41 @@ class CannedServiceAddModel {
   String tax;
   int? vendorId;
   int position;
+  String cost;
 
-  CannedServiceAddModel({
-    required this.cannedServiceId,
-    required this.itemName,
-    required this.unitPrice,
-    required this.discount,
-    required this.subTotal,
-    required this.note,
-    required this.part,
-    this.id = '',
-    this.itemType = 'Material',
-    this.quanityHours = '1',
-    this.discountType = 'Percentage',
-    this.tax = 'N',
-    this.position = 0,
-    this.vendorId,
-  });
+  CannedServiceAddModel(
+      {required this.cannedServiceId,
+      required this.itemName,
+      required this.unitPrice,
+      required this.discount,
+      required this.subTotal,
+      required this.note,
+      required this.part,
+      this.id = '',
+      this.itemType = 'Material',
+      this.quanityHours = '1',
+      this.discountType = 'Percentage',
+      this.tax = 'N',
+      this.position = 0,
+      this.vendorId,
+      this.cost = "0"});
 
   factory CannedServiceAddModel.fromJson(Map<String, dynamic> json) =>
       CannedServiceAddModel(
-        cannedServiceId: json["canned_service_id"],
-        itemType: json["item_type"],
-        itemName: json["item_name"],
-        unitPrice: json["unit_price"],
-        quanityHours: json["quanity_hours"],
-        discount: json["discount"],
-        discountType: json["discount_type"],
-        subTotal: json["sub_total"],
-        position: json["position"],
-        note: json["item_service_note"],
-        part: json["part_name"],
-        tax: json["is_tax"],
-        vendorId: json["vendor_id"],
-      );
+          cannedServiceId: json["canned_service_id"],
+          itemType: json["item_type"],
+          itemName: json["item_name"],
+          unitPrice: json["unit_price"],
+          quanityHours: json["quanity_hours"],
+          discount: json["discount"],
+          discountType: json["discount_type"],
+          subTotal: json["sub_total"],
+          position: json["position"],
+          note: json["item_service_note"],
+          part: json["part_name"],
+          tax: json["is_tax"],
+          vendorId: json["vendor_id"],
+          cost: json['markup']);
 
   Map<String, dynamic> toJson() => {
         "canned_service_id": cannedServiceId,
@@ -74,5 +75,6 @@ class CannedServiceAddModel {
         "part_name": part,
         "is_tax": tax,
         "vendor_id": vendorId,
+        "markup": cost
       };
 }

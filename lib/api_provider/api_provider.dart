@@ -302,19 +302,19 @@ class ApiProvider {
   // }
 
   Future<dynamic> addVechile(
-    String token,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) async {
+      String token,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) async {
     try {
       final clientId = await AppUtils.getUserID();
       var url = Uri.parse("${BASE_URL}api/vehicles?client_id=$clientId");
@@ -330,6 +330,11 @@ class ApiProvider {
         ..fields['engine_size'] = engine
         ..fields['licence_plate'] = licNumber
         ..fields['customer_id'] = customerId;
+      if (mileage != "") {
+        request.fields['kilometers'] = mileage;
+      } else {
+        request.fields['kilometers'] = "0";
+      }
 
       // final map = {};
       var response = await request.send();
@@ -341,20 +346,20 @@ class ApiProvider {
   }
 
   Future<dynamic> editVechile(
-    String token,
-    String id,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) async {
+      String token,
+      String id,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) async {
     try {
       var url = Uri.parse("${BASE_URL}api/vehicles/$id");
       final map = {};
@@ -369,7 +374,11 @@ class ApiProvider {
       map['engine_size'] = engine;
       map['licence_plate'] = licNumber;
       map['customer_id'] = customerId;
-      map['kilometers'] = '0';
+      if (mileage != "") {
+        map['kilometers'] = mileage;
+      } else {
+        map['kilometers'] = "0";
+      }
 
       var response =
           await http.put(url, body: jsonEncode(map), headers: getHeader(token));
@@ -1361,7 +1370,7 @@ class ApiProvider {
         "notes": notes,
         "start_on": startTime,
         "end_on": endTime,
-        "createEvent": 1,
+        "createEvent": "1",
         "order_id": orderId
       };
       final url = Uri.parse('${BASE_URL}api/appointments');
@@ -1403,6 +1412,8 @@ class ApiProvider {
         headers: getHeader(token),
         body: json.encode(body),
       );
+
+      inspect(response);
 
       log(body.toString() + "APPOINTMENT BODY");
       log(id.toString() + "APPOINTMENT ID");
@@ -1587,7 +1598,8 @@ class ApiProvider {
   Future<dynamic> getAllVendors(String token, int page) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse('${BASE_URL}api/vendors?client_id=');
+      final url =
+          Uri.parse('${BASE_URL}api/vendors?client_id=$clientId&page=$page');
 
       final response = await http.get(
         url,
@@ -1763,7 +1775,8 @@ class ApiProvider {
       String discountType,
       String position,
       String subTotal,
-      String tax) async {
+      String tax,
+      String cost) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -1779,7 +1792,8 @@ class ApiProvider {
         ..fields['discount_type'] = discountType
         ..fields['position'] = position
         ..fields['sub_total'] = subTotal
-        ..fields['tax'] = tax;
+        ..fields['tax'] = tax
+        ..fields['markup'] = cost;
 
       request.headers.addAll(getHeader(token));
       inspect(request);
@@ -2209,6 +2223,8 @@ class ApiProvider {
         headers: getHeader(token),
       );
 
+      log("test $eventId");
+
       inspect(response);
       return response;
     } catch (e) {
@@ -2233,6 +2249,55 @@ class ApiProvider {
       return response;
     } catch (e) {
       log(e.toString() + 'Create vendor provider error');
+    }
+  }
+
+  Future<dynamic> getPartsNotes(String token, String partsId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/inventory_notes?parts_id=$partsId');
+      final response = http.get(url, headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  Future<dynamic> deletePartsNotes(String id, String token) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${BASE_URL}api/inventory_notes/$id'),
+        headers: getHeader(token),
+      );
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
+    }
+  }
+
+  Future<dynamic> addPartsNote(
+      String partsId, String token, String notes) async {
+    try {
+      final body = {"parts_id": partsId, "notes": notes};
+      final response = await http.post(
+          Uri.parse('${BASE_URL}api/inventory_notes'),
+          headers: getHeader(token),
+          body: json.encode(body));
+      return response;
+    } catch (e) {
+      log(e.toString() + 'Delete part provider error');
+    }
+  }
+
+  Future<dynamic> getAppointmentDetails(
+      String token, String appointmentId) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/appointments/$appointmentId');
+      final response = http.get(url, headers: getHeader(token));
+
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
     }
   }
 }

@@ -146,65 +146,40 @@ class ApiRepository {
   }
 
   Future addVechile(
-    String token,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) {
-    return apiProvider.addVechile(
-      token,
-      email,
-      year,
-      model,
-      submodel,
-      engine,
-      color,
-      vinNumber,
-      licNumber,
-      type,
-      make,
-      customerId,
-    );
+      String token,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) {
+    return apiProvider.addVechile(token, email, year, model, submodel, engine,
+        color, vinNumber, licNumber, type, make, customerId, mileage);
   }
 
   Future editVechile(
-    String token,
-    String id,
-    String email,
-    String year,
-    String model,
-    String submodel,
-    String engine,
-    String color,
-    String vinNumber,
-    String licNumber,
-    String type,
-    String make,
-    String customerId,
-  ) {
-    return apiProvider.editVechile(
-      token,
-      id,
-      email,
-      year,
-      model,
-      submodel,
-      engine,
-      color,
-      vinNumber,
-      licNumber,
-      type,
-      make,
-      customerId,
-    );
+      String token,
+      String id,
+      String email,
+      String year,
+      String model,
+      String submodel,
+      String engine,
+      String color,
+      String vinNumber,
+      String licNumber,
+      String type,
+      String make,
+      String customerId,
+      String mileage) {
+    return apiProvider.editVechile(token, id, email, year, model, submodel,
+        engine, color, vinNumber, licNumber, type, make, customerId, mileage);
   }
 
   Future dropdownVechile(String token) {
@@ -508,7 +483,8 @@ class ApiRepository {
       String discountType,
       String position,
       String subTotal,
-      String tax) {
+      String tax,
+      String cost) {
     return apiProvider.createOrderServiceItem(
         token,
         cannedServiceId,
@@ -520,7 +496,8 @@ class ApiRepository {
         discountType,
         position,
         subTotal,
-        tax);
+        tax,
+        cost);
   }
 
   Future deleteCannedService(String token, String serviceId) {
@@ -652,6 +629,22 @@ class ApiRepository {
       String contactPerson, String token) {
     return apiProvider.createVendor(
         clientId, name, email, contactPerson, token);
+  }
+
+  Future<dynamic> getPartsNotes(String token, String partsId) {
+    return apiProvider.getPartsNotes(token, partsId);
+  }
+
+  Future<dynamic> deletePartsNote(String token, String partsId) {
+    return apiProvider.deletePartsNotes(partsId, token);
+  }
+
+  Future<dynamic> addPartsNote(String token, String partsId, String notes) {
+    return apiProvider.addPartsNote(partsId, token, notes);
+  }
+
+  Future<dynamic> getAppointmentDetails(String token, String appointmentId) {
+    return apiProvider.getAppointmentDetails(token, appointmentId);
   }
 }
 

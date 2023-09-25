@@ -263,14 +263,18 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                     ),
                   ),
                 )
-              : Text(
-                  textAlign: TextAlign.end,
-                  value,
-                  style: TextStyle(
-                      height: label == 'Employees' ? 2 : null,
-                      color: AppColors.primaryTitleColor,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400),
+              : Flexible(
+                  child: Text(
+                    textAlign: TextAlign.end,
+                    value,
+                    style: TextStyle(
+                        height: label == 'Employees' ? 2 : null,
+                        color: AppColors.primaryTitleColor,
+                        fontSize: 16,
+                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.w400),
+                    maxLines: 1,
+                  ),
                 )
         ],
       ),

@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:auto_pilot/Models/appointment_create_model.dart';
+import 'package:auto_pilot/Models/canned_service_create.dart';
+import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/client_model.dart';
 import 'package:auto_pilot/Models/create_estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_appointment_model.dart';
@@ -63,6 +65,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<ChangeEstimateStatusEvent>(changeEstimateStateBloc);
     on<GetEventDetailsByIdEvent>(getEventDetailsByIdBloc);
     on<GetClientByIdInEstimateEvent>(getClientByIdEstimate);
+    on<CreateCannedOrderServiceEstimateEvent>(createCannedOrderEstimateService);
   }
 
   Future<void> createEstimateFromAppointment(
@@ -666,7 +669,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
               event.discountType,
               event.position,
               event.subTotal,
-              event.tax);
+              event.tax,
+              event.cost);
 
       log("res${createOrderServiceItem.body}");
 
@@ -756,6 +760,9 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       var token = prefs.getString(AppConstants.USER_TOKEN);
       // emit(CreateEstimateLoadingState());
 
+      Response detailsResponse = await _apiRepository.getAppointmentDetails(
+          token!, event.appointmetId);
+
       Response deleteAppointmentRes = await _apiRepository
           .deleteAppointmentEstimate(token, event.appointmetId);
 
@@ -766,6 +773,19 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           if (event.eventId != null) {
             final response =
                 await _apiRepository.deleteEvent(token, event.eventId!);
+          } else {
+            print("executed");
+
+            log(detailsResponse.body + "detaillss");
+            if (detailsResponse.statusCode == 200 ||
+                detailsResponse.statusCode == 201) {
+              final decodedBody = json.decode(detailsResponse.body);
+              Response deleteResponse = await _apiRepository.deleteEvent(
+                  token, decodedBody['data']['event_id'].toString());
+
+              print(deleteResponse.statusCode.toString() + "coddeee");
+              print(deleteResponse.body + "deleteddd");
+            }
           }
         } catch (e, s) {
           emit(DeleteAppointmentEstimateErrorState(
@@ -1023,6 +1043,139 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       log(e.toString() + " Get client bloc error");
       emit(GetClientByIdInEstimateErrorState(
           errorMessage: 'Something went wrong'));
+    }
+  }
+
+  Future<void> createCannedOrderEstimateService(
+    CreateCannedOrderServiceEstimateEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      int serviceId = 0;
+      bool materialDone = true;
+      bool partDone = true;
+      bool laborDone = true;
+      bool subcontractDone = true;
+      bool feeDone = true;
+      // emit(CreateCannedOrderServiceLoadingState());
+      final token = await AppUtils.getToken();
+      final Response serviceCreateResponse =
+          await _apiRepository.createCannedOrderService(token, event.service);
+
+      log(serviceCreateResponse.body.toString());
+
+      if (serviceCreateResponse.statusCode == 200 ||
+          serviceCreateResponse.statusCode == 201) {
+        final body = jsonDecode(serviceCreateResponse.body);
+        serviceId = body['created_id'];
+        if (event.material != null) {
+          event.material!.forEach((material) async {
+            final Response materialResponse = await _apiRepository
+                .createCannedOrderServiceItem(token, material, serviceId);
+            log(materialResponse.body.toString());
+            if (materialResponse.statusCode == 200 ||
+                materialResponse.statusCode == 201) {
+            } else {
+              materialDone = false;
+            }
+          });
+        }
+        if (event.part != null) {
+          for (var part in event.part!) {
+            final Response partResponse = await _apiRepository
+                .createCannedOrderServiceItem(token, part, serviceId);
+            if (partResponse.statusCode == 200 ||
+                partResponse.statusCode == 201) {
+            } else {
+              partDone = false;
+            }
+          }
+        }
+        if (event.labor != null) {
+          for (var labor in event.labor!) {
+            final Response laborResponse = await _apiRepository
+                .createCannedOrderServiceItem(token, labor, serviceId);
+            if (laborResponse.statusCode == 200 ||
+                laborResponse.statusCode == 201) {
+            } else {
+              laborDone = false;
+            }
+          }
+        }
+        if (event.subcontract != null) {
+          for (var subcontract in event.subcontract!) {
+            final Response subcontractResponse = await _apiRepository
+                .createCannedOrderServiceItem(token, subcontract, serviceId);
+            if (subcontractResponse.statusCode == 200 ||
+                subcontractResponse.statusCode == 201) {
+            } else {
+              subcontractDone = false;
+            }
+          }
+        }
+        if (event.fee != null) {
+          for (var fee in event.fee!) {
+            final Response feeResponse = await _apiRepository
+                .createCannedOrderServiceItem(token, fee, serviceId);
+            if (feeResponse.statusCode == 200 ||
+                feeResponse.statusCode == 201) {
+            } else {
+              feeDone = false;
+            }
+          }
+        }
+        String message = 'Service Created Successfully';
+        String errorMessage =
+            'Service Created\nBut Something Went Wrong with\n';
+
+        if (!materialDone) {
+          errorMessage += ' Material';
+        }
+        if (!partDone) {
+          if (errorMessage !=
+              'Service Created\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Part';
+        }
+        if (!laborDone) {
+          if (errorMessage !=
+              'Service Created\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Labor';
+        }
+        if (!subcontractDone) {
+          if (errorMessage !=
+              'Service Created\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Sub Contract';
+        }
+        if (!feeDone) {
+          if (errorMessage !=
+              'Service Created\nBut Something Went Wrong with\n') {
+            errorMessage += ',';
+          }
+          errorMessage += ' Fee';
+        }
+        log(message);
+        log(errorMessage);
+        if (errorMessage !=
+            'Service Created\nBut Something Went Wrong with\n') {
+          message = errorMessage;
+        }
+
+        // emit(CreateCannedOrderServiceSuccessState(message: message));
+        emit(CreateCannedServiceEstimateState());
+      } else {
+        // emit(const CreateCannedOrderServiceErrorState(
+        //     message: 'Something went wrong'));
+      }
+    } catch (e) {
+      log("$e Create service bloc error");
+      // emit(const CreateCannedOrderServiceErrorState(
+      //     message: "Something went wrong"));
     }
   }
 }

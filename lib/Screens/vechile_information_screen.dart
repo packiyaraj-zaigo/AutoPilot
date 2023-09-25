@@ -344,7 +344,15 @@ class _VechileInformationState extends State<VechileInformation> {
                                                     : noteList.isEmpty
                                                         ? const Center(
                                                             child: Text(
-                                                                "No Notes Found"),
+                                                                "No Notes Found",
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        18,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    color: AppColors
+                                                                        .greyText)),
                                                           )
                                                         : ListView.builder(
                                                             itemBuilder:
@@ -923,6 +931,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                   textAlignVertical: TextAlignVertical.top,
                                   maxLines: null,
                                   expands: true,
+                                  maxLength: 299,
                                   controller: addNoteController,
                                   decoration: InputDecoration(
                                       hintText: "Enter Notes",
@@ -955,7 +964,7 @@ class _VechileInformationState extends State<VechileInformation> {
                               padding: const EdgeInsets.only(top: 24.0),
                               child: GestureDetector(
                                 onTap: () {
-                                  if (addNoteController.text.isEmpty) {
+                                  if (addNoteController.text.trim().isEmpty) {
                                     newSetState(() {
                                       addNoteErrorStatus = true;
                                       addNoteErrorMessage =

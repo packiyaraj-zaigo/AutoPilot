@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:auto_pilot/Models/parts_model.dart';
+import 'package:auto_pilot/Models/parts_notes_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_event.dart';
-import 'package:auto_pilot/bloc/parts_model/parts_state.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_event.dart';
+import 'package:auto_pilot/bloc/parts_bloc/parts_state.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,9 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
     on<EditPartEvent>(editPartEvent);
     on<ChangeQuantity>(changeQuantity);
     on<DeletePart>(deletePart);
+    on<GetPartsNotesEvent>(getPartsNoteBloc);
+    on<DeletePartsNoteEvent>(deletePartsNoteBloc);
+    on<AddPartsNoteEvent>(addPartsNoteBloc);
   }
 
   Future<void> deletePart(DeletePart event, Emitter<PartsState> emit) async {
@@ -180,6 +184,75 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
     } catch (e) {
       emit(PartsDetailsErrorState(message: 'Something went wrong'));
       isPartsLoading = false;
+    }
+  }
+
+  Future<void> getPartsNoteBloc(
+    GetPartsNotesEvent event,
+    Emitter<PartsState> emit,
+  ) async {
+    try {
+      PartsNotesModel partsNotesModel;
+      emit(GetPartsNoteLoadingState());
+      final token = await AppUtils.getToken();
+
+      Response response = await apiRepo.getPartsNotes(token, event.partsId);
+      log(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        partsNotesModel = partsNotesModelFromJson(response.body);
+        emit(GetPartsNoteState(partsNotesModel: partsNotesModel));
+      } else {
+        emit(GetPartsNoteErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s.toString());
+      emit(GetPartsNoteErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  Future<void> deletePartsNoteBloc(
+    DeletePartsNoteEvent event,
+    Emitter<PartsState> emit,
+  ) async {
+    try {
+      emit(DeletePartLoadingState());
+      final token = await AppUtils.getToken();
+
+      Response response = await apiRepo.deletePartsNote(token, event.partsId);
+      log(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(DeletePartsNoteState());
+      } else {
+        emit(DeletePartsNoteErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s.toString());
+      emit(DeletePartsNoteErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  Future<void> addPartsNoteBloc(
+    AddPartsNoteEvent event,
+    Emitter<PartsState> emit,
+  ) async {
+    try {
+      emit(AddPartsNoteLoadingState());
+      final token = await AppUtils.getToken();
+
+      Response response =
+          await apiRepo.addPartsNote(token, event.partsId, event.notes);
+      log(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(AddPartsNoteState());
+      } else {
+        emit(AddPartsNoteErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s.toString());
+      emit(AddPartsNoteErrorState(errorMessage: "Something went wrong"));
     }
   }
 }

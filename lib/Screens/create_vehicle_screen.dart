@@ -53,6 +53,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   final TextEditingController makeController = TextEditingController();
   final TextEditingController typeController = TextEditingController();
   final TextEditingController customerController = TextEditingController();
+  final TextEditingController mileageController = TextEditingController();
 
   bool yearErrorStaus = false;
   bool modelErrorStatus = false;
@@ -66,6 +67,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   bool makeErrorStatus = false;
   bool customerErrorStatus = false;
   bool isChecked = false;
+  bool mileageErrorStatus = false;
 
   bool isVechileLoading = false;
 
@@ -79,6 +81,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
   String licErrorMsg = '';
   String engineErrorMsg = '';
   String customerErrorMsg = '';
+  String mileageErrorMsg = "";
 
   final List<Datum> vechile = [];
 
@@ -102,6 +105,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
     makeController.text = widget.editVehicle!.vehicleMake;
     modelController.text = widget.editVehicle!.vehicleModel;
     subModelController.text = widget.editVehicle!.subModel ?? "";
+    mileageController.text = widget.editVehicle!.kilometers ?? "";
     engineController.text = widget.editVehicle!.engineSize ?? "";
     colorController.text = widget.editVehicle!.vehicleColor ?? "";
     licController.text = widget.editVehicle!.licencePlate ?? "";
@@ -426,12 +430,20 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                                                   //     makeController,
                                                   //     "Make",
                                                   //     makeErrorStatus),
+
+                                                  textBox(
+                                                    "Enter Mileage",
+                                                    mileageController,
+                                                    "Mileage",
+                                                    mileageErrorStatus,
+                                                  ),
                                                   textBox(
                                                     "Enter Color",
                                                     colorController,
                                                     "Color",
                                                     colorErrorStatus,
                                                   ),
+
                                                   textBox(
                                                       "Enter Number",
                                                       licController,
@@ -617,35 +629,35 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
           if (widget.editVehicle != null) {
             scaffoldKey.currentContext!.read<VechileBloc>().add(
                   EditVehicleEvent(
-                    id: widget.editVehicle!.id.toString(),
-                    email: nameController.text,
-                    year: yearController.text,
-                    model: modelController.text,
-                    submodel: subModelController.text,
-                    engine: engineController.text,
-                    color: colorController.text,
-                    vinNumber: vinController.text,
-                    licNumber: licController.text,
-                    make: makeController.text,
-                    type: typeController.text,
-                    customerId: customerId.toString(),
-                  ),
+                      id: widget.editVehicle!.id.toString(),
+                      email: nameController.text,
+                      year: yearController.text,
+                      model: modelController.text,
+                      submodel: subModelController.text,
+                      engine: engineController.text,
+                      color: colorController.text,
+                      vinNumber: vinController.text,
+                      licNumber: licController.text,
+                      make: makeController.text,
+                      type: typeController.text,
+                      customerId: customerId.toString(),
+                      mileage: mileageController.text),
                 );
           } else {
             scaffoldKey.currentContext!.read<VechileBloc>().add(
                   AddVechile(
-                    email: nameController.text,
-                    year: yearController.text,
-                    model: modelController.text,
-                    submodel: subModelController.text,
-                    engine: engineController.text,
-                    color: colorController.text,
-                    vinNumber: vinController.text,
-                    licNumber: licController.text,
-                    make: makeController.text,
-                    type: typeController.text,
-                    customerId: customerId.toString(),
-                  ),
+                      email: nameController.text,
+                      year: yearController.text,
+                      model: modelController.text,
+                      submodel: subModelController.text,
+                      engine: engineController.text,
+                      color: colorController.text,
+                      vinNumber: vinController.text,
+                      licNumber: licController.text,
+                      make: makeController.text,
+                      type: typeController.text,
+                      customerId: customerId.toString(),
+                      mileage: mileageController.text),
                 );
           }
         }
@@ -713,7 +725,11 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
               inputFormatters: label == "Year"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : null,
-              keyboardType: label == 'Year' ? TextInputType.number : null,
+              keyboardType: label == 'Year'
+                  ? TextInputType.number
+                  : label == "Mileage"
+                      ? const TextInputType.numberWithOptions(decimal: true)
+                      : null,
               maxLength: label == 'Year'
                   ? 4
                   : label == "Make" || label == "Model" || label == "Sub-Model"

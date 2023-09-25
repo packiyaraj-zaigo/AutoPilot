@@ -314,25 +314,29 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.greyText),
                           ))
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              material.isEmpty
-                                  ? const SizedBox()
-                                  : itemTile(material, 'Material'),
-                              part.isEmpty
-                                  ? const SizedBox()
-                                  : itemTile(part, 'Part'),
-                              labor.isEmpty
-                                  ? const SizedBox()
-                                  : itemTile(labor, 'Labor'),
-                              subContract.isEmpty
-                                  ? const SizedBox()
-                                  : itemTile(subContract, 'Sub Contract'),
-                              fee.isEmpty
-                                  ? const SizedBox()
-                                  : itemTile(fee, 'Fee'),
-                            ],
+                        : Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  material.isEmpty
+                                      ? const SizedBox()
+                                      : itemTile(material, 'Material'),
+                                  part.isEmpty
+                                      ? const SizedBox()
+                                      : itemTile(part, 'Part'),
+                                  labor.isEmpty
+                                      ? const SizedBox()
+                                      : itemTile(labor, 'Labor'),
+                                  subContract.isEmpty
+                                      ? const SizedBox()
+                                      : itemTile(subContract, 'Sub Contract'),
+                                  fee.isEmpty
+                                      ? const SizedBox()
+                                      : itemTile(fee, 'Fee'),
+                                ],
+                              ),
+                            ),
                           )
               ],
             ),
@@ -359,6 +363,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
             ),
             ListView.builder(
               shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
               itemCount: cannedServiceItem.length,
               itemBuilder: (context, index) {
                 final item = cannedServiceItem[index];
