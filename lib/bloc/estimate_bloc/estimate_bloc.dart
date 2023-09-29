@@ -1126,7 +1126,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
             vendors.add(VendorResponseModel.fromJson(vendor));
           });
         }
-        emit(GetAllVendorsSuccessState(vendors: vendors));
+        emit(GetAllVendorsSuccessEstimateState(vendors: vendors));
 
         if (totalPages > currentPage && currentPage != 0) {
           currentPage += 1;

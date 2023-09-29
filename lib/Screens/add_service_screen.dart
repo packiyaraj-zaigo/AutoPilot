@@ -965,7 +965,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           label == 'Discount' ||
                           label == 'Cost' ||
                           label == 'Cost ' ||
-                          label == 'Price'
+                          label == 'Price' ||
+                          label == "Labor Tax"
                       ? const TextInputType.numberWithOptions(decimal: true)
                       : null,
               inputFormatters: label == "Hours" ||
@@ -978,7 +979,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       label == 'Price ' ||
                       label == "Quantity " ||
                       label == "Quantity" ||
-                      label == "Base Cost"
+                      label == "Base Cost" ||
+                      label == "Labor Tax"
                   ? [NumberInputFormatter()]
                   : [],
               maxLength: label == 'Cost' ||
@@ -2390,6 +2392,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         TextEditingController(text: item?.quanityHours ?? '1');
     final addLaborBaseCostController =
         TextEditingController(text: client?.baseLaborCost ?? '');
+    final addLaborTaxController =
+        TextEditingController(text: item?.tax ?? client?.laborTaxRate ?? '');
 
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
@@ -2398,6 +2402,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     String addLaborDiscountErrorStatus = '';
     String addLaborHoursErrorStatus = '';
     String addLaborBaseCostStatus = '';
+    String addLaborTaxStatus = '';
 
     double subTotal = 0;
     double total = 0;
@@ -2578,6 +2583,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           newSetState),
                     ),
                     ErrorWidget(error: addLaborBaseCostStatus),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 17.0),
+                      child: textBox(
+                          "Amount",
+                          addLaborTaxController,
+                          "Labor Tax",
+                          addLaborTaxStatus.isNotEmpty,
+                          context,
+                          true,
+                          newSetState),
+                    ),
+                    ErrorWidget(error: addLaborTaxStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(

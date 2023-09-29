@@ -1009,7 +1009,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           label == 'Price' ||
                           label == 'Tax' ||
                           label == 'Price ' ||
-                          label == "Base Cost"
+                          label == "Base Cost" ||
+                          label == "Labor Tax"
                       ? TextInputType.numberWithOptions(decimal: true)
                       : null,
               inputFormatters: label == "Hours" ||
@@ -1021,7 +1022,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == 'Price ' ||
                       label == "Quantity" ||
-                      label == "Base Cost"
+                      label == "Base Cost" ||
+                      label == "Labor Tax"
                   ? [NumberInputFormatter()]
                   : [],
               maxLength: label == "Service Name"
@@ -2310,8 +2312,10 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
         TextEditingController(text: item?.discount ?? '0');
     final addLaborHoursController =
         TextEditingController(text: item?.quanityHours ?? '1');
-    final addLaborBaseCostController =
-        TextEditingController(text: client?.baseLaborCost ?? '');
+    final addLaborBaseCostController = TextEditingController(
+        text: item?.unitPrice ?? client?.baseLaborCost ?? '');
+    final addLaborTaxController =
+        TextEditingController(text: item?.tax ?? client?.laborTaxRate ?? '');
 
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
@@ -2320,6 +2324,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String addLaborDiscountErrorStatus = '';
     String addLaborHoursErrorStatus = '';
     String addLaborBaseCostStatus = '';
+    String addLaborTaxStatus = '';
 
     double subTotal = 0;
     double total = 0;
@@ -2372,7 +2377,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
       if (addLaborBaseCostController.text.isNotEmpty) {
         laborCost = ((double.tryParse(addLaborHoursController.text) ?? 1) *
             (double.tryParse(addLaborCostController.text) ?? 0));
-        if (client?.taxOnLabors == 'N') {
+        if (client?.taxOnLabors == 'N' &&
+            addLaborTaxController.text.trim().isEmpty) {
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = (double.tryParse(addLaborHoursController.text) ?? 1) *
                 (double.tryParse(addLaborBaseCostController.text) ?? 0);
@@ -2391,7 +2397,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           }
           total = subTotal;
         } else {
-          final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
+          double tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
+          if (addLaborTaxController.text.trim().isNotEmpty) {
+            tax =
+                (double.tryParse(addLaborTaxController.text.trim()) ?? 0) / 100;
+          }
+
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
                         (double.tryParse(addLaborBaseCostController.text) ??
@@ -2498,6 +2509,18 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           newSetState),
                     ),
                     errorWidget(error: addLaborBaseCostStatus),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 17.0),
+                      child: textBox(
+                          "Amount",
+                          addLaborTaxController,
+                          "Labor Tax",
+                          addLaborTaxStatus.isNotEmpty,
+                          context,
+                          false,
+                          newSetState),
+                    ),
+                    errorWidget(error: addLaborTaxStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2679,6 +2702,11 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                       : "Fixed",
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
+                                  tax: (double.tryParse(addLaborTaxController
+                                              .text
+                                              .trim()) ??
+                                          0.0)
+                                      .toStringAsFixed(2),
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: laborCost.toStringAsFixed(2));
                               if (item.id != '') {
@@ -2703,6 +2731,11 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                           .isEmpty
                                       ? "0"
                                       : addLaborDiscountController.text.trim(),
+                                  tax: (double.tryParse(addLaborTaxController
+                                              .text
+                                              .trim()) ??
+                                          0.0)
+                                      .toStringAsFixed(2),
                                   discountType: isPercentage &&
                                           addLaborDiscountController
                                               .text.isNotEmpty
