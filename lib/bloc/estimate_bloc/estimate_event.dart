@@ -11,7 +11,6 @@ class GetEstimateEvent extends EstimateEvent {
   final String orderStatus;
   const GetEstimateEvent({required this.orderStatus});
 }
-
 class CreateEstimateEvent extends EstimateEvent {
   final String id;
   final String which;

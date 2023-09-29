@@ -74,7 +74,7 @@ class CannedServiceAddModel {
         "item_service_note": note,
         "part_name": part,
         "is_tax": tax,
-        "vendor_id": vendorId,
+        "vendor_id": vendorId ?? 0,
         "markup": cost
       };
 }

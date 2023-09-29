@@ -90,6 +90,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
   final countryPicker = const FlCountryCodePicker();
   List<String> tagDataList = [];
   List<String> deletedItems = [];
+  final List<CannedServiceAddModel> editedItems = [];
 
   ClientModel? client;
 
@@ -147,7 +148,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           child: BlocProvider(
             create: (context) => ServiceBloc()
               ..add(GetClientByIdEvent())
-              ..add(GetTechnicianEvent()),
+              ..add(GetTechnicianEvent())
+              ..add(GetAllVendorsEvent()),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
                 if (state is EditOrderServiceSuccessState) {
@@ -166,6 +168,14 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
                   CommonWidgets().showDialog(context, state.message);
                 }
+                if (state is GetAllVendorsSuccessState) {
+                  if (context.read<ServiceBloc>().currentPage == 2 ||
+                      context.read<ServiceBloc>().currentPage == 1) {
+                    vendors.clear();
+                  }
+                  vendors.addAll(state.vendors);
+                }
+
                 if (state is CreateCannedOrderServiceErrorState) {
                   CommonWidgets().showDialog(context, state.message);
                 }
@@ -384,51 +394,68 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = material[index];
-                          return Column(
-                            children: [
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  // const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
-                                          style: const TextStyle(
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content: addMaterialPopup(
+                                        item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                          style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          material.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                            ],
+                                    ),
+                                    // const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            material.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -440,51 +467,68 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = part[index];
-                          return Column(
-                            children: [
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content:
+                                        addPartPopup(item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          part.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            part.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -495,51 +539,68 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = labor[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content:
+                                        addLaborPopup(item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          labor.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            labor.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -550,51 +611,68 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = subContract[index];
-                          return Column(
-                            children: [
-                              SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content: addSubContractPopup(
+                                        item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          subContract.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            subContract.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -605,50 +683,67 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         physics: ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = fee[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content: addMaterialPopup(
+                                        item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          fee.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            fee.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -748,6 +843,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                                   (element) => element.id == '')
                                               .toList(),
                                       deletedItems: deletedItems,
+                                      editedItems: editedItems,
                                       technicianId: technicianId),
                                 );
                                 log(deletedItems.toString());
@@ -1134,15 +1230,20 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     );
   }
 
-  addMaterialPopup() {
+  addMaterialPopup({CannedServiceAddModel? item, int? index}) {
     //Add material popup controllers
-    final addMaterialNameController = TextEditingController();
-    final addMaterialDescriptionController = TextEditingController();
-    final addMaterialPriceController = TextEditingController();
-    final addMaterialCostController = TextEditingController();
-    final addMaterialDiscountController = TextEditingController(text: '0');
-    final addMaterialBatchController = TextEditingController();
-    final addMaterialQuantityController = TextEditingController(text: '1');
+    final addMaterialNameController =
+        TextEditingController(text: item?.itemName);
+    final addMaterialDescriptionController =
+        TextEditingController(text: item?.note);
+    final addMaterialPriceController =
+        TextEditingController(text: item?.unitPrice);
+    final addMaterialQuantityController =
+        TextEditingController(text: item?.quanityHours ?? '1');
+    final addMaterialCostController = TextEditingController(text: item?.cost);
+    final addMaterialDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+    final addMaterialBatchController = TextEditingController(text: item?.part);
 
     //Add material errorstatus and error message variables
     String adddMaterialNameErrorStatus = '';
@@ -1619,7 +1720,10 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                           onPressed: () {
                             final status = addMaterialValidation(newSetState);
                             if (status) {
-                              material.add(CannedServiceAddModel(
+                              FocusNode().requestFocus();
+                              if (index != null) {
+                                material[index] = CannedServiceAddModel(
+                                  id: item!.id,
                                   cannedServiceId: int.parse(serviceId),
                                   note: addMaterialDescriptionController.text,
                                   part: addMaterialBatchController.text,
@@ -1640,10 +1744,45 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                       addMaterialQuantityController.text.trim(),
                                   itemType: "Material",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  tax: client!.taxOnMaterial == "Y"
-                                      ? client!.materialTaxRate ?? '0'
-                                      : '0',
-                                  cost: materialCost.toStringAsFixed(2)));
+                                  cost: materialCost.toStringAsFixed(2),
+                                );
+                                if (item.id != '') {
+                                  final ind = editedItems.indexWhere(
+                                      (element) => element.id == item.id);
+                                  if (ind != -1) {
+                                    editedItems[index] = material[index];
+                                  } else {
+                                    editedItems.add(material[index]);
+                                  }
+                                }
+                              } else {
+                                material.add(CannedServiceAddModel(
+                                    cannedServiceId: int.parse(serviceId),
+                                    note: addMaterialDescriptionController.text,
+                                    part: addMaterialBatchController.text,
+                                    itemName: addMaterialNameController.text,
+                                    unitPrice: addMaterialPriceController.text,
+                                    discount: addMaterialDiscountController.text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : addMaterialDiscountController.text
+                                            .trim(),
+                                    discountType: isPercentage &&
+                                            addMaterialDiscountController
+                                                .text.isNotEmpty
+                                        ? "Percentage"
+                                        : "Fixed",
+                                    quanityHours: addMaterialQuantityController
+                                        .text
+                                        .trim(),
+                                    itemType: "Material",
+                                    subTotal: subTotal.toStringAsFixed(2),
+                                    tax: client!.taxOnMaterial == "Y"
+                                        ? client!.materialTaxRate ?? '0'
+                                        : '0',
+                                    cost: materialCost.toStringAsFixed(2)));
+                              }
                               setState(() {});
                               Navigator.pop(context);
                             }
@@ -1676,27 +1815,31 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     );
   }
 
-  addPartPopup() {
+  addPartPopup({CannedServiceAddModel? item, int? index}) {
     //Add part popup controllers
-    final addPartNameController = TextEditingController();
-    final addPartDescriptionController = TextEditingController();
-    final addPartPriceController = TextEditingController();
-    final addPartCostController = TextEditingController();
-    final addPartDiscountController = TextEditingController(text: '0');
-    final addPartPartNumberController = TextEditingController();
-    final addPartQuantityController = TextEditingController(text: '1');
+    final addPartNameController = TextEditingController(text: item?.itemName);
+    final addPartDescriptionController =
+        TextEditingController(text: item?.note);
+    final addPartPriceController = TextEditingController(text: item?.unitPrice);
+    final addPartQuantityController =
+        TextEditingController(text: item?.quanityHours ?? '1');
+    final addPartCostController = TextEditingController(text: item?.cost);
+    final addPartDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+    final addPartPartNumberController = TextEditingController(text: item?.part);
 
     //Add part errorstatus and error message variables
     String addPartNameErrorStatus = '';
     String addPartDescriptionErrorStatus = '';
-    String addPartQuantityErrorStatus = '';
     String addPartPriceErrorStatus = '';
+    String addPartQuantityErrorStatus = '';
     String addPartCostErrorStatus = '';
     String addPartDiscountErrorStatus = '';
     String adddPartPartNumberErrorStatus = '';
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = item?.discountType == "Percentage" ? true : false;
     double partCost = 0;
 
     addPartValidation(StateSetter setState) {
@@ -2071,29 +2214,61 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         onPressed: () {
                           final status = addPartValidation(newSetState);
                           if (status) {
-                            part.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addPartDescriptionController.text,
-                                part: addPartPartNumberController.text,
-                                itemName: addPartNameController.text,
-                                unitPrice: addPartPriceController.text,
-                                quanityHours: addPartQuantityController.text,
-                                discount: addPartDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addPartDiscountController.text.trim(),
-                                discountType: isPercentage &&
-                                        addPartDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-                                itemType: "Part",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                tax: client!.taxOnParts == "Y"
-                                    ? client!.salesTaxRate ?? '0'
-                                    : '0',
-                                cost: partCost.toStringAsFixed(2)));
+                            FocusNode().requestFocus();
+
+                            if (index != null) {
+                              part[index] = CannedServiceAddModel(
+                                  id: item!.id,
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addPartDescriptionController.text,
+                                  part: addPartPartNumberController.text,
+                                  itemName: addPartNameController.text,
+                                  unitPrice: addPartPriceController.text,
+                                  discount: addPartDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addPartDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addPartDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addPartQuantityController.text,
+                                  itemType: "Part",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: partCost.toStringAsFixed(2));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = part[index];
+                                } else {
+                                  editedItems.add(part[index]);
+                                }
+                              }
+                            } else {
+                              part.add(CannedServiceAddModel(
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addPartDescriptionController.text,
+                                  part: addPartPartNumberController.text,
+                                  itemName: addPartNameController.text,
+                                  unitPrice: addPartPriceController.text,
+                                  discount: addPartDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addPartDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addPartDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addPartQuantityController.text,
+                                  itemType: "Part",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: partCost.toStringAsFixed(2)));
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2125,13 +2300,16 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     });
   }
 
-  addLaborPopup() {
+  addLaborPopup({CannedServiceAddModel? item, int? index}) {
     //Add Labor popup controllers
-    final addLaborNameController = TextEditingController();
-    final addLaborDescriptionController = TextEditingController();
-    final addLaborCostController = TextEditingController();
-    final addLaborDiscountController = TextEditingController(text: '0');
-    final addLaborHoursController = TextEditingController(text: '1');
+    final addLaborNameController = TextEditingController(text: item?.itemName);
+    final addLaborDescriptionController =
+        TextEditingController(text: item?.note);
+    final addLaborCostController = TextEditingController(text: item?.cost);
+    final addLaborDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+    final addLaborHoursController =
+        TextEditingController(text: item?.quanityHours ?? '1');
     final addLaborBaseCostController =
         TextEditingController(text: client?.baseLaborCost ?? '');
 
@@ -2145,6 +2323,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
+    bool isPercentage = item?.discountType == "Percentage" ? true : false;
     double laborCost = 0;
 
     addLaborValidation(StateSetter setState) {
@@ -2477,30 +2656,63 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         onPressed: () {
                           final status = addLaborValidation(newSetState);
                           if (status) {
-                            labor.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addLaborDescriptionController.text,
-                                // part: addLaborLaborNumberController.text,
-                                part: '',
-                                itemName: addLaborNameController.text,
-                                unitPrice: addLaborBaseCostController.text,
-                                discount: addLaborDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addLaborDiscountController.text.trim(),
-                                discountType: isPercentage &&
-                                        addLaborDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-                                quanityHours: addLaborHoursController.text,
-                                itemType: "Labor",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                tax: client!.taxOnLabors == "Y"
-                                    ? client!.laborTaxRate ?? '0'
-                                    : '0',
-                                cost: laborCost.toStringAsFixed(2)));
+                            FocusNode().requestFocus();
+
+                            if (index != null) {
+                              labor[index] = CannedServiceAddModel(
+                                  id: item!.id,
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addLaborDescriptionController.text,
+                                  // part: addLaborLaborNumberController.text,
+                                  part: '',
+                                  itemName: addLaborNameController.text,
+                                  unitPrice: addLaborBaseCostController.text,
+                                  discount: addLaborDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addLaborDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addLaborDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addLaborHoursController.text,
+                                  itemType: "Labor",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: laborCost.toStringAsFixed(2));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = labor[index];
+                                } else {
+                                  editedItems.add(labor[index]);
+                                }
+                              }
+                            } else {
+                              labor.add(CannedServiceAddModel(
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addLaborDescriptionController.text,
+                                  // part: addLaborLaborNumberController.text,
+                                  part: '',
+                                  itemName: addLaborNameController.text,
+                                  unitPrice: addLaborBaseCostController.text,
+                                  discount: addLaborDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addLaborDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addLaborDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addLaborHoursController.text,
+                                  itemType: "Labor",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: laborCost.toStringAsFixed(2)));
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2532,12 +2744,12 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     });
   }
 
-  addFeePopup() {
+  addFeePopup({CannedServiceAddModel? item, int? index}) {
     //Add Fee popup controllers
-    final addFeeNameController = TextEditingController();
-    final addFeeDescriptionController = TextEditingController();
-    final addFeeCostController = TextEditingController();
-    final addFeePriceController = TextEditingController();
+    final addFeeNameController = TextEditingController(text: item?.itemName);
+    final addFeeDescriptionController = TextEditingController(text: item?.note);
+    final addFeeCostController = TextEditingController(text: item?.cost);
+    final addFeePriceController = TextEditingController(text: item?.unitPrice);
 
     //Add Fee errorstatus and error message variables
     String addFeeNameErrorStatus = '';
@@ -2769,20 +2981,43 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         onPressed: () {
                           final status = addFeeValidation(newSetState);
                           if (status) {
-                            fee.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addFeeDescriptionController.text,
-                                // part: addFeeFeeNumberController.text,
-                                part: '',
-                                itemName: addFeeNameController.text,
-                                discount: '0',
-                                unitPrice: addFeePriceController.text,
-                                itemType: "Fee",
-                                tax: client!.taxOnLabors == "Y"
-                                    ? client!.laborTaxRate ?? '0'
-                                    : '0',
-                                subTotal: subTotal.toStringAsFixed(2),
-                                cost: feeCost.toStringAsFixed(2)));
+                            FocusNode().requestFocus();
+                            if (index != null) {
+                              fee[index] = CannedServiceAddModel(
+                                  id: item!.id,
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addFeeDescriptionController.text,
+                                  // part: addFeeFeeNumberController.text,
+                                  part: '',
+                                  itemName: addFeeNameController.text,
+                                  discount: '0',
+                                  unitPrice: addFeePriceController.text,
+                                  itemType: "Fee",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: feeCost.toStringAsFixed(2));
+
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = fee[index];
+                                } else {
+                                  editedItems.add(fee[index]);
+                                }
+                              }
+                            } else {
+                              fee.add(CannedServiceAddModel(
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addFeeDescriptionController.text,
+                                  // part: addFeeFeeNumberController.text,
+                                  part: '',
+                                  itemName: addFeeNameController.text,
+                                  discount: '0',
+                                  unitPrice: addFeePriceController.text,
+                                  itemType: "Fee",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: feeCost.toStringAsFixed(2)));
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2814,14 +3049,26 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     });
   }
 
-  addSubContractPopup() {
+  addSubContractPopup({CannedServiceAddModel? item, int? index}) {
     //Add SubContract popup controllers
-    final addSubContractNameController = TextEditingController();
-    final addSubContractDescriptionController = TextEditingController();
-    final addSubContractCostController = TextEditingController();
-    final addSubContractPriceController = TextEditingController();
-    final addSubContractDiscountController = TextEditingController(text: '0');
+    final addSubContractNameController =
+        TextEditingController(text: item?.itemName);
+    final addSubContractDescriptionController =
+        TextEditingController(text: item?.note);
+    final addSubContractCostController =
+        TextEditingController(text: item?.cost);
+    final addSubContractPriceController =
+        TextEditingController(text: item?.unitPrice);
+    final addSubContractDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
     final addSubContractVendorController = TextEditingController();
+
+    final vendor =
+        vendors.where((element) => element.id == item?.vendorId).toList();
+    if (vendor.isNotEmpty) {
+      addSubContractVendorController.text = vendor[0].vendorName.toString();
+      vendorId = vendor[0].id;
+    }
 
     //Add SubContract errorstatus and error message variables
     String addSubContractNameErrorStatus = '';
@@ -3175,18 +3422,16 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                         onPressed: () {
                           final status = addSubContractValidation(newSetState);
                           if (status) {
-                            subContract.add(
-                              CannedServiceAddModel(
+                            FocusNode().requestFocus();
+                            if (index != null) {
+                              subContract[index] = CannedServiceAddModel(
+                                  id: item!.id,
                                   cannedServiceId: int.parse(serviceId),
                                   note:
                                       addSubContractDescriptionController.text,
                                   // part: addSubContractSubContractNumberController.text,
                                   part: '',
                                   itemName: addSubContractNameController.text,
-                                  // discount: addSubContractDiscountController.text,
-                                  //tax: isTax == true ? 'Y' : 'N',
-                                  vendorId: vendorId,
-                                  unitPrice: addSubContractPriceController.text,
                                   discount: addSubContractDiscountController
                                           .text
                                           .trim()
@@ -3199,13 +3444,51 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                               .text.isNotEmpty
                                       ? "Percentage"
                                       : "Fixed",
+                                  tax: isTax == true ? 'Y' : 'N',
+                                  vendorId: vendorId,
+                                  unitPrice: addSubContractPriceController.text,
                                   itemType: "SubContract",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  tax: client!.taxOnLabors == "Y"
-                                      ? client!.laborTaxRate ?? '0'
-                                      : '0',
-                                  cost: subContractCost.toStringAsFixed(2)),
-                            );
+                                  cost: subContractCost.toStringAsFixed(2));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = subContract[index];
+                                } else {
+                                  editedItems.add(subContract[index]);
+                                }
+                              }
+                            } else {
+                              subContract.add(
+                                CannedServiceAddModel(
+                                    cannedServiceId: int.parse(serviceId),
+                                    note: addSubContractDescriptionController
+                                        .text,
+                                    // part: addSubContractSubContractNumberController.text,
+                                    part: '',
+                                    itemName: addSubContractNameController.text,
+                                    discount: addSubContractDiscountController
+                                            .text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : addSubContractDiscountController.text
+                                            .trim(),
+                                    discountType: isPercentage &&
+                                            addSubContractDiscountController
+                                                .text.isNotEmpty
+                                        ? "Percentage"
+                                        : "Fixed",
+                                    tax: isTax == true ? 'Y' : 'N',
+                                    vendorId: vendorId,
+                                    unitPrice:
+                                        addSubContractPriceController.text,
+                                    itemType: "SubContract",
+                                    subTotal: subTotal.toStringAsFixed(2),
+                                    cost: subContractCost.toStringAsFixed(2)),
+                              );
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }

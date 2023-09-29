@@ -110,8 +110,8 @@ class ApiProvider {
     try {
       var url = Uri.parse("${BASE_URL}api/dashboard");
       var request = http.MultipartRequest("Get", url);
-
       request.headers.addAll(getHeader(token));
+      log('Inside revenue chart ');
       var response = await request.send();
       inspect(response);
       print(response.statusCode.toString() + "provider status code");
@@ -1875,6 +1875,38 @@ class ApiProvider {
 
       final response = await http.put(url,
           headers: getHeader(token), body: json.encode(model.toJson()));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
+    }
+  }
+
+  Future<dynamic> editCannedOrderServiceItems(String token,
+      CannedServiceAddModel model, String id, String serviceId) async {
+    try {
+      final map = model.toJson();
+      map['canned_service_id'] = serviceId;
+
+      final url = Uri.parse('${BASE_URL}api/canned_service_items/$id');
+
+      final response = await http.put(url,
+          headers: getHeader(token), body: json.encode(map));
+      return response;
+    } catch (e) {
+      log(e.toString() + " Create canned order service api error");
+    }
+  }
+
+  Future<dynamic> editOrderServiceItems(String token,
+      CannedServiceAddModel model, String id, String serviceId) async {
+    try {
+      final map = model.toJson();
+      map['order_service_id'] = serviceId;
+
+      final url = Uri.parse('${BASE_URL}api/order_service_items/$id');
+
+      final response = await http.put(url,
+          headers: getHeader(token), body: json.encode(map));
       return response;
     } catch (e) {
       log(e.toString() + " Create canned order service api error");

@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
@@ -10,11 +9,11 @@ import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+// ignore: depend_on_referenced_packages
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 
 part 'service_event.dart';
 part 'service_state.dart';
@@ -50,7 +49,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       final response = await apiRepo.createVendor(
           clientId, event.name, event.email, event.contactPerson, token);
       if (response.statusCode == 200 || response.statusCode == 201) {
-        log(response.body);
         final decodedBody = json.decode(response.body);
         emit(CreateVendorSuccessState(
             vendorId: decodedBody['created_id'].toString()));
@@ -63,8 +61,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
         }
       }
     } catch (e) {
-      log(e.toString() + "Create vendor event");
-      emit(CreateVendorErrorState(message: "Something went wrong"));
+      emit(const CreateVendorErrorState(message: "Something went wrong"));
     }
   }
 
@@ -102,15 +99,13 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       final response = await apiRepo.getClientByClientId();
       if (response.statusCode == 200) {
         final body = await jsonDecode(response.body);
-        log(body.toString());
         emit(GetClientSuccessState(
             client: ClientModel.fromJson(body['client'])));
       } else {
-        emit(GetClientErrorState(message: 'Something went wrong'));
+        emit(const GetClientErrorState(message: 'Something went wrong'));
       }
-    } catch (e, s) {
-      log(s.toString() + " Get client bloc error");
-      emit(GetClientErrorState(message: 'Something went wrong'));
+    } catch (e) {
+      emit(const GetClientErrorState(message: 'Something went wrong'));
     }
   }
 
@@ -124,22 +119,19 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       bool laborDone = true;
       bool subcontractDone = true;
       bool feeDone = true;
-      bool deleteDone = true;
       emit(EditCannedServiceLoadingState());
       final token = await AppUtils.getToken();
       final Response serviceCreateResponse =
           await apiRepo.editCannedOrderService(token, event.service, event.id);
 
-      log(serviceCreateResponse.body.toString());
-
       if (serviceCreateResponse.statusCode == 200 ||
           serviceCreateResponse.statusCode == 201) {
         serviceId = int.parse(event.id);
         if (event.material != null && event.material!.isNotEmpty) {
+          // ignore: avoid_function_literals_in_foreach_calls
           event.material!.forEach((material) async {
             final Response materialResponse = await apiRepo
                 .createCannedOrderServiceItem(token, material, serviceId);
-            log(materialResponse.body.toString());
             if (materialResponse.statusCode == 200 ||
                 materialResponse.statusCode == 201) {
             } else {
@@ -191,15 +183,42 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
             }
           }
         }
-        if (event.deletedItems!.isNotEmpty) {
+        if ((event.deletedItems ?? []).isNotEmpty) {
           for (var element in event.deletedItems!) {
-            final Response deleteResponse =
-                await apiRepo.deleteCannedServiceItem(token, element);
-            log(deleteResponse.body);
-            if (deleteResponse.statusCode == 200 ||
-                deleteResponse.statusCode == 201) {
-            } else {
-              deleteDone = false;
+            await apiRepo.deleteCannedServiceItem(token, element);
+          }
+        }
+        if ((event.editedItems ?? []).isNotEmpty) {
+          for (var element in event.editedItems!) {
+            try {
+              final Response editResponse =
+                  await apiRepo.editCannedOrderServiceItems(
+                      token, element, element.id, event.id);
+              if (editResponse.statusCode != 200) {
+                if (element.itemType == "Material") {
+                  materialDone = false;
+                } else if (element.itemType == 'Part') {
+                  partDone = false;
+                } else if (element.itemType == 'Labor') {
+                  laborDone = false;
+                } else if (element.itemType == "Fee") {
+                  feeDone = false;
+                } else if (element.itemType == 'SubContract') {
+                  subcontractDone = false;
+                }
+              }
+            } catch (e) {
+              if (element.itemType == "Material") {
+                materialDone = false;
+              } else if (element.itemType == 'Part') {
+                partDone = false;
+              } else if (element.itemType == 'Labor') {
+                laborDone = false;
+              } else if (element.itemType == "Fee") {
+                feeDone = false;
+              } else if (element.itemType == 'SubContract') {
+                subcontractDone = false;
+              }
             }
           }
         }
@@ -238,8 +257,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           }
           errorMessage += ' Fee';
         }
-        log(message);
-        log(errorMessage);
         if (errorMessage !=
             'Service Updated\nBut Something Went Wrong with\n') {
           message = errorMessage;
@@ -251,7 +268,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
             message: 'Something went wrong'));
       }
     } catch (e) {
-      log("$e Create service bloc error");
       emit(const EditCannedServiceErrorState(message: "Something went wrong"));
     }
   }
@@ -266,22 +282,19 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       bool laborDone = true;
       bool subcontractDone = true;
       bool feeDone = true;
-      bool deleteDone = true;
       emit(EditCannedServiceLoadingState());
       final token = await AppUtils.getToken();
       final Response serviceCreateResponse = await apiRepo.editOrderService(
           token, event.service, event.id, event.technicianId);
 
-      log(serviceCreateResponse.body.toString());
-
       if (serviceCreateResponse.statusCode == 200 ||
           serviceCreateResponse.statusCode == 201) {
         serviceId = int.parse(event.id);
         if (event.material != null && event.material!.isNotEmpty) {
+          // ignore: avoid_function_literals_in_foreach_calls
           event.material!.forEach((material) async {
             final Response materialResponse =
                 await apiRepo.editOrderServiceItem(token, material, serviceId);
-            log(materialResponse.body.toString());
             if (materialResponse.statusCode == 200 ||
                 materialResponse.statusCode == 201) {
             } else {
@@ -337,11 +350,42 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           for (var element in event.deletedItems!) {
             final Response deleteResponse =
                 await apiRepo.deleteOrderServiceItem(token, element);
-            log(deleteResponse.body);
             if (deleteResponse.statusCode == 200 ||
                 deleteResponse.statusCode == 201) {
-            } else {
-              deleteDone = false;
+            } else {}
+          }
+        }
+        if ((event.editedItems ?? []).isNotEmpty) {
+          for (var element in event.editedItems!) {
+            try {
+              final Response editResponse = await apiRepo.editOrderServiceItems(
+                  token, element, element.id, event.id);
+              log(editResponse.body);
+              if (editResponse.statusCode != 200) {
+                if (element.itemType == "Material") {
+                  materialDone = false;
+                } else if (element.itemType == 'Part') {
+                  partDone = false;
+                } else if (element.itemType == 'Labor') {
+                  laborDone = false;
+                } else if (element.itemType == "Fee") {
+                  feeDone = false;
+                } else if (element.itemType == 'SubContract') {
+                  subcontractDone = false;
+                }
+              }
+            } catch (e) {
+              if (element.itemType == "Material") {
+                materialDone = false;
+              } else if (element.itemType == 'Part') {
+                partDone = false;
+              } else if (element.itemType == 'Labor') {
+                laborDone = false;
+              } else if (element.itemType == "Fee") {
+                feeDone = false;
+              } else if (element.itemType == 'SubContract') {
+                subcontractDone = false;
+              }
             }
           }
         }
@@ -380,8 +424,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           }
           errorMessage += ' Fee';
         }
-        log(message);
-        log(errorMessage);
         if (errorMessage !=
             'Service Updated\nBut Something Went Wrong with\n') {
           message = errorMessage;
@@ -393,7 +435,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
             message: 'Something went wrong'));
       }
     } catch (e) {
-      log("$e Create service bloc error");
       emit(const EditCannedServiceErrorState(message: "Something went wrong"));
     }
   }
@@ -415,7 +456,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
             DeleteCannedServiceErrorState(message: body['message'].toString()));
       }
     } catch (e) {
-      log(e.toString() + " Delete Canned Service bloc error");
       emit(
           const DeleteCannedServiceErrorState(message: 'Something went wrong'));
     }
@@ -430,7 +470,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       var token = prefs.getString(AppConstants.USER_TOKEN);
       Response getProvinceRes =
           await apiRepo.getAllVendors(token!, currentPage);
-      log("res${getProvinceRes.body}");
       final body = jsonDecode(getProvinceRes.body);
       if (getProvinceRes.statusCode == 200) {
         List<VendorResponseModel> vendors = [];
@@ -451,7 +490,7 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
         }
       }
     } catch (e) {
-      log(e.toString() + " Vendors pagenation bloc error");
+      emit(const GetAllVendorsErrorState(message: 'Something went wrong'));
     }
   }
 
@@ -478,18 +517,14 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           if (currentPage <= totalPages) {
             currentPage++;
           }
-          print(value.body.toString());
         } else {
-          log(value.body.toString());
           final body = jsonDecode(value.body);
           emit(ServiceDetailsErrorState(message: body['message']));
         }
         isEmployeesLoading = false;
         isPagenationLoading = false;
       });
-    } catch (e, s) {
-      print(e.toString());
-      print(s);
+    } catch (e) {
       emit(ServiceDetailsErrorState(message: e.toString()));
       isEmployeesLoading = false;
       isPagenationLoading = false;
@@ -533,8 +568,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
       final Response serviceCreateResponse =
           await apiRepo.createCannedOrderService(token, event.service);
 
-      log(serviceCreateResponse.body.toString());
-
       if (serviceCreateResponse.statusCode == 200 ||
           serviceCreateResponse.statusCode == 201) {
         final body = jsonDecode(serviceCreateResponse.body);
@@ -543,7 +576,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           event.material!.forEach((material) async {
             final Response materialResponse = await apiRepo
                 .createCannedOrderServiceItem(token, material, serviceId);
-            log(materialResponse.body.toString());
             if (materialResponse.statusCode == 200 ||
                 materialResponse.statusCode == 201) {
             } else {
@@ -630,8 +662,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
           }
           errorMessage += ' Fee';
         }
-        log(message);
-        log(errorMessage);
         if (errorMessage !=
             'Service Created\nBut Something Went Wrong with\n') {
           message = errorMessage;
@@ -643,7 +673,6 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
             message: 'Something went wrong'));
       }
     } catch (e) {
-      log("$e Create service bloc error");
       emit(const CreateCannedOrderServiceErrorState(
           message: "Something went wrong"));
     }

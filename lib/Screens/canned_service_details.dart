@@ -1,11 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:developer';
 
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
 import 'package:auto_pilot/Screens/add_service_screen.dart';
-import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
-import 'package:auto_pilot/bloc/employee/employee_bloc.dart';
 import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -50,7 +50,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
           itemType: element.itemType,
           position: element.position,
           quanityHours: element.quanityHours,
-          note: '',
+          note: element.itemServiceNote ?? '',
         );
         if (element.itemType == 'Material') {
           material.add(item);
@@ -132,7 +132,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
             }
             if (state is DeleteCannedServiceErrorState) {
               Navigator.of(context).pop(true);
-              CommonWidgets().showDialog(context, '${state.message}');
+              CommonWidgets().showDialog(context, state.message);
             }
             if (state is DeleteCannedServiceLoadingState) {
               showDialog(
@@ -363,7 +363,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
             ),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: cannedServiceItem.length,
               itemBuilder: (context, index) {
                 final item = cannedServiceItem[index];

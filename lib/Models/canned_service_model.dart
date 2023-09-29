@@ -2,6 +2,8 @@
 //
 //     final cannedServiceModel = cannedServiceModelFromJson(jsonString);
 
+// ignore_for_file: constant_identifier_names
+
 import 'dart:convert';
 
 CannedServiceModel cannedServiceModelFromJson(String str) =>
@@ -192,7 +194,7 @@ class Datum {
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "canned_service_items":
-            List<dynamic>.from(cannedServiceItems!.map((x) => x)),
+            List<dynamic>.from(cannedServiceItems!.map((x) => x.toJson())),
       };
 }
 
