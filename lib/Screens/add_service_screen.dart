@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
@@ -12,11 +10,9 @@ import 'package:auto_pilot/bloc/service_bloc/service_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
-
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -72,6 +68,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   List<String> pricingModelList = ['Per Sqft', 'Per Roll'];
 
   String taxRateError = '';
+  // ignore: prefer_typing_uninitialized_variables
   var dropdownValue;
   String categoryError = '';
   List<Datum> technicianData = [];
@@ -80,6 +77,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   final countryPicker = const FlCountryCodePicker();
   List<String> tagDataList = [];
   List<String> deletedItems = [];
+  List<CannedServiceAddModel> editedItems = [];
 
   ClientModel? client;
 
@@ -112,7 +110,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         elevation: 0,
         title: Text(
           widget.service != null ? "Edit Service" : 'New Service',
-          style: TextStyle(color: Colors.black87, fontSize: 16),
+          style: const TextStyle(color: Colors.black87, fontSize: 16),
         ),
         centerTitle: true,
         actions: [
@@ -135,7 +133,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         child: ScrollConfiguration(
           behavior: const ScrollBehavior(),
           child: BlocProvider(
-            create: (context) => ServiceBloc()..add(GetClientByIdEvent()),
+            create: (context) => ServiceBloc()
+              ..add(GetClientByIdEvent())
+              ..add(GetAllVendorsEvent()),
             child: BlocListener<ServiceBloc, ServiceState>(
               listener: (context, state) {
                 if (state is CreateCannedOrderServiceSuccessState) {
@@ -143,19 +143,27 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     Navigator.pop(context);
                   } else {
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => ServicesListScreen(),
+                      builder: (context) => const ServicesListScreen(),
                     ));
                   }
 
                   CommonWidgets().showDialog(context, state.message);
                 }
+                if (state is GetAllVendorsSuccessState) {
+                  if (context.read<ServiceBloc>().currentPage == 2 ||
+                      context.read<ServiceBloc>().currentPage == 1) {
+                    vendors.clear();
+                  }
+                  vendors.addAll(state.vendors);
+                }
+
                 if (state is CreateCannedOrderServiceErrorState) {
                   CommonWidgets().showDialog(context, state.message);
                 }
                 if (state is EditCannedServiceSuccessState) {
                   Navigator.of(context).pop();
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => ServicesListScreen(),
+                    builder: (context) => const ServicesListScreen(),
                   ));
                   CommonWidgets().showDialog(context, state.message);
                 }
@@ -167,14 +175,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     Navigator.pop(context);
                   } else {
                     Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => ServicesListScreen(),
+                      builder: (context) => const ServicesListScreen(),
                     ));
                   }
                   CommonWidgets().showDialog(context, state.message);
                 }
                 if (state is GetClientSuccessState) {
                   client = state.client;
-                  log(client!.toJson().toString());
                   rateController.text = client?.baseLaborCost ?? '0';
                 }
               },
@@ -202,7 +209,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           serviceNameError.isNotEmpty,
                           context,
                           true),
-                      errorWidget(error: serviceNameError),
+                      ErrorWidget(error: serviceNameError),
                       const SizedBox(height: 16),
                       textBox(
                           'Enter Notes',
@@ -211,7 +218,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           laborDescriptionError.isNotEmpty,
                           context,
                           false),
-                      errorWidget(error: laborDescriptionError),
+                      ErrorWidget(error: laborDescriptionError),
 
                       const SizedBox(height: 16),
                       // const Text(
@@ -344,51 +351,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = material[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content: addMaterialPopup(
+                                        item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          material.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            material.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -400,51 +424,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = part[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content:
+                                        addPartPopup(item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          part.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            part.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -455,51 +496,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = labor[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content:
+                                        addLaborPopup(item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          labor.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            labor.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -510,51 +568,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = subContract[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content: addSubContractPopup(
+                                        item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          subContract.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            subContract.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -565,50 +640,67 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         physics: const ClampingScrollPhysics(),
                         itemBuilder: (context, index) {
                           final item = fee[index];
-                          return Column(
-                            children: [
-                              const SizedBox(height: 8),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Flexible(
-                                    child: Text(item.itemName,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  const Expanded(child: SizedBox()),
-                                  Row(
-                                    children: [
-                                      Text('\$${item.subTotal} ',
+                          return GestureDetector(
+                            behavior: HitTestBehavior.translucent,
+                            onTap: () {
+                              showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    contentPadding: const EdgeInsets.all(20),
+                                    insetPadding: const EdgeInsets.all(20),
+                                    content:
+                                        addFeePopup(item: item, index: index),
+                                  );
+                                },
+                              );
+                            },
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Flexible(
+                                      child: Text(item.itemName,
+                                          overflow: TextOverflow.ellipsis,
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w400,
                                           )),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (widget.service != null &&
-                                              item.id.isNotEmpty) {
-                                            deletedItems
-                                                .add(item.id.toString());
-                                          }
-                                          fee.removeAt(index);
-                                          setState(() {});
-                                        },
-                                        child: const Icon(
-                                          CupertinoIcons.clear_thick_circled,
-                                          color: Color(0xFFFF5C5C),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                            ],
+                                    ),
+                                    const Expanded(child: SizedBox()),
+                                    Row(
+                                      children: [
+                                        Text('\$${item.subTotal} ',
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w400,
+                                            )),
+                                        GestureDetector(
+                                          onTap: () {
+                                            if (widget.service != null &&
+                                                item.id.isNotEmpty) {
+                                              deletedItems
+                                                  .add(item.id.toString());
+                                            }
+                                            fee.removeAt(index);
+                                            setState(() {});
+                                          },
+                                          child: const Icon(
+                                            CupertinoIcons.clear_thick_circled,
+                                            color: Color(0xFFFF5C5C),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
                           );
                         },
                       ),
@@ -623,14 +715,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       //       context,
                       //       true),
                       // ),
-                      // errorWidget(error: rateError),
+                      // ErrorWidget(error: rateError),
 
                       // Padding(
                       //   padding: const EdgeInsets.only(top: 16.0),
                       //   child: textBox("Enter Tax", taxController, "Tax",
                       //       taxError.isNotEmpty, context, true),
                       // ),
-                      // errorWidget(error: taxError),
+                      // ErrorWidget(error: taxError),
 
                       const SizedBox(height: 16),
                       const SizedBox(height: 16),
@@ -640,24 +732,23 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
                           final validate = validation();
                           if (validate) {
-                            log('Here');
                             await AppUtils.getUserID().then((clientId) {
                               double subT = 0;
-                              material.forEach((element) {
+                              for (var element in material) {
                                 subT += double.parse(element.subTotal);
-                              });
-                              part.forEach((element) {
+                              }
+                              for (var element in part) {
                                 subT += double.parse(element.subTotal);
-                              });
-                              labor.forEach((element) {
+                              }
+                              for (var element in labor) {
                                 subT += double.parse(element.subTotal);
-                              });
-                              subContract.forEach((element) {
+                              }
+                              for (var element in subContract) {
                                 subT += double.parse(element.subTotal);
-                              });
-                              fee.forEach((element) {
+                              }
+                              for (var element in fee) {
                                 subT += double.parse(element.subTotal);
-                              });
+                              }
 
                               // subT += double.tryParse(rateController.text) ?? 0;
                               service = CannedServiceCreateModel(
@@ -672,7 +763,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     : '0',
                                 subTotal: subT.toStringAsFixed(2),
                               );
-                              log(subT.toStringAsFixed(2));
                               if (widget.service != null) {
                                 BlocProvider.of<ServiceBloc>(context).add(
                                   EditCannedOrderServiceEvent(
@@ -709,9 +799,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                                 (element) => element.id == '')
                                             .toList(),
                                     deletedItems: deletedItems,
+                                    editedItems: editedItems,
                                   ),
                                 );
-                                log(deletedItems.toString());
                               } else {
                                 BlocProvider.of<ServiceBloc>(context).add(
                                   CreateCannedOrderServiceEvent(
@@ -740,7 +830,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           ),
                           child: Text(
                             widget.service != null ? 'Update' : "Confirm",
-                            style: TextStyle(
+                            style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.white),
@@ -748,7 +838,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ),
                       CupertinoButton(
-                          child: Text("Cancel"),
+                          child: const Text("Cancel"),
                           onPressed: () {
                             Navigator.pop(context);
                           }),
@@ -794,7 +884,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox(),
             label == "Vendor"
                 ? GestureDetector(
                     onTap: () {
@@ -802,7 +892,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               isScrollControlled: true,
                               useSafeArea: true,
                               context: context,
-                              builder: (context) => AddVendorScreen())
+                              builder: (context) => const AddVendorScreen())
                           .then((value) {
                         //do something
                         if (value != null) {
@@ -830,7 +920,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ],
                     ),
                   )
-                : SizedBox(),
+                : const SizedBox(),
           ],
         ),
         const SizedBox(height: 3),
@@ -876,7 +966,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           label == 'Cost' ||
                           label == 'Cost ' ||
                           label == 'Price'
-                      ? TextInputType.numberWithOptions(decimal: true)
+                      ? const TextInputType.numberWithOptions(decimal: true)
                       : null,
               inputFormatters: label == "Hours" ||
                       label == 'Discount' ||
@@ -1022,8 +1112,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      contentPadding: EdgeInsets.all(20),
-                      insetPadding: EdgeInsets.all(20),
+                      contentPadding: const EdgeInsets.all(20),
+                      insetPadding: const EdgeInsets.all(20),
                       content: addMaterialPopup(),
                     );
                   },
@@ -1034,8 +1124,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      contentPadding: EdgeInsets.all(20),
-                      insetPadding: EdgeInsets.all(20),
+                      contentPadding: const EdgeInsets.all(20),
+                      insetPadding: const EdgeInsets.all(20),
                       content: addPartPopup(),
                     );
                   },
@@ -1046,8 +1136,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      contentPadding: EdgeInsets.all(20),
-                      insetPadding: EdgeInsets.all(20),
+                      contentPadding: const EdgeInsets.all(20),
+                      insetPadding: const EdgeInsets.all(20),
                       content: addLaborPopup(),
                     );
                   },
@@ -1057,8 +1147,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      contentPadding: EdgeInsets.all(20),
-                      insetPadding: EdgeInsets.all(20),
+                      contentPadding: const EdgeInsets.all(20),
+                      insetPadding: const EdgeInsets.all(20),
                       content: addFeePopup(),
                     );
                   },
@@ -1069,8 +1159,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   context: context,
                   builder: (context) {
                     return AlertDialog(
-                      contentPadding: EdgeInsets.all(20),
-                      insetPadding: EdgeInsets.all(20),
+                      contentPadding: const EdgeInsets.all(20),
+                      insetPadding: const EdgeInsets.all(20),
                       content: addSubContractPopup(),
                     );
                   },
@@ -1099,15 +1189,20 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     );
   }
 
-  addMaterialPopup() {
+  addMaterialPopup({CannedServiceAddModel? item, int? index}) {
     //Add material popup controllers
-    final addMaterialNameController = TextEditingController();
-    final addMaterialDescriptionController = TextEditingController();
-    final addMaterialPriceController = TextEditingController();
-    final addMaterialQuantityController = TextEditingController(text: '1');
-    final addMaterialCostController = TextEditingController();
-    final addMaterialDiscountController = TextEditingController(text: '0');
-    final addMaterialBatchController = TextEditingController();
+    final addMaterialNameController =
+        TextEditingController(text: item?.itemName);
+    final addMaterialDescriptionController =
+        TextEditingController(text: item?.note);
+    final addMaterialPriceController =
+        TextEditingController(text: item?.unitPrice);
+    final addMaterialQuantityController =
+        TextEditingController(text: item?.quanityHours ?? '1');
+    final addMaterialCostController = TextEditingController(text: item?.cost);
+    final addMaterialDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+    final addMaterialBatchController = TextEditingController(text: item?.part);
 
     //Add material errorstatus and error message variables
     String adddMaterialNameErrorStatus = '';
@@ -1120,7 +1215,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
+    bool isPercentage = item?.discountType == "Percentage" ? true : false;
     double materialCost = 0;
 
     addMaterialValidation(StateSetter setState) {
@@ -1370,7 +1465,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             context,
                             true),
                       ),
-                      errorWidget(error: adddMaterialNameErrorStatus),
+                      ErrorWidget(error: adddMaterialNameErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
                         child: textBox(
@@ -1381,7 +1476,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             context,
                             false),
                       ),
-                      errorWidget(error: addMaterialDescriptionErrorStatus),
+                      ErrorWidget(error: addMaterialDescriptionErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
                         child: Row(
@@ -1400,7 +1495,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           ],
                         ),
                       ),
-                      errorWidget(error: addMaterialPriceErrorStatus),
+                      ErrorWidget(error: addMaterialPriceErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
                         child: textBox(
@@ -1412,7 +1507,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             true,
                             newSetState),
                       ),
-                      errorWidget(error: addMaterialQuantityErrorStatus),
+                      ErrorWidget(error: addMaterialQuantityErrorStatus),
                       Padding(
                         padding: const EdgeInsets.only(top: 17.0),
                         child: textBox(
@@ -1424,9 +1519,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             false,
                             newSetState),
                       ),
-                      errorWidget(error: addMaterialCostErrorStatus),
+                      ErrorWidget(error: addMaterialCostErrorStatus),
                       Padding(
-                        padding: EdgeInsets.only(top: 17),
+                        padding: const EdgeInsets.only(top: 17),
                         child: Stack(
                           children: [
                             textBox(
@@ -1454,7 +1549,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                           : AppColors.primaryColors,
                                     ),
                                   ),
-                                  Text(
+                                  const Text(
                                     '  /  ',
                                     style: TextStyle(
                                       color: AppColors.greyText,
@@ -1479,7 +1574,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           ],
                         ),
                       ),
-                      errorWidget(error: addMaterialDiscountErrorStatus),
+                      ErrorWidget(error: addMaterialDiscountErrorStatus),
                       // Padding(
                       //   padding: const EdgeInsets.only(top: 17),
                       //   child: Row(
@@ -1532,11 +1627,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               tagDataList[index], index, newSetState);
                         },
                         itemCount: tagDataList.length,
-                        physics: ClampingScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         shrinkWrap: true,
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 17),
+                        padding: const EdgeInsets.only(top: 17),
                         child: textBox(
                             "Enter Batch Number",
                             addMaterialBatchController,
@@ -1546,9 +1641,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             false,
                             newSetState),
                       ),
-                      errorWidget(error: adddMaterialBatchErrorStatus),
+                      ErrorWidget(error: adddMaterialBatchErrorStatus),
                       Padding(
-                        padding: EdgeInsets.only(top: 17),
+                        padding: const EdgeInsets.only(top: 17),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1571,7 +1666,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
 
                       Padding(
-                        padding: EdgeInsets.only(top: 17),
+                        padding: const EdgeInsets.only(top: 17),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1593,7 +1688,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 17),
+                        padding: const EdgeInsets.only(top: 17),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1637,15 +1732,17 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 31),
+                        padding: const EdgeInsets.only(top: 31),
                         child: ElevatedButton(
                           onPressed: () {
                             FocusManager.instance.primaryFocus?.unfocus();
 
                             final status = addMaterialValidation(newSetState);
                             if (status) {
-                              final focus = FocusNode().requestFocus();
-                              material.add(CannedServiceAddModel(
+                              FocusNode().requestFocus();
+                              if (index != null) {
+                                material[index] = CannedServiceAddModel(
+                                  id: item!.id,
                                   cannedServiceId: int.parse(serviceId),
                                   note: addMaterialDescriptionController.text,
                                   part: addMaterialBatchController.text,
@@ -1666,7 +1763,42 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       addMaterialQuantityController.text.trim(),
                                   itemType: "Material",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: materialCost.toStringAsFixed(2)));
+                                  cost: materialCost.toStringAsFixed(2),
+                                );
+                                if (item.id != '') {
+                                  final ind = editedItems.indexWhere(
+                                      (element) => element.id == item.id);
+                                  if (ind != -1) {
+                                    editedItems[index] = material[index];
+                                  } else {
+                                    editedItems.add(material[index]);
+                                  }
+                                }
+                              } else {
+                                material.add(CannedServiceAddModel(
+                                    cannedServiceId: int.parse(serviceId),
+                                    note: addMaterialDescriptionController.text,
+                                    part: addMaterialBatchController.text,
+                                    itemName: addMaterialNameController.text,
+                                    unitPrice: addMaterialPriceController.text,
+                                    discount: addMaterialDiscountController.text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : addMaterialDiscountController.text
+                                            .trim(),
+                                    discountType: isPercentage &&
+                                            addMaterialDiscountController
+                                                .text.isNotEmpty
+                                        ? "Percentage"
+                                        : "Fixed",
+                                    quanityHours: addMaterialQuantityController
+                                        .text
+                                        .trim(),
+                                    itemType: "Material",
+                                    subTotal: subTotal.toStringAsFixed(2),
+                                    cost: materialCost.toStringAsFixed(2)));
+                              }
                               setState(() {});
                               Navigator.pop(context);
                             }
@@ -1677,7 +1809,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                 borderRadius: BorderRadius.circular(12)),
                             fixedSize:
                                 Size(MediaQuery.of(context).size.width, 56),
-                            primary: AppColors.primaryColors,
+                            backgroundColor: AppColors.primaryColors,
                           ),
                           child: const Text(
                             "Continue",
@@ -1699,15 +1831,18 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     );
   }
 
-  addPartPopup() {
+  addPartPopup({CannedServiceAddModel? item, int? index}) {
     //Add part popup controllers
-    final addPartNameController = TextEditingController();
-    final addPartDescriptionController = TextEditingController();
-    final addPartPriceController = TextEditingController();
-    final addPartQuantityController = TextEditingController(text: '1');
-    final addPartCostController = TextEditingController();
-    final addPartDiscountController = TextEditingController(text: '0');
-    final addPartPartNumberController = TextEditingController();
+    final addPartNameController = TextEditingController(text: item?.itemName);
+    final addPartDescriptionController =
+        TextEditingController(text: item?.note);
+    final addPartPriceController = TextEditingController(text: item?.unitPrice);
+    final addPartQuantityController =
+        TextEditingController(text: item?.quanityHours ?? '1');
+    final addPartCostController = TextEditingController(text: item?.cost);
+    final addPartDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+    final addPartPartNumberController = TextEditingController(text: item?.part);
 
     //Add part errorstatus and error message variables
     String addPartNameErrorStatus = '';
@@ -1720,7 +1855,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
+    bool isPercentage = item?.discountType == "Percentage" ? true : false;
     double partCost = 0;
 
     addPartValidation(StateSetter setState) {
@@ -1873,7 +2008,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           true),
                     ),
-                    errorWidget(error: addPartNameErrorStatus),
+                    ErrorWidget(error: addPartNameErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -1884,7 +2019,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           false),
                     ),
-                    errorWidget(error: addPartDescriptionErrorStatus),
+                    ErrorWidget(error: addPartDescriptionErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: Row(
@@ -1914,13 +2049,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       children: [
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 2.7,
-                          child: errorWidget(
+                          child: ErrorWidget(
                             error: addPartPriceErrorStatus,
                           ),
                         ),
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 2.7,
-                          child: errorWidget(
+                          child: ErrorWidget(
                             error: addPartQuantityErrorStatus,
                           ),
                         ),
@@ -1937,11 +2072,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false,
                           newSetState),
                     ),
-                    errorWidget(error: addPartCostErrorStatus),
+                    ErrorWidget(error: addPartCostErrorStatus),
                     Stack(
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(top: 17),
+                          padding: const EdgeInsets.only(top: 17),
                           child: textBox(
                             "Enter Amount",
                             addPartDiscountController,
@@ -1969,7 +2104,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : AppColors.primaryColors,
                                 ),
                               ),
-                              Text(
+                              const Text(
                                 '  /  ',
                                 style: TextStyle(
                                   color: AppColors.greyText,
@@ -1993,7 +2128,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ],
                     ),
-                    errorWidget(error: addPartDiscountErrorStatus),
+                    ErrorWidget(error: addPartDiscountErrorStatus),
                     // Padding(
                     //   padding: const EdgeInsets.only(top: 17),
                     //   child: Row(
@@ -2046,11 +2181,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             tagDataList[index], index, newSetState);
                       },
                       itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
                       shrinkWrap: true,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: textBox(
                           "Enter Part Number",
                           addPartPartNumberController,
@@ -2059,9 +2194,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           false),
                     ),
-                    errorWidget(error: adddPartPartNumberErrorStatus),
+                    ErrorWidget(error: adddPartPartNumberErrorStatus),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2084,7 +2219,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                     ),
 
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2106,7 +2241,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2128,7 +2263,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2150,35 +2285,68 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 31),
+                      padding: const EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
                           FocusManager.instance.primaryFocus?.unfocus();
 
                           final status = addPartValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
+                            FocusNode().requestFocus();
 
-                            part.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addPartDescriptionController.text,
-                                part: addPartPartNumberController.text,
-                                itemName: addPartNameController.text,
-                                unitPrice: addPartPriceController.text,
-                                discount: addPartDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addPartDiscountController.text.trim(),
-                                discountType: isPercentage &&
-                                        addPartDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-                                quanityHours: addPartQuantityController.text,
-                                itemType: "Part",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                cost: partCost.toStringAsFixed(2)));
+                            if (index != null) {
+                              part[index] = CannedServiceAddModel(
+                                  id: item!.id,
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addPartDescriptionController.text,
+                                  part: addPartPartNumberController.text,
+                                  itemName: addPartNameController.text,
+                                  unitPrice: addPartPriceController.text,
+                                  discount: addPartDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addPartDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addPartDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addPartQuantityController.text,
+                                  itemType: "Part",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: partCost.toStringAsFixed(2));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = part[index];
+                                } else {
+                                  editedItems.add(part[index]);
+                                }
+                              }
+                            } else {
+                              part.add(CannedServiceAddModel(
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addPartDescriptionController.text,
+                                  part: addPartPartNumberController.text,
+                                  itemName: addPartNameController.text,
+                                  unitPrice: addPartPriceController.text,
+                                  discount: addPartDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addPartDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addPartDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addPartQuantityController.text,
+                                  itemType: "Part",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: partCost.toStringAsFixed(2)));
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2189,7 +2357,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               borderRadius: BorderRadius.circular(12)),
                           fixedSize:
                               Size(MediaQuery.of(context).size.width, 56),
-                          primary: AppColors.primaryColors,
+                          backgroundColor: AppColors.primaryColors,
                         ),
                         child: const Text(
                           "Continue",
@@ -2210,13 +2378,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     });
   }
 
-  addLaborPopup() {
+  addLaborPopup({CannedServiceAddModel? item, int? index}) {
     //Add Labor popup controllers
-    final addLaborNameController = TextEditingController();
-    final addLaborDescriptionController = TextEditingController();
-    final addLaborCostController = TextEditingController();
-    final addLaborDiscountController = TextEditingController(text: '0');
-    final addLaborHoursController = TextEditingController(text: '1');
+    final addLaborNameController = TextEditingController(text: item?.itemName);
+    final addLaborDescriptionController =
+        TextEditingController(text: item?.note);
+    final addLaborCostController = TextEditingController(text: item?.cost);
+    final addLaborDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+    final addLaborHoursController =
+        TextEditingController(text: item?.quanityHours ?? '1');
     final addLaborBaseCostController =
         TextEditingController(text: client?.baseLaborCost ?? '');
 
@@ -2230,7 +2401,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
+    bool isPercentage = item?.discountType == "Percentage" ? true : false;
     double laborCost = 0;
 
     addLaborValidation(StateSetter setState) {
@@ -2300,7 +2471,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           }
           total = subTotal;
         } else {
-          log((client?.laborTaxRate).toString());
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
@@ -2372,7 +2542,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           true),
                     ),
-                    errorWidget(error: addLaborNameErrorStatus),
+                    ErrorWidget(error: addLaborNameErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2383,7 +2553,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           false),
                     ),
-                    errorWidget(error: addLaborDescriptionErrorStatus),
+                    ErrorWidget(error: addLaborDescriptionErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2395,7 +2565,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           true,
                           newSetState),
                     ),
-                    errorWidget(error: addLaborHoursErrorStatus),
+                    ErrorWidget(error: addLaborHoursErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2407,7 +2577,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           true,
                           newSetState),
                     ),
-                    errorWidget(error: addLaborBaseCostStatus),
+                    ErrorWidget(error: addLaborBaseCostStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2419,11 +2589,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false,
                           newSetState),
                     ),
-                    errorWidget(error: addLaborCostErrorStatus),
+                    ErrorWidget(error: addLaborCostErrorStatus),
                     Stack(
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(top: 17),
+                          padding: const EdgeInsets.only(top: 17),
                           child: textBox(
                               "Enter Amount",
                               addLaborDiscountController,
@@ -2450,7 +2620,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : AppColors.primaryColors,
                                 ),
                               ),
-                              Text(
+                              const Text(
                                 '  /  ',
                                 style: TextStyle(
                                   color: AppColors.greyText,
@@ -2474,9 +2644,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ],
                     ),
-                    errorWidget(error: addLaborDiscountErrorStatus),
+                    ErrorWidget(error: addLaborDiscountErrorStatus),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2498,7 +2668,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2520,7 +2690,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2542,7 +2712,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2564,36 +2734,70 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 31),
+                      padding: const EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
                           FocusManager.instance.primaryFocus?.unfocus();
 
                           final status = addLaborValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
+                            FocusNode().requestFocus();
 
-                            labor.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addLaborDescriptionController.text,
-                                // part: addLaborLaborNumberController.text,
-                                part: '',
-                                itemName: addLaborNameController.text,
-                                unitPrice: addLaborBaseCostController.text,
-                                discount: addLaborDiscountController.text
-                                        .trim()
-                                        .isEmpty
-                                    ? "0"
-                                    : addLaborDiscountController.text.trim(),
-                                discountType: isPercentage &&
-                                        addLaborDiscountController
-                                            .text.isNotEmpty
-                                    ? "Percentage"
-                                    : "Fixed",
-                                quanityHours: addLaborHoursController.text,
-                                itemType: "Labor",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                cost: laborCost.toStringAsFixed(2)));
+                            if (index != null) {
+                              labor[index] = CannedServiceAddModel(
+                                  id: item!.id,
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addLaborDescriptionController.text,
+                                  // part: addLaborLaborNumberController.text,
+                                  part: '',
+                                  itemName: addLaborNameController.text,
+                                  unitPrice: addLaborBaseCostController.text,
+                                  discount: addLaborDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addLaborDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addLaborDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addLaborHoursController.text,
+                                  itemType: "Labor",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: laborCost.toStringAsFixed(2));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = labor[index];
+                                } else {
+                                  editedItems.add(labor[index]);
+                                }
+                              }
+                            } else {
+                              labor.add(CannedServiceAddModel(
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addLaborDescriptionController.text,
+                                  // part: addLaborLaborNumberController.text,
+                                  part: '',
+                                  itemName: addLaborNameController.text,
+                                  unitPrice: addLaborBaseCostController.text,
+                                  discount: addLaborDiscountController.text
+                                          .trim()
+                                          .isEmpty
+                                      ? "0"
+                                      : addLaborDiscountController.text.trim(),
+                                  discountType: isPercentage &&
+                                          addLaborDiscountController
+                                              .text.isNotEmpty
+                                      ? "Percentage"
+                                      : "Fixed",
+                                  quanityHours: addLaborHoursController.text,
+                                  itemType: "Labor",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: laborCost.toStringAsFixed(2)));
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2604,7 +2808,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               borderRadius: BorderRadius.circular(12)),
                           fixedSize:
                               Size(MediaQuery.of(context).size.width, 56),
-                          primary: AppColors.primaryColors,
+                          backgroundColor: AppColors.primaryColors,
                         ),
                         child: const Text(
                           "Continue",
@@ -2625,12 +2829,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     });
   }
 
-  addFeePopup() {
+  addFeePopup({CannedServiceAddModel? item, int? index}) {
     //Add Fee popup controllers
-    final addFeeNameController = TextEditingController();
-    final addFeeDescriptionController = TextEditingController();
-    final addFeeCostController = TextEditingController();
-    final addFeePriceController = TextEditingController();
+    final addFeeNameController = TextEditingController(text: item?.itemName);
+    final addFeeDescriptionController = TextEditingController(text: item?.note);
+    final addFeeCostController = TextEditingController(text: item?.cost);
+    final addFeePriceController = TextEditingController(text: item?.unitPrice);
 
     //Add Fee errorstatus and error message variables
     String addFeeNameErrorStatus = '';
@@ -2715,7 +2919,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           true),
                     ),
-                    errorWidget(error: addFeeNameErrorStatus),
+                    ErrorWidget(error: addFeeNameErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2726,7 +2930,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           false),
                     ),
-                    errorWidget(error: addFeeDescriptionErrorStatus),
+                    ErrorWidget(error: addFeeDescriptionErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2738,7 +2942,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           true,
                           newSetState),
                     ),
-                    errorWidget(error: addFeePriceErrorStatus),
+                    ErrorWidget(error: addFeePriceErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -2750,7 +2954,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false,
                           newSetState),
                     ),
-                    errorWidget(error: addFeeCostErrorStatus),
+                    ErrorWidget(error: addFeeCostErrorStatus),
                     // Padding(
                     //   padding: const EdgeInsets.only(top: 17),
                     //   child: Row(
@@ -2803,11 +3007,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             tagDataList[index], index, newSetState);
                       },
                       itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
                       shrinkWrap: true,
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2829,7 +3033,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2851,7 +3055,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2873,7 +3077,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -2895,26 +3099,50 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 31),
+                      padding: const EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
                           FocusManager.instance.primaryFocus?.unfocus();
 
                           final status = addFeeValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
+                            FocusNode().requestFocus();
+                            if (index != null) {
+                              fee[index] = CannedServiceAddModel(
+                                  id: item!.id,
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addFeeDescriptionController.text,
+                                  // part: addFeeFeeNumberController.text,
+                                  part: '',
+                                  itemName: addFeeNameController.text,
+                                  discount: '0',
+                                  unitPrice: addFeePriceController.text,
+                                  itemType: "Fee",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: feeCost.toStringAsFixed(2));
 
-                            fee.add(CannedServiceAddModel(
-                                cannedServiceId: int.parse(serviceId),
-                                note: addFeeDescriptionController.text,
-                                // part: addFeeFeeNumberController.text,
-                                part: '',
-                                itemName: addFeeNameController.text,
-                                discount: '0',
-                                unitPrice: addFeePriceController.text,
-                                itemType: "Fee",
-                                subTotal: subTotal.toStringAsFixed(2),
-                                cost: feeCost.toStringAsFixed(2)));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = fee[index];
+                                } else {
+                                  editedItems.add(fee[index]);
+                                }
+                              }
+                            } else {
+                              fee.add(CannedServiceAddModel(
+                                  cannedServiceId: int.parse(serviceId),
+                                  note: addFeeDescriptionController.text,
+                                  // part: addFeeFeeNumberController.text,
+                                  part: '',
+                                  itemName: addFeeNameController.text,
+                                  discount: '0',
+                                  unitPrice: addFeePriceController.text,
+                                  itemType: "Fee",
+                                  subTotal: subTotal.toStringAsFixed(2),
+                                  cost: feeCost.toStringAsFixed(2)));
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -2925,7 +3153,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               borderRadius: BorderRadius.circular(12)),
                           fixedSize:
                               Size(MediaQuery.of(context).size.width, 56),
-                          primary: AppColors.primaryColors,
+                          backgroundColor: AppColors.primaryColors,
                         ),
                         child: const Text(
                           "Continue",
@@ -2946,13 +3174,25 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     });
   }
 
-  addSubContractPopup() {
+  addSubContractPopup({CannedServiceAddModel? item, int? index}) {
     //Add SubContract popup controllers
-    final addSubContractNameController = TextEditingController();
-    final addSubContractDescriptionController = TextEditingController();
-    final addSubContractCostController = TextEditingController();
-    final addSubContractPriceController = TextEditingController();
-    final addSubContractDiscountController = TextEditingController(text: '0');
+    final addSubContractNameController =
+        TextEditingController(text: item?.itemName);
+    final addSubContractDescriptionController =
+        TextEditingController(text: item?.note);
+    final addSubContractCostController =
+        TextEditingController(text: item?.cost);
+    final addSubContractPriceController =
+        TextEditingController(text: item?.unitPrice);
+    final addSubContractDiscountController =
+        TextEditingController(text: item?.discount ?? '0');
+
+    final vendor =
+        vendors.where((element) => element.id == item?.vendorId).toList();
+    if (vendor.isNotEmpty) {
+      addSubContractVendorController.text = vendor[0].vendorName.toString();
+      vendorId = vendor[0].id;
+    }
 
     //Add SubContract errorstatus and error message variables
     String addSubContractNameErrorStatus = '';
@@ -2964,7 +3204,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     double subTotal = 0;
     double total = 0;
-    bool isPercentage = false;
+    bool isPercentage = item?.discountType == "Percentage" ? true : false;
     double subContractCost = 0;
 
     addSubContractValidation(StateSetter setState) {
@@ -3098,7 +3338,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           true),
                     ),
-                    errorWidget(error: addSubContractNameErrorStatus),
+                    ErrorWidget(error: addSubContractNameErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -3109,7 +3349,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           context,
                           false),
                     ),
-                    errorWidget(error: addSubContractDescriptionErrorStatus),
+                    ErrorWidget(error: addSubContractDescriptionErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -3121,7 +3361,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           true,
                           newSetState),
                     ),
-                    errorWidget(error: addSubContractPriceErrorStatus),
+                    ErrorWidget(error: addSubContractPriceErrorStatus),
                     Padding(
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
@@ -3133,7 +3373,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false,
                           newSetState),
                     ),
-                    errorWidget(error: addSubContractCostErrorStatus),
+                    ErrorWidget(error: addSubContractCostErrorStatus),
                     Stack(
                       children: [
                         Padding(
@@ -3164,7 +3404,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : AppColors.primaryColors,
                                 ),
                               ),
-                              Text(
+                              const Text(
                                 '  /  ',
                                 style: TextStyle(
                                   color: AppColors.greyText,
@@ -3188,7 +3428,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                         ),
                       ],
                     ),
-                    errorWidget(error: addSubContractDiscountErrorStatus),
+                    ErrorWidget(error: addSubContractDiscountErrorStatus),
                     // Padding(
                     //   padding: const EdgeInsets.only(top: 17),
                     //   child: Row(
@@ -3241,7 +3481,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                             tagDataList[index], index, newSetState);
                       },
                       itemCount: tagDataList.length,
-                      physics: ClampingScrollPhysics(),
+                      physics: const ClampingScrollPhysics(),
                       shrinkWrap: true,
                     ),
                     Padding(
@@ -3255,9 +3495,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           false,
                           newSetState),
                     ),
-                    errorWidget(error: addSubContractVendorErrorStatus),
+                    ErrorWidget(error: addSubContractVendorErrorStatus),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -3279,7 +3519,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -3301,7 +3541,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -3323,7 +3563,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 17),
+                      padding: const EdgeInsets.only(top: 17),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -3345,17 +3585,17 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 31),
+                      padding: const EdgeInsets.only(top: 31),
                       child: ElevatedButton(
                         onPressed: () {
                           FocusManager.instance.primaryFocus?.unfocus();
 
                           final status = addSubContractValidation(newSetState);
                           if (status) {
-                            final focus = FocusNode().requestFocus();
-
-                            subContract.add(
-                              CannedServiceAddModel(
+                            FocusNode().requestFocus();
+                            if (index != null) {
+                              subContract[index] = CannedServiceAddModel(
+                                  id: item!.id,
                                   cannedServiceId: int.parse(serviceId),
                                   note:
                                       addSubContractDescriptionController.text,
@@ -3379,8 +3619,46 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   unitPrice: addSubContractPriceController.text,
                                   itemType: "SubContract",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: subContractCost.toStringAsFixed(2)),
-                            );
+                                  cost: subContractCost.toStringAsFixed(2));
+                              if (item.id != '') {
+                                final ind = editedItems.indexWhere(
+                                    (element) => element.id == item.id);
+                                if (ind != -1) {
+                                  editedItems[index] = subContract[index];
+                                } else {
+                                  editedItems.add(subContract[index]);
+                                }
+                              }
+                            } else {
+                              subContract.add(
+                                CannedServiceAddModel(
+                                    cannedServiceId: int.parse(serviceId),
+                                    note: addSubContractDescriptionController
+                                        .text,
+                                    // part: addSubContractSubContractNumberController.text,
+                                    part: '',
+                                    itemName: addSubContractNameController.text,
+                                    discount: addSubContractDiscountController
+                                            .text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : addSubContractDiscountController.text
+                                            .trim(),
+                                    discountType: isPercentage &&
+                                            addSubContractDiscountController
+                                                .text.isNotEmpty
+                                        ? "Percentage"
+                                        : "Fixed",
+                                    tax: isTax == true ? 'Y' : 'N',
+                                    vendorId: vendorId,
+                                    unitPrice:
+                                        addSubContractPriceController.text,
+                                    itemType: "SubContract",
+                                    subTotal: subTotal.toStringAsFixed(2),
+                                    cost: subContractCost.toStringAsFixed(2)),
+                              );
+                            }
                             setState(() {});
                             Navigator.pop(context);
                           }
@@ -3391,7 +3669,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               borderRadius: BorderRadius.circular(12)),
                           fixedSize:
                               Size(MediaQuery.of(context).size.width, 56),
-                          primary: AppColors.primaryColors,
+                          backgroundColor: AppColors.primaryColors,
                         ),
                         child: const Text(
                           "Continue",
@@ -3598,8 +3876,6 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     padding: const EdgeInsets.only(top: 12.0),
                                     child: GestureDetector(
                                       onTap: () {
-                                        print("heyy");
-
                                         addSubContractVendorController.text =
                                             vendors[index].vendorName ?? '';
                                         vendorId = vendors[index].id;
@@ -3664,8 +3940,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
   }
 }
 
-class errorWidget extends StatelessWidget {
-  const errorWidget({
+class ErrorWidget extends StatelessWidget {
+  const ErrorWidget({
     super.key,
     required this.error,
   });

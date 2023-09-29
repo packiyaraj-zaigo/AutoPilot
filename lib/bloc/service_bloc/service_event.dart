@@ -9,7 +9,7 @@ abstract class ServiceEvent extends Equatable {
 
 class GetAllServicess extends ServiceEvent {
   final String query;
-  GetAllServicess({this.query = ''});
+  const GetAllServicess({this.query = ''});
 }
 
 class CreateServices extends ServiceEvent {
@@ -49,6 +49,7 @@ class EditCannedOrderServiceEvent extends ServiceEvent {
   final List<CannedServiceAddModel>? subcontract;
   final List<CannedServiceAddModel>? fee;
   final List<String>? deletedItems;
+  final List<CannedServiceAddModel>? editedItems;
   const EditCannedOrderServiceEvent({
     required this.id,
     required this.service,
@@ -58,6 +59,7 @@ class EditCannedOrderServiceEvent extends ServiceEvent {
     this.subcontract,
     this.fee,
     this.deletedItems,
+    this.editedItems,
   });
 }
 
@@ -70,8 +72,10 @@ class EditOrderServiceEvent extends ServiceEvent {
   final List<CannedServiceAddModel>? subcontract;
   final List<CannedServiceAddModel>? fee;
   final List<String>? deletedItems;
+  List<CannedServiceAddModel>? editedItems;
+
   final String technicianId;
-  const EditOrderServiceEvent(
+  EditOrderServiceEvent(
       {required this.id,
       required this.service,
       this.material,
@@ -80,6 +84,7 @@ class EditOrderServiceEvent extends ServiceEvent {
       this.subcontract,
       this.fee,
       this.deletedItems,
+      this.editedItems,
       required this.technicianId});
 }
 

@@ -517,6 +517,16 @@ class ApiRepository {
     return apiProvider.editCannedOrderService(token, model, id);
   }
 
+  Future<dynamic> editCannedOrderServiceItems(String token,
+      CannedServiceAddModel model, String id, String serviceId) async {
+    return apiProvider.editCannedOrderServiceItems(token, model, id, serviceId);
+  }
+
+  Future<dynamic> editOrderServiceItems(String token,
+      CannedServiceAddModel model, String id, String serviceId) async {
+    return apiProvider.editOrderServiceItems(token, model, id, serviceId);
+  }
+
   Future<dynamic> editOrderService(String token, CannedServiceCreateModel model,
       String id, String technicianId) async {
     return apiProvider.editOrderService(token, model, id, technicianId);
