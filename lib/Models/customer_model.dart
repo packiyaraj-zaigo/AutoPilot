@@ -4,6 +4,8 @@ import 'dart:convert';
 CustomerModel customerModelFromJson(String str) =>
     CustomerModel.fromJson(json.decode(str));
 
+Datum datumFromJson(String str) => Datum.fromJson(json.decode(str));
+
 String customerModelToJson(CustomerModel data) => json.encode(data.toJson());
 
 class CustomerModel {

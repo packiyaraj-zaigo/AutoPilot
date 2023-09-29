@@ -6,6 +6,7 @@ import 'package:auto_pilot/Models/vechile_model.dart';
 import 'package:auto_pilot/Models/vin_global_response.dart';
 import 'package:auto_pilot/Screens/customer_select_screen.dart';
 import 'package:auto_pilot/Screens/dummy_vehcile_screen.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_bloc.dart';
 import 'package:auto_pilot/bloc/vechile/vechile_event.dart';
@@ -223,17 +224,29 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                   } else if (state is EditVehicleErrorState) {
                     CommonWidgets().showDialog(context, state.message);
                   } else if (state is EditVehicleSuccessState) {
-                    log('here');
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                          builder: (context) => const VehiclesScreen()),
-                      (route) => false,
-                    );
+                    if (widget.navigation == "estimate_partial_vehicle_edit") {
+                      context.read<VechileBloc>().add(
+                          GetSingleEstimateFromVehicleEvent(
+                              orderId: widget.orderId ?? ""));
+                    } else {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (context) => const VehiclesScreen()),
+                        (route) => false,
+                      );
+                    }
 
                     CommonWidgets().showSuccessDialog(
                         context, "Vehicle Updated Successfully");
                   } else if (state is DropdownVechileDetailsSuccessState) {
                     dropdownData.addAll(state.dropdownData.data.data);
+                  } else if (state is GetSingleEstimateFromVehicleState) {
+                    Navigator.pushReplacement(context, MaterialPageRoute(
+                      builder: (context) {
+                        return EstimatePartialScreen(
+                            estimateDetails: state.createEstimateModel);
+                      },
+                    ));
                   }
                 },
                 child: BlocBuilder<VechileBloc, VechileState>(

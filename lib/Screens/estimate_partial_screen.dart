@@ -21,6 +21,7 @@ import 'package:auto_pilot/Screens/select_service_screen.dart';
 import 'package:auto_pilot/Screens/vechile_information_screen.dart';
 import 'package:auto_pilot/Screens/vehicle_select_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
+import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart' as cb;
 import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -252,6 +253,28 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 return estimateSuccessSheet();
               },
             );
+          }
+          if (state is GetSingleCustomerDetailsState) {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return NewCustomerScreen(
+                  customerEdit: state.customerData,
+                  navigation: "partial_estimate_customer_edit",
+                  orderId: widget.estimateDetails.data.id.toString(),
+                );
+              },
+            ));
+          }
+          if (state is GetSingleVehicleDetailsState) {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return CreateVehicleScreen(
+                  editVehicle: state.vehicleDate.vehicle,
+                  orderId: widget.estimateDetails.data.id.toString(),
+                  navigation: "estimate_partial_vehicle_edit",
+                );
+              },
+            ));
           }
 
           // TODO: implement listener
@@ -624,7 +647,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                           backgroundColor: Colors.transparent,
                                           context: context,
                                           builder: (context) {
-                                            return editCustomerBottomSheet();
+                                            return editCustomerBottomSheet(
+                                                context, state);
                                           },
                                         );
                                       },
@@ -2093,7 +2117,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 customerId: widget
                                     .estimateDetails.data.customerId
                                     .toString(),
-                              ));
+                              ),
+                              "");
                         }
                       } else if (label == "Service") {
                         showModalBottomSheet(
@@ -2211,7 +2236,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             navigation: "partial",
                             subNavigation: widget.navigation,
                             orderId: widget.estimateDetails.data.id.toString(),
-                          ));
+                          ),
+                          "");
                     }
                   }
                 } else if (label == 'Vehicle') {
@@ -2274,7 +2300,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             orderId: widget.estimateDetails.data.id.toString(),
                             customerId: widget.estimateDetails.data.customerId
                                 .toString(),
-                          ));
+                          ),
+                          "");
                     }
                   }
                 } else if (label == "Service") {
@@ -2333,7 +2360,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           SelectServiceScreen(
                             orderId: widget.estimateDetails.data.id.toString(),
                             navigation: widget.navigation,
-                          ));
+                          ),
+                          "");
                     }
                   }
                 }
@@ -3711,12 +3739,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
-  Widget editCustomerBottomSheet() {
+  Widget editCustomerBottomSheet(BuildContext context, state) {
     return Container(
       decoration: BoxDecoration(
           color: Colors.white, borderRadius: BorderRadius.circular(12)),
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height / 2.6,
+      height: MediaQuery.of(context).size.height / 1.7,
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
@@ -3756,7 +3784,82 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             .where((element) => element.isNotEmpty)
                             .toList()
                             .isNotEmpty) {
-                      showPopUpBeforeService(context, null, false);
+                      showPopUpBeforeService(context, null, "", false);
+                    }
+                  }
+                },
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width,
+                  height: 56,
+                  decoration: BoxDecoration(
+                      color: const Color(0xffF6F6F6),
+                      borderRadius: BorderRadius.circular(8)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // SvgPicture.asset("assets/images/edit_pen_icon.svg",
+                      //     color: !isVehicleEdit
+                      //         ? AppColors.primaryColors
+                      //         : Colors.grey),
+                      Icon(Icons.change_circle_outlined,
+                          color: !isVehicleEdit
+                              ? AppColors.primaryColors
+                              : Colors.grey),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          "Change Customer",
+                          style: TextStyle(
+                              color: !isVehicleEdit
+                                  ? AppColors.primaryColors
+                                  : Colors.grey,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 18.0),
+              child: GestureDetector(
+                onTap: () {
+                  if ((appointmentValidation() &&
+                          startTimeController.text.isEmpty) &&
+                      (noteValidation() &&
+                          estimateNoteController.text.isEmpty) &&
+                      networkImageList
+                          .where((element) => element.isNotEmpty)
+                          .toList()
+                          .isEmpty) {
+                    if (!isVehicleEdit &&
+                        widget.estimateDetails.data.customer != null) {
+                      // setState(() {
+                      //   isCustomerEdit = true;
+                      // });
+                      // Navigator.pop(context);
+                      //Navigate to edit customer screeen.
+                      _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                          GetSingleCustomerDetailsEvent(
+                              customerId: widget.estimateDetails.data.customerId
+                                  .toString()));
+                    }
+                  } else {
+                    // CommonWidgets().showDialog(context,
+                    //     "Please save the unsaved changes before selecting the service");
+                    // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isNotEmpty) ||
+                        (noteValidation() &&
+                            estimateNoteController.text.isNotEmpty) ||
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isNotEmpty) {
+                      showPopUpBeforeService(context, null, "customer", false);
                     }
                   }
                 },
@@ -3771,20 +3874,28 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SvgPicture.asset("assets/images/edit_pen_icon.svg",
-                          color: !isVehicleEdit
+                          color: !isVehicleEdit &&
+                                  widget.estimateDetails.data.customer != null
                               ? AppColors.primaryColors
                               : Colors.grey),
                       Padding(
                         padding: const EdgeInsets.only(left: 8.0),
-                        child: Text(
-                          "Edit Customer",
-                          style: TextStyle(
-                              color: !isVehicleEdit
-                                  ? AppColors.primaryColors
-                                  : Colors.grey,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600),
-                        ),
+                        child: state is GetSingleCustomerDetailsLoadingState
+                            ? const Center(
+                                child: CupertinoActivityIndicator(),
+                              )
+                            : Text(
+                                "Edit Customer",
+                                style: TextStyle(
+                                    color: !isVehicleEdit &&
+                                            widget.estimateDetails.data
+                                                    .customer !=
+                                                null
+                                        ? AppColors.primaryColors
+                                        : Colors.grey,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
                       ),
                     ],
                   ),
@@ -3823,7 +3934,94 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               .where((element) => element.isNotEmpty)
                               .toList()
                               .isNotEmpty) {
-                        showPopUpBeforeService(context, null, true);
+                        showPopUpBeforeService(context, null, "", true);
+                      }
+                    }
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: MediaQuery.of(context).size.width,
+                    height: 56,
+                    decoration: BoxDecoration(
+                        color: const Color(0xffF6F6F6),
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // SvgPicture.asset(
+                        //   "assets/images/edit_pen_icon.svg",
+                        //   color: widget.estimateDetails.data.vehicle != null &&
+                        //           !isCustomerEdit
+                        //       ? AppColors.primaryColors
+                        //       : Colors.grey,
+                        // ),
+
+                        Icon(
+                          Icons.change_circle_outlined,
+                          color: widget.estimateDetails.data.vehicle != null &&
+                                  !isCustomerEdit
+                              ? AppColors.primaryColors
+                              : Colors.grey,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            "Change Vehicle",
+                            style: TextStyle(
+                                color: widget.estimateDetails.data.vehicle !=
+                                            null &&
+                                        !isCustomerEdit
+                                    ? AppColors.primaryColors
+                                    : Colors.grey,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+            Padding(
+                padding: const EdgeInsets.only(top: 18.0),
+                child: GestureDetector(
+                  onTap: () {
+                    if ((appointmentValidation() &&
+                            startTimeController.text.isEmpty) &&
+                        (noteValidation() &&
+                            estimateNoteController.text.isEmpty) &&
+                        networkImageList
+                            .where((element) => element.isNotEmpty)
+                            .toList()
+                            .isEmpty) {
+                      if (widget.estimateDetails.data.vehicle != null &&
+                          !isCustomerEdit) {
+                        // setState(() {
+                        //   isVehicleEdit = true;
+
+                        // });
+
+                        // Navigator.pop(context);
+
+                        //Navigate to vehicle edit screen.
+
+                        _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                            GetSingleVehicleDetailsEvent(
+                                vehicleId: widget.estimateDetails.data.vehicleId
+                                    .toString()));
+                      }
+                    } else {
+                      // CommonWidgets().showDialog(context,
+                      //     "Please save the unsaved changes before selecting the service");
+                      // if(appointmentValidation() && noteValidation() && startTImeController.text.isEmpty)
+                      if ((appointmentValidation() &&
+                              startTimeController.text.isNotEmpty) ||
+                          (noteValidation() &&
+                              estimateNoteController.text.isNotEmpty) ||
+                          networkImageList
+                              .where((element) => element.isNotEmpty)
+                              .toList()
+                              .isNotEmpty) {
+                        showPopUpBeforeService(context, null, "vehicle", true);
                       }
                     }
                   },
@@ -5087,7 +5285,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
-  Future showPopUpBeforeService(BuildContext ctx, constructor,
+  Future showPopUpBeforeService(BuildContext ctx, constructor, String edit,
       [bool? isVehicle]) {
     return showCupertinoDialog(
       context: ctx,
@@ -5108,7 +5306,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               estimateNoteController.clear();
               networkImageList.clear();
               networkImageList.addAll(["", "", "", ""]);
-              if (constructor == null) {
+              if (constructor == null && edit == "") {
                 if (widget.estimateDetails.data.vehicle != null) {
                   setState(() {
                     if (isVehicle == true) {
@@ -5133,25 +5331,37 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                 }
 
                 return;
+              } else if (constructor == null && edit != "") {
+                if (edit == "customer") {
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetSingleCustomerDetailsEvent(
+                          customerId: widget.estimateDetails.data.customerId
+                              .toString()));
+                } else if (edit == "vehicle") {
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetSingleVehicleDetailsEvent(
+                          vehicleId: widget.estimateDetails.data.vehicleId
+                              .toString()));
+                }
+              } else {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) {
+                    return constructor;
+                  },
+                )).then((value) {
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetEstimateAppointmentEvent(
+                          orderId: widget.estimateDetails.data.id.toString()));
+
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetEstimateNoteEvent(
+                          orderId: widget.estimateDetails.data.id.toString()));
+                  _scaffoldKey.currentContext!.read<EstimateBloc>().add(
+                      GetAllOrderImageEvent(
+                          orderId: widget.estimateDetails.data.id.toString()));
+                  Navigator.pop(context);
+                });
               }
-
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) {
-                  return constructor;
-                },
-              )).then((value) {
-                _scaffoldKey.currentContext!.read<EstimateBloc>().add(
-                    GetEstimateAppointmentEvent(
-                        orderId: widget.estimateDetails.data.id.toString()));
-
-                _scaffoldKey.currentContext!.read<EstimateBloc>().add(
-                    GetEstimateNoteEvent(
-                        orderId: widget.estimateDetails.data.id.toString()));
-                _scaffoldKey.currentContext!.read<EstimateBloc>().add(
-                    GetAllOrderImageEvent(
-                        orderId: widget.estimateDetails.data.id.toString()));
-                Navigator.pop(context);
-              });
 
               //  context.read<EstimateBloc>().add(GetSingleEstimateEvent(orderId: widget.estimateDetails.data.id.toString()));
             }

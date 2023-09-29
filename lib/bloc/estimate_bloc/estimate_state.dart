@@ -225,3 +225,42 @@ class GetClientByIdInEstimateErrorState extends EstimateState {
 class CreateCannedServiceEstimateState extends EstimateState {}
 
 class GetAppointmentDetailsState extends EstimateState {}
+
+class GetSingleCustomerDetailsState extends EstimateState {
+  final cm.Datum customerData;
+  GetSingleCustomerDetailsState({required this.customerData});
+}
+
+class GetSingleCustomerDetailsLoadingState extends EstimateState {}
+
+class GetSingleCustomerDetailsErrorState extends EstimateState {
+  final String errorMessage;
+  GetSingleCustomerDetailsErrorState({required this.errorMessage});
+}
+
+class GetSingleVehicleDetailsState extends EstimateState {
+  SingleVehicleInfoModel vehicleDate;
+  GetSingleVehicleDetailsState({required this.vehicleDate});
+}
+
+class GetSingleVehicleDetailsLoadingState extends EstimateState {}
+
+class GetSingleVehicleDetailsErrorState extends EstimateState {
+  final String errorMessage;
+  GetSingleVehicleDetailsErrorState({required this.errorMessage});
+}
+
+class GetAllVendorsSuccessEstimateState extends EstimateState {
+  final List<VendorResponseModel> vendors;
+  const GetAllVendorsSuccessEstimateState({required this.vendors});
+
+  @override
+  List<Object> get props => [vendors];
+}
+
+class GetAllVendorsLoadingState extends EstimateState {}
+
+class GetAllVendorsErrorState extends EstimateState {
+  final String message;
+  const GetAllVendorsErrorState({required this.message});
+}

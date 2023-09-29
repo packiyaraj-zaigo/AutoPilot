@@ -12,6 +12,8 @@ import 'package:auto_pilot/Models/estimate_model.dart';
 import 'package:auto_pilot/Models/estimate_note_model.dart';
 import 'package:auto_pilot/Models/order_image_model.dart';
 import 'package:auto_pilot/Models/payment_history_model.dart';
+import 'package:auto_pilot/Models/single_vehicle_info_model.dart';
+import 'package:auto_pilot/Models/vendor_response_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/bloc/customer_bloc/customer_bloc.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
@@ -20,6 +22,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:auto_pilot/Models/customer_model.dart' as cm;
 
 part 'estimate_event.dart';
 part 'estimate_state.dart';
@@ -29,6 +32,7 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
   int currentPage = 1;
   int totalPages = 0;
   bool isFetching = false;
+  bool isVendorsPagenationLoading = false;
 
   int paymentCurrentPage = 1;
   int paymentTotalPage = 0;
@@ -66,6 +70,9 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     on<GetEventDetailsByIdEvent>(getEventDetailsByIdBloc);
     on<GetClientByIdInEstimateEvent>(getClientByIdEstimate);
     on<CreateCannedOrderServiceEstimateEvent>(createCannedOrderEstimateService);
+    on<GetSingleCustomerDetailsEvent>(getSingleCustomerDetailsBloc);
+    on<GetSingleVehicleDetailsEvent>(getSingleVehicleDetailsBloc);
+    on<GetAllVendorsEstimateEvent>(getAllVendors);
   }
 
   Future<void> createEstimateFromAppointment(
@@ -1043,6 +1050,92 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       log(e.toString() + " Get client bloc error");
       emit(GetClientByIdInEstimateErrorState(
           errorMessage: 'Something went wrong'));
+    }
+  }
+
+  Future<void> getSingleCustomerDetailsBloc(
+      GetSingleCustomerDetailsEvent event, Emitter<EstimateState> emit) async {
+    try {
+      emit(GetSingleCustomerDetailsLoadingState());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      cm.Datum customerData;
+      Response response =
+          await _apiRepository.getSingleCustomer(token!, event.customerId);
+      if (response.statusCode == 200) {
+        print(response.body);
+        var decodedBody = json.decode(response.body);
+        customerData = cm.Datum.fromJson(decodedBody['customer']);
+
+        emit(GetSingleCustomerDetailsState(customerData: customerData));
+      } else {
+        emit(GetSingleCustomerDetailsErrorState(
+            errorMessage: 'Something went wrong'));
+      }
+    } catch (e) {
+      log(e.toString() + " Get client bloc error");
+      emit(GetSingleCustomerDetailsErrorState(
+          errorMessage: 'Something went wrong'));
+    }
+  }
+
+  Future<void> getSingleVehicleDetailsBloc(
+      GetSingleVehicleDetailsEvent event, Emitter<EstimateState> emit) async {
+    try {
+      emit(GetSingleVehicleDetailsLoadingState());
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      SingleVehicleInfoModel vehicleData;
+      Response response =
+          await _apiRepository.getSingleVehicle(token!, event.vehicleId);
+      print(response.body);
+      if (response.statusCode == 200) {
+        print(response.body);
+        vehicleData = singleVehicleInfoModelFromJson(response.body);
+
+        emit(GetSingleVehicleDetailsState(vehicleDate: vehicleData));
+      } else {
+        emit(GetSingleVehicleDetailsErrorState(
+            errorMessage: 'Something went wrong'));
+      }
+    } catch (e) {
+      log(e.toString() + " Get client bloc error");
+      emit(GetSingleVehicleDetailsErrorState(
+          errorMessage: 'Something went wrong'));
+    }
+  }
+
+  Future<void> getAllVendors(
+    GetAllVendorsEstimateEvent event,
+    Emitter<EstimateState> emit,
+  ) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString(AppConstants.USER_TOKEN);
+      Response getProvinceRes =
+          await _apiRepository.getAllVendors(token!, currentPage);
+      log("res${getProvinceRes.body}");
+      final body = jsonDecode(getProvinceRes.body);
+      if (getProvinceRes.statusCode == 200) {
+        List<VendorResponseModel> vendors = [];
+
+        totalPages = body['data']['last_page'] ?? 1;
+        isVendorsPagenationLoading = false;
+        if (body['data']['data'] != null && body['data']['data'].isNotEmpty) {
+          body['data']['data'].forEach((vendor) {
+            vendors.add(VendorResponseModel.fromJson(vendor));
+          });
+        }
+        emit(GetAllVendorsSuccessState(vendors: vendors));
+
+        if (totalPages > currentPage && currentPage != 0) {
+          currentPage += 1;
+        } else {
+          currentPage = 0;
+        }
+      }
+    } catch (e) {
+      log(e.toString() + " Vendors pagenation bloc error");
     }
   }
 

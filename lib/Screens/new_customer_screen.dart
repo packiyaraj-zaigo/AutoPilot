@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:auto_pilot/Models/customer_model.dart';
 import 'package:auto_pilot/Screens/customers_screen.dart';
 import 'package:auto_pilot/Screens/dummy_customer_screen.dart';
+import 'package:auto_pilot/Screens/estimate_partial_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
@@ -157,6 +158,7 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                     (route) => false,
                   );
                 } else {
+                  log("this works");
                   CommonWidgets().showSuccessDialog(
                       context, "Customer Created Successfully");
                   Navigator.of(context).pushAndRemoveUntil(
@@ -167,6 +169,26 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   );
                 }
               }
+            } else if (state is EditCustomerSuccessState) {
+              if (widget.navigation == "partial_estimate_customer_edit") {
+                print("this one workds");
+                context.read<CustomerBloc>().add(
+                    GetSingleEstimateEvent(orderId: widget.orderId.toString()));
+              } else {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const CustomersScreen(),
+                  ),
+                  (route) => false,
+                );
+              }
+            } else if (state is GetSingleEstimateState) {
+              Navigator.pushReplacement(context, MaterialPageRoute(
+                builder: (context) {
+                  return EstimatePartialScreen(
+                      estimateDetails: state.createEstimateModel);
+                },
+              ));
             } else if (state is AddCustomerLoading) {
               const Center(
                 child: CupertinoActivityIndicator(),
