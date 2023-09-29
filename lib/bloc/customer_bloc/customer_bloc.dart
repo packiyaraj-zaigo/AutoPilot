@@ -388,12 +388,14 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
           loadedResponse.statusCode == 201) {
         CommonWidgets()
             .showSuccessDialog(event.context, 'Customer Updated Successfully');
-        Navigator.of(event.context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => const CustomersScreen(),
-          ),
-          (route) => false,
-        );
+        // Navigator.of(event.context).pushAndRemoveUntil(
+        //   MaterialPageRoute(
+        //     builder: (context) => const CustomersScreen(),
+        //   ),
+        //   (route) => false,
+        // );
+
+        emit(EditCustomerSuccessState());
       } else {
         if (unloadData.containsKey('message')) {
           emit(EditCustomerError(message: unloadData['message']));

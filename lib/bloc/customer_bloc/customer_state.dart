@@ -43,6 +43,8 @@ class EditCustomerLoading extends CustomerState {
   EditCustomerLoading();
 }
 
+class EditCustomerSuccessState extends CustomerState {}
+
 class DeleteCustomerLoading extends CustomerState {
   DeleteCustomerLoading();
 }

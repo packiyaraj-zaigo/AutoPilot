@@ -263,3 +263,15 @@ class GetAppointmentDetailsEvent extends EstimateEvent {
   final String appointmentId;
   GetAppointmentDetailsEvent({required this.appointmentId});
 }
+
+class GetSingleCustomerDetailsEvent extends EstimateEvent {
+  final String customerId;
+  GetSingleCustomerDetailsEvent({required this.customerId});
+}
+
+class GetSingleVehicleDetailsEvent extends EstimateEvent {
+  final String vehicleId;
+  GetSingleVehicleDetailsEvent({required this.vehicleId});
+}
+
+class GetAllVendorsEstimateEvent extends EstimateEvent {}
