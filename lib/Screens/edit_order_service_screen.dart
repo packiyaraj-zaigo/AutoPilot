@@ -1029,10 +1029,10 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
               maxLength: label == "Service Name"
                   ? 150
                   : label == "Notes" || label == "Description"
-                      ? 255
+                      ? null
                       : label == "Price" || label == "Cost"
                           ? 7
-                          : 50,
+                          : 100,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
@@ -3108,7 +3108,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     }
 
     isPercentage = item?.discountType == "Percentage";
-
 
     //Add SubContract errorstatus and error message variables
     String addSubContractNameErrorStatus = '';

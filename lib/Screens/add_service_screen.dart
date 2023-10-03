@@ -998,8 +998,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   : label == "Service Name" ||
                           label == "Notes" ||
                           label == "Description"
-                      ? 255
-                      : 25,
+                      ? null
+                      : 100,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
                     ? const Icon(
@@ -1069,11 +1069,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         laborDescriptionController.text.trim().length < 2) {
       laborDescriptionError = 'Notes should be atleast 2 characters';
       status = false;
-    } else if (laborDescriptionController.text.trim().isNotEmpty &&
-        laborDescriptionController.text.trim().length > 150) {
-      laborDescriptionError = "Notes can't be more than 150 characters";
-      status = false;
-    } else {
+    }
+    //  else if (laborDescriptionController.text.trim().isNotEmpty &&
+    //     laborDescriptionController.text.trim().length > 150) {
+    //   laborDescriptionError = "Notes can't be more than 150 characters";
+    //   status = false;
+    // }
+    else {
       laborDescriptionError = '';
     }
 
