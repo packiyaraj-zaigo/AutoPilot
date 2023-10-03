@@ -1509,6 +1509,10 @@ class ApiProvider {
       if (map['vendor_id'] == null) {
         map.remove('vendor_id');
       }
+
+      if (map['markup'] == null || map['markup'] == '') {
+        map.remove('markup');
+      }
       map['canned_service_id'] = serviceId;
       final response = await http.post(url,
           headers: getHeader(token), body: json.encode(map));
@@ -1789,6 +1793,10 @@ class ApiProvider {
         'POST',
         url,
       );
+
+      if (map['markup'] == null || map['markup'] == '') {
+        map.remove('markup');
+      }
       map.forEach((key, value) {
         request.fields[key] = value.toString();
       });
@@ -1869,6 +1877,10 @@ class ApiProvider {
       final map = model.toJson();
       map['canned_service_id'] = serviceId;
 
+      if (map['markup'] == null || map['markup'] == '') {
+        map.remove('markup');
+      }
+
       final url = Uri.parse('${BASE_URL}api/canned_service_items/$id');
 
       final response = await http.put(url,
@@ -1888,6 +1900,10 @@ class ApiProvider {
       map["tax"] = model.tax;
       map.remove('is_tax');
 
+      if (map['markup'] == null || map['markup'] == '') {
+        map.remove('markup');
+      }
+
       final url = Uri.parse('${BASE_URL}api/order_service_items/$id');
 
       final response = await http.put(url,
@@ -1905,6 +1921,10 @@ class ApiProvider {
       final map = model.toJson();
       if (map['vendor_id'] == null) {
         map.remove('vendor_id');
+      }
+
+      if (map['markup'] == null || map['markup'] == '') {
+        map.remove('markup');
       }
 
       map['order_service_id'] = serviceId.toString();
