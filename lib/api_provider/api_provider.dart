@@ -1885,6 +1885,8 @@ class ApiProvider {
       final map = model.toJson();
       map['order_service_id'] = serviceId;
       map.remove('canned_service_id');
+      map["tax"] = model.tax;
+      map.remove('is_tax');
 
       final url = Uri.parse('${BASE_URL}api/order_service_items/$id');
 
