@@ -1599,7 +1599,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                 Text(
+                Text(
                   "${item == null ? "Add" : "Edit"} Material",
                   style: TextStyle(
                       fontSize: 18,
@@ -2144,7 +2144,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Text(
+              Text(
                 "${item == null ? "Add" : "Edit"} Part",
                 style: TextStyle(
                     fontSize: 18,
@@ -2556,9 +2556,9 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
     final addLaborHoursController =
         TextEditingController(text: item?.quanityHours ?? '1');
     final addLaborBaseCostController =
-        TextEditingController(text: client?.baseLaborCost ?? '');
+        TextEditingController(text: item?.unitPrice ?? client?.baseLaborCost);
     final addLaborTaxController =
-        TextEditingController(text: item?.tax ?? client?.laborTaxRate ?? '');
+        TextEditingController(text: item?.tax ?? client?.laborTaxRate);
 
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
@@ -2686,7 +2686,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Text(
+              Text(
                 "${item == null ? "Add" : "Edit"} Labor",
                 style: TextStyle(
                     fontSize: 18,
@@ -3085,7 +3085,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Text(
+              Text(
                 "${item == null ? "Add" : "Edit"} Fee",
                 style: TextStyle(
                     fontSize: 18,
@@ -3521,7 +3521,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                       Text(
+                      Text(
                         "${item == null ? "Add" : "Edit"} SubContract",
                         style: TextStyle(
                             fontSize: 18,
