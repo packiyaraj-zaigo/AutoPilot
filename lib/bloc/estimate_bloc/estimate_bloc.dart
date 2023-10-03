@@ -663,21 +663,13 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
     try {
       emit(CreateOrderServiceItemLoadingState());
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var token = prefs.getString(AppConstants.USER_TOKEN);
+      final token = await AppUtils.getToken();
       Response createOrderServiceItem =
           await _apiRepository.createOrderServiceItem(
-              token,
-              event.cannedServiceId,
-              event.itemType,
-              event.itemName,
-              event.unitPrice,
-              event.quantityHours,
-              event.discount,
-              event.discountType,
-              event.position,
-              event.subTotal,
-              event.tax,
-              event.cost);
+        token,
+        event.item,
+        event.cannedServiceId.toString(),
+      );
 
       log("res${createOrderServiceItem.body}");
 

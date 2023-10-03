@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:auto_pilot/Bloc/service_Bloc/service_bloc.dart';
+import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart';
 import 'package:auto_pilot/Screens/add_service_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
@@ -508,22 +509,34 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
               if (item.cannedServiceItems != null &&
                   item.cannedServiceItems!.isNotEmpty) {
                 for (int i = 0; i < item.cannedServiceItems!.length; i++) {
-                  context.read<EstimateBloc>().add(CreateOrderServiceItemEvent(
-                      cannedServiceId: state.orderServiceId,
-                      itemType: item.cannedServiceItems![i].itemType,
-                      itemName: item.cannedServiceItems![i].itemName,
-                      discount: item.cannedServiceItems![i].discount,
-                      discountType: item.cannedServiceItems![i].discountType,
-                      position: "0",
-                      quantityHours: item.cannedServiceItems![i].quanityHours,
-                      subTotal: item.cannedServiceItems![i].subTotal,
-                      unitPrice: item.cannedServiceItems![i].unitPrice,
-                      tax: item.cannedServiceItems![i].itemType == "Material"
-                          ? materialTax
-                          : item.cannedServiceItems![i].itemType == "Part"
-                              ? partTax
-                              : laborTax,
-                      cost: item.cannedServiceItems![i].markup));
+                  context.read<EstimateBloc>().add(
+                        CreateOrderServiceItemEvent(
+                          cannedServiceId: state.orderServiceId,
+                          item: CannedServiceAddModel(
+                            cannedServiceId: 0,
+                            itemName: item.cannedServiceItems![i].itemName,
+                            itemType: item.cannedServiceItems![i].itemType,
+                            discount: item.cannedServiceItems![i].discount,
+                            discountType:
+                                item.cannedServiceItems![i].discountType,
+                            quanityHours:
+                                item.cannedServiceItems![i].quanityHours,
+                            subTotal: item.cannedServiceItems![i].subTotal,
+                            unitPrice: item.cannedServiceItems![i].unitPrice,
+                            tax: item.cannedServiceItems![i].itemType ==
+                                    "Material"
+                                ? materialTax
+                                : item.cannedServiceItems![i].itemType == "Part"
+                                    ? partTax
+                                    : laborTax,
+                            cost: item.cannedServiceItems![i].markup,
+                            note: item.cannedServiceItems![i].itemServiceNote ??
+                                '',
+                            part: item.cannedServiceItems![i].partName ?? '',
+                            vendorId: item.cannedServiceItems![i].vendorId,
+                          ),
+                        ),
+                      );
                 }
               } else {
                 context

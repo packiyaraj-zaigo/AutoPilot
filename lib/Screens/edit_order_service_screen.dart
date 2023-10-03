@@ -693,8 +693,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   return AlertDialog(
                                     contentPadding: const EdgeInsets.all(20),
                                     insetPadding: const EdgeInsets.all(20),
-                                    content: addMaterialPopup(
-                                        item: item, index: index),
+                                    content:
+                                        addFeePopup(item: item, index: index),
                                   );
                                 },
                               );
@@ -1476,8 +1476,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Add Material",
+                Text(
+                  "${item == null ? "Add" : "Edit"} Material",
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -1963,8 +1963,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Part",
+              Text(
+                "${item == null ? "Add" : "Edit"} Part",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -2442,8 +2442,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Labor",
+              Text(
+                "${item == null ? "Add" : "Edit"} Labor",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -2831,8 +2831,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Fee",
+              Text(
+                "${item == null ? "Add" : "Edit"} Fee",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -3215,8 +3215,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Subcontract",
+              Text(
+                "${item == null ? "Add" : "Edit"} Subcontract",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -3477,7 +3477,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                               .text.isNotEmpty
                                       ? "Percentage"
                                       : "Fixed",
-                                  tax: isTax == true ? 'Y' : 'N',
                                   vendorId: vendorId,
                                   unitPrice: addSubContractPriceController.text,
                                   itemType: "SubContract",
@@ -3513,7 +3512,6 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                                 .text.isNotEmpty
                                         ? "Percentage"
                                         : "Fixed",
-                                    tax: isTax == true ? 'Y' : 'N',
                                     vendorId: vendorId,
                                     unitPrice:
                                         addSubContractPriceController.text,
