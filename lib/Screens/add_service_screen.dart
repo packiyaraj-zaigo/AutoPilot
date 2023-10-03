@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Models/canned_service_create.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_model.dart' as cs;
@@ -1436,8 +1438,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Add Material",
+                Text(
+                  "${item == null ? "Add" : "Edit"} Material",
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -1765,7 +1767,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       addMaterialQuantityController.text.trim(),
                                   itemType: "Material",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: materialCost.toStringAsFixed(2),
+                                  cost: addMaterialCostController.text.trim(),
                                 );
                                 if (item.id != '') {
                                   final ind = editedItems.indexWhere(
@@ -1799,7 +1801,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                         .trim(),
                                     itemType: "Material",
                                     subTotal: subTotal.toStringAsFixed(2),
-                                    cost: materialCost.toStringAsFixed(2)));
+                                    cost:
+                                        addMaterialCostController.text.trim()));
                               }
                               setState(() {});
                               Navigator.pop(context);
@@ -1979,8 +1982,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Part",
+              Text(
+                "${item == null ? "Add" : "Edit"} Part",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -2317,7 +2320,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   quanityHours: addPartQuantityController.text,
                                   itemType: "Part",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: partCost.toStringAsFixed(2));
+                                  cost: addPartCostController.text.trim());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -2347,7 +2350,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   quanityHours: addPartQuantityController.text,
                                   itemType: "Part",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: partCost.toStringAsFixed(2)));
+                                  cost: addPartCostController.text.trim()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -2516,8 +2519,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Labor",
+              Text(
+                "${item == null ? "Add" : "Edit"} Labor",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -2782,7 +2785,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: laborCost.toStringAsFixed(2));
+                                  cost: addLaborCostController.text.trim());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -2813,7 +2816,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: laborCost.toStringAsFixed(2)));
+                                  cost: addLaborCostController.text.trim()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -2905,8 +2908,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Fee",
+              Text(
+                "${item == null ? "Add" : "Edit"} Fee",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -3136,7 +3139,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: feeCost.toStringAsFixed(2));
+                                  cost: addFeeCostController.text.trim());
 
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
@@ -3158,7 +3161,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: feeCost.toStringAsFixed(2)));
+                                  cost: addFeeCostController.text.trim()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -3324,8 +3327,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Subcontract",
+              Text(
+                "${item == null ? "Add" : "Edit"} Subcontract",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -3631,12 +3634,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                               .text.isNotEmpty
                                       ? "Percentage"
                                       : "Fixed",
-                                  tax: isTax == true ? 'Y' : 'N',
                                   vendorId: vendorId,
                                   unitPrice: addSubContractPriceController.text,
                                   itemType: "SubContract",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: subContractCost.toStringAsFixed(2));
+                                  cost:
+                                      addSubContractCostController.text.trim());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -3667,13 +3670,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                                 .text.isNotEmpty
                                         ? "Percentage"
                                         : "Fixed",
-                                    tax: isTax == true ? 'Y' : 'N',
                                     vendorId: vendorId,
                                     unitPrice:
                                         addSubContractPriceController.text,
                                     itemType: "SubContract",
                                     subTotal: subTotal.toStringAsFixed(2),
-                                    cost: subContractCost.toStringAsFixed(2)),
+                                    cost: addSubContractCostController.text
+                                        .trim()),
                               );
                             }
                             setState(() {});

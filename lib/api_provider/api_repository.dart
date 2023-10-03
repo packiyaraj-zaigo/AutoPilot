@@ -476,32 +476,9 @@ class ApiRepository {
         serviceNotes, laborRate, tax, servicePrice, technicianId);
   }
 
-  Future createOrderServiceItem(
-      dynamic token,
-      String cannedServiceId,
-      String itemType,
-      String itemName,
-      String unitPrice,
-      String quantityHours,
-      String discount,
-      String discountType,
-      String position,
-      String subTotal,
-      String tax,
-      String cost) {
-    return apiProvider.createOrderServiceItem(
-        token,
-        cannedServiceId,
-        itemType,
-        itemName,
-        unitPrice,
-        quantityHours,
-        discount,
-        discountType,
-        position,
-        subTotal,
-        tax,
-        cost);
+  Future<dynamic> createOrderServiceItem(
+      String token, CannedServiceAddModel model, String serviceId) {
+    return apiProvider.createOrderServiceItems(token, model, serviceId);
   }
 
   Future deleteCannedService(String token, String serviceId) {

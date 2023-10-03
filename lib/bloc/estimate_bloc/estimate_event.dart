@@ -11,6 +11,7 @@ class GetEstimateEvent extends EstimateEvent {
   final String orderStatus;
   const GetEstimateEvent({required this.orderStatus});
 }
+
 class CreateEstimateEvent extends EstimateEvent {
   final String id;
   final String which;
@@ -133,30 +134,13 @@ class CreateOrderServiceEvent extends EstimateEvent {
 }
 
 class CreateOrderServiceItemEvent extends EstimateEvent {
-  final String cannedServiceId,
-      itemType,
-      itemName,
-      unitPrice,
-      quantityHours,
-      discount,
-      discountType,
-      position,
-      subTotal,
-      tax,
-      cost;
+  final String cannedServiceId;
+  final CannedServiceAddModel item;
 
-  CreateOrderServiceItemEvent(
-      {required this.cannedServiceId,
-      required this.itemType,
-      required this.itemName,
-      required this.discount,
-      required this.discountType,
-      required this.position,
-      required this.quantityHours,
-      required this.subTotal,
-      required this.unitPrice,
-      required this.tax,
-      required this.cost});
+  CreateOrderServiceItemEvent({
+    required this.cannedServiceId,
+    required this.item,
+  });
 }
 
 class DeleteOrderServiceEvent extends EstimateEvent {

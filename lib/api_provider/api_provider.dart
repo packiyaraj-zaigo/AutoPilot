@@ -1776,47 +1776,29 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> createOrderServiceItem(
-      dynamic token,
-      String cannedServiceId,
-      String itemType,
-      String itemName,
-      String unitPrice,
-      String quantityHours,
-      String discount,
-      String discountType,
-      String position,
-      String subTotal,
-      String tax,
-      String cost) async {
-    print("into provider");
-
-    //  LoadingFormModel? loadingFormModel;
+  Future<dynamic> createOrderServiceItems(
+      String token, CannedServiceAddModel model, String serviceId) async {
     try {
-      var url = Uri.parse("${BASE_URL}api/order_service_items");
-      var request = http.MultipartRequest("POST", url)
-        ..fields['order_service_id'] = cannedServiceId
-        ..fields['item_type'] = itemType
-        ..fields['item_name'] = itemName
-        ..fields['unit_price'] = unitPrice
-        ..fields['quanity_hours'] = quantityHours
-        ..fields['discount'] = discount
-        ..fields['discount_type'] = discountType
-        ..fields['position'] = position
-        ..fields['sub_total'] = subTotal
-        ..fields['tax'] = tax
-        ..fields['markup'] = cost;
+      final url = Uri.parse('${BASE_URL}api/order_service_items');
+      final map = model.toJson();
+      if (map['vendor_id'] == null) {
+        map.remove('vendor_id');
+      }
+      map['order_service_id'] = serviceId;
+      final request = http.MultipartRequest(
+        'POST',
+        url,
+      );
+      map.forEach((key, value) {
+        request.fields[key] = value.toString();
+      });
+      final response = await request.send();
 
-      request.headers.addAll(getHeader(token));
-      inspect(request);
-      var response = await request.send();
-      log(request.fields.toString());
+      log(map.toString());
       inspect(response);
-      print(response.statusCode.toString() + "provider status code");
-      print(response.toString() + "provider response");
       return http.Response.fromStream(response);
     } catch (e) {
-      print(e.toString() + "provider error");
+      log(e.toString() + " Create canned order service api error");
     }
   }
 
@@ -1902,6 +1884,7 @@ class ApiProvider {
     try {
       final map = model.toJson();
       map['order_service_id'] = serviceId;
+      map.remove('canned_service_id');
 
       final url = Uri.parse('${BASE_URL}api/order_service_items/$id');
 
@@ -1921,7 +1904,8 @@ class ApiProvider {
       if (map['vendor_id'] == null) {
         map.remove('vendor_id');
       }
-      map['order_service_id'] = serviceId;
+
+      map['order_service_id'] = serviceId.toString();
       map.remove('canned_service_id');
       map["tax"] = model.tax;
       map.remove('is_tax');

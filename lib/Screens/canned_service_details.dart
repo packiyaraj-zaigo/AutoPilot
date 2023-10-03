@@ -44,6 +44,7 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
           discount: element.discount,
           itemName: element.itemName,
           unitPrice: element.unitPrice,
+          cost: element.markup,
           part: element.partName ?? '',
           subTotal: element.subTotal,
           discountType: 'Percentage',

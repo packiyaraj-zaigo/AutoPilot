@@ -3125,7 +3125,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                     100;
           }
 
-          costAmount = costAmount + double.parse(element2.markup);
+          costAmount = costAmount +
+              ((double.tryParse(element2.markup) ?? 0) *
+                  (double.tryParse(element2.quanityHours) ?? 1));
         });
       });
     });
@@ -4493,73 +4495,83 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 quanityHours: e.quanityHours,
                                 tax: e.tax,
                                 vendorId: e.vendorId,
+                                cost: e.markup,
+                                
                               ),
                             );
                           } else if (e.itemType.toLowerCase() == "part") {
                             partAddModel.add(CannedServiceAddModel(
-                                cannedServiceId: e.orderServiceId,
-                                itemName: e.itemName,
-                                unitPrice: e.unitPrice,
-                                discount: e.discount,
-                                subTotal: e.subTotal,
-                                note: e.itemServiceNote ?? '',
-                                part: e.partName ?? "",
-                                discountType: e.discountType,
-                                id: e.id.toString(),
-                                itemType: e.itemType,
-                                position: e.position,
-                                quanityHours: e.quanityHours,
-                                tax: e.tax,
-                                vendorId: e.vendorId));
+                              cannedServiceId: e.orderServiceId,
+                              itemName: e.itemName,
+                              unitPrice: e.unitPrice,
+                              discount: e.discount,
+                              subTotal: e.subTotal,
+                              note: e.itemServiceNote ?? '',
+                              part: e.partName ?? "",
+                              discountType: e.discountType,
+                              id: e.id.toString(),
+                              itemType: e.itemType,
+                              position: e.position,
+                              quanityHours: e.quanityHours,
+                              tax: e.tax,
+                              vendorId: e.vendorId,
+                              cost: e.markup,
+                            ));
                           } else if (e.itemType.toLowerCase() == "labor") {
                             laborAddModel.add(CannedServiceAddModel(
-                                cannedServiceId: e.orderServiceId,
-                                itemName: e.itemName,
-                                unitPrice: e.unitPrice,
-                                discount: e.discount,
-                                subTotal: e.subTotal,
-                                note: e.itemServiceNote ?? "",
-                                part: e.partName ?? "",
-                                discountType: e.discountType,
-                                id: e.id.toString(),
-                                itemType: e.itemType,
-                                position: e.position,
-                                quanityHours: e.quanityHours,
-                                tax: e.tax,
-                                vendorId: e.vendorId));
+                              cannedServiceId: e.orderServiceId,
+                              itemName: e.itemName,
+                              unitPrice: e.unitPrice,
+                              discount: e.discount,
+                              subTotal: e.subTotal,
+                              note: e.itemServiceNote ?? "",
+                              part: e.partName ?? "",
+                              discountType: e.discountType,
+                              id: e.id.toString(),
+                              itemType: e.itemType,
+                              position: e.position,
+                              quanityHours: e.quanityHours,
+                              tax: e.tax,
+                              vendorId: e.vendorId,
+                              cost: e.markup,
+                            ));
                           } else if (e.itemType.toLowerCase() == "fee") {
                             feeAddModel.add(CannedServiceAddModel(
-                                cannedServiceId: e.orderServiceId,
-                                itemName: e.itemName,
-                                unitPrice: e.unitPrice,
-                                discount: e.discount,
-                                subTotal: e.subTotal,
-                                note: e.itemServiceNote ?? "",
-                                part: e.partName ?? "",
-                                discountType: e.discountType,
-                                id: e.id.toString(),
-                                itemType: e.itemType,
-                                position: e.position,
-                                quanityHours: e.quanityHours,
-                                tax: e.tax,
-                                vendorId: e.vendorId));
+                              cannedServiceId: e.orderServiceId,
+                              itemName: e.itemName,
+                              unitPrice: e.unitPrice,
+                              discount: e.discount,
+                              subTotal: e.subTotal,
+                              note: e.itemServiceNote ?? "",
+                              part: e.partName ?? "",
+                              discountType: e.discountType,
+                              id: e.id.toString(),
+                              itemType: e.itemType,
+                              position: e.position,
+                              quanityHours: e.quanityHours,
+                              tax: e.tax,
+                              vendorId: e.vendorId,
+                              cost: e.markup,
+                            ));
                           } else if (e.itemType.toLowerCase() ==
                               "subcontract") {
                             subContractAddModel.add(CannedServiceAddModel(
-                                cannedServiceId: e.orderServiceId,
-                                itemName: e.itemName,
-                                unitPrice: e.unitPrice,
-                                discount: e.discount,
-                                subTotal: e.subTotal,
-                                note: e.itemServiceNote ?? "",
-                                part: e.partName ?? "",
-                                discountType: e.discountType,
-                                id: e.id.toString(),
-                                itemType: e.itemType,
-                                position: e.position,
-                                quanityHours: e.quanityHours,
-                                tax: e.tax,
-                                vendorId: e.vendorId));
+                              cannedServiceId: e.orderServiceId,
+                              itemName: e.itemName,
+                              unitPrice: e.unitPrice,
+                              discount: e.discount,
+                              subTotal: e.subTotal,
+                              note: e.itemServiceNote ?? "",
+                              part: e.partName ?? "",
+                              discountType: e.discountType,
+                              id: e.id.toString(),
+                              itemType: e.itemType,
+                              position: e.position,
+                              quanityHours: e.quanityHours,
+                              tax: e.tax,
+                              vendorId: e.vendorId,
+                              cost: e.markup,
+                            ));
                           }
                         });
                       }

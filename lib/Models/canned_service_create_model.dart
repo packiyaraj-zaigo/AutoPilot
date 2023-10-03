@@ -39,7 +39,7 @@ class CannedServiceAddModel {
       this.itemType = 'Material',
       this.quanityHours = '1',
       this.discountType = 'Percentage',
-      this.tax = 'N',
+      this.tax = '0',
       this.position = 0,
       this.vendorId,
       this.cost = "0"});
