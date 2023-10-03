@@ -1438,8 +1438,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Add Material",
+                Text(
+                  "${item == null ? "Add" : "Edit"} Material",
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -1982,8 +1982,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Part",
+              Text(
+                "${item == null ? "Add" : "Edit"} Part",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -2519,8 +2519,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Labor",
+              Text(
+                "${item == null ? "Add" : "Edit"} Labor",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -2908,8 +2908,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Fee",
+              Text(
+                "${item == null ? "Add" : "Edit"} Fee",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -3327,8 +3327,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Add Subcontract",
+              Text(
+                "${item == null ? "Add" : "Edit"} Subcontract",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
