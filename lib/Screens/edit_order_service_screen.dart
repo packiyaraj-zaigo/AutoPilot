@@ -1257,6 +1257,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     String addMaterialDiscountErrorStatus = '';
     String adddMaterialBatchErrorStatus = '';
 
+    isPercentage = item?.discountType == "Percentage";
+
     double subTotal = 0;
     double total = 0;
     double materialCost = 0;
@@ -3104,6 +3106,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
       addSubContractVendorController.text = vendor[0].vendorName.toString();
       vendorId = vendor[0].id;
     }
+
+    isPercentage = item?.discountType == "Percentage";
+
 
     //Add SubContract errorstatus and error message variables
     String addSubContractNameErrorStatus = '';
