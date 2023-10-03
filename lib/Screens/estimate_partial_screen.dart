@@ -2381,9 +2381,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       : label == 'Password'
                           ? 12
                           : label == "Note"
-                              ? 299
+                              ? null
                               : label == "Appointment Note"
-                                  ? 299
+                                  ? null
                                   : 50,
               // expands: label == "Note" ? true : false,
               decoration: InputDecoration(

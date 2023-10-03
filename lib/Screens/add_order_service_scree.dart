@@ -1156,9 +1156,9 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                   : label == "Service Name" ||
                           label == "Notes" ||
                           label == "Description"
-                      ? 255
-                      : 25,
-              maxLines: label == "Notes" || label == "Description" ? 6 : 1,
+                      ? null
+                      : 100,
+              maxLines: label == "Notes" || label == "Description" ? 10 : 1,
               minLines: 1,
               decoration: InputDecoration(
                 suffixIcon: label.contains("Labor Rate")
@@ -1229,11 +1229,13 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
         laborDescriptionController.text.trim().length < 2) {
       laborDescriptionError = 'Notes should be atleast 2 characters';
       status = false;
-    } else if (laborDescriptionController.text.trim().isNotEmpty &&
-        laborDescriptionController.text.trim().length > 150) {
-      laborDescriptionError = "Notes can't be more than 150 characters";
-      status = false;
-    } else {
+    }
+    //  else if (laborDescriptionController.text.trim().isNotEmpty &&
+    //     laborDescriptionController.text.trim().length > 150) {
+    //   laborDescriptionError = "Notes can't be more than 150 characters";
+    //   status = false;
+    // } 
+    else {
       laborDescriptionError = '';
     }
 

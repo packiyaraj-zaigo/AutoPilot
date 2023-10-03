@@ -523,8 +523,8 @@ class _NewCustomerScreenState extends State<NewCustomerScreen> {
                   : label == "Address" || label == "Email"
                       ? 150
                       : label == "Customer Notes"
-                          ? 255
-                          : 25,
+                          ? null
+                          : 100,
               keyboardType: label == "Phone"
                   ? TextInputType.phone
                   : label == "Email"
