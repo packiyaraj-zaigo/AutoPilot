@@ -146,9 +146,14 @@ class _ServicesListScreenState extends State<ServicesListScreen> {
                               onTap: () {
                                 if (searchController.text.isNotEmpty) {
                                   searchController.clear();
+
+                                  serviceList.clear();
                                   BlocProvider.of<ServiceBloc>(
                                           scaffoldKey.currentContext!)
-                                      .add(GetAllServicess(query: ""));
+                                      .currentPage = 1;
+                                  BlocProvider.of<ServiceBloc>(
+                                          scaffoldKey.currentContext!)
+                                      .add(GetAllServicess(query: ''));
                                 }
                               },
                               child: const Icon(
