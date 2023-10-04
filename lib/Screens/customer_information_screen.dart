@@ -1630,8 +1630,9 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
                                   addNoteErrorStatus = "Note can't be empty";
                                 } else {
                                   addNoteErrorStatus = '';
-                                  BlocProvider.of<CustomerBloc>(context).add(
-                                      CreateCustomerNoteEvent(
+                                  BlocProvider.of<CustomerBloc>(
+                                          scaffoldKey.currentContext!)
+                                      .add(CreateCustomerNoteEvent(
                                           customerId:
                                               customerData!.id.toString(),
                                           notes:
@@ -1779,7 +1780,7 @@ class _CustomerInformationScreenState extends State<CustomerInformationScreen> {
           controller: addNoteController,
           maxLines: null,
           expands: true,
-          maxLength: 299,
+          // maxLength: 299,
           textAlignVertical: TextAlignVertical.top,
           decoration: InputDecoration(
             hintText: "Enter Notes",

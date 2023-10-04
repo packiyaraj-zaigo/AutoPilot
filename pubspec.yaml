@@ -60,6 +60,7 @@ dependencies:
   flutter_image_compress: ^2.0.4
   flutter_colorpicker: ^1.0.3
   colornames: ^0.1.0
+  cached_network_image: ^3.3.0
 
 dev_dependencies:
   flutter_test:

@@ -264,8 +264,14 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
 
         emit(EditCannedServiceSuccessState(message: message));
       } else {
-        emit(const CreateCannedOrderServiceErrorState(
-            message: 'Something went wrong'));
+        final decodedBody = await jsonDecode(serviceCreateResponse.body);
+        if (decodedBody.containsKey('service_note')) {
+          emit(CreateCannedOrderServiceErrorState(
+              message: decodedBody['service_note'][0]));
+        } else {
+          emit(const CreateCannedOrderServiceErrorState(
+              message: "Something went wrong"));
+        }
       }
     } catch (e) {
       emit(const EditCannedServiceErrorState(message: "Something went wrong"));
@@ -431,8 +437,14 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
 
         emit(EditOrderServiceSuccessState(message: message));
       } else {
-        emit(const CreateCannedOrderServiceErrorState(
-            message: 'Something went wrong'));
+        final decodedBody = await jsonDecode(serviceCreateResponse.body);
+        if (decodedBody.containsKey('service_note')) {
+          emit(CreateCannedOrderServiceErrorState(
+              message: decodedBody['service_note'][0]));
+        } else {
+          emit(const CreateCannedOrderServiceErrorState(
+              message: "Something went wrong"));
+        }
       }
     } catch (e) {
       emit(const EditCannedServiceErrorState(message: "Something went wrong"));
@@ -669,8 +681,14 @@ class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
 
         emit(CreateCannedOrderServiceSuccessState(message: message));
       } else {
-        emit(const CreateCannedOrderServiceErrorState(
-            message: 'Something went wrong'));
+        final decodedBody = await jsonDecode(serviceCreateResponse.body);
+        if (decodedBody.containsKey('service_note')) {
+          emit(CreateCannedOrderServiceErrorState(
+              message: decodedBody['service_note'][0]));
+        } else {
+          emit(const CreateCannedOrderServiceErrorState(
+              message: "Something went wrong"));
+        }
       }
     } catch (e) {
       emit(const CreateCannedOrderServiceErrorState(

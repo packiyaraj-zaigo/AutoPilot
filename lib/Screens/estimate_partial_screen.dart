@@ -35,6 +35,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EstimatePartialScreen extends StatefulWidget {
   const EstimatePartialScreen(
@@ -1896,7 +1897,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       .orderServiceItems![index]
                       .subTotal);
                   sumAmount = sumAmount + parsedValue;
-                  print(parsedValue.toString() + "SDJFSLDKJF");
                   return Padding(
                     padding: EdgeInsets.only(top: 5.0),
                     child: Row(
@@ -2893,9 +2893,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 4.8,
                     height: 75,
-                    child: Image.network(
-                      networkUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: networkUrl,
                       fit: BoxFit.cover,
+                      progressIndicatorBuilder: (context, url, progress) {
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width / 8.8,
+                          height: 37,
+                          child: const CupertinoActivityIndicator(),
+                        );
+                      },
                     ),
                   ),
                   Padding(
@@ -3040,121 +3047,103 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
       }
       element.orderServiceItems!.forEach((element2) {
         if (element2.itemType.toLowerCase() == "material") {
-          setState(() {
-            materialAmount = materialAmount +
-                (double.parse(element2.unitPrice) *
-                    double.parse(element2.quanityHours));
-          });
+          materialAmount = materialAmount +
+              (double.parse(element2.unitPrice) *
+                  double.parse(element2.quanityHours));
         }
         if (element2.itemType.toLowerCase() == "labor") {
-          setState(() {
-            laborAmount = laborAmount +
-                (double.parse(element2.unitPrice) *
-                    double.parse(element2.quanityHours));
-          });
+          laborAmount = laborAmount +
+              (double.parse(element2.unitPrice) *
+                  double.parse(element2.quanityHours));
         }
         if (element2.itemType.toLowerCase() == "subcontract") {
-          setState(() {
-            subContractAmount =
-                subContractAmount + double.parse(element2.unitPrice);
-          });
+          subContractAmount =
+              subContractAmount + double.parse(element2.unitPrice);
         }
         if (element2.itemType.toLowerCase() == "fee") {
-          setState(() {
-            feeAmount = feeAmount + double.parse(element2.unitPrice);
-          });
+          feeAmount = feeAmount + double.parse(element2.unitPrice);
         }
         if (element2.itemType.toLowerCase() == "part") {
-          setState(() {
-            partAmount = partAmount +
-                (double.parse(element2.unitPrice) *
-                    double.parse(element2.quanityHours));
-          });
+          partAmount = partAmount +
+              (double.parse(element2.unitPrice) *
+                  double.parse(element2.quanityHours));
         }
 
-        setState(() {
-          double tempPrice = 0.00;
-          if (element2.discountType == "Fixed") {
-            if (element2.itemType.toLowerCase() == "part" ||
-                element2.itemType.toLowerCase() == "labor" ||
-                element2.itemType.toLowerCase() == "material") {
-              tempPrice = (double.parse(element2.unitPrice) *
-                      double.parse(element2.quanityHours)) -
-                  double.parse(element2.discount);
-            } else {
-              tempPrice = double.parse(element2.unitPrice) -
-                  double.parse(element2.discount);
-            }
-
-            log(tempPrice.toString() + "tempp");
-          } else {
-            if (element2.itemType.toLowerCase() == "part" ||
-                element2.itemType.toLowerCase() == "labor" ||
-                element2.itemType.toLowerCase() == "material") {
-              tempPrice = (double.parse(element2.unitPrice) *
-                      double.parse(element2.quanityHours)) -
-                  (double.parse(element2.discount) *
-                          (double.parse(element2.unitPrice) *
-                              double.parse(element2.quanityHours))) /
-                      100;
-            } else {
-              tempPrice = double.parse(element2.unitPrice) -
-                  (double.parse(element2.discount) *
-                          double.parse(element2.unitPrice)) /
-                      100;
-            }
-          }
-
+        double tempPrice = 0.00;
+        if (element2.discountType == "Fixed") {
           if (element2.itemType.toLowerCase() == "part" ||
               element2.itemType.toLowerCase() == "labor" ||
               element2.itemType.toLowerCase() == "material") {
-            taxAmount =
-                taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
+            tempPrice = (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours)) -
+                double.parse(element2.discount);
           } else {
-            taxAmount =
-                taxAmount + (double.parse(element2.tax) * tempPrice / 100);
+            tempPrice = double.parse(element2.unitPrice) -
+                double.parse(element2.discount);
           }
 
-          if (element2.discountType == "Fixed") {
-            discountAmount = discountAmount + double.parse(element2.discount);
-          } else {
-            discountAmount = discountAmount +
+          log(tempPrice.toString() + "tempp");
+        } else {
+          if (element2.itemType.toLowerCase() == "part" ||
+              element2.itemType.toLowerCase() == "labor" ||
+              element2.itemType.toLowerCase() == "material") {
+            tempPrice = (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours)) -
                 (double.parse(element2.discount) *
-                        double.parse(element2.unitPrice) *
-                        double.parse(element2.quanityHours)) /
+                        (double.parse(element2.unitPrice) *
+                            double.parse(element2.quanityHours))) /
+                    100;
+          } else {
+            tempPrice = double.parse(element2.unitPrice) -
+                (double.parse(element2.discount) *
+                        double.parse(element2.unitPrice)) /
                     100;
           }
+        }
 
-          costAmount = costAmount +
-              ((double.tryParse(element2.markup) ?? 0) *
-                  (double.tryParse(element2.quanityHours) ?? 1));
-        });
+        if (element2.itemType.toLowerCase() == "part" ||
+            element2.itemType.toLowerCase() == "labor" ||
+            element2.itemType.toLowerCase() == "material") {
+          taxAmount =
+              taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
+        } else {
+          taxAmount =
+              taxAmount + (double.parse(element2.tax) * tempPrice / 100);
+        }
+
+        if (element2.discountType == "Fixed") {
+          discountAmount = discountAmount + double.parse(element2.discount);
+        } else {
+          discountAmount = discountAmount +
+              (double.parse(element2.discount) *
+                      double.parse(element2.unitPrice) *
+                      double.parse(element2.quanityHours)) /
+                  100;
+        }
+
+        costAmount = costAmount +
+            ((double.tryParse(element2.markup) ?? 0) *
+                (double.tryParse(element2.quanityHours) ?? 1));
       });
     });
 
-    setState(() {
-      totalAmount = (materialAmount +
-              laborAmount +
-              taxAmount +
-              partAmount +
-              subContractAmount +
-              feeAmount) -
-          discountAmount;
+    totalAmount = (materialAmount +
+            laborAmount +
+            taxAmount +
+            partAmount +
+            subContractAmount +
+            feeAmount) -
+        discountAmount;
 
-      balanceDueAmount =
-          totalAmount - double.parse(widget.estimateDetails.data.paidAmount);
-      double tempProfit = (materialAmount +
-              laborAmount +
-              partAmount +
-              subContractAmount +
-              feeAmount) -
-          discountAmount;
-      profitAmount = tempProfit - costAmount;
-
-      log(widget.estimateDetails.data.paidAmount);
-      log(totalAmount.toString());
-      log(balanceDueAmount.toString());
-    });
+    balanceDueAmount =
+        totalAmount - double.parse(widget.estimateDetails.data.paidAmount);
+    double tempProfit = (materialAmount +
+            laborAmount +
+            partAmount +
+            subContractAmount +
+            feeAmount) -
+        discountAmount;
+    profitAmount = tempProfit - costAmount;
 
     setState(() {});
   }
@@ -4496,7 +4485,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 tax: e.tax,
                                 vendorId: e.vendorId,
                                 cost: e.markup,
-                                
                               ),
                             );
                           } else if (e.itemType.toLowerCase() == "part") {

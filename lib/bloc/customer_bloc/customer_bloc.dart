@@ -245,8 +245,13 @@ class CustomerBloc extends Bloc<CustomerEvent, CustomerState> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         emit(CreateCustomerNoteSuccessState());
       } else {
-        emit(const CreateCustomerNoteErrorState(
-            message: 'Unable to create the note'));
+        final responseBody = await jsonDecode(response.body);
+        if (responseBody.containsKey('notes')) {
+          emit(CreateCustomerNoteErrorState(message: responseBody['notes'][0]));
+        } else {
+          emit(const CreateCustomerNoteErrorState(
+              message: 'Unable to create the note'));
+        }
       }
     } catch (e) {
       log("$e Create note bloc error");

@@ -294,6 +294,7 @@ class _VechileInformationState extends State<VechileInformation> {
                                             height: 50,
                                             child: ElevatedButton(
                                               onPressed: () {
+                                                addNoteController.clear();
                                                 addNotePopup(context);
                                               },
                                               style: ElevatedButton.styleFrom(
@@ -871,6 +872,8 @@ class _VechileInformationState extends State<VechileInformation> {
 
                 Navigator.pop(context);
                 addNoteController.clear();
+              } else if (state is AddVehicleNoteErrorState) {
+                CommonWidgets().showDialog(context, state.errorMessage);
               }
 
               // TODO: implement listener
@@ -931,7 +934,6 @@ class _VechileInformationState extends State<VechileInformation> {
                                   textAlignVertical: TextAlignVertical.top,
                                   maxLines: null,
                                   expands: true,
-                                  maxLength: 299,
                                   controller: addNoteController,
                                   decoration: InputDecoration(
                                       hintText: "Enter Notes",
