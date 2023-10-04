@@ -1772,7 +1772,12 @@ class ApiProvider {
       inspect(request);
       var response = await request.send();
       inspect(response);
-      print(response.statusCode.toString() + "provider status code");
+      print(response.statusCode.toString() +
+          "provider status code " +
+          request.fields.toString() +
+          "FIELDS" +
+          request.headers.toString() +
+          "Headers");
       print(response.toString() + "provider response");
       return http.Response.fromStream(response);
     } catch (e) {
@@ -1800,6 +1805,8 @@ class ApiProvider {
       map.forEach((key, value) {
         request.fields[key] = value.toString();
       });
+
+      request.headers.addAll(getHeader(token));
       final response = await request.send();
 
       log(map.toString());
