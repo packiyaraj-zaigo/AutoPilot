@@ -3137,8 +3137,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         discountAmount;
     profitAmount = costAmount - tempProfit;
 
-    taxAmount = taxAmount - discountAmount;
-
     setState(() {});
   }
 
