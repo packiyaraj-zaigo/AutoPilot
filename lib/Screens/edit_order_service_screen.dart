@@ -1748,6 +1748,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                       : "Fixed",
                                   quanityHours:
                                       addMaterialQuantityController.text.trim(),
+                                  tax: client?.taxOnMaterial == "Y"
+                                      ? client?.materialTaxRate ?? '0'
+                                      : '0',
                                   itemType: "Material",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addMaterialCostController.text.trim(),
@@ -2243,6 +2246,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                 quanityHours: addPartQuantityController.text,
                                 itemType: "Part",
                                 subTotal: subTotal.toStringAsFixed(2),
+                                tax: client?.taxOnParts == "Y"
+                                    ? client?.salesTaxRate ?? '0'
+                                    : '0',
                                 cost: addPartCostController.text.trim(),
                               );
                               if (item.id != '') {
@@ -2273,6 +2279,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                     : "Fixed",
                                 quanityHours: addPartQuantityController.text,
                                 itemType: "Part",
+                                tax: client?.taxOnParts == "Y"
+                                    ? client?.salesTaxRate ?? '0'
+                                    : '0',
                                 subTotal: subTotal.toStringAsFixed(2),
                                 cost: addPartCostController.text.trim(),
                               ));
@@ -3032,6 +3041,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   discount: '0',
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addFeePriceController.text.trim());
 
@@ -3054,6 +3066,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   discount: '0',
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addFeePriceController.text.trim()));
                             }
@@ -3488,6 +3503,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   vendorId: vendorId,
                                   unitPrice: addSubContractPriceController.text,
                                   itemType: "SubContract",
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost:
                                       addSubContractCostController.text.trim());
@@ -3525,6 +3543,9 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                     unitPrice:
                                         addSubContractPriceController.text,
                                     itemType: "SubContract",
+                                    tax: client?.taxOnLabors == "Y"
+                                        ? client?.laborTaxRate ?? '0'
+                                        : '0',
                                     subTotal: subTotal.toStringAsFixed(2),
                                     cost: addSubContractCostController.text
                                         .trim()),

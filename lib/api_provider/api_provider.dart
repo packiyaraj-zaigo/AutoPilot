@@ -1772,12 +1772,6 @@ class ApiProvider {
       inspect(request);
       var response = await request.send();
       inspect(response);
-      print(response.statusCode.toString() +
-          "provider status code " +
-          request.fields.toString() +
-          "FIELDS" +
-          request.headers.toString() +
-          "Headers");
       print(response.toString() + "provider response");
       return http.Response.fromStream(response);
     } catch (e) {
@@ -1793,11 +1787,15 @@ class ApiProvider {
       if (map['vendor_id'] == null) {
         map.remove('vendor_id');
       }
+      map.remove('canned_service_id');
       map['order_service_id'] = serviceId;
       final request = http.MultipartRequest(
         'POST',
         url,
       );
+
+      map["tax"] = model.tax;
+      map.remove('is_tax');
 
       if (map['markup'] == null || map['markup'] == '') {
         map.remove('markup');

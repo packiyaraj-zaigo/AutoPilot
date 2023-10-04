@@ -1767,6 +1767,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : "Fixed",
                                   quanityHours:
                                       addMaterialQuantityController.text.trim(),
+                                  tax: client?.taxOnMaterial == "Y"
+                                      ? client?.materialTaxRate ?? '0'
+                                      : '0',
                                   itemType: "Material",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addMaterialCostController.text.trim(),
@@ -1801,6 +1804,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     quanityHours: addMaterialQuantityController
                                         .text
                                         .trim(),
+                                    tax: client?.taxOnMaterial == "Y"
+                                        ? client?.materialTaxRate ?? '0'
+                                        : '0',
                                     itemType: "Material",
                                     subTotal: subTotal.toStringAsFixed(2),
                                     cost:
@@ -2321,6 +2327,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : "Fixed",
                                   quanityHours: addPartQuantityController.text,
                                   itemType: "Part",
+                                  tax: client?.taxOnParts == "Y"
+                                      ? client?.salesTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addPartCostController.text.trim());
                               if (item.id != '') {
@@ -2350,6 +2359,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       ? "Percentage"
                                       : "Fixed",
                                   quanityHours: addPartQuantityController.text,
+                                  tax: client?.taxOnParts == "Y"
+                                      ? client?.salesTaxRate ?? '0'
+                                      : '0',
                                   itemType: "Part",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addPartCostController.text.trim()));
@@ -2785,6 +2797,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       ? "Percentage"
                                       : "Fixed",
                                   quanityHours: addLaborHoursController.text,
+                                  tax: addLaborTaxController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addLaborCostController.text.trim());
@@ -2805,6 +2818,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   part: '',
                                   itemName: addLaborNameController.text,
                                   unitPrice: addLaborBaseCostController.text,
+                                  tax: addLaborTaxController.text,
                                   discount: addLaborDiscountController.text
                                           .trim()
                                           .isEmpty
@@ -3140,6 +3154,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   discount: '0',
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addFeeCostController.text.trim());
 
@@ -3162,6 +3179,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   discount: '0',
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addFeeCostController.text.trim()));
                             }
@@ -3637,6 +3657,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       ? "Percentage"
                                       : "Fixed",
                                   vendorId: vendorId,
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   unitPrice: addSubContractPriceController.text,
                                   itemType: "SubContract",
                                   subTotal: subTotal.toStringAsFixed(2),
@@ -3673,6 +3696,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                         ? "Percentage"
                                         : "Fixed",
                                     vendorId: vendorId,
+                                    tax: client?.taxOnLabors == "Y"
+                                        ? client?.laborTaxRate ?? '0'
+                                        : '0',
                                     unitPrice:
                                         addSubContractPriceController.text,
                                     itemType: "SubContract",
