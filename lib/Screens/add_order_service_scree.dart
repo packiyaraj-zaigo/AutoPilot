@@ -116,9 +116,12 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
     }
   }
 
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFFAFAFA),
@@ -198,6 +201,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                   client = state.clientModel;
                   log(client!.toJson().toString());
                   rateController.text = client?.baseLaborCost ?? '0';
+                } else if (state is GetEstimateErrorState) {
+                  CommonWidgets().showDialog(context, state.errorMsg);
                 } else if (state is CreateOrderServiceState) {
                   if (material.isEmpty &&
                       part.isEmpty &&
@@ -1234,7 +1239,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
     //     laborDescriptionController.text.trim().length > 150) {
     //   laborDescriptionError = "Notes can't be more than 150 characters";
     //   status = false;
-    // } 
+    // }
     else {
       laborDescriptionError = '';
     }

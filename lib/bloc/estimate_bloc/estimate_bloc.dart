@@ -638,13 +638,17 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
 
       log("orderserviceres${createOrderServiceRes.body}");
 
+      final decodedBody = json.decode(createOrderServiceRes.body);
       if (createOrderServiceRes.statusCode == 200 ||
           createOrderServiceRes.statusCode == 201) {
-        final decodedBody = json.decode(createOrderServiceRes.body);
         emit(CreateOrderServiceState(
             orderServiceId: decodedBody['created_id'].toString()));
       } else {
-        emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+        if (decodedBody.containsKey('service_note')) {
+          emit(GetEstimateErrorState(errorMsg: decodedBody['service_note'][0]));
+        } else {
+          emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));
+        }
       }
     } catch (e, s) {
       emit(const GetEstimateErrorState(errorMsg: "Something went wrong"));

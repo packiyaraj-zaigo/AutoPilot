@@ -255,7 +255,14 @@ class VechileBloc extends Bloc<VechileEvent, VechileState> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         emit(AddVehicleNoteState());
       } else {
-        emit(AddVehicleNoteErrorState(errorMessage: "Something went wrong"));
+        final responseBody = await jsonDecode(response.body);
+        if (responseBody.containsKey('notes')) {
+          emit(
+              AddVehicleNoteErrorState(errorMessage: responseBody['notes'][0]));
+        } else {
+          emit(AddVehicleNoteErrorState(
+              errorMessage: 'Unable to create the note'));
+        }
       }
     } catch (e) {
       log(e.toString() + " Edit bloc error");

@@ -1102,11 +1102,13 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
         laborDescriptionController.text.trim().length < 2) {
       laborDescriptionError = 'Notes should be atleast 2 characters';
       status = false;
-    } else if (laborDescriptionController.text.trim().isNotEmpty &&
-        laborDescriptionController.text.trim().length > 150) {
-      laborDescriptionError = "Notes can't be more than 150 characters";
-      status = false;
-    } else {
+    }
+    // else if (laborDescriptionController.text.trim().isNotEmpty &&
+    //     laborDescriptionController.text.trim().length > 150) {
+    //   laborDescriptionError = "Notes can't be more than 150 characters";
+    //   status = false;
+    // }
+    else {
       laborDescriptionError = '';
     }
 

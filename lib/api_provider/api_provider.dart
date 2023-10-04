@@ -2072,8 +2072,9 @@ class ApiProvider {
         "customer_id": customerId,
         "notes": notes,
       };
-      final response =
-          http.post(url, headers: getHeader(token), body: jsonEncode(map));
+      final response = await http.post(url,
+          headers: getHeader(token), body: jsonEncode(map));
+      log(response.body.toString());
       return response;
     } catch (e) {
       log(e.toString() + " Create notes api error");
