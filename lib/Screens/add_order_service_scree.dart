@@ -1100,6 +1100,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
               readOnly: label == "Vendor" || label == "Technician",
               onTap: label == "Vendor"
                   ? () {
+                      vendors.clear();
                       showModalBottomSheet(
                           context: context,
                           builder: (context) {
@@ -2494,7 +2495,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                       : "Fixed",
                                   quanityHours: addPartQuantityController.text,
                                   itemType: "Part",
-                                   tax: client?.taxOnParts == "Y"
+                                  tax: client?.taxOnParts == "Y"
                                       ? client?.salesTaxRate ?? '0'
                                       : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
@@ -3336,7 +3337,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   discount: '0',
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
-                                   tax: client?.taxOnLabors == "Y"
+                                  tax: client?.taxOnLabors == "Y"
                                       ? client?.laborTaxRate ?? '0'
                                       : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
@@ -3361,9 +3362,9 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   discount: '0',
                                   unitPrice: addFeePriceController.text,
                                   itemType: "Fee",
-                                   tax: client?.taxOnLabors == "Y"
-                                                ? client?.laborTaxRate ?? '0'
-                                                : '0',
+                                  tax: client?.taxOnLabors == "Y"
+                                      ? client?.laborTaxRate ?? '0'
+                                      : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addFeeCostController.text.trim()));
                             }
@@ -3849,30 +3850,29 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                               id: item!.id,
                                               cannedServiceId:
                                                   int.parse(serviceId),
-                                              note:
-                                                  addSubContractDescriptionController
-                                                      .text,
+                                              note: addSubContractDescriptionController
+                                                  .text,
                                               // part: addSubContractSubContractNumberController.text,
                                               part: '',
                                               itemName:
                                                   addSubContractNameController
                                                       .text,
-                                              discount:
-                                                  addSubContractDiscountController
-                                                          .text
-                                                          .trim()
-                                                          .isEmpty
-                                                      ? "0"
-                                                      : addSubContractDiscountController
-                                                          .text
-                                                          .trim(),
+                                              discount: addSubContractDiscountController
+                                                      .text
+                                                      .trim()
+                                                      .isEmpty
+                                                  ? "0"
+                                                  : addSubContractDiscountController
+                                                      .text
+                                                      .trim(),
                                               discountType: isPercentage &&
                                                       addSubContractDiscountController
                                                           .text.isNotEmpty
                                                   ? "Percentage"
-                                                  : "Fixed", tax: client?.taxOnLabors == "Y"
-                                                ? client?.laborTaxRate ?? '0'
-                                                : '0',
+                                                  : "Fixed",
+                                              tax: client?.taxOnLabors == "Y"
+                                                  ? client?.laborTaxRate ?? '0'
+                                                  : '0',
                                               vendorId: vendorId,
                                               unitPrice:
                                                   addSubContractPriceController
@@ -3880,10 +3880,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                               itemType: "SubContract",
                                               subTotal:
                                                   subTotal.toStringAsFixed(2),
-                                                  
-                                              cost: addSubContractCostController
-                                                  .text
-                                                  .trim());
+                                              cost: addSubContractCostController.text.trim());
                                       if (item.id != '') {
                                         final ind = editedItems.indexWhere(
                                             (element) => element.id == item.id);
@@ -3897,16 +3894,14 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                     } else {
                                       subContract.add(
                                         CannedServiceAddModel(
-                                            cannedServiceId: int
-                                                .parse(serviceId),
-                                            note:
-                                                addSubContractDescriptionController
-                                                    .text,
+                                            cannedServiceId:
+                                                int.parse(serviceId),
+                                            note: addSubContractDescriptionController
+                                                .text,
                                             // part: addSubContractSubContractNumberController.text,
                                             part: '',
-                                            itemName:
-                                                addSubContractNameController
-                                                    .text,
+                                            itemName: addSubContractNameController
+                                                .text,
                                             discount:
                                                 addSubContractDiscountController
                                                         .text
@@ -3921,7 +3916,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                                         .text.isNotEmpty
                                                 ? "Percentage"
                                                 : "Fixed",
-                                          tax: client?.taxOnLabors == "Y"
+                                            tax: client?.taxOnLabors == "Y"
                                                 ? client?.laborTaxRate ?? '0'
                                                 : '0',
                                             vendorId: vendorId,

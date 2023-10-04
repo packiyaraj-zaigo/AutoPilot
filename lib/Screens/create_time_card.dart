@@ -47,6 +47,10 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
   Duration clockOut = const Duration();
   DateTime selectedDate = DateTime.now();
 
+  bool clicked = false;
+
+  final _debouncer = Debouncer();
+
   populateData() {
     final timeCard = widget.timeCard!;
     employeeController.text =
@@ -111,6 +115,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
         listener: (context, state) {
           if (state is CreateTimeCardErrorState) {
             CommonWidgets().showDialog(context, state.message);
+            clicked = false;
           } else if (state is CreateTimeCardSucessState ||
               state is EditTimeCardSuccessState) {
             Navigator.of(context).pushAndRemoveUntil(
@@ -122,6 +127,7 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                 'Successfully ${widget.timeCard == null ? "Created" : "Updated"} the\ntime card');
           } else if (state is EditTimeCardErrorState) {
             CommonWidgets().showDialog(context, state.message);
+            clicked = false;
           }
         },
         child: BlocBuilder<TimeCardBloc, TimeCardState>(
@@ -185,46 +191,52 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                     Padding(
                       padding: const EdgeInsets.only(top: 32.0),
                       child: GestureDetector(
-                        onTap: () async {
-                          final status = validate();
-                          if (status) {
-                            dynamic clientId = await AppUtils.getUserID();
-                            if (widget.timeCard != null) {
-                              clientId = widget.timeCard!.clientId.toString();
-                            }
-                            final clockedIn = DateTime(
-                                selectedDate.year,
-                                selectedDate.month,
-                                selectedDate.day,
-                                clockIn.inHours,
-                                clockIn.inMinutes % 60);
-                            final clockedOut = DateTime(
-                                selectedDate.year,
-                                selectedDate.month,
-                                selectedDate.day,
-                                clockOut.inHours,
-                                clockOut.inMinutes % 60);
-                            final totalTime =
-                                '${(clockOut.inHours - clockIn.inHours).toString().padLeft(2, '0')}:${((clockOut.inMinutes % 60) - (clockIn.inMinutes % 60)).toString().padLeft(2, '0')}:00';
-                            final timeCard = TimeCardCreateModel(
-                                clientId: int.parse(clientId),
-                                technicianId: technicianId,
-                                task: taskController.text,
-                                notes: notesController.text,
-                                clockInTime: clockedIn,
-                                clockOutTime: clockedOut,
-                                totalTime: totalTime);
-                            if (widget.timeCard != null) {
-                              BlocProvider.of<TimeCardBloc>(context).add(
-                                  EditTimeCardEvent(
-                                      timeCard: timeCard,
-                                      id: widget.timeCard!.id.toString()));
-                            } else {
-                              BlocProvider.of<TimeCardBloc>(context)
-                                  .add(CreateTimeCardEvent(timeCard: timeCard));
-                            }
-                          }
-                        },
+                        onTap: state is CreateTimeCardLoadingState || clicked
+                            ? null
+                            : () async {
+                                clicked = true;
+                                final status = validate();
+                                if (status) {
+                                  dynamic clientId = await AppUtils.getUserID();
+                                  if (widget.timeCard != null) {
+                                    clientId =
+                                        widget.timeCard!.clientId.toString();
+                                  }
+                                  final clockedIn = DateTime(
+                                      selectedDate.year,
+                                      selectedDate.month,
+                                      selectedDate.day,
+                                      clockIn.inHours,
+                                      clockIn.inMinutes % 60);
+                                  final clockedOut = DateTime(
+                                      selectedDate.year,
+                                      selectedDate.month,
+                                      selectedDate.day,
+                                      clockOut.inHours,
+                                      clockOut.inMinutes % 60);
+                                  final totalTime =
+                                      '${(clockOut.inHours - clockIn.inHours).toString().padLeft(2, '0')}:${((clockOut.inMinutes % 60) - (clockIn.inMinutes % 60)).toString().padLeft(2, '0')}:00';
+                                  final timeCard = TimeCardCreateModel(
+                                      clientId: int.parse(clientId),
+                                      technicianId: technicianId,
+                                      task: taskController.text,
+                                      notes: notesController.text,
+                                      clockInTime: clockedIn,
+                                      clockOutTime: clockedOut,
+                                      totalTime: totalTime);
+                                  if (widget.timeCard != null) {
+                                    BlocProvider.of<TimeCardBloc>(context).add(
+                                        EditTimeCardEvent(
+                                            timeCard: timeCard,
+                                            id: widget.timeCard!.id
+                                                .toString()));
+                                  } else {
+                                    BlocProvider.of<TimeCardBloc>(context).add(
+                                        CreateTimeCardEvent(
+                                            timeCard: timeCard));
+                                  }
+                                }
+                              },
                         child: Container(
                           height: 56,
                           alignment: Alignment.center,

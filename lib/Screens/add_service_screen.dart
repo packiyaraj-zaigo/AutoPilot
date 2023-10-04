@@ -573,6 +573,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                           return GestureDetector(
                             behavior: HitTestBehavior.translucent,
                             onTap: () {
+                              BlocProvider.of<ServiceBloc>(context)
+                                  .add(GetAllVendorsEvent());
                               showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -943,6 +945,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
               readOnly: label == "Vendor",
               onTap: label == "Vendor"
                   ? () {
+                      vendors.clear();
                       showModalBottomSheet(
                           context: context,
                           builder: (context) {

@@ -35,6 +35,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EstimatePartialScreen extends StatefulWidget {
   const EstimatePartialScreen(
@@ -2892,9 +2893,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 4.8,
                     height: 75,
-                    child: Image.network(
-                      networkUrl,
+                    child: CachedNetworkImage(
+                      imageUrl: networkUrl,
                       fit: BoxFit.cover,
+                      progressIndicatorBuilder: (context, url, progress) {
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width / 8.8,
+                          height: 37,
+                          child: const CupertinoActivityIndicator(),
+                        );
+                      },
                     ),
                   ),
                   Padding(
@@ -3135,7 +3143,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             subContractAmount +
             feeAmount) -
         discountAmount;
-    profitAmount = costAmount - tempProfit;
+    profitAmount = tempProfit - costAmount;
 
     setState(() {});
   }

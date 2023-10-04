@@ -977,6 +977,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
               readOnly: label == "Vendor" || label == "Technician",
               onTap: label == "Vendor"
                   ? () {
+                      vendors.clear();
                       showModalBottomSheet(
                           context: context,
                           builder: (context) {

@@ -7,6 +7,7 @@ import 'package:auto_pilot/Screens/create_time_card.dart';
 import 'package:auto_pilot/Screens/user_time_cards_screen.dart';
 import 'package:auto_pilot/bloc/time_card/time_card_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -449,22 +450,6 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class Debouncer {
-  int? milliseconds;
-  VoidCallback? action;
-  Timer? timer;
-
-  run(VoidCallback action) {
-    if (null != timer) {
-      timer!.cancel();
-    }
-    timer = Timer(
-      const Duration(milliseconds: Duration.millisecondsPerSecond),
-      action,
     );
   }
 }
