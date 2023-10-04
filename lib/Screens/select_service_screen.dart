@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:auto_pilot/Bloc/service_Bloc/service_bloc.dart';
 import 'package:auto_pilot/Models/canned_service_create_model.dart';
@@ -495,12 +496,25 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
   // }
 
   Future showPopup(BuildContext ctx, message, Datum item) {
+    bool alreadyLoaded = false;
     return showCupertinoDialog(
       context: context,
       builder: (context) => BlocProvider(
         create: (context) => EstimateBloc(apiRepository: ApiRepository()),
         child: BlocListener<EstimateBloc, EstimateState>(
           listener: (context, state) {
+            if ((state is CreateOrderServiceLoadingState ||
+                    state is GetSingleEstimateLoadingState ||
+                    state is CreateOrderServiceItemLoadingState) &&
+                !alreadyLoaded) {
+              log('loading');
+              alreadyLoaded = true;
+              showCupertinoDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const CupertinoActivityIndicator(),
+              );
+            }
             if (state is CreateOrderServiceState) {
               //push to partial estiimate screen.
               // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
@@ -580,6 +594,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                   CupertinoDialogAction(
                       child: const Text("Yes"),
                       onPressed: () {
+                        log(state.toString() + "STATEEE");
                         // _debouncer.run(() {
                         if (state is! CreateOrderServiceLoadingState &&
                             state is! GetSingleEstimateLoadingState &&
