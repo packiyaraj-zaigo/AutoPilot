@@ -103,12 +103,12 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getRevenueChartData(String token) async {
+  Future<dynamic> getRevenueChartData(String token, String today) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
     try {
-      var url = Uri.parse("${BASE_URL}api/dashboard");
+      var url = Uri.parse("${BASE_URL}api/dashboard?selected_date=$today");
       var request = http.MultipartRequest("Get", url);
       request.headers.addAll(getHeader(token));
       log('Inside revenue chart ');
@@ -1514,6 +1514,8 @@ class ApiProvider {
         map.remove('markup');
       }
       map['canned_service_id'] = serviceId;
+      map['tax'] = map['is_tax'];
+      map.remove('is_tax');
       final response = await http.post(url,
           headers: getHeader(token), body: json.encode(map));
 
@@ -1887,6 +1889,8 @@ class ApiProvider {
       }
 
       final url = Uri.parse('${BASE_URL}api/canned_service_items/$id');
+      map['tax'] = map['is_tax'];
+      map.remove('is_tax');
 
       final response = await http.put(url,
           headers: getHeader(token), body: json.encode(map));
