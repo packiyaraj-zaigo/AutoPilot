@@ -24,8 +24,11 @@ class ApiRepository {
     return apiProvider.login(email, password);
   }
 
-  Future getRevenueChartData(dynamic token) {
-    return apiProvider.getRevenueChartData(token);
+  Future getRevenueChartData(
+    dynamic token,
+    String today,
+  ) {
+    return apiProvider.getRevenueChartData(token, today);
   }
 
   Future resetPasswordGetOtp(String emailId) {

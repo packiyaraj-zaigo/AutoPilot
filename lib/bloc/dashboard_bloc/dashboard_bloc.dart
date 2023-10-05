@@ -45,11 +45,12 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       var token = prefs.getString(AppConstants.USER_TOKEN);
       RevenueChartModel revenueChartModel;
+      final DateTime todaysDate = DateTime.now();
 
       emit(DashboardLoadingState());
 
-      Response getChartDataRes =
-          await _apiRepository.getRevenueChartData(token);
+      Response getChartDataRes = await _apiRepository.getRevenueChartData(
+          token, "${todaysDate.year}-${todaysDate.month}-${todaysDate.day}");
       // var getChartData = _decoder.convert(getChartDataRes.body);
       log("res${getChartDataRes.body}");
 
