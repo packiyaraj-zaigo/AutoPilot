@@ -37,3 +37,8 @@ class GetSingleWorkflowEvent extends WorkflowEvent {
   final String id;
   const GetSingleWorkflowEvent({required this.id});
 }
+
+class DeleteWorkFlowBucketEvent extends WorkflowEvent {
+  final String id;
+  DeleteWorkFlowBucketEvent({required this.id});
+}

@@ -989,10 +989,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             "Tax", "\$ ${taxAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget("Discount",
                             "\$ ${discountAmount.toStringAsFixed(2)}"),
-                        taxDetailsWidget(
-                            "Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget("Total Cost",
                             "\$ ${costAmount.toStringAsFixed(2)}"),
+                        taxDetailsWidget(
+                            "Total", "\$ ${totalAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget(
                             "Profit", "\$ ${profitAmount.toStringAsFixed(2)}"),
                         taxDetailsWidget("Balance due",
@@ -2010,7 +2010,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               ? Color(0xff12A58C)
                               : Color(0xffFF5C5C)),
                     ),
-                    Text(sumAmount.toString(),
+                    Text(" \$ ${sumAmount.toStringAsFixed(2)}",
                         style: const TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 16,
@@ -2033,17 +2033,33 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
         children: [
           Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
                 color: AppColors.primaryTitleColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w500),
+                fontSize: title == "Total" ||
+                        title == "Profit" ||
+                        title == "Balance due"
+                    ? 17
+                    : 16,
+                fontWeight: title == "Total" ||
+                        title == "Profit" ||
+                        title == "Balance due"
+                    ? FontWeight.w600
+                    : FontWeight.w500),
           ),
           Text(
             " $price",
-            style: const TextStyle(
+            style: TextStyle(
                 color: AppColors.primaryTitleColor,
-                fontSize: 16,
-                fontWeight: FontWeight.w500),
+                fontSize: title == "Total" ||
+                        title == "Profit" ||
+                        title == "Balance due"
+                    ? 17
+                    : 16,
+                fontWeight: title == "Total" ||
+                        title == "Profit" ||
+                        title == "Balance due"
+                    ? FontWeight.w600
+                    : FontWeight.w500),
           )
         ],
       ),
@@ -2162,6 +2178,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             width: MediaQuery.of(context).size.width,
             child: TextField(
               controller: controller,
+              textInputAction: label == "Note" ? TextInputAction.done : null,
               textCapitalization: TextCapitalization.sentences,
               inputFormatters: label == "Card Number"
                   ? [CardNumberInputFormatter()]

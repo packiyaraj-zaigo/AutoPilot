@@ -247,6 +247,12 @@ class PartsBloc extends Bloc<PartsEvent, PartsState> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         emit(AddPartsNoteState());
       } else {
+        try {
+          var decodedBody = json.decode(response.body);
+          emit(AddPartsNoteErrorState(errorMessage: decodedBody['notes'][0]));
+        } catch (e) {
+          emit(AddPartsNoteErrorState(errorMessage: "Something went wrong"));
+        }
         emit(AddPartsNoteErrorState(errorMessage: "Something went wrong"));
       }
     } catch (e, s) {

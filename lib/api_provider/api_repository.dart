@@ -24,8 +24,11 @@ class ApiRepository {
     return apiProvider.login(email, password);
   }
 
-  Future getRevenueChartData(dynamic token) {
-    return apiProvider.getRevenueChartData(token);
+  Future getRevenueChartData(
+    dynamic token,
+    String today,
+  ) {
+    return apiProvider.getRevenueChartData(token, today);
   }
 
   Future resetPasswordGetOtp(String emailId) {
@@ -397,6 +400,10 @@ class ApiRepository {
   Future editWorkflowBucket(
       String token, Map<String, dynamic> json, String id) {
     return apiProvider.editWorkflowBucket(token, json, id);
+  }
+
+  Future deleteWorkflowBucket(String token, String id) {
+    return apiProvider.deleteWorkflowBucket(token, id);
   }
 
   Future getSingleWorkflowBucket(String token, String id) async {

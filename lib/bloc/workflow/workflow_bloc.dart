@@ -21,6 +21,7 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
     on<CreateWorkflowBucketEvent>(createWorkflowBucket);
     on<EditWorkflowBucketEvent>(editWorkflowBucket);
     on<EditWorkflow>(editWorkflow);
+    on<DeleteWorkFlowBucketEvent>(deleteWorkflowBucketBloc);
   }
 
   Future<void> editWorkflow(
@@ -138,6 +139,34 @@ class WorkflowBloc extends Bloc<WorkflowEvent, WorkflowState> {
     } catch (e) {
       log("$e Worfflow create bloc error");
       emit(const CreateWorkflowErrorState(message: 'Something went wrong'));
+    }
+  }
+
+  deleteWorkflowBucketBloc(
+    DeleteWorkFlowBucketEvent event,
+    Emitter<WorkflowState> emit,
+  ) async {
+    try {
+      final token = await AppUtils.getToken();
+      final Response response =
+          await apiRepo.deleteWorkflowBucket(token, event.id);
+      log(response.body.toString());
+      final body = json.decode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        emit(DeleteWorkFlowBucketState());
+      } else {
+        if (body.containsKey('error')) {
+          emit(DeleteWorkflowBucketErrorState(errorMessage: body['error']));
+        } else if (body.containsKey('message')) {
+          emit(DeleteWorkflowBucketErrorState(errorMessage: body['message']));
+        } else {
+          emit(CreateWorkflowErrorState(message: "Something went wrong"));
+        }
+      }
+    } catch (e) {
+      log("$e Worfflow create bloc error");
+      emit(
+          DeleteWorkflowBucketErrorState(errorMessage: 'Something went wrong'));
     }
   }
 

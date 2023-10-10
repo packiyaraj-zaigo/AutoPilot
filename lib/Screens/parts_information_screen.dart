@@ -682,6 +682,10 @@ class _PartsInformationState extends State<PartsInformation> {
 
                 Navigator.pop(context);
                 addNoteController.clear();
+              } else if (state is AddPartsNoteErrorState) {
+                //show error message here
+                addNoteErrorStatus = true;
+                addNoteErrorMessage = state.errorMessage;
               }
 
               // TODO: implement listener
@@ -697,7 +701,7 @@ class _PartsInformationState extends State<PartsInformation> {
                       automaticallyImplyLeading: false,
                       elevation: 0,
                       title: const Text(
-                        "Add Vehicle Note",
+                        "Add Part Note",
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.w600),
                       ),
@@ -741,7 +745,7 @@ class _PartsInformationState extends State<PartsInformation> {
                                 child: TextField(
                                   textAlignVertical: TextAlignVertical.top,
                                   maxLines: null,
-                                  maxLength: 299,
+                                  maxLength: null,
                                   expands: true,
                                   controller: addNoteController,
                                   decoration: InputDecoration(
