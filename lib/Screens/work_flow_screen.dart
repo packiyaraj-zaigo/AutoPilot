@@ -220,7 +220,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           },
           item: Column(
             children: [
-              workflowCard(workflows[index], isVehicle, status),
+              workflowCard(workflows[index], isVehicle, status, workflows),
               const SizedBox(height: 16)
             ],
           ),
@@ -229,8 +229,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  Widget workflowCard(
-      WorkflowModel workflow, bool isVehicle, WorkflowStatusModel status) {
+  Widget workflowCard(WorkflowModel workflow, bool isVehicle,
+      WorkflowStatusModel status, List<WorkflowModel> allWorkflows) {
     String str = workflow.bucketName!.color ?? '';
     str = str.replaceAll('#', '0xFF');
     String mainTitle = "";
@@ -307,7 +307,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     children: [
                       IconButton(
                         onPressed: () {
-                          showActionSheet(context, status, workflow);
+                          showActionSheet(
+                              context, status, workflow, allWorkflows);
                         },
                         icon: const Icon(Icons.more_horiz,
                             color: AppColors.primaryColors),
@@ -372,7 +373,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                     onTap: () {
                       showDialog(
                         context: context,
-                        builder: (context) => dropDown(status, workflow),
+                        builder: (context) =>
+                            dropDown(status, workflow, allWorkflows),
                       );
                     },
                     child: Container(
@@ -404,7 +406,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
     );
   }
 
-  AlertDialog dropDown(WorkflowStatusModel status, WorkflowModel workflow) {
+  AlertDialog dropDown(WorkflowStatusModel status, WorkflowModel workflow,
+      List<WorkflowModel> allWorkflows) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -423,10 +426,13 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
         child: BlocListener<WorkflowBloc, WorkflowState>(
           listener: (context, state) {
             if (state is DeleteWorkFlowBucketState) {
-              // context.read<WorkflowBloc>().add(GetAllWorkflows());
+              scaffoldKey.currentContext!
+                  .read<WorkflowBloc>()
+                  .add(GetAllWorkflows());
               Navigator.pop(context);
+              CommonWidgets()
+                  .showDialog(context, 'Status deleted successfully');
             }
-            // TODO: implement listener
           },
           child: BlocBuilder<WorkflowBloc, WorkflowState>(
             builder: (context, state) {
@@ -447,7 +453,6 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                                   oldBucketId: status.id.toString(),
                                 ),
                               );
-                          Navigator.pop(context);
                         },
                         child: Container(
                           height: 50,
@@ -458,13 +463,17 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  status.childBuckets[index].title,
-                                  style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500),
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Text(
+                                    status.childBuckets[index].title,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500),
+                                  ),
                                 ),
                               ),
                               Row(
@@ -491,10 +500,26 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                                   ),
                                   IconButton(
                                     onPressed: () {
-                                      context.read<WorkflowBloc>().add(
-                                          DeleteWorkFlowBucketEvent(
-                                              id: status.childBuckets[index].id
-                                                  .toString()));
+                                      bool isWorkflowAlreadyUsed = true;
+                                      for (var element in allWorkflows) {
+                                        if (element.bucketName?.title ==
+                                            status.childBuckets[index].title) {
+                                          isWorkflowAlreadyUsed = false;
+                                          break;
+                                        }
+                                      }
+                                      if (!isWorkflowAlreadyUsed) {
+                                        CommonWidgets().showDialog(context,
+                                            'Can\'t delete an active status');
+                                      } else {
+                                        context.read<WorkflowBloc>().add(
+                                              DeleteWorkFlowBucketEvent(
+                                                id: status
+                                                    .childBuckets[index].id
+                                                    .toString(),
+                                              ),
+                                            );
+                                      }
                                     },
                                     icon: const Icon(
                                       Icons.close,
@@ -519,7 +544,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
   }
 
   void showActionSheet(BuildContext context, WorkflowStatusModel status,
-      WorkflowModel workflow) {
+      WorkflowModel workflow, List<WorkflowModel> allWorkflows) {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
@@ -544,7 +569,8 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                 Navigator.pop(context);
                 showDialog(
                   context: context,
-                  builder: (context) => dropDown(status, workflow),
+                  builder: (context) =>
+                      dropDown(status, workflow, allWorkflows),
                 );
               },
               child: const Padding(

@@ -39,7 +39,9 @@ class WorkflowModel {
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         orders: json['orders'] == null ? null : Orders.fromJson(json["orders"]),
-        bucketName: BucketName.fromJson(json["bucket_name"]),
+        bucketName: json['bucket_name'] == null
+            ? null
+            : BucketName.fromJson(json["bucket_name"]),
       );
 
   Map<String, dynamic> toJson() => {
