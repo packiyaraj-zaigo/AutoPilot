@@ -21,7 +21,10 @@ class GetAllTimeCardsSucessState extends TimeCardState {
   const GetAllTimeCardsSucessState({required this.timeCards});
 }
 
-class CreateTimeCardLoadingState extends TimeCardState {}
+class CreateTimeCardLoadingState extends TimeCardState {
+  final DateTime time;
+  CreateTimeCardLoadingState({required this.time});
+}
 
 class CreateTimeCardErrorState extends TimeCardState {
   final String message;

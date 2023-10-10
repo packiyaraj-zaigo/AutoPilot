@@ -402,6 +402,10 @@ class ApiRepository {
     return apiProvider.editWorkflowBucket(token, json, id);
   }
 
+  Future deleteWorkflowBucket(String token, String id) {
+    return apiProvider.deleteWorkflowBucket(token, id);
+  }
+
   Future getSingleWorkflowBucket(String token, String id) async {
     return apiProvider.getSingleWorkflowBucket(token, id);
   }

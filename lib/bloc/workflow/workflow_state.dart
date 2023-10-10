@@ -67,3 +67,12 @@ class GetSingleBucketErrorState extends WorkflowState {
 }
 
 class GetSingleBucketSuccessState extends WorkflowState {}
+
+class DeleteWorkFlowBucketState extends WorkflowState {}
+
+class DeleteWorkFlowBucketLoadingState extends WorkflowState {}
+
+class DeleteWorkflowBucketErrorState extends WorkflowState {
+  final String errorMessage;
+  DeleteWorkflowBucketErrorState({required this.errorMessage});
+}

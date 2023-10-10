@@ -86,9 +86,9 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         centerTitle: true,
-        title: const Text(
-          'Edit Column',
-          style: TextStyle(
+        title: Text(
+          widget.status != null ? 'Edit Status' : "Create Status",
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
             color: AppColors.primaryTitleColor,
@@ -127,8 +127,8 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                textBox('Estimate', titleController, 'Title',
-                    titleError.isNotEmpty),
+                textBox(
+                    'Title', titleController, 'Title', titleError.isNotEmpty),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Visibility(
@@ -332,9 +332,9 @@ class _CreateWorkflowScreenState extends State<CreateWorkflowScreen> {
                             ? const CupertinoActivityIndicator(
                                 color: AppColors.greyText,
                               )
-                            : const Text(
-                                "Update",
-                                style: TextStyle(
+                            : Text(
+                                widget.status != null ? "Update" : "Create",
+                                style: const TextStyle(
                                     letterSpacing: 1.1,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,

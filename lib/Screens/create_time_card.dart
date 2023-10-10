@@ -191,9 +191,10 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
                     Padding(
                       padding: const EdgeInsets.only(top: 32.0),
                       child: GestureDetector(
-                        onTap: state is CreateTimeCardLoadingState || clicked
+                        onTap: state is CreateTimeCardLoadingState && clicked
                             ? null
                             : () async {
+                                print("here");
                                 clicked = true;
                                 final status = validate();
                                 if (status) {
@@ -650,37 +651,56 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
   }
 
   validate() {
+    print("there");
     bool status = true;
     if (technicianId == -1) {
-      employeeError = 'Select an employee';
-      status = false;
+      setState(() {
+        employeeError = 'Select an employee';
+        status = false;
+      });
     } else {
-      employeeError = '';
+      setState(() {
+        employeeError = '';
+      });
     }
     if (dateController.text.trim().isEmpty) {
-      dateError = "Please select a date";
-      status = false;
+      setState(() {
+        dateError = "Please select a date";
+        status = false;
+      });
     } else {
-      dateError = '';
+      setState(() {
+        dateError = '';
+      });
     }
     if (notesController.text.isNotEmpty &&
-            notesController.text.trim().length < 2 ||
-        notesController.text.isNotEmpty &&
-            notesController.text.trim().length >= 256) {
-      notesError = "Notes should be between 2 and 255 characters";
-      status = false;
+            notesController.text.trim().length < 2
+        // notesController.text.trim().length >= 256
+        ) {
+      setState(() {
+        notesError = "Notes should be atleast 2 characters";
+        status = false;
+      });
     } else {
-      notesError = '';
+      setState(() {
+        notesError = '';
+      });
     }
     if (clockInController.text.isEmpty && clockOutController.text.isEmpty) {
-      clockError = "Clock in and clock out can't be empty";
-      status = false;
+      setState(() {
+        clockError = "Clock in and clock out can't be empty";
+        status = false;
+      });
     } else if (clockInController.text.isEmpty) {
-      clockError = "Clock in can't be empty";
-      status = false;
+      setState(() {
+        clockError = "Clock in can't be empty";
+        status = false;
+      });
     } else if (clockOutController.text.isEmpty) {
-      clockError = "Clock out can't be empty";
-      status = false;
+      setState(() {
+        clockError = "Clock out can't be empty";
+        status = false;
+      });
     }
     // else if (clockIn >
     //         Duration(hours: selectedDate.hour, minutes: selectedDate.minute) &&
@@ -691,22 +711,34 @@ class _TimeCardCreateState extends State<TimeCardCreate> {
     //   status = false;
     // }
     else if (clockOut < clockIn) {
-      clockError = "Clock out should be valid";
-      status = false;
+      setState(() {
+        clockError = "Clock out should be valid";
+        status = false;
+      });
     } else {
-      clockError = '';
+      setState(() {
+        clockError = '';
+      });
     }
     if (taskController.text.trim().isEmpty) {
-      taskError = "Task can't be empty";
-      status = false;
+      setState(() {
+        taskError = "Task can't be empty";
+        status = false;
+      });
     } else if (taskController.text.length > 50) {
-      taskError = "Task can't be more than 50 characters";
-      status = false;
+      setState(() {
+        taskError = "Task can't be more than 50 characters";
+        status = false;
+      });
     } else {
-      taskError = '';
+      setState(() {
+        taskError = '';
+      });
     }
 
-    setState(() {});
+    setState(() {
+      clicked = false;
+    });
     return status;
   }
 

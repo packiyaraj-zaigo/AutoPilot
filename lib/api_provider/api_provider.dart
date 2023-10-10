@@ -1488,6 +1488,17 @@ class ApiProvider {
     }
   }
 
+  Future<dynamic> deleteWorkflowBucket(String token, String id) async {
+    try {
+      final url = Uri.parse('${BASE_URL}api/workflowbuckets/$id');
+
+      final response = await http.delete(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log(e.toString() + " delete workflow api error");
+    }
+  }
+
   Future<dynamic> createCannedOrderService(
       String token, CannedServiceCreateModel model) async {
     try {
