@@ -1524,6 +1524,9 @@ class ApiProvider {
       if (map['markup'] == null || map['markup'] == '') {
         map.remove('markup');
       }
+
+      map['tax'] = map['is_tax'];
+      map.remove('is_tax');
       map['canned_service_id'] = serviceId;
       map['tax'] = map['is_tax'];
       map.remove('is_tax');
@@ -1898,6 +1901,8 @@ class ApiProvider {
       if (map['markup'] == null || map['markup'] == '') {
         map.remove('markup');
       }
+      map['tax'] = map['is_tax'];
+      map.remove('is_tax');
 
       final url = Uri.parse('${BASE_URL}api/canned_service_items/$id');
       map['tax'] = map['is_tax'];
