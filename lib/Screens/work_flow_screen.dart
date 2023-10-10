@@ -177,20 +177,23 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          CreateWorkflowScreen(id: status.id.toString()),
-                    ),
-                  );
-                },
-                child: const Icon(
-                  Icons.more_horiz,
-                  color: AppColors.primaryColors,
-                ),
-              ),
+              // GestureDetector(
+              //   onTap: () {
+              //     //here to show action buttons.
+              //     showActionSheet(context, status);
+
+              //     // Navigator.of(context).push(
+              //     //   MaterialPageRoute(
+              //     //     builder: (context) =>
+              //     //         CreateWorkflowScreen(id: status.id.toString()),
+              //     //   ),
+              //     // );
+              //   },
+              //   child: const Icon(
+              //     Icons.more_horiz,
+              //     color: AppColors.primaryColors,
+              //   ),
+              // ),
             ],
           ),
         )
@@ -293,11 +296,24 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
               ],
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(
+                  top: 3, left: 16.0, right: 16, bottom: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          showActionSheet(context, status, workflow);
+                        },
+                        icon: const Icon(Icons.more_horiz,
+                            color: AppColors.primaryColors),
+                      )
+                    ],
+                  ),
                   Text(
                     '${AppUtils.getTimeFormatted(workflow.orders?.shopStart ?? DateTime.now())} - ${AppUtils.getTimeFormatted(workflow.orders?.shopFinish ?? DateTime.now())}',
                     style: const TextStyle(
@@ -402,67 +418,149 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
           fontWeight: FontWeight.w600,
         ),
       ),
-      content: Builder(builder: (context) {
-        return Column(
-          children: List.generate(
-            status.childBuckets.length,
-            (index) => Padding(
-              padding: const EdgeInsets.only(top: 12.0),
-              child: GestureDetector(
-                onTap: () {
-                  scaffoldKey.currentContext!.read<WorkflowBloc>().add(
-                        EditWorkflow(
-                          workflowId: workflow.id.toString(),
-                          clientBucketId:
-                              status.childBuckets[index].id.toString(),
-                          orderId: workflow.orderId.toString(),
-                          oldBucketId: status.id.toString(),
-                        ),
-                      );
-                  Navigator.pop(context);
-                },
-                child: Container(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width - 75,
-                  decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          status.childBuckets[index].title,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => CreateWorkflowScreen(
-                                  id: status.childBuckets[index].parentId
-                                      .toString(),
-                                  status: status.childBuckets[index]),
-                            ),
-                          );
+      content: BlocProvider(
+        create: (context) => WorkflowBloc(),
+        child: BlocListener<WorkflowBloc, WorkflowState>(
+          listener: (context, state) {
+            if (state is DeleteWorkFlowBucketState) {
+              // context.read<WorkflowBloc>().add(GetAllWorkflows());
+              Navigator.pop(context);
+            }
+            // TODO: implement listener
+          },
+          child: BlocBuilder<WorkflowBloc, WorkflowState>(
+            builder: (context, state) {
+              return StatefulBuilder(builder: (context, newSetState) {
+                return Column(
+                  children: List.generate(
+                    status.childBuckets.length,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          scaffoldKey.currentContext!.read<WorkflowBloc>().add(
+                                EditWorkflow(
+                                  workflowId: workflow.id.toString(),
+                                  clientBucketId:
+                                      status.childBuckets[index].id.toString(),
+                                  orderId: workflow.orderId.toString(),
+                                  oldBucketId: status.id.toString(),
+                                ),
+                              );
+                          Navigator.pop(context);
                         },
-                        icon: const Icon(
-                          Icons.edit,
-                          color: AppColors.primaryColors,
+                        child: Container(
+                          height: 50,
+                          width: MediaQuery.of(context).size.width - 75,
+                          decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Text(
+                                  status.childBuckets[index].title,
+                                  style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CreateWorkflowScreen(
+                                                  id: status.childBuckets[index]
+                                                      .parentId
+                                                      .toString(),
+                                                  status: status
+                                                      .childBuckets[index]),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: AppColors.primaryColors,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      context.read<WorkflowBloc>().add(
+                                          DeleteWorkFlowBucketEvent(
+                                              id: status
+                                                  .childBuckets[index].parentId
+                                                  .toString()));
+                                    },
+                                    icon: const Icon(
+                                      Icons.close,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                );
+              });
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showActionSheet(BuildContext context, WorkflowStatusModel status,
+      WorkflowModel workflow) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+          actions: <CupertinoActionSheetAction>[
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        CreateWorkflowScreen(id: status.id.toString()),
+                  ),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.only(left: 12.0),
+                child: Text('Create Status'),
               ),
             ),
-          ),
-        );
-      }),
+            CupertinoActionSheetAction(
+              onPressed: () {
+                Navigator.pop(context);
+                showDialog(
+                  context: context,
+                  builder: (context) => dropDown(status, workflow),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.only(left: 12.0),
+                child: Text('Change Status'),
+              ),
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            // isDefaultAction: true,
+            onPressed: () {
+              Navigator.pop(context, 'Cancel');
+            },
+            child: const Text('Cancel'),
+          )),
     );
   }
 }
