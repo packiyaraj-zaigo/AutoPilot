@@ -423,14 +423,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .estimateDetails.data.vehicle?.id
                                               .toString() ??
                                           "0",
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
+                                      orderId:
+                                          widget
+                                              .estimateDetails.data.id
+                                              .toString(),
                                       which: "vehicle",
-                                      customerId: widget
-                                              .estimateDetails.data.customer?.id
-                                              .toString() ??
-                                          "",
-                                      dropScedule: startDateController.text));
+                                      customerId:
+                                          widget.estimateDetails.data.customer
+                                                  ?.id
+                                                  .toString() ??
+                                              "",
+                                      dropScedule: endDateController.text,
+                                      vehicleCheckin:
+                                          startDateController.text));
                             } else {
                               context.read<EstimateBloc>().add(
                                   EditAppointmentEstimateEvent(
@@ -459,14 +464,19 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .estimateDetails.data.vehicle?.id
                                               .toString() ??
                                           "0",
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
+                                      orderId:
+                                          widget
+                                              .estimateDetails.data.id
+                                              .toString(),
                                       which: "vehicle",
-                                      customerId: widget
-                                              .estimateDetails.data.customer?.id
-                                              .toString() ??
-                                          "",
-                                      dropScedule: startDateController.text));
+                                      customerId:
+                                          widget.estimateDetails.data.customer
+                                                  ?.id
+                                                  .toString() ??
+                                              "",
+                                      dropScedule: endDateController.text,
+                                      vehicleCheckin:
+                                          startDateController.text));
                             }
                           }
 
@@ -1904,20 +1914,37 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       children: [
                         Flexible(
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                widget
-                                        .estimateDetails
-                                        .data
-                                        .orderService?[serviceIndex]
-                                        .orderServiceItems?[index]
-                                        .itemName ??
-                                    "",
-                                style: const TextStyle(
-                                    color: AppColors.primaryTitleColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                    overflow: TextOverflow.ellipsis),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width / 3.1,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService?[serviceIndex]
+                                              .orderServiceItems?[index]
+                                              .itemName ??
+                                          "",
+                                      style: const TextStyle(
+                                          color: AppColors.primaryTitleColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          overflow: TextOverflow.ellipsis),
+                                    ),
+                                    Text(
+                                      "(${widget.estimateDetails.data.orderService?[serviceIndex].orderServiceItems?[index].itemType ?? ""})",
+                                      style: const TextStyle(
+                                          color: AppColors.primaryTitleColor,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          overflow: TextOverflow.ellipsis),
+                                    )
+                                  ],
+                                ),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(left: 8.0),
@@ -1965,16 +1992,16 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                         : const SizedBox()
                                   ],
                                 ),
-                              )
+                              ),
+                              Text(
+                                  "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].orderServiceItems?[index].subTotal ?? ""}",
+                                  style: const TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500))
                             ],
                           ),
                         ),
-                        Text(
-                            "\$ ${widget.estimateDetails.data.orderService?[serviceIndex].orderServiceItems?[index].subTotal ?? ""}",
-                            style: const TextStyle(
-                                color: AppColors.primaryTitleColor,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500))
                       ],
                     ),
                   );
@@ -5435,7 +5462,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       .estimateDetails.data.customer?.id
                                       .toString() ??
                                   "",
-                              dropScedule: startDateController.text));
+                              dropScedule: endDateController.text,
+                              vehicleCheckin: startDateController.text));
                         } else {
                           context
                               .read<EstimateBloc>()
@@ -5471,7 +5499,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       .estimateDetails.data.customer?.id
                                       .toString() ??
                                   "",
-                              dropScedule: startDateController.text));
+                              dropScedule: endDateController.text,
+                              vehicleCheckin: startDateController.text));
                         }
                       }
 
