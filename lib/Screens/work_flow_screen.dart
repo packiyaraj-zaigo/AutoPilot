@@ -493,8 +493,7 @@ class _WorkFlowScreenState extends State<WorkFlowScreen>
                                     onPressed: () {
                                       context.read<WorkflowBloc>().add(
                                           DeleteWorkFlowBucketEvent(
-                                              id: status
-                                                  .childBuckets[index].parentId
+                                              id: status.childBuckets[index].id
                                                   .toString()));
                                     },
                                     icon: const Icon(
