@@ -207,7 +207,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           token,
           event.orderId,
           event.customerId,
-          event.dropScedule);
+          event.dropScedule,
+          event.vehicleCheckin);
 
       log("res${editEstimateRes.body}");
 

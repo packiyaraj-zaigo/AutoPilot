@@ -7,7 +7,10 @@ abstract class TimeCardEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetAllTimeCardsEvent extends TimeCardEvent {}
+class GetAllTimeCardsEvent extends TimeCardEvent {
+  final String userName;
+  GetAllTimeCardsEvent({required this.userName});
+}
 
 class CreateTimeCardEvent extends TimeCardEvent {
   final TimeCardCreateModel timeCard;

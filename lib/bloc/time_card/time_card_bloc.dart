@@ -88,7 +88,8 @@ class TimeCardBloc extends Bloc<TimeCardEvent, TimeCardState> {
     }
     try {
       final token = await AppUtils.getToken();
-      final Response response = await apiRepo.getAllTimeCards(token);
+      final Response response =
+          await apiRepo.getAllTimeCards(token, event.userName);
       final body = jsonDecode(response.body);
       if (response.statusCode == 200) {
         log(body.toString() + "BODY");

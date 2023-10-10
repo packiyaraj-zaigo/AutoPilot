@@ -25,12 +25,13 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
   final List<TimeCardModel> timeCards = [];
   late final TimeCardBloc bloc;
   final _debouncer = Debouncer();
+  final searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     bloc = BlocProvider.of<TimeCardBloc>(context);
-    bloc.add(GetAllTimeCardsEvent());
+    bloc.add(GetAllTimeCardsEvent(userName: ""));
   }
 
   @override
@@ -92,6 +93,7 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
               BlocListener<TimeCardBloc, TimeCardState>(
                 listener: (context, state) {
                   if (state is GetAllTimeCardsSucessState) {
+                    timeCards.clear();
                     timeCards.addAll(state.timeCards);
                   } else if (state is GetAllTimeCardsErrorState) {
                     CommonWidgets().showDialog(context, state.message);
@@ -424,9 +426,13 @@ class _TimeCardsScreenState extends State<TimeCardsScreen> {
           height: 50,
           child: CupertinoTextField(
             textAlignVertical: TextAlignVertical.bottom,
+            controller: searchController,
+            clearButtonMode: OverlayVisibilityMode.editing,
             padding: const EdgeInsets.only(top: 14, bottom: 14, left: 16),
             onChanged: (value) {
-              _debouncer.run(() {});
+              _debouncer.run(() {
+                bloc.add(GetAllTimeCardsEvent(userName: value));
+              });
             },
             prefix: const Row(
               children: [

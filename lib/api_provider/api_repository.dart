@@ -218,8 +218,8 @@ class ApiRepository {
     return apiProvider.getParts(token, currentPage, query);
   }
 
-  Future getAllTimeCards(String token) {
-    return apiProvider.getAllTimeCards(token);
+  Future getAllTimeCards(String token, String userName) {
+    return apiProvider.getAllTimeCards(token, userName);
   }
 
   Future getUserTimeCards(String token, String technicianId, int page) {
@@ -331,9 +331,9 @@ class ApiRepository {
   }
 
   Future editEstimate(String id, String which, dynamic token, String orderId,
-      String customerId, String? dropSchedule) {
+      String customerId, String? dropSchedule, String? vehicleCheckin) {
     return apiProvider.editEstimate(
-        id, which, token, orderId, customerId, dropSchedule);
+        id, which, token, orderId, customerId, dropSchedule, vehicleCheckin);
   }
 
   Future addEstimateNote(String orderId, String comment, dynamic token) {

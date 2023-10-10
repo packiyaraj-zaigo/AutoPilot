@@ -852,11 +852,11 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> getAllTimeCards(String token) async {
+  Future<dynamic> getAllTimeCards(String token, String userName) async {
     try {
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse(
-          "${BASE_URL}api/mobilelist?client_id=$clientId&order_by=id&sort=DESC");
+          "${BASE_URL}api/mobilelist?client_id=$clientId&order_by=id&sort=DESC&username=$userName");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -1159,8 +1159,14 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> editEstimate(String id, String which, dynamic token,
-      String orderId, String customerId, String? dropSchedule) async {
+  Future<dynamic> editEstimate(
+      String id,
+      String which,
+      dynamic token,
+      String orderId,
+      String customerId,
+      String? dropSchedule,
+      String? vehicleCheckin) async {
     print("into provider");
     print(customerId + "cusstomerrr");
 
@@ -1179,6 +1185,10 @@ class ApiProvider {
       if (dropSchedule != null) {
         vehicleBody["drop_schedule"] = dropSchedule;
       }
+      if (vehicleCheckin != null) {
+        vehicleBody['vehicle_checkin'] = vehicleCheckin;
+      }
+
       // var request = http.MultipartRequest("PUT", url)
       //   ..fields['client_id'] = clientId;
       // if (which == "vehicle") {
