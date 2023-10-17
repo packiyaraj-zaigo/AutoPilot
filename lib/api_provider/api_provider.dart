@@ -214,7 +214,7 @@ class ApiProvider {
     try {
       final clientId = await AppUtils.getUserID();
       String url =
-          '${BASE_URL}api/users?client_id=$clientId&order_by=id&sort=DESC';
+          '${BASE_URL}api/users?client_id=$clientId&order_by=created_at';
 
       if (page != 1) {
         url = '$url&page=$page';
