@@ -39,3 +39,19 @@ class AddCompanyErrorState extends DashboardState {
   final String errorMessage;
   AddCompanyErrorState({required this.errorMessage});
 }
+
+class CompanyLogoUploadState extends DashboardState {
+  final String imagePath;
+
+  CompanyLogoUploadState({required this.imagePath});
+
+  @override
+  List<Object> get props => [imagePath];
+}
+
+class CompanyLogoUploadLoadingState extends DashboardState {}
+
+class CompanyLogoUploadErrorState extends DashboardState {
+  final String errorMessage;
+  CompanyLogoUploadErrorState({required this.errorMessage});
+}

@@ -900,6 +900,7 @@ class ApiProvider {
       final url = Uri.parse("${BASE_URL}api/clocks");
       final response = http.post(url,
           headers: getHeader(token), body: json.encode(timeCard.toJson()));
+      log(json.encode(timeCard.toJson()));
       return response;
     } catch (e) {
       log(e.toString() + "  Create time cards api error");
