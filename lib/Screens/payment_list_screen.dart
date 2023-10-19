@@ -72,7 +72,8 @@ class _PaymentListScreenState extends State<PaymentListScreen> {
                                   paymentList[index].id.toString(),
                                   paymentList[index].paymentMode,
                                   paymentList[index].paymentDate,
-                                  paymentList[index].paidAmount);
+                                  paymentList[index].paidAmount,
+                                  paymentList[index].note);
                             },
                             itemCount: paymentList.length + 1,
                             shrinkWrap: true,
@@ -109,8 +110,8 @@ class _PaymentListScreenState extends State<PaymentListScreen> {
     );
   }
 
-  paymentTile(
-      String paymentId, String paymentMode, DateTime date, String amount) {
+  paymentTile(String paymentId, String paymentMode, DateTime date,
+      String amount, String notes) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Container(
@@ -161,6 +162,18 @@ class _PaymentListScreenState extends State<PaymentListScreen> {
                       ),
                     ),
                   ],
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: Text(
+                    notes,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.5,
+                      color: AppColors.primaryTitleColor,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 Text(
