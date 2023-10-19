@@ -26,6 +26,7 @@ import 'package:auto_pilot/bloc/estimate_bloc/estimate_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -60,6 +61,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   bool isInspectionPhotos = false;
   bool isService = false;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  CarouselController buttonCarouselController = CarouselController();
 
   //Text Editing Controllers
   final vehicleController = TextEditingController();
@@ -423,19 +425,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .estimateDetails.data.vehicle?.id
                                               .toString() ??
                                           "0",
-                                      orderId:
-                                          widget
-                                              .estimateDetails.data.id
-                                              .toString(),
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
                                       which: "vehicle",
-                                      customerId:
-                                          widget.estimateDetails.data.customer
-                                                  ?.id
-                                                  .toString() ??
-                                              "",
-                                      dropScedule: endDateController.text,
-                                      vehicleCheckin:
-                                          startDateController.text));
+                                      customerId: widget
+                                              .estimateDetails.data.customer?.id
+                                              .toString() ??
+                                          "",
+                                      dropScedule: endDateToServer,
+                                      vehicleCheckin: startDateToServer));
                             } else {
                               context.read<EstimateBloc>().add(
                                   EditAppointmentEstimateEvent(
@@ -464,19 +462,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .estimateDetails.data.vehicle?.id
                                               .toString() ??
                                           "0",
-                                      orderId:
-                                          widget
-                                              .estimateDetails.data.id
-                                              .toString(),
+                                      orderId: widget.estimateDetails.data.id
+                                          .toString(),
                                       which: "vehicle",
-                                      customerId:
-                                          widget.estimateDetails.data.customer
-                                                  ?.id
-                                                  .toString() ??
-                                              "",
-                                      dropScedule: endDateController.text,
-                                      vehicleCheckin:
-                                          startDateController.text));
+                                      customerId: widget
+                                              .estimateDetails.data.customer?.id
+                                              .toString() ??
+                                          "",
+                                      dropScedule: endDateToServer,
+                                      vehicleCheckin: startDateToServer));
                             }
                           }
 
@@ -923,6 +917,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                     if (newOrderImageData.length > index ||
                                         networkImageList[index]
                                             .contains("http")) {
+                                      showImageView(networkImageList[index],
+                                          index, networkImageList);
                                     } else {
                                       showActionSheet(context, index);
                                     }
@@ -1497,7 +1493,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
           Padding(
             padding: EdgeInsets.only(top: 8.0),
             child: Text(
-              "${widget.estimateDetails.data.vehicle?.vehicleModel ?? ''} ${widget.estimateDetails.data.vehicle?.vehicleYear ?? ''}",
+              "${widget.estimateDetails.data.vehicle?.vehicleYear ?? ''} ${widget.estimateDetails.data.vehicle?.vehicleMake ?? ''} ${widget.estimateDetails.data.vehicle?.vehicleModel ?? ''} ",
               style: TextStyle(
                   fontSize: 16,
                   color: AppColors.primaryTitleColor,
@@ -5462,8 +5458,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       .estimateDetails.data.customer?.id
                                       .toString() ??
                                   "",
-                              dropScedule: endDateController.text,
-                              vehicleCheckin: startDateController.text));
+                              dropScedule: endDateToServer,
+                              vehicleCheckin: startDateToServer));
                         } else {
                           context
                               .read<EstimateBloc>()
@@ -5499,8 +5495,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                       .estimateDetails.data.customer?.id
                                       .toString() ??
                                   "",
-                              dropScedule: endDateController.text,
-                              vehicleCheckin: startDateController.text));
+                              dropScedule: endDateToServer,
+                              vehicleCheckin: startDateToServer));
                         }
                       }
 
@@ -5653,6 +5649,95 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               ),
             ),
           )),
+    );
+  }
+
+  showImageView(String imageUrl, int index, List<String> imageList) {
+    List<String> newImageUrlList = [];
+    imageList.forEach((element) {
+      if (element.contains("http://")) {
+        newImageUrlList.add(element);
+      }
+    });
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter newSetState) {
+          return AlertDialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            titlePadding: EdgeInsets.only(top: 18, left: 16, right: 20),
+            contentPadding: EdgeInsets.only(top: 18, left: 0, right: 0),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text("Inspection Photos ",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            color: Colors.black)),
+                    InkWell(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Icon(Icons.close))
+                  ],
+                ),
+              ],
+            ),
+            content: Padding(
+              padding: const EdgeInsets.only(bottom: 6.0),
+              child: Container(
+                height: 380,
+                width: MediaQuery.of(context).size.width,
+                child: CarouselSlider(
+                  carouselController: buttonCarouselController,
+                  options: CarouselOptions(
+                      initialPage: index,
+                      enableInfiniteScroll: false,
+                      height: 380.0,
+                      aspectRatio: 9 / 16,
+                      viewportFraction: 1),
+                  items: newImageUrlList.map((i) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                            decoration:
+                                const BoxDecoration(color: Colors.white),
+                            child: CachedNetworkImage(
+                              imageUrl: i,
+                              fit: BoxFit.cover,
+                              progressIndicatorBuilder:
+                                  (context, url, progress) {
+                                return SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width / 8.8,
+                                  height: 37,
+                                  child: const CupertinoActivityIndicator(),
+                                );
+                              },
+                            ));
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            insetPadding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.20,
+                left: 16,
+                right: 16,
+                bottom: MediaQuery.of(context).size.height * 0.15),
+          );
+        });
+      },
     );
   }
 }

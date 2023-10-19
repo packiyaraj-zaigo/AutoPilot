@@ -143,7 +143,7 @@ class _PaymentListScreenState extends State<PaymentListScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      paymentMode,
+                      paymentMode == "CreditCard" ? "Credit Card" : paymentMode,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w400,

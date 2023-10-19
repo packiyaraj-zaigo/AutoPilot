@@ -295,14 +295,16 @@ class ApiRepository {
         token, clientId, customerId, messageBody);
   }
 
-  Future createNewEstimate(String id, String which, dynamic token) {
-    return apiProvider.createNewEstimate(id, which, token);
+  Future createNewEstimate(String id, String which, dynamic token,
+      String? dropSchedule, String? vehicleCheckin) {
+    return apiProvider.createNewEstimate(
+        id, which, token, dropSchedule, vehicleCheckin);
   }
 
-  Future createNewEstimateFromAppointment(
-      String vehicleId, String customerId, dynamic token) {
+  Future createNewEstimateFromAppointment(String vehicleId, String customerId,
+      dynamic token, String? dropSchedule, String? vehicleCheckin) {
     return apiProvider.createNewEstimateFromAppointment(
-        vehicleId, customerId, token);
+        vehicleId, customerId, token, dropSchedule, vehicleCheckin);
   }
 
   Future createAppointmentEstimate(

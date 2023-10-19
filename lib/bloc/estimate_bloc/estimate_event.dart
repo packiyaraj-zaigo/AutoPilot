@@ -15,7 +15,13 @@ class GetEstimateEvent extends EstimateEvent {
 class CreateEstimateEvent extends EstimateEvent {
   final String id;
   final String which;
-  CreateEstimateEvent({required this.id, required this.which});
+  final String? dropOff;
+  final String? vehicleCheckin;
+  CreateEstimateEvent(
+      {required this.id,
+      required this.which,
+      this.dropOff,
+      this.vehicleCheckin});
 }
 
 class EditEstimateEvent extends EstimateEvent {
@@ -195,15 +201,18 @@ class CreateEstimateFromAppointmentEvent extends EstimateEvent {
   final String startTime;
   final String endTime;
   final String appointmentNote;
+  final String? dropOff;
+  final String? vehicleCheckin;
 
-  const CreateEstimateFromAppointmentEvent({
-    required this.customerId,
-    required this.vehicleId,
-    required this.appointmentId,
-    required this.startTime,
-    required this.endTime,
-    required this.appointmentNote,
-  });
+  const CreateEstimateFromAppointmentEvent(
+      {required this.customerId,
+      required this.vehicleId,
+      required this.appointmentId,
+      required this.startTime,
+      required this.endTime,
+      required this.appointmentNote,
+      this.dropOff,
+      this.vehicleCheckin});
 }
 
 class AuthServiceByTechnicianEvent extends EstimateEvent {
