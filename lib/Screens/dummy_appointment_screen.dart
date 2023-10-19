@@ -40,13 +40,14 @@ class _DummyAppointmentScreenState extends State<DummyAppointmentScreen> {
       create: (context) => EstimateBloc(apiRepository: ApiRepository())
         ..add(
           CreateEstimateFromAppointmentEvent(
-            customerId: widget.customerId,
-            vehicleId: widget.vehicleId,
-            appointmentId: widget.appointmentId,
-            startTime: widget.startTime,
-            endTime: widget.endTime,
-            appointmentNote: widget.appointmentNote,
-          ),
+              customerId: widget.customerId,
+              vehicleId: widget.vehicleId,
+              appointmentId: widget.appointmentId,
+              startTime: widget.startTime,
+              endTime: widget.endTime,
+              appointmentNote: widget.appointmentNote,
+              dropOff: widget.endTime,
+              vehicleCheckin: widget.startTime),
         ),
       child: BlocListener<EstimateBloc, EstimateState>(
         listener: (context, state) {

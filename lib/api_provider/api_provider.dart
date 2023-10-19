@@ -214,7 +214,7 @@ class ApiProvider {
     try {
       final clientId = await AppUtils.getUserID();
       String url =
-          '${BASE_URL}api/users?client_id=$clientId&order_by=id&sort=DESC';
+          '${BASE_URL}api/users?client_id=$clientId&order_by=created_at';
 
       if (page != 1) {
         url = '$url&page=$page';
@@ -900,6 +900,7 @@ class ApiProvider {
       final url = Uri.parse("${BASE_URL}api/clocks");
       final response = http.post(url,
           headers: getHeader(token), body: json.encode(timeCard.toJson()));
+      log(json.encode(timeCard.toJson()));
       return response;
     } catch (e) {
       log(e.toString() + "  Create time cards api error");
@@ -1109,8 +1110,8 @@ class ApiProvider {
   //   }
   // }
 
-  Future<dynamic> createNewEstimate(
-      String id, String which, dynamic token) async {
+  Future<dynamic> createNewEstimate(String id, String which, dynamic token,
+      dropSchedule, vehicleCheckin) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -1122,8 +1123,20 @@ class ApiProvider {
       if (which == "vehicle") {
         request.fields['vehicle_id'] = id;
         request.fields['customer_id'] = "0";
+        if (dropSchedule != null) {
+          request.fields["drop_schedule"] = dropSchedule;
+        }
+        if (vehicleCheckin != null) {
+          request.fields['vehicle_checkin'] = vehicleCheckin;
+        }
       } else {
         request.fields['customer_id'] = id;
+        if (dropSchedule != null) {
+          request.fields["drop_schedule"] = dropSchedule;
+        }
+        if (vehicleCheckin != null) {
+          request.fields['vehicle_checkin'] = vehicleCheckin;
+        }
       }
 
       request.headers.addAll(getHeader(token));
@@ -1138,7 +1151,11 @@ class ApiProvider {
   }
 
   Future<dynamic> createNewEstimateFromAppointment(
-      String vehicleId, String customerId, dynamic token) async {
+      String vehicleId,
+      String customerId,
+      dynamic token,
+      String? dropSchedule,
+      String? vehicleCheckin) async {
     print("into provider");
 
     //  LoadingFormModel? loadingFormModel;
@@ -1149,6 +1166,12 @@ class ApiProvider {
         ..fields['client_id'] = clientId;
       request.fields['vehicle_id'] = vehicleId;
       request.fields['customer_id'] = customerId;
+      if (dropSchedule != null) {
+        request.fields["drop_schedule"] = dropSchedule;
+      }
+      if (vehicleCheckin != null) {
+        request.fields['vehicle_checkin'] = vehicleCheckin;
+      }
 
       request.headers.addAll(getHeader(token));
       var response = await request.send();
@@ -1211,6 +1234,8 @@ class ApiProvider {
               ? json.encode(vehicleBody)
               : json.encode(customerBody),
           headers: getHeader(token));
+
+      inspect(response);
 
       return response;
     } catch (e) {

@@ -83,7 +83,11 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       emit(CreateEstimateLoadingState());
       final token = await AppUtils.getToken();
       final response = await _apiRepository.createNewEstimateFromAppointment(
-          event.vehicleId, event.customerId, token);
+          event.vehicleId,
+          event.customerId,
+          token,
+          event.dropOff,
+          event.vehicleCheckin);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final createModel = createEstimateModelFromJson(response.body);
         final appointmentResponse =
@@ -167,8 +171,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       var token = prefs.getString(AppConstants.USER_TOKEN);
       emit(CreateEstimateLoadingState());
 
-      Response createEstimateRes =
-          await _apiRepository.createNewEstimate(event.id, event.which, token);
+      Response createEstimateRes = await _apiRepository.createNewEstimate(
+          event.id, event.which, token, event.dropOff, event.vehicleCheckin);
 
       log("res${createEstimateRes.body}");
 

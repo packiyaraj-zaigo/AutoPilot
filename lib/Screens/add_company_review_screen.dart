@@ -85,8 +85,7 @@ class _AddCompanyReviewScreenState extends State<AddCompanyReviewScreen> {
                     print(widget.basicDetailsMap["company_logo"].toString() +
                         "basic");
 
-                    print(finalDataMap["company_logo"].toString() +
-                        "imagee pathhh");
+                    print(finalDataMap["company_logo"] + "imagee pathhh");
                     context.read<DashboardBloc>().add(AddCompanyEvent(
                         dataMap: finalDataMap,
                         context: context,

@@ -735,7 +735,7 @@ class _CreateVehicleScreenState extends State<CreateVehicleScreen> {
                       });
                     }
                   : null,
-              inputFormatters: label == "Year"
+              inputFormatters: label == "Year"||label=="Mileage"
                   ? [FilteringTextInputFormatter.digitsOnly]
                   : null,
               keyboardType: label == 'Year'

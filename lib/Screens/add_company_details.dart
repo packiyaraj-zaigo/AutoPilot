@@ -56,6 +56,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   dynamic _currentSelectedTimezoneValue;
   String selectedCountryString = '';
   String selectedStateString = '';
+  String companyLogoUrl = "";
   // Iterable<tz.Location> timeZones = [];
   // List<tz.Location> timeZoneList = [];
   List<String> staticTimeZoneList = [
@@ -378,129 +379,153 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   }
 
   Widget basicDetailsWidget() {
-    return SingleChildScrollView(
-      // physics: CustomScrollPhysics(),
-      child: Padding(
-        padding:
-            const EdgeInsets.only(left: 24.0, right: 24, bottom: 24, top: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Basic Details",
-              style: TextStyle(
-                  color: AppColors.primaryTitleColor,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 25.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          //show action sheet.
-                          showActionSheet(context, 0);
-                        },
-                        child: Container(
-                          height: 88,
-                          width: 88,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(157),
-                              color: const Color.fromARGB(255, 225, 225, 225),
-                              image: selectedImage != null ||
-                                      basicDetailsMap["company_logo"] != null
-                                  ? DecorationImage(
-                                      image: FileImage(selectedImage ??
-                                          File(
-                                              basicDetailsMap["company_logo"])),
-                                      fit: BoxFit.cover)
-                                  : null),
-                          child: Padding(
-                            padding: const EdgeInsets.all(32.0),
-                            child: selectedImage == null &&
-                                    basicDetailsMap["company_logo"] == null
-                                ? SvgPicture.asset(
-                                    "assets/images/upload_icon.svg")
-                                : const SizedBox(
-                                    height: 88,
-                                    width: 88,
-                                    // child: Image.file(
-                                    //   selectedImage!,
-                                    //   fit: BoxFit.cover,
-                                    //),
+    return BlocProvider(
+      create: (context) => DashboardBloc(apiRepository: ApiRepository()),
+      child: BlocListener<DashboardBloc, DashboardState>(
+        listener: (context, state) {
+          if (state is CompanyLogoUploadState) {
+            companyLogoUrl = state.imagePath;
+            log(companyLogoUrl);
+          }
+          // TODO: implement listener
+        },
+        child: BlocBuilder<DashboardBloc, DashboardState>(
+          builder: (context, state) {
+            return SingleChildScrollView(
+              // physics: CustomScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 24.0, right: 24, bottom: 24, top: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Basic Details",
+                      style: TextStyle(
+                          color: AppColors.primaryTitleColor,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 25.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Column(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  //show action sheet.
+                                  showActionSheet(context, 0);
+                                },
+                                child: Container(
+                                  height: 88,
+                                  width: 88,
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(157),
+                                      color: const Color.fromARGB(
+                                          255, 225, 225, 225),
+                                      image: selectedImage != null ||
+                                              basicDetailsMap["company_logo"] !=
+                                                  null
+                                          ? DecorationImage(
+                                              image: FileImage(selectedImage ??
+                                                  File(basicDetailsMap[
+                                                      "company_logo"])),
+                                              fit: BoxFit.cover)
+                                          : null),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(32.0),
+                                    child: selectedImage == null &&
+                                            basicDetailsMap["company_logo"] ==
+                                                null
+                                        ? SvgPicture.asset(
+                                            "assets/images/upload_icon.svg")
+                                        : const SizedBox(
+                                            height: 88,
+                                            width: 88,
+                                            // child: Image.file(
+                                            //   selectedImage!,
+                                            //   fit: BoxFit.cover,
+                                            //),
+                                          ),
                                   ),
+                                ),
+                              ),
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  "Upload Logo",
+                                  style: TextStyle(
+                                      color: AppColors.greyText,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
+                        ],
                       ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          "Upload Logo",
-                          style: TextStyle(
-                              color: AppColors.greyText,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: textBox("Enter Business Name", busineesNameController,
-                  "Business Name", businessNameErrorStatus, true),
-            ),
-            errorMessageWidget(businessNameErrorMsg, businessNameErrorStatus),
-            textBox("Enter Business Phone", businessPhoneController,
-                "Business Phone", businessPhoneErrorStatus, true),
-            errorMessageWidget(phoneErrorMsg, businessPhoneErrorStatus),
-            textBox("Enter Business Website", businessWebsiteController,
-                "Business Website", businessWebsiteErrorStatus, false),
-            errorMessageWidget(
-                businessWebsiteError, businessWebsiteErrorStatus),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 30.0),
+                      child: textBox(
+                          "Enter Business Name",
+                          busineesNameController,
+                          "Business Name",
+                          businessNameErrorStatus,
+                          true),
+                    ),
+                    errorMessageWidget(
+                        businessNameErrorMsg, businessNameErrorStatus),
+                    textBox("Enter Business Phone", businessPhoneController,
+                        "Business Phone", businessPhoneErrorStatus, true),
+                    errorMessageWidget(phoneErrorMsg, businessPhoneErrorStatus),
+                    textBox("Enter Business Website", businessWebsiteController,
+                        "Business Website", businessWebsiteErrorStatus, false),
+                    errorMessageWidget(
+                        businessWebsiteError, businessWebsiteErrorStatus),
 
-            textBox("Enter Address", addressController, "Address",
-                addressErrorStatus, true),
-            errorMessageWidget(addressErrorMsg, addressErrorStatus),
-            // countrydropDown(),
-            // errorMessageWidget(countryErrorMsg, countryErrorStatus),
-            textBox(
-                "Enter City", cityController, "City", cityErrorStatus, true),
-            errorMessageWidget(cityErrorMsg, cityErrorStatus),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    stateDropDown(),
-                    errorMessageWidget(stateErrorMsg, stateErrorStatus),
+                    textBox("Enter Address", addressController, "Address",
+                        addressErrorStatus, true),
+                    errorMessageWidget(addressErrorMsg, addressErrorStatus),
+                    // countrydropDown(),
+                    // errorMessageWidget(countryErrorMsg, countryErrorStatus),
+                    textBox("Enter City", cityController, "City",
+                        cityErrorStatus, true),
+                    errorMessageWidget(cityErrorMsg, cityErrorStatus),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            stateDropDown(),
+                            errorMessageWidget(stateErrorMsg, stateErrorStatus),
+                          ],
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            textBox("Enter Zipcode", zipController, "Zip",
+                                zipErrorStatus, true),
+                            errorMessageWidget(zipErrorMsg, zipErrorStatus)
+                          ],
+                        ),
+                      ],
+                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     errorMessageWidget(stateErrorMsg, stateErrorStatus),
+                    //     errorMessageWidget(zipErrorMsg, zipErrorStatus)
+                    //   ],
+                    // )
                   ],
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    textBox("Enter Zipcode", zipController, "Zip",
-                        zipErrorStatus, true),
-                    errorMessageWidget(zipErrorMsg, zipErrorStatus)
-                  ],
-                ),
-              ],
-            ),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     errorMessageWidget(stateErrorMsg, stateErrorStatus),
-            //     errorMessageWidget(zipErrorMsg, zipErrorStatus)
-            //   ],
-            // )
-          ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -1355,7 +1380,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "province_id": provinceId,
         "province_name": provinceController.text,
         "website": businessWebsiteController.text,
-        "company_logo": selectedImage != null ? selectedImage!.path : null
+        "company_logo": companyLogoUrl != "" ? companyLogoUrl : ""
       });
 
       print(basicDetailsMap["company_logo"].toString() + "image path");
@@ -1913,7 +1938,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
     );
   }
 
-  void showActionSheet(BuildContext context, int index) {
+  void showActionSheet(BuildContext ctx, int index) {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => CupertinoActionSheet(
@@ -1923,7 +1948,13 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 // setState(() {
                 //   selectedImage = null;
                 // });
-                selectImages("camera");
+                selectImages("camera").then((value) {
+                  if (selectedImage != null) {
+                    ctx
+                        .read<DashboardBloc>()
+                        .add(CompanyLogoUploadEvent(imagePath: selectedImage!));
+                  }
+                });
                 Navigator.pop(context);
                 // .then((value) {
                 //   if (selectedImage != null) {
@@ -1956,7 +1987,13 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 // setState(() {
                 //   selectedImage = null;
                 // });
-                selectImages("lib");
+                selectImages("lib").then((value) {
+                  if (selectedImage != null) {
+                    context
+                        .read<DashboardBloc>()
+                        .add(CompanyLogoUploadEvent(imagePath: selectedImage!));
+                  }
+                });
                 Navigator.pop(context);
                 // .then((value) {
                 //   if (selectedImage != null) {
@@ -1996,18 +2033,20 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
   Future selectImages(source) async {
     if (source == "camera") {
-      final tempImg = await imagePicker.pickImage(source: ImageSource.camera);
+      final tempImg = await imagePicker.pickImage(
+          source: ImageSource.camera, imageQuality: 80);
       // if (imageFileList != null) {
       if (tempImg != null) {
-        final compressedImage = await FlutterImageCompress.compressAndGetFile(
-          tempImg.path,
-          '${tempImg.path}.jpg',
-          quality: 80,
-        );
+        // final compressedImage = await FlutterImageCompress.compressAndGetFile(
+        //   tempImg.path,
+        //   '${tempImg.path}.jpg',
+        //   quality: 80,
+        // );
         setState(() {
-          if (compressedImage != null) {
-            selectedImage = File(compressedImage.path);
-          }
+          // if (compressedImage != null) {
+          //   selectedImage = File(compressedImage.path);
+          // }
+          selectedImage = File(tempImg.path);
         });
       } else {
         return;
@@ -2015,18 +2054,20 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
 
       // }
     } else {
-      final tempImg = await imagePicker.pickImage(source: ImageSource.gallery);
+      final tempImg = await imagePicker.pickImage(
+          source: ImageSource.gallery, imageQuality: 80);
       // if (imageFileList != null) {
       if (tempImg != null) {
-        final compressedImage = await FlutterImageCompress.compressAndGetFile(
-          tempImg.path,
-          '${tempImg.path}.jpg',
-          quality: 80,
-        );
+        // final compressedImage = await FlutterImageCompress.compressAndGetFile(
+        //   tempImg.path,
+        //   '${tempImg.path}.jpg',
+        //   quality: 80,
+        // );
         setState(() {
-          if (compressedImage != null) {
-            selectedImage = File(compressedImage.path);
-          }
+          // if (compressedImage != null) {
+          //   selectedImage = File(compressedImage.path);
+          // }
+          selectedImage = File(tempImg.path);
         });
       } else {
         return;

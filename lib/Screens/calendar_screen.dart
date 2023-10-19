@@ -36,13 +36,15 @@ class _CalendarScreenState extends State<CalendarScreen>
   void initState() {
     super.initState();
     _tabController = TabController(vsync: this, length: 2);
+    // _tabController.animation!.addListener(_onTabSwipe);
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     super.dispose();
   }
+
+  _onTabSwipe() {}
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +56,18 @@ class _CalendarScreenState extends State<CalendarScreen>
                   _selectedDate.year, _selectedDate.month, _selectedDate.day))),
         child: BlocBuilder<CalendarBloc, CalendarState>(
           builder: (context, state) {
+            _tabController.addListener(() {
+              if (_tabController.index == 0) {
+                context.read<CalendarBloc>().add(CalendarDetails(
+                      selectedDate: _selectedDate,
+                    ));
+              } else if (_tabController.index == 1) {
+                context.read<CalendarBloc>().add(CalendarWeekDetails(
+                      startDate: _selectedDate,
+                      endDate: _selectedDate,
+                    ));
+              }
+            });
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -195,15 +209,15 @@ class _CalendarScreenState extends State<CalendarScreen>
                 ),
                 TabBar(
                   onTap: (value) {
-                    _tabController.index == 0
-                        ? context.read<CalendarBloc>().add(CalendarDetails(
-                              selectedDate: DateTime(_selectedDate.year,
-                                  _selectedDate.month, _selectedDate.day),
-                            ))
-                        : context.read<CalendarBloc>().add(CalendarWeekDetails(
-                              startDate: _selectedDate,
-                              endDate: _selectedDate,
-                            ));
+                    // _tabController.index == 0
+                    //     ? context.read<CalendarBloc>().add(CalendarDetails(
+                    //           selectedDate: DateTime(_selectedDate.year,
+                    //               _selectedDate.month, _selectedDate.day),
+                    //         ))
+                    //     : context.read<CalendarBloc>().add(CalendarWeekDetails(
+                    //           startDate: _selectedDate,
+                    //           endDate: _selectedDate,
+                    //         ));
                   },
                   controller: _tabController,
                   labelColor: AppColors.primaryColors,

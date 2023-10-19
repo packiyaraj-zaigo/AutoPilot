@@ -20,3 +20,9 @@ class AddCompanyEvent extends DashboardEvent {
   AddCompanyEvent(
       {required this.dataMap, required this.context, required this.imagePath});
 }
+
+class CompanyLogoUploadEvent extends DashboardEvent {
+  final File imagePath;
+
+  CompanyLogoUploadEvent({required this.imagePath});
+}

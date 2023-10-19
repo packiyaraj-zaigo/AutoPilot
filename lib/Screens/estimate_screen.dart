@@ -191,7 +191,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                                 recentData[index].customer?.firstName ?? "",
                                 "${recentData[index].vehicle?.vehicleYear ?? ""} ${recentData[index].vehicle?.vehicleMake ?? ""} ${recentData[index].vehicle?.vehicleModel ?? ""}",
                                 recentData[index].estimationName ?? "",
-                                recentData[index].dropSchedule ?? "",
+                                "${recentData[index].createdAt.month}-${recentData[index].createdAt.day}-${recentData[index].createdAt.year}",
                               ),
                             );
                           },
@@ -283,7 +283,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                                 estimateData[index].customer?.firstName ?? "",
                                 "${estimateData[index].vehicle?.vehicleYear ?? ""} ${estimateData[index].vehicle?.vehicleMake ?? ""} ${estimateData[index].vehicle?.vehicleModel ?? ""}",
                                 estimateData[index].estimationName ?? "",
-                                estimateData[index].dropSchedule ?? "",
+                                "${estimateData[index].createdAt.month}-${estimateData[index].createdAt.day}-${estimateData[index].createdAt.year}",
                               ),
                             );
                           },
@@ -397,7 +397,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                                 ordersData[index].customer?.firstName ?? "",
                                 "${ordersData[index].vehicle?.vehicleYear ?? ""} ${ordersData[index].vehicle?.vehicleMake ?? ""} ${ordersData[index].vehicle?.vehicleModel ?? ""}",
                                 ordersData[index].estimationName ?? "",
-                                ordersData[index].dropSchedule ?? "",
+                                "${ordersData[index].createdAt.month}-${ordersData[index].createdAt.day}-${ordersData[index].createdAt.year}",
                               ),
                             );
                           },
@@ -512,7 +512,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                                 invoiceData[index].customer?.firstName ?? "",
                                 "${invoiceData[index].vehicle?.vehicleYear ?? ""} ${invoiceData[index].vehicle?.vehicleMake ?? ""} ${invoiceData[index].vehicle?.vehicleModel ?? ""}",
                                 invoiceData[index].estimationName ?? "",
-                                invoiceData[index].dropSchedule ?? "",
+                                "${invoiceData[index].createdAt.month}-${invoiceData[index].createdAt.day}-${invoiceData[index].createdAt.year}",
                               ),
                             );
                           },
@@ -576,7 +576,7 @@ class _EstimateScreenState extends State<EstimateScreen>
                         Padding(
                           padding: const EdgeInsets.only(left: 4.0),
                           child: Text(
-                            dropSchedule.substring(0, 10),
+                            dropSchedule,
                             style: const TextStyle(
                                 color: AppColors.greyText,
                                 fontSize: 12,

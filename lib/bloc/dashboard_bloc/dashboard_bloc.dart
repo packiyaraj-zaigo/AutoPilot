@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:auto_pilot/Models/province_model.dart';
 import 'package:auto_pilot/Models/revenue_chart_model.dart';
@@ -35,6 +36,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<GetUserProfileEvent>(getUserProfileBloc);
     on<GetProvinceEvent>(getProvinceBloc);
     on<AddCompanyEvent>(addCompanyBloc);
+    on<CompanyLogoUploadEvent>(uploadImageBloc);
   }
 
   Future<void> getRevenueChartDataBloc(
@@ -188,6 +190,37 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       print(e.toString());
       // emit(LoginInvalidCredentialsState(message: e.toString()));
       print("thisss");
+    }
+  }
+
+  uploadImageBloc(
+    CompanyLogoUploadEvent event,
+    Emitter<DashboardState> emit,
+  ) async {
+    try {
+      emit(CompanyLogoUploadLoadingState());
+
+      final token = await AppUtils.getToken();
+      final Response uploadImageRes =
+          await _apiRepository.uploadImage(token, event.imagePath);
+      final decodedBody = json.decode(uploadImageRes.body);
+
+      log(uploadImageRes.body.toString() + "upload bloccc");
+      print(decodedBody.toString() + "stattuss");
+      if (uploadImageRes.statusCode == 200 ||
+          uploadImageRes.statusCode == 201) {
+        emit(CompanyLogoUploadState(
+          imagePath: decodedBody['data']['image'],
+        ));
+
+        print(decodedBody['data']['image']);
+        print("emitted");
+      } else {
+        emit(CompanyLogoUploadErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      emit(CompanyLogoUploadErrorState(errorMessage: "Something went wrong"));
+      log("$e create appointment bloc error");
     }
   }
 }
