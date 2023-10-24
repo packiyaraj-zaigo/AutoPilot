@@ -38,6 +38,8 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import '../Models/order_image_model.dart';
+
 class EstimatePartialScreen extends StatefulWidget {
   const EstimatePartialScreen(
       {super.key,
@@ -157,6 +159,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
   List<String> authorizedValues = [
     "Not Yet Authorized",
     "Authorize",
+    "Decline"
   ];
   int authorizedIndex = 0;
 
@@ -910,15 +913,23 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             children: List.generate(4, (index) {
                               return GestureDetector(
                                   onTap: () {
+                                    List<String> combList = [];
                                     log(networkImageList.toString() +
-                                        "Image List");
+                                        "Image List network");
                                     log(newOrderImageData.toString() +
                                         "Image List");
                                     if (newOrderImageData.length > index ||
                                         networkImageList[index]
                                             .contains("http")) {
-                                      showImageView(networkImageList[index],
-                                          index, networkImageList);
+                                      newOrderImageData.forEach((element) {
+                                        combList.add(element.fileName);
+                                      });
+                                      networkImageList.forEach((element) {
+                                        combList.add(element);
+                                      });
+                                      // }
+                                      showImageView(
+                                          combList[index], index, combList);
                                     } else {
                                       showActionSheet(context, index);
                                     }
@@ -1825,11 +1836,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   context: context,
                                   isScrollControlled: true,
                                   builder: (context) {
-                                    changeAuthIndex(widget
-                                        .estimateDetails
-                                        .data
-                                        .orderService![serviceIndex]
-                                        .isAuthorized);
+                                    changeAuthIndex(
+                                        widget
+                                            .estimateDetails
+                                            .data
+                                            .orderService![serviceIndex]
+                                            .isAuthorized,
+                                        widget
+                                            .estimateDetails
+                                            .data
+                                            .orderService![serviceIndex]
+                                            .isAuthorizedCustomer);
                                     return editServiceSheet(
                                         widget.estimateDetails.data
                                                 .orderService?[serviceIndex].id
@@ -2019,17 +2036,42 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   children: [
                     Text(
                       widget.estimateDetails.data.orderService?[serviceIndex]
-                                  .isAuthorized ==
-                              "Y"
-                          ? "Authorized"
-                          : "Not Yet Authorized",
-                      style: TextStyle(
-                          color: widget
+                                      .isAuthorized ==
+                                  "Y" &&
+                              widget
                                       .estimateDetails
                                       .data
                                       .orderService?[serviceIndex]
-                                      .isAuthorized ==
+                                      .isAuthorizedCustomer ==
                                   "Y"
+                          ? "Authorized"
+                          : widget
+                                          .estimateDetails
+                                          .data
+                                          .orderService?[serviceIndex]
+                                          .isAuthorized ==
+                                      "Y" &&
+                                  widget
+                                          .estimateDetails
+                                          .data
+                                          .orderService?[serviceIndex]
+                                          .isAuthorizedCustomer ==
+                                      "N"
+                              ? "Declined"
+                              : "Not Yet Authorized",
+                      style: TextStyle(
+                          color: widget
+                                          .estimateDetails
+                                          .data
+                                          .orderService?[serviceIndex]
+                                          .isAuthorized ==
+                                      "Y" &&
+                                  widget
+                                          .estimateDetails
+                                          .data
+                                          .orderService?[serviceIndex]
+                                          .isAuthorizedCustomer ==
+                                      "Y"
                               ? Color(0xff12A58C)
                               : Color(0xffFF5C5C)),
                     ),
@@ -5203,17 +5245,22 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       // });
                       newSetState(() {
                         authStatus = authorizedValues[1];
+                        isDrop = false;
                       });
 
                       showAuthPopup(
                           authStatus == "Authorize"
                               ? "Authorize Service?"
-                              : "Unauthorize Service?",
+                              : authStatus == "Decline"
+                                  ? "Decline Service?"
+                                  : "Unauthorize Service?",
                           authStatus == "Authorize"
                               ? "Do you want to authorize this service"
-                              : "Do you want to unauthorize this service?",
+                              : authStatus == "Decline"
+                                  ? "Do you want to decline the service?"
+                                  : "Do you want to unauthorize this service?",
                           context,
-                          authStatus == "Authorize" ? "Y" : "N",
+                          authStatus,
                           serviceId,
                           technicianId,
                           serviceName);
@@ -5234,32 +5281,52 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                       ),
                     ),
                   ),
-                  // GestureDetector(
-                  //   onTap: () {
-                  //     newSetState(() {
-                  //       final temp = authorizedValues[0];
-                  //       authorizedValues[0] = authorizedValues[2];
-                  //       authorizedValues[2] = temp;
+                  GestureDetector(
+                    onTap: () {
+                      // newSetState(() {
+                      //   final temp = authorizedValues[0];
+                      //   authorizedValues[0] = authorizedValues[2];
+                      //   authorizedValues[2] = temp;
 
-                  //       isDrop = false;
-                  //     });
-                  //   },
-                  //   child: Container(
-                  //     height: 56,
-                  //     alignment: Alignment.center,
-                  //     width: MediaQuery.of(context).size.width,
-                  //     child: Padding(
-                  //       padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  //       child: Text(
-                  //         authorizedValues[2],
-                  //         style: const TextStyle(
-                  //             color: AppColors.primaryColors,
-                  //             fontSize: 16,
-                  //             fontWeight: FontWeight.w600),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
+                      //   isDrop = false;
+                      // });
+                      newSetState(() {
+                        authStatus = authorizedValues[2];
+                        isDrop = false;
+                      });
+                      showAuthPopup(
+                          authStatus == "Authorize"
+                              ? "Authorize Service?"
+                              : authStatus == "Decline"
+                                  ? "Decline Service?"
+                                  : "Unauthorize Service?",
+                          authStatus == "Authorize"
+                              ? "Do you want to authorize this service"
+                              : authStatus == "Decline"
+                                  ? "Do you want to decline the service?"
+                                  : "Do you want to unauthorize this service?",
+                          context,
+                          authStatus,
+                          serviceId,
+                          technicianId,
+                          serviceName);
+                    },
+                    child: Container(
+                      height: 56,
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                        child: Text(
+                          authorizedValues[2],
+                          style: const TextStyle(
+                              color: AppColors.primaryColors,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -5578,7 +5645,8 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
               //     orderId: widget.estimateDetails.data.id.toString()));
 
               context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
-                  orderId: widget.estimateDetails.data.id.toString()));
+                  orderId: widget.estimateDetails.data.id.toString(),
+                  status: auth));
             }
             if (state is ChangeEstimateStatusState) {
               context.read<EstimateBloc>().add(GetSingleEstimateEvent(
@@ -5624,13 +5692,28 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
-  changeAuthIndex(String auth) {
-    if (auth == "Y") {
+  changeAuthIndex(String auth, String customerAuth) {
+    if (auth == "Y" && customerAuth == "Y") {
       String temp = "";
+
       temp = authorizedValues[0];
       authorizedValues[0] = authorizedValues[1];
       authorizedValues[1] = temp;
+    } else if (auth == "Y" && customerAuth == "N") {
+      String temp = "";
+
+      temp = authorizedValues[0];
+      authorizedValues[0] = authorizedValues[2];
+      authorizedValues[2] = temp;
     }
+    // else{
+    //     String temp = "";
+
+    //   temp = authorizedValues[0];
+    //   authorizedValues[0] = authorizedValues[2];
+    //   authorizedValues[2] = temp;
+
+    // }
   }
 
   Padding errorWidget(String errorString, bool errorStatus) {
@@ -5652,11 +5735,15 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     );
   }
 
-  showImageView(String imageUrl, int index, List<String> imageList) {
+  showImageView(String imageUrl, int index, List<dynamic> imageList) {
     List<String> newImageUrlList = [];
     imageList.forEach((element) {
-      if (element.contains("http://")) {
-        newImageUrlList.add(element);
+      if (element is Datum) {
+        newImageUrlList.add(element.fileName);
+      } else {
+        if (element.contains("http://")) {
+          newImageUrlList.add(element);
+        }
       }
     });
     showDialog(

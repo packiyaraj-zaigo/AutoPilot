@@ -972,8 +972,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       var token = prefs.getString(AppConstants.USER_TOKEN);
       emit(ChangeEstimateStausLoadingState());
 
-      Response changeEstimateStausRes =
-          await _apiRepository.changeEstimateStatus(token!, event.orderId);
+      Response changeEstimateStausRes = await _apiRepository
+          .changeEstimateStatus(token!, event.orderId, event.status);
 
       log("res${changeEstimateStausRes.body}");
 
