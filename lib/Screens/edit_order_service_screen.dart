@@ -2744,7 +2744,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   // part: addLaborLaborNumberController.text,
                                   part: '',
                                   itemName: addLaborNameController.text,
-                                  unitPrice: addLaborBaseCostController.text,
+                                  unitPrice: addLaborPriceController.text,
                                   discount: addLaborDiscountController.text
                                           .trim()
                                           .isEmpty
@@ -2763,7 +2763,8 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addLaborPriceController.text.trim()));
+                                  cost:
+                                      addLaborBaseCostController.text.trim()));
                             }
                             setState(() {});
                             Navigator.pop(context);
