@@ -1257,7 +1257,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         addMaterialQuantityErrorStatus = "Quantity can't be empty";
         status = false;
       } else {
-        addMaterialPriceErrorStatus = '';
+        addMaterialQuantityErrorStatus = '';
       }
       if (addMaterialDiscountController.text.trim().isNotEmpty &&
           isPercentage &&

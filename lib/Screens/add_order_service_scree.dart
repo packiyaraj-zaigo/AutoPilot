@@ -1420,7 +1420,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
         addMaterialQuantityErrorStatus = "Quantity can't be empty";
         status = false;
       } else {
-        addMaterialPriceErrorStatus = '';
+        addMaterialQuantityErrorStatus = '';
       }
       if (addMaterialDiscountController.text.trim().isNotEmpty &&
           isPercentage &&
@@ -3014,7 +3014,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addLaborBaseCostController.text.trim()));
+                                  cost:
+                                      addLaborBaseCostController.text.trim()));
                             }
                             setState(() {});
                             Navigator.pop(context);
