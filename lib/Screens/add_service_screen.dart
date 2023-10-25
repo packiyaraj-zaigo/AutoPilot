@@ -2405,7 +2405,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addLaborNameController = TextEditingController(text: item?.itemName);
     final addLaborDescriptionController =
         TextEditingController(text: item?.note);
-    final addLaborCostController = TextEditingController(text: item?.cost);
+    final addLaborPriceController = TextEditingController(text: item?.cost);
     final addLaborDiscountController =
         TextEditingController(text: item?.discount ?? '0');
     final addLaborHoursController =
@@ -2418,7 +2418,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     //Add Labor errorstatus and error message variables
     String addLaborNameErrorStatus = '';
     String addLaborDescriptionErrorStatus = '';
-    String addLaborCostErrorStatus = '';
+    String addLaborPriceErrorStatus = '';
     String addLaborDiscountErrorStatus = '';
     String addLaborHoursErrorStatus = '';
     String addLaborBaseCostStatus = '';
@@ -2448,6 +2448,12 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       } else {
         addLaborBaseCostStatus = '';
       }
+      if (addLaborPriceController.text.trim().isEmpty) {
+        addLaborPriceErrorStatus = "Price can't be empty";
+        status = false;
+      } else {
+        addLaborPriceErrorStatus = '';
+      }
       if (addLaborHoursController.text.trim().isEmpty) {
         addLaborHoursErrorStatus = "Hours can't be empty";
         status = false;
@@ -2472,61 +2478,56 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     }
 
     return StatefulBuilder(builder: (context, StateSetter newSetState) {
-      if (addLaborBaseCostController.text.isNotEmpty) {
+      if (addLaborPriceController.text.isNotEmpty) {
         laborCost = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-            (double.tryParse(addLaborCostController.text) ?? 0));
+            (double.tryParse(addLaborBaseCostController.text) ?? 0));
         if (client?.taxOnLabors == 'N') {
           if (addLaborDiscountController.text.isEmpty) {
-            subTotal = (double.tryParse(addLaborBaseCostController.text) ?? 0) *
+            subTotal = (double.tryParse(addLaborPriceController.text) ?? 0) *
                 (double.tryParse(addLaborHoursController.text) ?? 1);
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborBaseCostController.text) ??
-                          0) *
+              discount = ((double.tryParse(addLaborPriceController.text) ?? 0) *
                       (double.tryParse(addLaborHoursController.text) ?? 1) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
-            subTotal =
-                (((double.tryParse(addLaborBaseCostController.text) ?? 0) *
-                        (double.tryParse(addLaborHoursController.text) ?? 1)) -
-                    discount);
+            subTotal = (((double.tryParse(addLaborPriceController.text) ?? 0) *
+                    (double.tryParse(addLaborHoursController.text) ?? 1)) -
+                discount);
           }
           total = subTotal;
         } else {
           final tax = (double.tryParse(client?.laborTaxRate ?? '') ?? 0) / 100;
           if (addLaborDiscountController.text.isEmpty) {
             subTotal = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborBaseCostController.text) ??
-                            0)) *
+                        (double.tryParse(addLaborPriceController.text) ?? 0)) *
                     tax +
                 ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborBaseCostController.text) ?? 0));
+                    (double.tryParse(addLaborPriceController.text) ?? 0));
             total = ((double.tryParse(addLaborHoursController.text) ?? 1) *
-                (double.tryParse(addLaborBaseCostController.text) ?? 0));
+                (double.tryParse(addLaborPriceController.text) ?? 0));
           } else {
             double discount =
                 double.tryParse(addLaborDiscountController.text) ?? 0;
             if (isPercentage) {
-              discount = ((double.tryParse(addLaborBaseCostController.text) ??
-                          0) *
+              discount = ((double.tryParse(addLaborPriceController.text) ?? 0) *
                       (double.tryParse(addLaborHoursController.text) ?? 0) *
                       (double.tryParse(addLaborDiscountController.text) ?? 0)) /
                   100;
             }
             subTotal = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                            (double.tryParse(addLaborBaseCostController.text) ??
+                            (double.tryParse(addLaborPriceController.text) ??
                                 0)) -
                         discount) *
                     tax +
                 (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                        (double.tryParse(addLaborBaseCostController.text) ??
-                            0)) -
+                        (double.tryParse(addLaborPriceController.text) ?? 0)) -
                     discount);
             total = (((double.tryParse(addLaborHoursController.text) ?? 1) *
-                    (double.tryParse(addLaborBaseCostController.text) ?? 0)) -
+                    (double.tryParse(addLaborPriceController.text) ?? 0)) -
                 discount);
           }
         }
@@ -2619,14 +2620,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                       padding: const EdgeInsets.only(top: 17.0),
                       child: textBox(
                           "Amount",
-                          addLaborCostController,
-                          "Cost ",
-                          addLaborCostErrorStatus.isNotEmpty,
+                          addLaborPriceController,
+                          "Price ",
+                          addLaborPriceErrorStatus.isNotEmpty,
                           context,
-                          false,
+                          true,
                           newSetState),
                     ),
-                    ErrorWidget(error: addLaborCostErrorStatus),
+                    ErrorWidget(error: addLaborPriceErrorStatus),
                     Stack(
                       children: [
                         Padding(
@@ -2803,7 +2804,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   tax: addLaborTaxController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addLaborCostController.text.trim());
+                                  cost: addLaborPriceController.text.trim());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -2820,7 +2821,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   // part: addLaborLaborNumberController.text,
                                   part: '',
                                   itemName: addLaborNameController.text,
-                                  unitPrice: addLaborBaseCostController.text,
+                                  unitPrice: addLaborPriceController.text,
                                   tax: addLaborTaxController.text,
                                   discount: addLaborDiscountController.text
                                           .trim()
@@ -2835,7 +2836,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addLaborCostController.text.trim()));
+                                  cost:
+                                      addLaborBaseCostController.text.trim()));
                             }
                             setState(() {});
                             Navigator.pop(context);
