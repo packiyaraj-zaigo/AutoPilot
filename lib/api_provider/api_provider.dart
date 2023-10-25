@@ -1898,14 +1898,41 @@ class ApiProvider {
 
     //  LoadingFormModel? loadingFormModel;
     try {
-      Map body = {
-        "is_authorized": auth,
+      final authorizeBody = {
+        "order_status": "Order",
+        "is_authorized": "Y",
+        "is_authorized_customer": "Y",
+        "technician_id": technicianId,
         "service_name": serviceName,
-        "technician_id": technicianId
       };
+      final notYetAuthorizedBody = {
+        "order_status": "Estimate",
+        "is_authorized": "N",
+        "is_authorized_customer": "N",
+        "technician_id": technicianId,
+        "service_name": serviceName,
+      };
+      final declineBody = {
+        "order_status": "Estimate",
+        "is_authorized": "Y",
+        "is_authorized_customer": "N",
+        "technician_id": technicianId,
+        "service_name": serviceName,
+      };
+
+      // Map body = {
+      //   "is_authorized": auth,
+      //   "service_name": serviceName,
+      //   "technician_id": technicianId
+      // };
       var url = Uri.parse("${BASE_URL}api/order_services/$serviceId");
-      var response =
-          http.put(url, headers: getHeader(token), body: json.encode(body));
+      var response = http.put(url,
+          headers: getHeader(token),
+          body: json.encode(auth == "Authorize"
+              ? authorizeBody
+              : auth == "Decline"
+                  ? declineBody
+                  : notYetAuthorizedBody));
 
       inspect(response);
       return response;

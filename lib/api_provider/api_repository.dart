@@ -606,7 +606,8 @@ class ApiRepository {
     return apiProvider.globalSearch(token, query);
   }
 
-  Future<dynamic> changeEstimateStatus(String token, String orderId) async {
+  Future<dynamic> changeEstimateStatus(
+      String token, String orderId, String status) async {
     return apiProvider.estimateStatusChange(token, orderId);
   }
 

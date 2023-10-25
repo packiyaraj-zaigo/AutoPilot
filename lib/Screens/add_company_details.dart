@@ -427,11 +427,14 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                                           255, 225, 225, 225),
                                       image: selectedImage != null ||
                                               basicDetailsMap["company_logo"] !=
-                                                  null
+                                                      null &&
+                                                  basicDetailsMap[
+                                                          "company_logo"] !=
+                                                      ""
                                           ? DecorationImage(
                                               image: FileImage(selectedImage ??
-                                                  File(basicDetailsMap[
-                                                      "company_logo"])),
+                                                  File(
+                                                      basicDetailsMap["logo"])),
                                               fit: BoxFit.cover)
                                           : null),
                                   child: Padding(
@@ -1380,7 +1383,8 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
         "province_id": provinceId,
         "province_name": provinceController.text,
         "website": businessWebsiteController.text,
-        "company_logo": companyLogoUrl != "" ? companyLogoUrl : ""
+        "company_logo": companyLogoUrl != "" ? companyLogoUrl : "",
+        "logo": selectedImage != null ? selectedImage!.path : ""
       });
 
       print(basicDetailsMap["company_logo"].toString() + "image path");
@@ -1989,7 +1993,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
                 // });
                 selectImages("lib").then((value) {
                   if (selectedImage != null) {
-                    context
+                    ctx
                         .read<DashboardBloc>()
                         .add(CompanyLogoUploadEvent(imagePath: selectedImage!));
                   }
@@ -2034,7 +2038,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
   Future selectImages(source) async {
     if (source == "camera") {
       final tempImg = await imagePicker.pickImage(
-          source: ImageSource.camera, imageQuality: 80);
+          source: ImageSource.camera, imageQuality: 60);
       // if (imageFileList != null) {
       if (tempImg != null) {
         // final compressedImage = await FlutterImageCompress.compressAndGetFile(
@@ -2055,7 +2059,7 @@ class _AddCompanyDetailsScreenState extends State<AddCompanyDetailsScreen> {
       // }
     } else {
       final tempImg = await imagePicker.pickImage(
-          source: ImageSource.gallery, imageQuality: 80);
+          source: ImageSource.gallery, imageQuality: 60);
       // if (imageFileList != null) {
       if (tempImg != null) {
         // final compressedImage = await FlutterImageCompress.compressAndGetFile(

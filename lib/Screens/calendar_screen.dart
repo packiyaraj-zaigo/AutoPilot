@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:auto_pilot/Screens/appointment_details_screen.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,6 +26,8 @@ class _CalendarScreenState extends State<CalendarScreen>
   var inputFormat = DateFormat('EE, MM/dd/yyyy');
   var monthFormat = DateFormat('EEEE MM/dd');
   var _selectedDate = DateTime.now();
+  DateTime? weekNavDate;
+  bool weekNav = false;
   final List<List<String>> items = [
     ['Item 1', 'Item 2'],
     ['Item 4', 'Item 5', 'Item 6'],
@@ -57,9 +62,15 @@ class _CalendarScreenState extends State<CalendarScreen>
         child: BlocBuilder<CalendarBloc, CalendarState>(
           builder: (context, state) {
             _tabController.addListener(() {
-              if (_tabController.index == 0) {
+              if (_tabController.index == 0 && weekNav == false) {
                 context.read<CalendarBloc>().add(CalendarDetails(
                       selectedDate: _selectedDate,
+                    ));
+              } else if (_tabController.index == 0 &&
+                  weekNav == false &&
+                  weekNavDate != null) {
+                context.read<CalendarBloc>().add(CalendarDetails(
+                      selectedDate: weekNavDate!,
                     ));
               } else if (_tabController.index == 1) {
                 context.read<CalendarBloc>().add(CalendarWeekDetails(
@@ -522,247 +533,283 @@ class _CalendarScreenState extends State<CalendarScreen>
                                                 const SizedBox(
                                                   height: 10,
                                                 ),
-                                                Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.grey
-                                                              .withOpacity(0.1),
-                                                          blurRadius: 10,
-                                                          offset: const Offset(
-                                                              7,
-                                                              7), // changes position of shadow
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 16.0,
-                                                              right: 16,
-                                                              top: 12,
-                                                              bottom: 8),
-                                                      child: Column(
-                                                        children: [
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              SizedBox(
-                                                                width: 70,
-                                                                child: Text(
-                                                                  '${state.calendarWeekModel.data[index].eventCount}',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xFF333333),
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 70,
-                                                                child: Text(
-                                                                  '${state.calendarWeekModel.data[index].eventCount}',
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xFF333333),
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ),
-                                                              Container()
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .spaceBetween,
-                                                            children: [
-                                                              const SizedBox(
-                                                                width: 93,
-                                                                child: Text(
-                                                                  'Appointment',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xFF333333),
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 5,
-                                                              ),
-                                                              const SizedBox(
-                                                                width: 93,
-                                                                child: Text(
-                                                                  'staff',
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
-                                                                    color: Color(
-                                                                        0xFF333333),
-                                                                  ),
-                                                                  maxLines: 1,
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                              ),
-                                                              Container(),
-                                                              Container()
-                                                            ],
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 5,
-                                                          ),
-                                                          // Row(
-                                                          //   mainAxisAlignment:
-                                                          //       MainAxisAlignment
-                                                          //           .spaceBetween,
-                                                          //   children: [
-                                                          //     Container(
-                                                          //       height: 24,
-                                                          //       decoration: BoxDecoration(
-                                                          //           color: const Color(
-                                                          //               0xFFF5F5F5),
-                                                          //           borderRadius:
-                                                          //               BorderRadius.circular(
-                                                          //                   12)),
-                                                          //       child:
-                                                          //           const Padding(
-                                                          //         padding: EdgeInsets
-                                                          //             .only(
-                                                          //                 left:
-                                                          //                     14.0,
-                                                          //                 right:
-                                                          //                     14,
-                                                          //                 top:
-                                                          //                     5),
-                                                          //         child: Text(
-                                                          //           'Tag',
-                                                          //           maxLines: 1,
-                                                          //           textAlign:
-                                                          //               TextAlign
-                                                          //                   .center,
-                                                          //           overflow:
-                                                          //               TextOverflow
-                                                          //                   .ellipsis,
-                                                          //           style: TextStyle(
-                                                          //               fontWeight:
-                                                          //                   FontWeight.w500),
-                                                          //         ),
-                                                          //       ),
-                                                          //     ),
-                                                          //     Container(
-                                                          //       height: 24,
-                                                          //       decoration: BoxDecoration(
-                                                          //           color: const Color(
-                                                          //               0xFFF5F5F5),
-                                                          //           borderRadius:
-                                                          //               BorderRadius.circular(
-                                                          //                   12)),
-                                                          //       child:
-                                                          //           const Padding(
-                                                          //         padding: EdgeInsets
-                                                          //             .only(
-                                                          //                 left:
-                                                          //                     14.0,
-                                                          //                 right:
-                                                          //                     14,
-                                                          //                 top:
-                                                          //                     5),
-                                                          //         child: Text(
-                                                          //           'Tag',
-                                                          //           maxLines: 1,
-                                                          //           overflow:
-                                                          //               TextOverflow
-                                                          //                   .ellipsis,
-                                                          //           textAlign:
-                                                          //               TextAlign
-                                                          //                   .center,
-                                                          //           style: TextStyle(
-                                                          //               fontWeight:
-                                                          //                   FontWeight.w500),
-                                                          //         ),
-                                                          //       ),
-                                                          //     ),
-                                                          //     Container(
-                                                          //       height: 24,
-                                                          //       decoration: BoxDecoration(
-                                                          //           color: const Color(
-                                                          //               0xFFF5F5F5),
-                                                          //           borderRadius:
-                                                          //               BorderRadius.circular(
-                                                          //                   12)),
-                                                          //       child:
-                                                          //           const Padding(
-                                                          //         padding: EdgeInsets
-                                                          //             .only(
-                                                          //                 left:
-                                                          //                     14.0,
-                                                          //                 right:
-                                                          //                     14,
-                                                          //                 top:
-                                                          //                     5),
-                                                          //         child: Text(
-                                                          //           'Tag',
-                                                          //           maxLines: 1,
-                                                          //           overflow:
-                                                          //               TextOverflow
-                                                          //                   .ellipsis,
-                                                          //           textAlign:
-                                                          //               TextAlign
-                                                          //                   .center,
-                                                          //           style: TextStyle(
-                                                          //               fontWeight:
-                                                          //                   FontWeight.w500),
-                                                          //         ),
-                                                          //       ),
-                                                          //     ),
-                                                          //     Container(),
-                                                          //     Container()
-                                                          //   ],
-                                                          // ),
-                                                          const SizedBox(
-                                                            height: 5,
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    log(state.calendarWeekModel
+                                                        .data[index].date
+                                                        .toString());
+                                                    if (state
+                                                            .calendarWeekModel
+                                                            .data[index]
+                                                            .eventCount !=
+                                                        0) {
+                                                      _tabController.index = 0;
+                                                      weekNav = true;
+                                                      weekNavDate = state
+                                                          .calendarWeekModel
+                                                          .data[index]
+                                                          .date;
+                                                      setState(() {
+                                                        _selectedDate =
+                                                            weekNavDate!;
+                                                      });
+                                                      context
+                                                          .read<CalendarBloc>()
+                                                          .add(CalendarDetails(
+                                                              selectedDate: state
+                                                                  .calendarWeekModel
+                                                                  .data[index]
+                                                                  .date));
+                                                    } else {
+                                                      CommonWidgets().showDialog(
+                                                          context,
+                                                          "No Events Found");
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                      decoration: BoxDecoration(
+                                                        color: Colors.white,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    0.1),
+                                                            blurRadius: 10,
+                                                            offset: const Offset(
+                                                                7,
+                                                                7), // changes position of shadow
                                                           ),
                                                         ],
                                                       ),
-                                                    )),
+                                                      child: Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                    .only(
+                                                                left: 16.0,
+                                                                right: 16,
+                                                                top: 12,
+                                                                bottom: 8),
+                                                        child: Column(
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                SizedBox(
+                                                                  width: 70,
+                                                                  child: Text(
+                                                                    '${state.calendarWeekModel.data[index].eventCount}',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Color(
+                                                                          0xFF333333),
+                                                                    ),
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  width: 70,
+                                                                  child: Text(
+                                                                    '${state.calendarWeekModel.data[index].eventCount}',
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Color(
+                                                                          0xFF333333),
+                                                                    ),
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                                Container()
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .spaceBetween,
+                                                              children: [
+                                                                const SizedBox(
+                                                                  width: 93,
+                                                                  child: Text(
+                                                                    'Appointment',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Color(
+                                                                          0xFF333333),
+                                                                    ),
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 5,
+                                                                ),
+                                                                const SizedBox(
+                                                                  width: 93,
+                                                                  child: Text(
+                                                                    'staff',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      color: Color(
+                                                                          0xFF333333),
+                                                                    ),
+                                                                    maxLines: 1,
+                                                                    overflow:
+                                                                        TextOverflow
+                                                                            .ellipsis,
+                                                                  ),
+                                                                ),
+                                                                Container(),
+                                                                Container()
+                                                              ],
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                            // Row(
+                                                            //   mainAxisAlignment:
+                                                            //       MainAxisAlignment
+                                                            //           .spaceBetween,
+                                                            //   children: [
+                                                            //     Container(
+                                                            //       height: 24,
+                                                            //       decoration: BoxDecoration(
+                                                            //           color: const Color(
+                                                            //               0xFFF5F5F5),
+                                                            //           borderRadius:
+                                                            //               BorderRadius.circular(
+                                                            //                   12)),
+                                                            //       child:
+                                                            //           const Padding(
+                                                            //         padding: EdgeInsets
+                                                            //             .only(
+                                                            //                 left:
+                                                            //                     14.0,
+                                                            //                 right:
+                                                            //                     14,
+                                                            //                 top:
+                                                            //                     5),
+                                                            //         child: Text(
+                                                            //           'Tag',
+                                                            //           maxLines: 1,
+                                                            //           textAlign:
+                                                            //               TextAlign
+                                                            //                   .center,
+                                                            //           overflow:
+                                                            //               TextOverflow
+                                                            //                   .ellipsis,
+                                                            //           style: TextStyle(
+                                                            //               fontWeight:
+                                                            //                   FontWeight.w500),
+                                                            //         ),
+                                                            //       ),
+                                                            //     ),
+                                                            //     Container(
+                                                            //       height: 24,
+                                                            //       decoration: BoxDecoration(
+                                                            //           color: const Color(
+                                                            //               0xFFF5F5F5),
+                                                            //           borderRadius:
+                                                            //               BorderRadius.circular(
+                                                            //                   12)),
+                                                            //       child:
+                                                            //           const Padding(
+                                                            //         padding: EdgeInsets
+                                                            //             .only(
+                                                            //                 left:
+                                                            //                     14.0,
+                                                            //                 right:
+                                                            //                     14,
+                                                            //                 top:
+                                                            //                     5),
+                                                            //         child: Text(
+                                                            //           'Tag',
+                                                            //           maxLines: 1,
+                                                            //           overflow:
+                                                            //               TextOverflow
+                                                            //                   .ellipsis,
+                                                            //           textAlign:
+                                                            //               TextAlign
+                                                            //                   .center,
+                                                            //           style: TextStyle(
+                                                            //               fontWeight:
+                                                            //                   FontWeight.w500),
+                                                            //         ),
+                                                            //       ),
+                                                            //     ),
+                                                            //     Container(
+                                                            //       height: 24,
+                                                            //       decoration: BoxDecoration(
+                                                            //           color: const Color(
+                                                            //               0xFFF5F5F5),
+                                                            //           borderRadius:
+                                                            //               BorderRadius.circular(
+                                                            //                   12)),
+                                                            //       child:
+                                                            //           const Padding(
+                                                            //         padding: EdgeInsets
+                                                            //             .only(
+                                                            //                 left:
+                                                            //                     14.0,
+                                                            //                 right:
+                                                            //                     14,
+                                                            //                 top:
+                                                            //                     5),
+                                                            //         child: Text(
+                                                            //           'Tag',
+                                                            //           maxLines: 1,
+                                                            //           overflow:
+                                                            //               TextOverflow
+                                                            //                   .ellipsis,
+                                                            //           textAlign:
+                                                            //               TextAlign
+                                                            //                   .center,
+                                                            //           style: TextStyle(
+                                                            //               fontWeight:
+                                                            //                   FontWeight.w500),
+                                                            //         ),
+                                                            //       ),
+                                                            //     ),
+                                                            //     Container(),
+                                                            //     Container()
+                                                            //   ],
+                                                            // ),
+                                                            const SizedBox(
+                                                              height: 5,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      )),
+                                                ),
                                                 const SizedBox(
                                                   height: 10,
                                                 ),
