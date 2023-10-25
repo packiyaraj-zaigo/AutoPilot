@@ -1296,7 +1296,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
         addMaterialQuantityErrorStatus = "Quantity can't be empty";
         status = false;
       } else {
-        addMaterialPriceErrorStatus = '';
+        addMaterialQuantityErrorStatus = '';
       }
       if (addMaterialDiscountController.text.trim().isNotEmpty &&
           isPercentage &&
