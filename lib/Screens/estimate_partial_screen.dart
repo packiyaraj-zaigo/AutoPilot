@@ -1083,6 +1083,49 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           padding: const EdgeInsets.only(top: 8.0),
                           child: GestureDetector(
                             onTap: () {
+                              if (widget.estimateDetails.data.orderStatus !=
+                                  "Estimate") {
+                                if (balanceDueAmount <= 0 &&
+                                        widget.estimateDetails.data
+                                                .orderService !=
+                                            null &&
+                                        widget.estimateDetails.data
+                                            .orderService!.isNotEmpty &&
+                                        widget
+                                                .estimateDetails
+                                                .data
+                                                .orderService![0]
+                                                .orderServiceItems !=
+                                            null
+                                    //     &&
+                                    // widget.estimateDetails.data.orderService![0]
+                                    //     .orderServiceItems!.isNotEmpty
+                                    ) {
+                                  Navigator.push(context, MaterialPageRoute(
+                                    builder: (context) {
+                                      return PaymentListScreen(
+                                        orderId: widget.estimateDetails.data.id
+                                            .toString(),
+                                      );
+                                    },
+                                  ));
+                                } else {
+                                  if (widget.estimateDetails.data
+                                              .orderService !=
+                                          null &&
+                                      widget.estimateDetails.data.orderService!
+                                          .isNotEmpty) {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      isScrollControlled: true,
+                                      builder: (context) {
+                                        return paymentPopUp();
+                                      },
+                                    );
+                                  }
+                                }
+                              }
                               // showDialog(
                               //   context: context,
                               //   builder: (context) {
@@ -1093,45 +1136,6 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               //     );
                               //   },
                               // );
-                              if (balanceDueAmount <= 0 &&
-                                      widget.estimateDetails.data
-                                              .orderService !=
-                                          null &&
-                                      widget.estimateDetails.data.orderService!
-                                          .isNotEmpty &&
-                                      widget
-                                              .estimateDetails
-                                              .data
-                                              .orderService![0]
-                                              .orderServiceItems !=
-                                          null
-                                  //     &&
-                                  // widget.estimateDetails.data.orderService![0]
-                                  //     .orderServiceItems!.isNotEmpty
-                                  ) {
-                                Navigator.push(context, MaterialPageRoute(
-                                  builder: (context) {
-                                    return PaymentListScreen(
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
-                                    );
-                                  },
-                                ));
-                              } else {
-                                if (widget.estimateDetails.data.orderService !=
-                                        null &&
-                                    widget.estimateDetails.data.orderService!
-                                        .isNotEmpty) {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    isScrollControlled: true,
-                                    builder: (context) {
-                                      return paymentPopUp();
-                                    },
-                                  );
-                                }
-                              }
                             },
                             child: widget.estimateDetails.data.orderStatus ==
                                     "Estimate"
@@ -1168,7 +1172,10 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                         .data
                                                         .orderService![0]
                                                         .orderServiceItems !=
-                                                    null
+                                                    null &&
+                                                widget.estimateDetails.data
+                                                        .orderStatus !=
+                                                    "Estimate"
                                             //      &&
                                             // widget
                                             //     .estimateDetails
@@ -3121,92 +3128,97 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
     profitAmount = 0;
     costAmount = 0;
     widget.estimateDetails.data.orderService?.forEach((element) {
-      if (element.orderServiceItems!.isEmpty) {
-        laborAmount += double.parse(element.servicePrice);
-        taxAmount += double.parse(element.tax) *
-            double.parse(element.servicePrice) /
-            100;
+      if ((element.isAuthorized == "Y" &&
+              element.isAuthorizedCustomer == "Y") ||
+          (element.isAuthorized == "N" &&
+              element.isAuthorizedCustomer == "N")) {
+        if (element.orderServiceItems!.isEmpty) {
+          laborAmount += double.parse(element.servicePrice);
+          taxAmount += double.parse(element.tax) *
+              double.parse(element.servicePrice) /
+              100;
+        }
+        element.orderServiceItems!.forEach((element2) {
+          if (element2.itemType.toLowerCase() == "material") {
+            materialAmount = materialAmount +
+                (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours));
+          }
+          if (element2.itemType.toLowerCase() == "labor") {
+            laborAmount = laborAmount +
+                (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours));
+          }
+          if (element2.itemType.toLowerCase() == "subcontract") {
+            subContractAmount =
+                subContractAmount + double.parse(element2.unitPrice);
+          }
+          if (element2.itemType.toLowerCase() == "fee") {
+            feeAmount = feeAmount + double.parse(element2.unitPrice);
+          }
+          if (element2.itemType.toLowerCase() == "part") {
+            partAmount = partAmount +
+                (double.parse(element2.unitPrice) *
+                    double.parse(element2.quanityHours));
+          }
+
+          double tempPrice = 0.00;
+          if (element2.discountType == "Fixed") {
+            if (element2.itemType.toLowerCase() == "part" ||
+                element2.itemType.toLowerCase() == "labor" ||
+                element2.itemType.toLowerCase() == "material") {
+              tempPrice = (double.parse(element2.unitPrice) *
+                      double.parse(element2.quanityHours)) -
+                  double.parse(element2.discount);
+            } else {
+              tempPrice = double.parse(element2.unitPrice) -
+                  double.parse(element2.discount);
+            }
+
+            log(tempPrice.toString() + "tempp");
+          } else {
+            if (element2.itemType.toLowerCase() == "part" ||
+                element2.itemType.toLowerCase() == "labor" ||
+                element2.itemType.toLowerCase() == "material") {
+              tempPrice = (double.parse(element2.unitPrice) *
+                      double.parse(element2.quanityHours)) -
+                  (double.parse(element2.discount) *
+                          (double.parse(element2.unitPrice) *
+                              double.parse(element2.quanityHours))) /
+                      100;
+            } else {
+              tempPrice = double.parse(element2.unitPrice) -
+                  (double.parse(element2.discount) *
+                          double.parse(element2.unitPrice)) /
+                      100;
+            }
+          }
+
+          if (element2.itemType.toLowerCase() == "part" ||
+              element2.itemType.toLowerCase() == "labor" ||
+              element2.itemType.toLowerCase() == "material") {
+            taxAmount =
+                taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
+          } else {
+            taxAmount =
+                taxAmount + (double.parse(element2.tax) * tempPrice / 100);
+          }
+
+          if (element2.discountType == "Fixed") {
+            discountAmount = discountAmount + double.parse(element2.discount);
+          } else {
+            discountAmount = discountAmount +
+                (double.parse(element2.discount) *
+                        double.parse(element2.unitPrice) *
+                        double.parse(element2.quanityHours)) /
+                    100;
+          }
+
+          costAmount = costAmount +
+              ((double.tryParse(element2.markup) ?? 0) *
+                  (double.tryParse(element2.quanityHours) ?? 1));
+        });
       }
-      element.orderServiceItems!.forEach((element2) {
-        if (element2.itemType.toLowerCase() == "material") {
-          materialAmount = materialAmount +
-              (double.parse(element2.unitPrice) *
-                  double.parse(element2.quanityHours));
-        }
-        if (element2.itemType.toLowerCase() == "labor") {
-          laborAmount = laborAmount +
-              (double.parse(element2.unitPrice) *
-                  double.parse(element2.quanityHours));
-        }
-        if (element2.itemType.toLowerCase() == "subcontract") {
-          subContractAmount =
-              subContractAmount + double.parse(element2.unitPrice);
-        }
-        if (element2.itemType.toLowerCase() == "fee") {
-          feeAmount = feeAmount + double.parse(element2.unitPrice);
-        }
-        if (element2.itemType.toLowerCase() == "part") {
-          partAmount = partAmount +
-              (double.parse(element2.unitPrice) *
-                  double.parse(element2.quanityHours));
-        }
-
-        double tempPrice = 0.00;
-        if (element2.discountType == "Fixed") {
-          if (element2.itemType.toLowerCase() == "part" ||
-              element2.itemType.toLowerCase() == "labor" ||
-              element2.itemType.toLowerCase() == "material") {
-            tempPrice = (double.parse(element2.unitPrice) *
-                    double.parse(element2.quanityHours)) -
-                double.parse(element2.discount);
-          } else {
-            tempPrice = double.parse(element2.unitPrice) -
-                double.parse(element2.discount);
-          }
-
-          log(tempPrice.toString() + "tempp");
-        } else {
-          if (element2.itemType.toLowerCase() == "part" ||
-              element2.itemType.toLowerCase() == "labor" ||
-              element2.itemType.toLowerCase() == "material") {
-            tempPrice = (double.parse(element2.unitPrice) *
-                    double.parse(element2.quanityHours)) -
-                (double.parse(element2.discount) *
-                        (double.parse(element2.unitPrice) *
-                            double.parse(element2.quanityHours))) /
-                    100;
-          } else {
-            tempPrice = double.parse(element2.unitPrice) -
-                (double.parse(element2.discount) *
-                        double.parse(element2.unitPrice)) /
-                    100;
-          }
-        }
-
-        if (element2.itemType.toLowerCase() == "part" ||
-            element2.itemType.toLowerCase() == "labor" ||
-            element2.itemType.toLowerCase() == "material") {
-          taxAmount =
-              taxAmount + (tempPrice * double.parse(element2.tax)) / 100;
-        } else {
-          taxAmount =
-              taxAmount + (double.parse(element2.tax) * tempPrice / 100);
-        }
-
-        if (element2.discountType == "Fixed") {
-          discountAmount = discountAmount + double.parse(element2.discount);
-        } else {
-          discountAmount = discountAmount +
-              (double.parse(element2.discount) *
-                      double.parse(element2.unitPrice) *
-                      double.parse(element2.quanityHours)) /
-                  100;
-        }
-
-        costAmount = costAmount +
-            ((double.tryParse(element2.markup) ?? 0) *
-                (double.tryParse(element2.quanityHours) ?? 1));
-      });
     });
 
     totalAmount = (materialAmount +
@@ -5634,6 +5646,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
 
   Future showAuthPopup(String title, String message, BuildContext context,
       String auth, String serviceId, String technicianId, String serviceName) {
+    bool changeStatus = false;
     return showCupertinoDialog(
       context: context,
       builder: (context) => BlocProvider(
@@ -5643,10 +5656,38 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
             if (state is AuthServiceByTechnicianState) {
               // context.read<EstimateBloc>().add(GetSingleEstimateEvent(
               //     orderId: widget.estimateDetails.data.id.toString()));
+              for (int i = 0;
+                  i < widget.estimateDetails.data.orderService!.length;
+                  i++) {
+                print("in for");
+                if (widget.estimateDetails.data.orderService![i].isAuthorized ==
+                        "Y" &&
+                    widget.estimateDetails.data.orderService![i]
+                            .isAuthorizedCustomer ==
+                        "Y") {
+                  print("bteak");
+                  changeStatus = true;
+                  break;
+                }
+              }
 
-              context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
-                  orderId: widget.estimateDetails.data.id.toString(),
-                  status: auth));
+              if (auth == "Decline" || auth == "Not Yet Authorized") {
+                if (changeStatus) {
+                  print("correct");
+                  context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
+                      orderId: widget.estimateDetails.data.id.toString(),
+                      status: "Authorize"));
+                } else {
+                  context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
+                      orderId: widget.estimateDetails.data.id.toString(),
+                      status: auth));
+                }
+              } else {
+                print("heree");
+                context.read<EstimateBloc>().add(ChangeEstimateStatusEvent(
+                    orderId: widget.estimateDetails.data.id.toString(),
+                    status: auth));
+              }
             }
             if (state is ChangeEstimateStatusState) {
               context.read<EstimateBloc>().add(GetSingleEstimateEvent(

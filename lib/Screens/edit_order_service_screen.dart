@@ -2323,13 +2323,14 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
     final addLaborNameController = TextEditingController(text: item?.itemName);
     final addLaborDescriptionController =
         TextEditingController(text: item?.note);
-    final addLaborPriceController = TextEditingController(text: item?.cost);
+    final addLaborPriceController =
+        TextEditingController(text: item?.unitPrice);
     final addLaborDiscountController =
         TextEditingController(text: item?.discount ?? '0');
     final addLaborHoursController =
         TextEditingController(text: item?.quanityHours ?? '1');
-    final addLaborBaseCostController = TextEditingController(
-        text: item?.unitPrice ?? client?.baseLaborCost ?? '');
+    final addLaborBaseCostController =
+        TextEditingController(text: item?.cost ?? client?.baseLaborCost ?? '');
     final addLaborTaxController =
         TextEditingController(text: item?.tax ?? client?.laborTaxRate ?? '');
 
@@ -2708,7 +2709,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                   // part: addLaborLaborNumberController.text,
                                   part: '',
                                   itemName: addLaborNameController.text,
-                                  unitPrice: addLaborBaseCostController.text,
+                                  unitPrice: addLaborPriceController.text,
                                   discount: addLaborDiscountController.text
                                           .trim()
                                           .isEmpty
@@ -2727,7 +2728,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                           0.0)
                                       .toStringAsFixed(2),
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addLaborPriceController.text.trim());
+                                  cost: addLaborBaseCostController.text.trim());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);

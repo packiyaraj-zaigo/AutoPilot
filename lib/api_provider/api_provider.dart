@@ -2294,12 +2294,14 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> estimateStatusChange(String token, String orderId) async {
+  Future<dynamic> estimateStatusChange(
+      String token, String orderId, String status) async {
     try {
       final url = Uri.parse('${BASE_URL}api/orders/status/$orderId');
       final response = http.post(url,
           headers: getHeader(token),
-          body: json.encode({"order_status": 'Order'}));
+          body: json.encode(
+              {"order_status": status == "Authorize" ? 'Order' : "Estimate"}));
       return response;
     } catch (e) {
       log(e.toString() + " Search api error");
