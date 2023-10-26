@@ -2405,13 +2405,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
     final addLaborNameController = TextEditingController(text: item?.itemName);
     final addLaborDescriptionController =
         TextEditingController(text: item?.note);
-    final addLaborPriceController = TextEditingController(text: item?.cost);
+    final addLaborPriceController =
+        TextEditingController(text: item?.unitPrice);
     final addLaborDiscountController =
         TextEditingController(text: item?.discount ?? '0');
     final addLaborHoursController =
         TextEditingController(text: item?.quanityHours ?? '1');
     final addLaborBaseCostController =
-        TextEditingController(text: client?.baseLaborCost ?? '');
+        TextEditingController(text: item?.cost ?? client?.baseLaborCost ?? '');
     final addLaborTaxController =
         TextEditingController(text: item?.tax ?? client?.laborTaxRate ?? '');
 

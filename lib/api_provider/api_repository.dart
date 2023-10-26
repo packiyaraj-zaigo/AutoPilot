@@ -608,7 +608,7 @@ class ApiRepository {
 
   Future<dynamic> changeEstimateStatus(
       String token, String orderId, String status) async {
-    return apiProvider.estimateStatusChange(token, orderId);
+    return apiProvider.estimateStatusChange(token, orderId, status);
   }
 
   Future<dynamic> getEmployeeMessage(String token, int currentPage,
