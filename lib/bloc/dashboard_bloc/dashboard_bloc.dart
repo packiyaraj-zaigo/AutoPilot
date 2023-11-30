@@ -7,9 +7,11 @@ import 'package:auto_pilot/Models/revenue_chart_model.dart';
 import 'package:auto_pilot/Models/user_profile_model.dart';
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
+import 'package:auto_pilot/Screens/login_signup_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +61,20 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
       if (getChartDataRes.statusCode == 200) {
         revenueChartModel = revenueChartModelFromJson(getChartDataRes.body);
         emit(GetRevenueChartDataState(revenueData: revenueChartModel));
+      } else if (getChartDataRes.statusCode == 401) {
+        final decodedBody = json.decode(getChartDataRes.body);
+        if (decodedBody['message'] == "Unauthenticated!") {
+          CommonWidgets().showDialog(event.context, "Session Expired!");
+          Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
+            builder: (context) {
+              return LoginAndSignupScreen(widgetIndex: 0);
+            },
+          ), (route) => false);
+
+          AppUtils.setToken("");
+          AppUtils.setUserName("");
+          AppUtils.setTokenValidity('');
+        }
       }
       // else if(createAccRes.statusCode==422){
       //   emit(CreateAccountErrorState());

@@ -74,18 +74,18 @@ class WelcomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     color: Colors.white),
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 8.0),
-                child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit uis porta ante dui, .",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 14,
-                      height: 1.8,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400),
-                ),
-              ),
+              // const Padding(
+              //   padding: EdgeInsets.only(top: 8.0),
+              //   child: Text(
+              //     "Lorem ipsum dolor sit amet, consectetur\nadipiscing elit uis porta ante dui, .",
+              //     textAlign: TextAlign.center,
+              //     style: TextStyle(
+              //         fontSize: 14,
+              //         height: 1.8,
+              //         color: Colors.white,
+              //         fontWeight: FontWeight.w400),
+              //   ),
+              // ),
 
               Padding(
                 padding: const EdgeInsets.only(top: 32.0),

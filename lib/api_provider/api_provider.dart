@@ -24,8 +24,11 @@ import '../utils/app_constants.dart';
 class ApiProvider {
   //DEV Server
 
-  static const BASE_URL =
-      'http://ec2-13-235-8-199.ap-south-1.compute.amazonaws.com/';
+  // static const BASE_URL =
+  //     'http://ec2-13-235-8-199.ap-south-1.compute.amazonaws.com/';
+
+  //Live Server
+  static const BASE_URL = "http://api.autopilot-crm.com/";
 
   late Map<String, String> requestHeaders;
 
