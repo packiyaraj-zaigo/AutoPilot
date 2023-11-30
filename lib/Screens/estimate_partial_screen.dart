@@ -5027,18 +5027,18 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                   ),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Text(
-                  "Fusce lacinia sed metus eu fringilla. Phasellus\nlobortis maximus posuere nunc placerat.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.greyText,
-                      height: 1.5),
-                ),
-              )
+              // const Padding(
+              //   padding: EdgeInsets.only(top: 16.0),
+              //   child: Text(
+              //     "Fusce lacinia sed metus eu fringilla. Phasellus\nlobortis maximus posuere nunc placerat.",
+              //     textAlign: TextAlign.center,
+              //     style: TextStyle(
+              //         fontSize: 14,
+              //         fontWeight: FontWeight.w400,
+              //         color: AppColors.greyText,
+              //         height: 1.5),
+              //   ),
+              // )
             ],
           ),
         ),

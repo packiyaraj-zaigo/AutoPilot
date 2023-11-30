@@ -73,7 +73,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => DashboardBloc(apiRepository: ApiRepository())
-        ..add(GetRevenueChartDataEvent())
+        ..add(GetRevenueChartDataEvent(context: context))
         ..add(GetUserProfileEvent()),
       child: BlocListener<DashboardBloc, DashboardState>(
         listener: (context, state) {

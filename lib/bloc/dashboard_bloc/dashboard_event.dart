@@ -7,7 +7,10 @@ abstract class DashboardEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class GetRevenueChartDataEvent extends DashboardEvent {}
+class GetRevenueChartDataEvent extends DashboardEvent {
+  final BuildContext context;
+  GetRevenueChartDataEvent({required this.context});
+}
 
 class GetUserProfileEvent extends DashboardEvent {}
 
