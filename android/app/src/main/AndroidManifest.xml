@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.autopilot">
+xmlns:tools="http://schemas.android.com/tools"
+    package="com.autopilotsoftware.us">
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
    <application
         android:label="Auto Pilot"
         android:name="${applicationName}"
@@ -31,4 +33,5 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+   
 </manifest>
