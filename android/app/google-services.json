@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "539108122579",
-    "project_id": "autopilot-69f20",
-    "storage_bucket": "autopilot-69f20.appspot.com"
+    "project_number": "902172643715",
+    "project_id": "autopilot-1966d",
+    "storage_bucket": "autopilot-1966d.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:539108122579:android:db471ac819284de3a05926",
+        "mobilesdk_app_id": "1:902172643715:android:da204f9449e07da5ffa6b6",
         "android_client_info": {
-          "package_name": "com.autopilot"
+          "package_name": "com.autopilotsoftware.us"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "539108122579-8qg16mtc364rcfbhd6tt1tvtlsfupbgl.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB9ibVhKcg7RWzvUnWNIGGLNk7mDKsSUyU"
+          "current_key": "AIzaSyAB6iiJBhHzLy8RExYYc_us8-jHMiKBZOo"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "539108122579-8qg16mtc364rcfbhd6tt1tvtlsfupbgl.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

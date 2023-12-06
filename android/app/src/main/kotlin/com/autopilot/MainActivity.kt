@@ -1,4 +1,4 @@
-package com.autopilot
+package com.autopilotsoftware.us
 
 import io.flutter.embedding.android.FlutterActivity
 
