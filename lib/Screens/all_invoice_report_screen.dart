@@ -15,13 +15,21 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> monthOptions = ["This Month", "Last Month"];
   final List<DataRow> rows = List.generate(
-    10, // Replace with your actual data
+    18, // Replace with your actual data
     (index) => DataRow(
       cells: [
-        DataCell(Text('Item $index')),
-        DataCell(Text('Description $index')),
-        DataCell(Text('Test $index')),
-        DataCell(Text('Test 2 $index')),
+        DataCell(Text('First Name $index')),
+        DataCell(Text('Last Name $index')),
+        DataCell(Text('Vehicle $index')),
+        DataCell(Text('Order $index')),
+        DataCell(Text('Order Name $index')),
+        DataCell(Text('Payment Date $index')),
+        DataCell(Text('Note $index')),
+        DataCell(Text('Payment Type $index')),
+        DataCell(Text('Card Type $index')),
+        DataCell(Text('Total Order Amount $index')),
+        DataCell(Text('Remaining Amount $index')),
+        DataCell(Text('Payment Amount $index')),
 
         // Add more DataCells as needed
       ],
@@ -213,32 +221,48 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   Widget tableWidget() {
     return Column(
       children: [
-        Container(
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  clipBehavior: Clip.antiAliasWithSaveLayer,
-                  child: PaginatedDataTable(columns: [
-                    DataColumn(label: Text('Item')),
-                    DataColumn(label: Text('Description')),
-                    DataColumn(label: Text('Test')),
-                    DataColumn(label: Text('Test 2')),
-                  ], headingRowHeight: 50, source: MyDataTableSource(rows)),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 4.0, left: 5),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Color.fromARGB(19, 168, 208, 248),
-                        borderRadius: BorderRadius.circular(10)),
-                    height: 50,
-                  ),
-                ),
-              ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      spreadRadius: 6,
+                      offset: Offset(10, 16)),
+                ]),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: DataTable(
+                columns: [
+                  // DataColumn(label: Text('Item')),
+                  // DataColumn(label: Text('Description')),
+                  // DataColumn(label: Text('Test')),
+                  // DataColumn(label: Text('Test 2')),
+
+                  DataColumn(label: Text('First Name')),
+                  DataColumn(label: Text('Vehicle')),
+                  DataColumn(label: Text('Last Name')),
+                  DataColumn(label: Text('Order')),
+                  DataColumn(label: Text('Order Name')),
+                  DataColumn(label: Text('Payment Date')),
+                  DataColumn(label: Text('Note')),
+                  DataColumn(label: Text('Payment Type')),
+                  DataColumn(label: Text('Card Type')),
+                  DataColumn(label: Text('Total Order Amount')),
+                  DataColumn(label: Text('Remaining Amount')),
+                  DataColumn(label: Text('Payment Amount')),
+                ],
+                rows: rows,
+                columnSpacing: 80,
+                headingRowColor:
+                    MaterialStateProperty.all(const Color(0xffCEDEFF)),
+                headingRowHeight: 50,
+              ),
             ),
           ),
         ),

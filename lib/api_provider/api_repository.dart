@@ -647,6 +647,56 @@ class ApiRepository {
   Future<dynamic> getAppointmentDetails(String token, String appointmentId) {
     return apiProvider.getAppointmentDetails(token, appointmentId);
   }
+
+  ///////////////////////////////////////////////////////////
+  ///Report Module
+
+  Future<dynamic> getAllinvoiceReport(String token, String monthFilter,
+      String paidFileter, int page, String searchQuery) {
+    return apiProvider.getAllInvoiceReport(
+        token, monthFilter, paidFileter, page, searchQuery);
+  }
+
+  Future<dynamic> getSalesTaxReport(
+    String token,
+    String startDate,
+    String endDate,
+    int page,
+  ) {
+    return apiProvider.getSalesTaxReport(token, startDate, endDate, page);
+  }
+
+  Future<dynamic> getPaymentTypeReport(
+    String token,
+    String monthFilter,
+    String searchQuery,
+    int page,
+  ) {
+    return apiProvider.getPaymentTypeReport(
+        token, monthFilter, searchQuery, page);
+  }
+
+  Future<dynamic> getTimeLogReport(
+    String token,
+    String monthFilter,
+    String techFilter,
+    String searchQuery,
+    int page,
+  ) {
+    return apiProvider.getTimeLogReport(
+        token, monthFilter, techFilter, searchQuery, page);
+  }
+
+  Future<dynamic> getServiceByTechnicianReport(
+    String token,
+    String monthFilter,
+    String searchQuery,
+    String techFilter,
+    int page,
+  ) {
+    return apiProvider.getServiceByTechnicianReport(
+        token, monthFilter, searchQuery, techFilter, page);
+  }
 }
 
 class NetworkError extends Error {}
