@@ -4,6 +4,7 @@ import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/Screens/employee_list_screen.dart';
 import 'package:auto_pilot/Screens/legal.dart';
 import 'package:auto_pilot/Screens/parts_list_screen.dart';
+import 'package:auto_pilot/Screens/report_list_screen.dart';
 import 'package:auto_pilot/Screens/services_list_screen.dart';
 import 'package:auto_pilot/Screens/time_card_screen.dart';
 import 'package:auto_pilot/Screens/vehicles_screen.dart';
@@ -106,10 +107,10 @@ showDrawer(BuildContext context) {
               // name: "Service Screen",
               // )),
               const ServicesListScreen()),
-          // drawerTileWidget("assets/images/reports_drawrer_icon.svg", "Reports",
-          //     context, BottomBarScreen()),
           drawerTileWidget("assets/images/time_card_drawer_icon.svg",
               "Time Cards", context, const TimeCardsScreen()),
+          drawerTileWidget("assets/images/report_icon.svg", "Reports", context,
+              ReportListScreen()),
           // DummyScreen(name: "Time card")),
           const SizedBox(
             height: 52,
