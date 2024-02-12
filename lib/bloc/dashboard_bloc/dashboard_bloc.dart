@@ -8,6 +8,7 @@ import 'package:auto_pilot/Models/user_profile_model.dart';
 import 'package:auto_pilot/Screens/add_company_screen.dart';
 import 'package:auto_pilot/Screens/bottom_bar.dart';
 import 'package:auto_pilot/Screens/login_signup_screen.dart';
+import 'package:auto_pilot/Screens/welcome_screen.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_constants.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
@@ -67,7 +68,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
           CommonWidgets().showDialog(event.context, "Session Expired!");
           Navigator.pushAndRemoveUntil(event.context, MaterialPageRoute(
             builder: (context) {
-              return LoginAndSignupScreen(widgetIndex: 0);
+              return WelcomeScreen();
             },
           ), (route) => false);
 
