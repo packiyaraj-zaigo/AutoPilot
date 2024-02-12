@@ -2443,4 +2443,96 @@ class ApiProvider {
       log('Error on getting local response');
     }
   }
+
+  //////////////////////////////////////////////////////////////
+  ///REPORT MODULE
+  ///
+  ///
+  ///Api call to get all invoice reports
+  Future<dynamic> getAllInvoiceReport(String token, String monthFilter,
+      String paidFileter, int page, String searchQuery) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/invoice_report?month=$monthFilter&page=$page&client_id=$clientId&paid_filter=$paidFileter&search=$searchQuery');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  //Api call to get sales tax report
+  Future<dynamic> getSalesTaxReport(
+    String token,
+    String startDate,
+    String endDate,
+    int page,
+  ) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/sales_tax_report?start_date=$startDate&end_date=$endDate&client_id=$clientId&page=$page');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  //Api call to get payment type report
+  Future<dynamic> getPaymentTypeReport(
+    String token,
+    String monthFilter,
+    String searchQuery,
+    int page,
+  ) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/payment_type_report?month=$monthFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  //Api call to get time log report
+  Future<dynamic> getTimeLogReport(
+    String token,
+    String monthFilter,
+    String techFilter,
+    String searchQuery,
+    int page,
+  ) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/payment_type_report?month=$monthFilter&tech_name=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  //Api call to get service by technician report.
+  Future<dynamic> getServiceByTechnicianReport(
+    String token,
+    String monthFilter,
+    String searchQuery,
+    String techFilter,
+    int page,
+  ) async {
+    try {
+      final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/service_technician_report?month=$monthFilter&tech_filter=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
 }
