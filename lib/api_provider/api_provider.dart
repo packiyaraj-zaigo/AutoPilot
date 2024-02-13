@@ -2453,8 +2453,12 @@ class ApiProvider {
       String paidFileter, int page, String searchQuery) async {
     try {
       final clientId = await AppUtils.getUserID();
+      // final url = Uri.parse(
+      //     '${BASE_URL}api/invoice_report?month=$monthFilter&page=$page&client_id=$clientId&paid_filter=$paidFileter&search=$searchQuery');
+
+      //mock api url
       final url = Uri.parse(
-          '${BASE_URL}api/invoice_report?month=$monthFilter&page=$page&client_id=$clientId&paid_filter=$paidFileter&search=$searchQuery');
+          'https://65caf767efec34d9ed8674e7.mockapi.io/api/mock/allinvoice_report');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2471,8 +2475,11 @@ class ApiProvider {
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
+      // final url = Uri.parse(
+      //     '${BASE_URL}api/sales_tax_report?start_date=$startDate&end_date=$endDate&client_id=$clientId&page=$page');
+      //mock api url
       final url = Uri.parse(
-          '${BASE_URL}api/sales_tax_report?start_date=$startDate&end_date=$endDate&client_id=$clientId&page=$page');
+          'https://65caf767efec34d9ed8674e7.mockapi.io/api/mock/sales_tax_report');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2489,8 +2496,11 @@ class ApiProvider {
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
+      // final url = Uri.parse(
+      //     '${BASE_URL}api/payment_type_report?month=$monthFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      //mock url
       final url = Uri.parse(
-          '${BASE_URL}api/payment_type_report?month=$monthFilter&client_id=$clientId&search=$searchQuery&page=$page');
+          'https://run.mocky.io/v3/05dde70b-bccd-428d-81e9-0442a359d674');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2508,8 +2518,12 @@ class ApiProvider {
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
+      // final url = Uri.parse(
+      //     '${BASE_URL}api/payment_type_report?month=$monthFilter&tech_name=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+
+      //mock api url
       final url = Uri.parse(
-          '${BASE_URL}api/payment_type_report?month=$monthFilter&tech_name=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+          'https://run.mocky.io/v3/3475c9fc-de58-4388-9532-35e957e7e051');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2527,8 +2541,11 @@ class ApiProvider {
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
+      // final url = Uri.parse(
+      //     '${BASE_URL}api/service_technician_report?month=$monthFilter&tech_filter=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      //mock api url
       final url = Uri.parse(
-          '${BASE_URL}api/service_technician_report?month=$monthFilter&tech_filter=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+          "https://run.mocky.io/v3/452d88e5-2849-4034-bd29-6cc4353f4998");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
