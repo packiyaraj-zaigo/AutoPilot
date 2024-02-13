@@ -52,6 +52,9 @@ class _ReportListScreen extends State<ReportListScreen> {
                 color: AppColors.primaryTitleColor,
               ),
             ),
+            const SizedBox(
+              height: 24,
+            ),
             reportTileWidget("All Invoice", AllInvoiceReportScreen()),
             reportTileWidget("Sales Tax", SalesTaxReportScreen()),
             reportTileWidget("Time Log", TimeLogReportScreen()),
@@ -75,9 +78,7 @@ class _ReportListScreen extends State<ReportListScreen> {
         ));
       },
       child: Padding(
-        padding: const EdgeInsets.only(
-          top: 32.0,
-        ),
+        padding: const EdgeInsets.only(top: 13.0, bottom: 13),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

@@ -30,7 +30,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      AllInvoiceReportModel? allInvoiceReportModel;
+      List<AllInvoiceReportModel> allInvoiceReportModel;
+
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getAllinvoiceReport(
@@ -42,9 +43,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
+        allInvoiceReportModel = allInvoiceReportModelFromJson(response.body);
         emit(GetAllInvoiceReportSuccessState(
-            allInvoiceReportModel:
-                allInvoiceReportModel!)); //change force null.
+            allInvoiceReportModel: allInvoiceReportModel)); //change force null.
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetAllInvoiceReportErrorState(errorMessage: decodedBody['msg']));
@@ -61,16 +62,17 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      SalesTaxReportModel? salesTaxReportModel;
+      List<SalesTaxReportModel> salesTaxReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getSalesTaxReport(
           token, event.startDate, event.endDate, event.currentPage);
       if (response.statusCode == 200) {
+        salesTaxReportModel = salesTaxReportModelFromJson(response.body);
         //decode response into model class.
         /////////////////////////////////
         emit(GetSalesTaxReportSuccessState(
-            salesTaxReportModel: salesTaxReportModel!)); //change force null.
+            salesTaxReportModel: salesTaxReportModel)); //change force null.
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetSalesTaxReportErrorState(errorMessage: decodedBody['msg']));
@@ -87,7 +89,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      TimeLogReportModel? timeLogReportModel;
+      List<TimeLogReportModel> timeLogReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getTimeLogReport(
@@ -98,9 +100,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.currentPage);
       if (response.statusCode == 200) {
         //decode response into model class.
-        /////////////////////////////////
+        timeLogReportModel = timeLogReportModelFromJson(response.body);
+
         emit(GetTimeLogReportSuccessState(
-            timeLogReportModel: timeLogReportModel!)); //change force null.
+            timeLogReportModel: timeLogReportModel)); //change force null.
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetTimeLogReportErrorState(errorMessage: decodedBody['msg']));
@@ -117,16 +120,17 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      PaymentTypeReportModel? paymentTypeReportModel;
+      List<PaymentTypeReportModel> paymentTypeReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getPaymentTypeReport(
           token, event.monthFilter, event.searchQuery, event.currentPage);
       if (response.statusCode == 200) {
+        paymentTypeReportModel = paymentTypeReportModelFromJson(response.body);
         //decode response into model class.
         /////////////////////////////////
         emit(GetPaymentTypeReportSuccessState(
-            paymentReportModel: paymentTypeReportModel!)); //change force null.
+            paymentReportModel: paymentTypeReportModel)); //change force null.
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetPaymentTypeReportErrorState(errorMessage: decodedBody['msg']));
@@ -145,7 +149,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      ServiceByTechReportModel? serviceByTechReportModel;
+      List<ServiceByTechReportModel> serviceByTechReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getServiceByTechnicianReport(
@@ -157,9 +161,11 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
+        serviceByTechReportModel =
+            serviceByTechReportModelFromJson(response.body);
         emit(GetServiceByTechnicianReportSuccessState(
             serviceByTechReportModel:
-                serviceByTechReportModel!)); //change force null.
+                serviceByTechReportModel)); //change force null.
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetServiceByTechnicianReportErrorState(

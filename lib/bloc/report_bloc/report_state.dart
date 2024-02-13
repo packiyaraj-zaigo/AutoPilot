@@ -12,7 +12,7 @@ class ReportInitial extends ReportState {}
 class ReportLoadingState extends ReportState {}
 
 class GetAllInvoiceReportSuccessState extends ReportState {
-  final AllInvoiceReportModel allInvoiceReportModel;
+  final List<AllInvoiceReportModel> allInvoiceReportModel;
   GetAllInvoiceReportSuccessState({required this.allInvoiceReportModel});
 
   @override
@@ -25,7 +25,7 @@ class GetAllInvoiceReportErrorState extends ReportState {
 }
 
 class GetSalesTaxReportSuccessState extends ReportState {
-  final SalesTaxReportModel salesTaxReportModel;
+  final List<SalesTaxReportModel> salesTaxReportModel;
   GetSalesTaxReportSuccessState({required this.salesTaxReportModel});
 
   @override
@@ -38,7 +38,7 @@ class GetSalesTaxReportErrorState extends ReportState {
 }
 
 class GetTimeLogReportSuccessState extends ReportState {
-  final TimeLogReportModel timeLogReportModel;
+  final List<TimeLogReportModel> timeLogReportModel;
   GetTimeLogReportSuccessState({required this.timeLogReportModel});
 
   @override
@@ -51,7 +51,7 @@ class GetTimeLogReportErrorState extends ReportState {
 }
 
 class GetPaymentTypeReportSuccessState extends ReportState {
-  final PaymentTypeReportModel paymentReportModel;
+  final List<PaymentTypeReportModel> paymentReportModel;
   GetPaymentTypeReportSuccessState({required this.paymentReportModel});
 
   @override
@@ -64,7 +64,7 @@ class GetPaymentTypeReportErrorState extends ReportState {
 }
 
 class GetServiceByTechnicianReportSuccessState extends ReportState {
-  final ServiceByTechReportModel serviceByTechReportModel;
+  final List<ServiceByTechReportModel> serviceByTechReportModel;
   GetServiceByTechnicianReportSuccessState(
       {required this.serviceByTechReportModel});
 

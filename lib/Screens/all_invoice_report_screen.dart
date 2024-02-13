@@ -1,7 +1,10 @@
+import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AllInvoiceReportScreen extends StatefulWidget {
@@ -14,98 +17,147 @@ class AllInvoiceReportScreen extends StatefulWidget {
 class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> monthOptions = ["This Month", "Last Month"];
-  final List<DataRow> rows = List.generate(
-    18, // Replace with your actual data
-    (index) => DataRow(
-      cells: [
-        DataCell(Text('First Name $index')),
-        DataCell(Text('Last Name $index')),
-        DataCell(Text('Vehicle $index')),
-        DataCell(Text('Order $index')),
-        DataCell(Text('Order Name $index')),
-        DataCell(Text('Payment Date $index')),
-        DataCell(Text('Note $index')),
-        DataCell(Text('Payment Type $index')),
-        DataCell(Text('Card Type $index')),
-        DataCell(Text('Total Order Amount $index')),
-        DataCell(Text('Remaining Amount $index')),
-        DataCell(Text('Payment Amount $index')),
+  List<AllInvoiceReportModel> allInvoiceReportList = [];
+  int _rowsPerPage = 5;
 
-        // Add more DataCells as needed
-      ],
-    ),
-  );
+  // final List<DataRow> rows = List.generate(
+  //   18, // Replace with your actual data
+  //   (index) => DataRow(
+  //     cells: [
+  //       DataCell(Text('First Name $index')),
+  //       DataCell(Text('Last Name $index')),
+  //       DataCell(Text('Vehicle $index')),
+  //       DataCell(Text('Order $index')),
+  //       DataCell(Text('Order Name $index')),
+  //       DataCell(Text('Payment Date $index')),
+  //       DataCell(Text('Note $index')),
+  //       DataCell(Text('Payment Type $index')),
+  //       DataCell(Text('Card Type $index')),
+  //       DataCell(Text('Total Order Amount $index')),
+  //       DataCell(Text('Remaining Amount $index')),
+  //       DataCell(Text('Payment Amount $index')),
+
+  //       // Add more DataCells as needed
+  //     ],
+  //   ),
+  // );
+
+  List<DataRow> rows = [];
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: scaffoldKey,
-      drawer: showDrawer(context),
-      appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: AppColors.primaryColors,
-            ),
-            onPressed: () {
-              scaffoldKey.currentState!.openDrawer();
-            },
-          ),
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: const Text(
-            'Autopilot',
-            style: TextStyle(color: Colors.black87),
-          ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-                onPressed: () {
-                  // Navigator.push(context, MaterialPageRoute(
-                  //   builder: (context) {
-                  //     return AppointmentDetailsScreen();
-                  //   },
-                  // ));
-                  // CommonWidgets().showSuccessDialog(
-                  //     context, "Successfully created data");
-                },
-                icon: SvgPicture.asset(
-                  "assets/images/message.svg",
-                  color: AppColors.primaryColors,
-                )),
-            IconButton(
-                onPressed: () {
-                  // Navigator.of(context).push(
-                  //   MaterialPageRoute(
-                  //       builder: (context) => AddCompanyScreen()),
-                  // );
-                },
-                icon: SvgPicture.asset(
-                  "assets/images/notification.svg",
-                  color: AppColors.primaryColors,
-                ))
-          ]),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            top: 15.0,
-            left: 24,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "All Invoices",
-                style: TextStyle(
-                    color: AppColors.primaryTitleColor,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600),
-              ),
-              monthDropdown("Invoiced"),
-              monthDropdown("Fully Paid"),
-              searchBar(),
-              tableWidget()
-            ],
-          ),
+    return BlocProvider(
+      create: (context) => ReportBloc()
+        ..add(GetAllInvoiceReportEvent(
+            monthFilter: "", paidFilter: "", searchQuery: "", currentPage: 1)),
+      child: BlocListener<ReportBloc, ReportState>(
+        listener: (context, state) {
+          // TODO: implement listener
+
+          if (state is GetAllInvoiceReportSuccessState) {
+            allInvoiceReportList.addAll(state.allInvoiceReportModel);
+
+            allInvoiceReportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.firstName)),
+                DataCell(Text(element.vehicle)),
+                DataCell(Text(element.lastName)),
+                DataCell(Text(element.order)),
+                DataCell(Text(element.orderName)),
+                DataCell(Text(element.paymentDate.toString())),
+                DataCell(Text(element.note)),
+                DataCell(Text(element.paymentType)),
+                DataCell(Text(element.cardType)),
+                DataCell(Text(element.totalOrderAmount.toString())),
+                DataCell(Text(element.remainingAmount.toString())),
+                DataCell(Text(element.paymentAmount.toString())),
+              ]));
+            });
+          }
+        },
+        child: BlocBuilder<ReportBloc, ReportState>(
+          builder: (context, state) {
+            return Scaffold(
+              key: scaffoldKey,
+              drawer: showDrawer(context),
+              appBar: AppBar(
+                  leading: IconButton(
+                    icon: const Icon(
+                      Icons.menu,
+                      color: AppColors.primaryColors,
+                    ),
+                    onPressed: () {
+                      scaffoldKey.currentState!.openDrawer();
+                    },
+                  ),
+                  backgroundColor: Colors.white,
+                  elevation: 0,
+                  title: const Text(
+                    'Autopilot',
+                    style: TextStyle(color: Colors.black87),
+                  ),
+                  centerTitle: true,
+                  actions: [
+                    IconButton(
+                        onPressed: () {
+                          // Navigator.push(context, MaterialPageRoute(
+                          //   builder: (context) {
+                          //     return AppointmentDetailsScreen();
+                          //   },
+                          // ));
+                          // CommonWidgets().showSuccessDialog(
+                          //     context, "Successfully created data");
+                        },
+                        icon: SvgPicture.asset(
+                          "assets/images/message.svg",
+                          color: AppColors.primaryColors,
+                        )),
+                    IconButton(
+                        onPressed: () {
+                          // Navigator.of(context).push(
+                          //   MaterialPageRoute(
+                          //       builder: (context) => AddCompanyScreen()),
+                          // );
+                        },
+                        icon: SvgPicture.asset(
+                          "assets/images/notification.svg",
+                          color: AppColors.primaryColors,
+                        ))
+                  ]),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: 15.0,
+                          left: 24,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "All Invoices",
+                              style: TextStyle(
+                                  color: AppColors.primaryTitleColor,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            monthDropdown("Invoiced"),
+                            monthDropdown("Fully Paid"),
+                            searchBar(),
+                            tableWidget()
+                          ],
+                        ),
+                      ),
+                    ),
+            );
+          },
         ),
       ),
     );
@@ -220,6 +272,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
 
   Widget tableWidget() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -269,6 +322,30 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Row(
+            children: [
+              Text('Rows per page: '),
+              DropdownButton<int>(
+                value: _rowsPerPage,
+                underline: const SizedBox(),
+                onChanged: (newValue) {
+                  setState(() {
+                    _rowsPerPage = newValue!;
+                  });
+                },
+                items: [5, 10, 20, 50]
+                    .map((value) => DropdownMenuItem<int>(
+                          value: value,
+                          child: Text(value.toString()),
+                        ))
+                    .toList(),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Transform.scale(
                   scale: 0.7,
