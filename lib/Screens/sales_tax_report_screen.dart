@@ -3,10 +3,12 @@ import 'package:auto_pilot/Screens/all_invoice_report_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class SalesTaxReportScreen extends StatefulWidget {
   const SalesTaxReportScreen({super.key});
@@ -32,13 +34,28 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   int _rowsPerPage = 5;
   List<DataRow> rows = [];
+  List<DateTime?> dateRangeList = [
+    DateTime.now(),
+    DateTime.now().add(const Duration(days: 1)),
+  ];
+
+  String startDateStr = "";
+  String endDateStr = "";
   final List<SalesTaxReportModel> salesTaxReportList = [];
+
+  @override
+  void initState() {
+    DateFormat outputFormat = DateFormat('MMM d, yyyy');
+    startDateStr = outputFormat.format(dateRangeList[0]!);
+    endDateStr = outputFormat.format(dateRangeList[1]!);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReportBloc()
-        ..add(
-            GetSalesTaxReportEvent(startDate: "", endDate: "", currentPage: 1)),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           // TODO: implement listener
@@ -55,6 +72,11 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                 DataCell(Text(element.total.toString())),
               ]));
             });
+          } else if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(
+                  GetSalesTaxReportEvent(
+                      startDate: "", endDate: "", currentPage: 1),
+                );
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -110,30 +132,46 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                   ? Center(
                       child: CupertinoActivityIndicator(),
                     )
-                  : SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 15.0, left: 24),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  : state is InternerConnectionErrorState
+                      ? Column(
                           children: [
-                            Text(
-                              "Sales Tax",
-                              style: TextStyle(
-                                  color: AppColors.primaryTitleColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600),
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
                             ),
-                            dateSelectionWidget(),
-                            const SizedBox(
-                              height: 6,
-                            ),
-                            taxTileWidget("Taxes collected", "48000"),
-                            taxTileWidget("Taxe owed", "68000"),
-                            tableWidget()
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
                           ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 15.0, left: 24),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Sales Tax",
+                                  style: TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                dateSelectionWidget(),
+                                const SizedBox(
+                                  height: 6,
+                                ),
+                                taxTileWidget("Taxes collected", "48000"),
+                                taxTileWidget("Taxe owed", "68000"),
+                                tableWidget()
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
             );
           },
         ),
@@ -178,7 +216,7 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12.0),
                       child: Text(
-                        "Aug 1 ,2023- Aug 10 , 2023",
+                        "${startDateStr}- ${endDateStr}",
                         style: TextStyle(fontSize: 16),
                       ),
                     )),
@@ -186,26 +224,90 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
               const SizedBox(
                 width: 16,
               ),
-              Container(
-                height: 50,
-                width: 50,
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.07),
-                          spreadRadius: 0,
-                          offset: Offset(0, 4),
-                          blurRadius: 10)
-                    ]),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: SvgPicture.asset(
-                          "assets/images/report_calander_icon.svg")),
+              GestureDetector(
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      List<DateTime?> tempDateList = dateRangeList;
+                      return AlertDialog(
+                        insetPadding: EdgeInsets.zero,
+                        content: Container(
+                          height: 400,
+                          width: 300,
+                          child: Column(
+                            children: [
+                              CalendarDatePicker2(
+                                  config: CalendarDatePicker2Config(
+                                    calendarType: CalendarDatePicker2Type.range,
+                                  ),
+                                  value: dateRangeList,
+                                  onValueChanged: (dates) {
+                                    tempDateList = dates;
+                                    print(tempDateList);
+                                  }),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          DateFormat outputFormat =
+                                              DateFormat('MMM d, yyyy');
+                                          // dateRangeList[0] = DateTime.parse(
+                                          //     outputFormat
+                                          //         .format(tempDateList[0]!));
+
+                                          // dateRangeList[1] = DateTime.parse(
+                                          //     outputFormat
+                                          //         .format(tempDateList[1]!));
+
+                                          dateRangeList = tempDateList;
+
+                                          startDateStr = outputFormat
+                                              .format(dateRangeList[0]!);
+                                          endDateStr = outputFormat
+                                              .format(dateRangeList[1]!);
+                                        });
+
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Ok")),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Cancel")),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.07),
+                            spreadRadius: 0,
+                            offset: Offset(0, 4),
+                            blurRadius: 10)
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: SvgPicture.asset(
+                            "assets/images/report_calander_icon.svg")),
+                  ),
                 ),
               )
             ],

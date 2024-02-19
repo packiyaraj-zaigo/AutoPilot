@@ -4,12 +4,15 @@ import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
 import 'package:auto_pilot/Models/sales_tax_report_model.dart';
 import 'package:auto_pilot/Models/service_technician_report_model.dart';
+import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/time_log_report_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart'
+    as internet;
 
 part 'report_event.dart';
 part 'report_state.dart';
@@ -22,6 +25,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<GetTimeLogReportEvent>(getTimeLogReportBloc);
     on<GetPaymentTypeReportEvent>(getPaymentTypeReportBloc);
     on<GetServiceByTechnicianReportEvent>(getServiceByTechnicianReportBloc);
+    on<InternetConnectionEvent>(internetConnectionBloc);
+    on<GetAllTechnicianEvent>(getAllTechnicianBloc);
   }
 
   //Bloc to get all invoice report.
@@ -30,7 +35,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<AllInvoiceReportModel> allInvoiceReportModel;
+      AllInvoiceReportModel allInvoiceReportModel;
 
       final token = await AppUtils.getToken();
 
@@ -120,7 +125,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<PaymentTypeReportModel> paymentTypeReportModel;
+      PaymentTypeReportModel paymentTypeReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getPaymentTypeReport(
@@ -135,8 +140,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         var decodedBody = json.decode(response.body);
         emit(GetPaymentTypeReportErrorState(errorMessage: decodedBody['msg']));
       }
-    } catch (e) {
+    } catch (e, s) {
       print(e.toString());
+      print(s);
+
       emit(
           GetPaymentTypeReportErrorState(errorMessage: "Something went wrong"));
     }
@@ -149,7 +156,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<ServiceByTechReportModel> serviceByTechReportModel;
+      ServiceByTechReportModel serviceByTechReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getServiceByTechnicianReport(
@@ -175,6 +182,48 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       print(e.toString());
       emit(GetServiceByTechnicianReportErrorState(
           errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to check internet connection
+  Future<void> internetConnectionBloc(
+      InternetConnectionEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      bool result =
+          await internet.InternetConnectionCheckerPlus().hasConnection;
+      if (result) {
+        emit(InternetConnectionSuccessState());
+      } else {
+        emit(InternerConnectionErrorState());
+      }
+    } catch (e) {
+      print(e.toString());
+      emit(InternerConnectionErrorState());
+    }
+  }
+
+  //bloc to get all technicain data
+  getAllTechnicianBloc(
+    GetAllTechnicianEvent event,
+    Emitter<ReportState> emit,
+  ) async {
+    try {
+      emit(ReportLoadingState());
+      TechnicianOnlyModel technicianModel;
+
+      final token = await AppUtils.getToken();
+      Response getTechnicianResponse = await apiRepo.getTechniciansOnly(token);
+      if (getTechnicianResponse.statusCode == 200) {
+        technicianModel =
+            technicianOnlyModelFromJson(getTechnicianResponse.body);
+        emit(GetAllTechnicianState(technicianModel: technicianModel));
+      } else {
+        emit(GetAllTechnicianErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      print(e.toString());
+      emit(GetAllTechnicianErrorState(errorMessage: "Something went wrong"));
     }
   }
 }

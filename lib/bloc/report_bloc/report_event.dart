@@ -64,3 +64,7 @@ class GetServiceByTechnicianReportEvent extends ReportEvent {
       required this.techFilter,
       required this.currentPage});
 }
+
+class InternetConnectionEvent extends ReportEvent {}
+
+class GetAllTechnicianEvent extends ReportEvent {}

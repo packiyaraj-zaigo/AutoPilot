@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/time_log_report_model.dart';
 import 'package:auto_pilot/Screens/all_invoice_report_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
@@ -20,6 +21,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
   List<String> monthOptions = ["This Month", "Last Month"];
   int _rowsPerPage = 5;
   final List<TimeLogReportModel> timeLogReportList = [];
+  Datum? currentTechnician;
   // final List<DataRow> rows = List.generate(
   //   10, // Replace with your actual data
   //   (index) => DataRow(
@@ -35,12 +37,11 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
   // );
 
   List<DataRow> rows = [];
+  TechnicianOnlyModel? technicianModel;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReportBloc()
-        ..add(GetTimeLogReportEvent(
-            monthFilter: "", techFilter: "", searchQuery: "", currentPage: 1)),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           // TODO: implement listener
@@ -65,6 +66,16 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                 DataCell(Text(element.total.toString())),
               ]));
             });
+          } else if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetTimeLogReportEvent(
+                monthFilter: "",
+                techFilter: "",
+                searchQuery: "",
+                currentPage: 1));
+
+            context.read<ReportBloc>().add(GetAllTechnicianEvent());
+          } else if (state is GetAllTechnicianState) {
+            technicianModel = state.technicianModel;
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -120,40 +131,57 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                   ? Center(
                       child: CupertinoActivityIndicator(),
                     )
-                  : SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 15.0,
-                          left: 24,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              "Time Log",
-                              style: TextStyle(
-                                  color: AppColors.primaryTitleColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600),
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
                             ),
-                            const SizedBox(
-                              height: 21,
-                            ),
-                            timeLogTile(
-                                "Hours tracked", "0", Color(0xff5976F6)),
-                            timeLogTile("Average hours per service", "0",
-                                Color(0xff12A58C)),
-                            const SizedBox(
-                              height: 35,
-                            ),
-                            monthDropdown("Time in"),
-                            monthDropdown("Technicians"),
-                            searchBar(),
-                            tableWidget()
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay))
                           ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 15.0,
+                              left: 24,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Time Log",
+                                  style: TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(
+                                  height: 21,
+                                ),
+                                timeLogTile(
+                                    "Hours tracked", "0", Color(0xff5976F6)),
+                                timeLogTile("Average hours per service", "0",
+                                    Color(0xff12A58C)),
+                                const SizedBox(
+                                  height: 35,
+                                ),
+                                monthDropdown("Time in"),
+                                technicianDropdown("Technicians"),
+                                searchBar(),
+                                tableWidget()
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
             );
           },
         ),
@@ -201,6 +229,63 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                         child: Text(month),
                       ))
                   .toList(),
+              isExpanded: true,
+              underline: const SizedBox(),
+              padding: EdgeInsets.only(left: 12, right: 12),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  technicianDropdown(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0, right: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width,
+            height: 55,
+            decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.07),
+                      spreadRadius: 0,
+                      offset: Offset(0, 4),
+                      blurRadius: 10)
+                ]),
+            child: DropdownButton<Datum>(
+              hint: Text("Technician"),
+              value: currentTechnician,
+              onChanged: (Datum? technician) {
+                // Handle selected month
+                print('Selected Month: $technician');
+                setState(() {
+                  currentTechnician = technician;
+                });
+              },
+              items: technicianModel != null
+                  ? technicianModel!.data
+                      .map((Datum technician) => DropdownMenuItem<Datum>(
+                            value: technician,
+                            child: Text(
+                                "${technician.firstName} ${technician.lastName}"),
+                          ))
+                      .toList()
+                  : [],
               isExpanded: true,
               underline: const SizedBox(),
               padding: EdgeInsets.only(left: 12, right: 12),
