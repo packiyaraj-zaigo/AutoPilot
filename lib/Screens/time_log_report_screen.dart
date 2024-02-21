@@ -1,4 +1,5 @@
-import 'package:auto_pilot/Models/technician_only_model.dart';
+import 'package:auto_pilot/Models/technician_only_model.dart'
+    as technicianModel;
 import 'package:auto_pilot/Models/time_log_report_model.dart';
 import 'package:auto_pilot/Screens/all_invoice_report_screen.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
@@ -20,8 +21,11 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> monthOptions = ["This Month", "Last Month"];
   int _rowsPerPage = 5;
-  final List<TimeLogReportModel> timeLogReportList = [];
-  Datum? currentTechnician;
+  TimeLogReportModel? timeLogReportModel;
+
+  List<technicianModel.Datum> technicianData = [];
+  final TextEditingController technicianController = TextEditingController();
+  String technicianId = '';
   // final List<DataRow> rows = List.generate(
   //   10, // Replace with your actual data
   //   (index) => DataRow(
@@ -37,7 +41,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
   // );
 
   List<DataRow> rows = [];
-  TechnicianOnlyModel? technicianModel;
+  //TechnicianOnlyModel? technicianModel;
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
@@ -47,19 +51,19 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
           // TODO: implement listener
 
           if (state is GetTimeLogReportSuccessState) {
-            timeLogReportList.addAll(state.timeLogReportModel);
+            timeLogReportModel = state.timeLogReportModel;
 
-            timeLogReportList.forEach((element) {
+            timeLogReportModel?.data.data.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.entry.toString())),
                 DataCell(Text(element.type)),
-                DataCell(Text(element.technician)),
-                DataCell(Text(element.firstName)),
-                DataCell(Text(element.lastName)),
-                DataCell(Text(element.vehicle)),
-                DataCell(Text(element.fndDatetime.toString())),
-                DataCell(Text(element.activityType)),
-                DataCell(Text(element.activityName)),
+                DataCell(Text(element.techician.name)),
+                DataCell(Text(element.firstName.name)),
+                DataCell(Text(element.lastName.name)),
+                DataCell(Text(element.vehicleName.name)),
+                DataCell(Text(element.fndEndDate.toString())),
+                DataCell(Text(element.activityType.name)),
+                DataCell(Text(element.activityName.name)),
                 DataCell(Text(element.note)),
                 DataCell(Text(element.techRate.toString())),
                 DataCell(Text(element.duration.toString())),
@@ -74,8 +78,6 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                 currentPage: 1));
 
             context.read<ReportBloc>().add(GetAllTechnicianEvent());
-          } else if (state is GetAllTechnicianState) {
-            technicianModel = state.technicianModel;
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -168,8 +170,12 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                   height: 21,
                                 ),
                                 timeLogTile(
-                                    "Hours tracked", "0", Color(0xff5976F6)),
-                                timeLogTile("Average hours per service", "0",
+                                    "Hours tracked",
+                                    timeLogReportModel?.hoursTracked ?? "",
+                                    Color(0xff5976F6)),
+                                timeLogTile(
+                                    "Average hours per service",
+                                    timeLogReportModel?.averageHours ?? "",
                                     Color(0xff12A58C)),
                                 const SizedBox(
                                   height: 35,
@@ -254,43 +260,41 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
             height: 5,
           ),
           Container(
-            width: MediaQuery.of(context).size.width,
-            height: 55,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
-                      spreadRadius: 0,
-                      offset: Offset(0, 4),
-                      blurRadius: 10)
-                ]),
-            child: DropdownButton<Datum>(
-              hint: Text("Technician"),
-              value: currentTechnician,
-              onChanged: (Datum? technician) {
-                // Handle selected month
-                print('Selected Month: $technician');
-                setState(() {
-                  currentTechnician = technician;
-                });
-              },
-              items: technicianModel != null
-                  ? technicianModel!.data
-                      .map((Datum technician) => DropdownMenuItem<Datum>(
-                            value: technician,
-                            child: Text(
-                                "${technician.firstName} ${technician.lastName}"),
-                          ))
-                      .toList()
-                  : [],
-              isExpanded: true,
-              underline: const SizedBox(),
-              padding: EdgeInsets.only(left: 12, right: 12),
-            ),
-          ),
+              width: MediaQuery.of(context).size.width,
+              height: 55,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  border:
+                      Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        spreadRadius: 0,
+                        offset: Offset(0, 4),
+                        blurRadius: 10)
+                  ]),
+              child: TextField(
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) {
+                      return technicianBottomSheet();
+                    },
+                  );
+                },
+                readOnly: true,
+                controller: technicianController,
+                decoration: InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding:
+                        EdgeInsets.only(left: 12, right: 12, top: 0, bottom: 2),
+                    hintText: "Technician",
+                    suffix: Icon(
+                      Icons.arrow_drop_down_sharp,
+                      color: Colors.black54,
+                    )),
+              )),
         ],
       ),
     );
@@ -473,22 +477,128 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Transform.scale(
-                  scale: 0.7,
-                  child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-              Text(
-                "Dense",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        )
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 8.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Transform.scale(
+        //           scale: 0.7,
+        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+        //       Text(
+        //         "Dense",
+        //         style: TextStyle(fontSize: 16),
+        //       ),
+        //     ],
+        //   ),
+        // )
       ],
+    );
+  }
+
+  Widget technicianBottomSheet() {
+    return BlocProvider(
+      create: (context) => ReportBloc()..add(GetAllTechnicianEvent()),
+      child: BlocListener<ReportBloc, ReportState>(
+        listener: (context, state) {
+          if (state is GetAllTechnicianState) {
+            technicianData.clear();
+            technicianData.addAll(state.technicianModel.data);
+
+            print(technicianData);
+          }
+          // TODO: implement listener
+        },
+        child: BlocBuilder<ReportBloc, ReportState>(
+          builder: (context, state) {
+            return Container(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12), color: Colors.white),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: state is ReportLoadingState
+                    ? const Center(
+                        child: CupertinoActivityIndicator(),
+                      )
+                    : technicianData.isNotEmpty
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Technician",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.primaryTitleColor),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12.0),
+                                child: LimitedBox(
+                                  maxHeight:
+                                      MediaQuery.of(context).size.height / 2 -
+                                          90,
+                                  child: ListView.builder(
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 12.0),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            print("heyy");
+
+                                            technicianController
+                                                .text = technicianData[index]
+                                                    .firstName +
+                                                " " +
+                                                technicianData[index].lastName;
+                                            technicianId = technicianData[index]
+                                                .id
+                                                .toString();
+
+                                            print(technicianId + "techhh iddd");
+
+                                            Navigator.pop(context);
+                                          },
+                                          child: Container(
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[100],
+                                                borderRadius:
+                                                    BorderRadius.circular(8)),
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(12.0),
+                                              child: Text(
+                                                technicianData[index].firstName,
+                                                style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight:
+                                                        FontWeight.w500),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    itemCount: technicianData.length,
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        : const Center(
+                            child: Text("No Technician Found!"),
+                          ),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 }

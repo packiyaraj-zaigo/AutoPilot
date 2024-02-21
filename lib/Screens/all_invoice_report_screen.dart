@@ -2,6 +2,7 @@ import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -96,6 +97,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 DataCell(Text(element.paymentAmount.toString())),
               ]));
             });
+          } else if (state is ExportReportState) {
+            print("state here");
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -192,7 +195,9 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                 dateSelectionWidget(),
                                 monthDropdown("Fully Paid"),
                                 searchBar(),
-                                tableWidget()
+                                tableWidget(),
+                                //Add storage permission in android manifest.
+                                // exportButtonWidget(context)
                               ],
                             ),
                           ),
@@ -540,6 +545,80 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
         //   ),
         // )
       ],
+    );
+  }
+
+  Widget exportButtonWidget(BuildContext ctx) {
+    String downloadPath = "";
+    return BlocProvider(
+      create: (context) => ReportBloc(),
+      child: BlocListener<ReportBloc, ReportState>(
+        listener: (context, state) {
+          // TODO: implement listener
+          if (state is ExportReportState) {
+            CommonWidgets().showDialog(context, state.message);
+          }
+        },
+        child: BlocBuilder<ReportBloc, ReportState>(
+          builder: (context, state) {
+            return Padding(
+                padding: const EdgeInsets.only(right: 21.0, bottom: 12),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      // context.read<ReportBloc>().add(ExportReportEvent(
+                      //     downloadPath: downloadPath,
+                      //     downloadUrl: downloadUrl,
+                      //     fileName: fileName));
+
+                      // PermissionStatus status = await Permission.storage.request();
+                      // print(status.toString() + "sttaus");
+                      // if (status.isGranted) {
+                      //   var dir =
+                      //       await DownloadsPath.downloadsDirectory().then((value) {
+                      //     downloadPath = value?.path ?? "";
+                      //     print(downloadPath + "pathhhh");
+                      //     context.read<ReportBloc>().add(ExportReportEvent(
+                      //         downloadPath: downloadPath,
+                      //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                      //         fileName: "test"));
+                      //   });
+                      // } else if (status.isDenied) {
+                      //   await Permission.storage.request();
+                      // }
+
+                      ctx.read<ReportBloc>().add(ExportReportEvent(
+                          downloadPath: downloadPath,
+                          downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                          fileName: "test",
+                          context: ctx));
+                    },
+                    style: ElevatedButton.styleFrom(
+                        alignment: Alignment.center,
+                        minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                        backgroundColor: Color(0xffF6F6F6),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                        textStyle: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.exit_to_app,
+                          color: AppColors.primaryColors,
+                        ),
+                        Text(
+                          " Export",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryColors),
+                        )
+                      ],
+                    )));
+          },
+        ),
+      ),
     );
   }
 }

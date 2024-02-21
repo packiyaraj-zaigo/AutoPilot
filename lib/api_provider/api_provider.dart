@@ -2479,7 +2479,7 @@ class ApiProvider {
       //     '${BASE_URL}api/sales_tax_report?start_date=$startDate&end_date=$endDate&client_id=$clientId&page=$page');
       //mock api url
       final url = Uri.parse(
-          'https://65caf767efec34d9ed8674e7.mockapi.io/api/mock/sales_tax_report');
+          'https://run.mocky.io/v3/9eafb7f2-bd2a-45fb-84b6-e81a59dd143f');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2523,7 +2523,7 @@ class ApiProvider {
 
       //mock api url
       final url = Uri.parse(
-          'https://run.mocky.io/v3/3475c9fc-de58-4388-9532-35e957e7e051');
+          'https://run.mocky.io/v3/669aa7b0-b377-4a2c-b720-994591e6c57e');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {

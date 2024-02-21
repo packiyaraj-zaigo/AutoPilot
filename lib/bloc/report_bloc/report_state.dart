@@ -25,7 +25,7 @@ class GetAllInvoiceReportErrorState extends ReportState {
 }
 
 class GetSalesTaxReportSuccessState extends ReportState {
-  final List<SalesTaxReportModel> salesTaxReportModel;
+  final SalesTaxReportModel salesTaxReportModel;
   GetSalesTaxReportSuccessState({required this.salesTaxReportModel});
 
   @override
@@ -38,7 +38,7 @@ class GetSalesTaxReportErrorState extends ReportState {
 }
 
 class GetTimeLogReportSuccessState extends ReportState {
-  final List<TimeLogReportModel> timeLogReportModel;
+  final TimeLogReportModel timeLogReportModel;
   GetTimeLogReportSuccessState({required this.timeLogReportModel});
 
   @override
@@ -92,4 +92,20 @@ class GetAllTechnicianState extends ReportState {
 class GetAllTechnicianErrorState extends ReportState {
   final String errorMessage;
   GetAllTechnicianErrorState({required this.errorMessage});
+}
+
+class ExportReportState extends ReportState {
+  final String message;
+  final DateTime time;
+  ExportReportState({required this.message, required this.time});
+
+  @override
+  List<Object> get props => [message, time];
+}
+
+class ExportReportLoadingState extends ReportState {}
+
+class ExportReportErrorState extends ReportState {
+  final String errorMessage;
+  ExportReportErrorState({required this.errorMessage});
 }

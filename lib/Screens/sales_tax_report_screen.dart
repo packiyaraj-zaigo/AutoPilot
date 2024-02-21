@@ -41,7 +41,7 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
 
   String startDateStr = "";
   String endDateStr = "";
-  final List<SalesTaxReportModel> salesTaxReportList = [];
+  SalesTaxReportModel? salesTaxReportModel;
 
   @override
   void initState() {
@@ -60,15 +60,15 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
         listener: (context, state) {
           // TODO: implement listener
           if (state is GetSalesTaxReportSuccessState) {
-            salesTaxReportList.addAll(state.salesTaxReportModel);
+            salesTaxReportModel = state.salesTaxReportModel;
 
-            salesTaxReportList.forEach((element) {
+            salesTaxReportModel?.data.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.type)),
                 DataCell(Text(element.taxable.toString())),
                 DataCell(Text(element.nonTaxable.toString())),
                 DataCell(Text(element.taxExempt.toString())),
-                DataCell(Text(element.discounts.toString())),
+                DataCell(Text(element.discount.toString())),
                 DataCell(Text(element.total.toString())),
               ]));
             });
@@ -165,8 +165,16 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                                 const SizedBox(
                                   height: 6,
                                 ),
-                                taxTileWidget("Taxes collected", "48000"),
-                                taxTileWidget("Taxe owed", "68000"),
+                                taxTileWidget(
+                                    "Taxes collected",
+                                    salesTaxReportModel?.taxCollected
+                                            .toString() ??
+                                        ""),
+                                taxTileWidget(
+                                    "Taxe owed",
+                                    salesTaxReportModel?.nonTaxableTotal
+                                            .toString() ??
+                                        ""),
                                 tableWidget()
                               ],
                             ),
@@ -420,21 +428,21 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Transform.scale(
-                  scale: 0.7,
-                  child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-              Text(
-                "Dense",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        )
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 8.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Transform.scale(
+        //           scale: 0.7,
+        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+        //       Text(
+        //         "Dense",
+        //         style: TextStyle(fontSize: 16),
+        //       ),
+        //     ],
+        //   ),
+        // )
       ],
     );
   }
