@@ -64,3 +64,19 @@ class GetServiceByTechnicianReportEvent extends ReportEvent {
       required this.techFilter,
       required this.currentPage});
 }
+
+class InternetConnectionEvent extends ReportEvent {}
+
+class GetAllTechnicianEvent extends ReportEvent {}
+
+class ExportReportEvent extends ReportEvent {
+  final String downloadUrl;
+  final String downloadPath;
+  final String fileName;
+  final BuildContext context;
+  ExportReportEvent(
+      {required this.downloadPath,
+      required this.downloadUrl,
+      required this.fileName,
+      required this.context});
+}

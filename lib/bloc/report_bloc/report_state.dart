@@ -12,7 +12,7 @@ class ReportInitial extends ReportState {}
 class ReportLoadingState extends ReportState {}
 
 class GetAllInvoiceReportSuccessState extends ReportState {
-  final List<AllInvoiceReportModel> allInvoiceReportModel;
+  final AllInvoiceReportModel allInvoiceReportModel;
   GetAllInvoiceReportSuccessState({required this.allInvoiceReportModel});
 
   @override
@@ -25,7 +25,7 @@ class GetAllInvoiceReportErrorState extends ReportState {
 }
 
 class GetSalesTaxReportSuccessState extends ReportState {
-  final List<SalesTaxReportModel> salesTaxReportModel;
+  final SalesTaxReportModel salesTaxReportModel;
   GetSalesTaxReportSuccessState({required this.salesTaxReportModel});
 
   @override
@@ -38,7 +38,7 @@ class GetSalesTaxReportErrorState extends ReportState {
 }
 
 class GetTimeLogReportSuccessState extends ReportState {
-  final List<TimeLogReportModel> timeLogReportModel;
+  final TimeLogReportModel timeLogReportModel;
   GetTimeLogReportSuccessState({required this.timeLogReportModel});
 
   @override
@@ -51,7 +51,7 @@ class GetTimeLogReportErrorState extends ReportState {
 }
 
 class GetPaymentTypeReportSuccessState extends ReportState {
-  final List<PaymentTypeReportModel> paymentReportModel;
+  final PaymentTypeReportModel paymentReportModel;
   GetPaymentTypeReportSuccessState({required this.paymentReportModel});
 
   @override
@@ -64,7 +64,7 @@ class GetPaymentTypeReportErrorState extends ReportState {
 }
 
 class GetServiceByTechnicianReportSuccessState extends ReportState {
-  final List<ServiceByTechReportModel> serviceByTechReportModel;
+  final ServiceByTechReportModel serviceByTechReportModel;
   GetServiceByTechnicianReportSuccessState(
       {required this.serviceByTechReportModel});
 
@@ -75,4 +75,37 @@ class GetServiceByTechnicianReportSuccessState extends ReportState {
 class GetServiceByTechnicianReportErrorState extends ReportState {
   final String errorMessage;
   GetServiceByTechnicianReportErrorState({required this.errorMessage});
+}
+
+class InternetConnectionSuccessState extends ReportState {}
+
+class InternerConnectionErrorState extends ReportState {}
+
+class GetAllTechnicianState extends ReportState {
+  final TechnicianOnlyModel technicianModel;
+  GetAllTechnicianState({required this.technicianModel});
+
+  @override
+  List<Object> get props => [technicianModel];
+}
+
+class GetAllTechnicianErrorState extends ReportState {
+  final String errorMessage;
+  GetAllTechnicianErrorState({required this.errorMessage});
+}
+
+class ExportReportState extends ReportState {
+  final String message;
+  final DateTime time;
+  ExportReportState({required this.message, required this.time});
+
+  @override
+  List<Object> get props => [message, time];
+}
+
+class ExportReportLoadingState extends ReportState {}
+
+class ExportReportErrorState extends ReportState {
+  final String errorMessage;
+  ExportReportErrorState({required this.errorMessage});
 }

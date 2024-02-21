@@ -1,15 +1,23 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
 import 'package:auto_pilot/Models/sales_tax_report_model.dart';
 import 'package:auto_pilot/Models/service_technician_report_model.dart';
+import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/time_log_report_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
 import 'package:bloc/bloc.dart';
+
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:http/http.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart'
+    as internet;
 
 part 'report_event.dart';
 part 'report_state.dart';
@@ -22,6 +30,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<GetTimeLogReportEvent>(getTimeLogReportBloc);
     on<GetPaymentTypeReportEvent>(getPaymentTypeReportBloc);
     on<GetServiceByTechnicianReportEvent>(getServiceByTechnicianReportBloc);
+    on<InternetConnectionEvent>(internetConnectionBloc);
+    on<GetAllTechnicianEvent>(getAllTechnicianBloc);
+    on<ExportReportEvent>(exportReportBloc);
   }
 
   //Bloc to get all invoice report.
@@ -30,7 +41,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<AllInvoiceReportModel> allInvoiceReportModel;
+      AllInvoiceReportModel allInvoiceReportModel;
 
       final token = await AppUtils.getToken();
 
@@ -62,7 +73,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<SalesTaxReportModel> salesTaxReportModel;
+      SalesTaxReportModel salesTaxReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getSalesTaxReport(
@@ -89,7 +100,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<TimeLogReportModel> timeLogReportModel;
+      TimeLogReportModel timeLogReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getTimeLogReport(
@@ -108,8 +119,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         var decodedBody = json.decode(response.body);
         emit(GetTimeLogReportErrorState(errorMessage: decodedBody['msg']));
       }
-    } catch (e) {
+    } catch (e, s) {
       print(e.toString());
+      print(s);
       emit(GetTimeLogReportErrorState(errorMessage: "Something went wrong"));
     }
   }
@@ -120,7 +132,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<PaymentTypeReportModel> paymentTypeReportModel;
+      PaymentTypeReportModel paymentTypeReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getPaymentTypeReport(
@@ -135,8 +147,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
         var decodedBody = json.decode(response.body);
         emit(GetPaymentTypeReportErrorState(errorMessage: decodedBody['msg']));
       }
-    } catch (e) {
+    } catch (e, s) {
       print(e.toString());
+      print(s);
+
       emit(
           GetPaymentTypeReportErrorState(errorMessage: "Something went wrong"));
     }
@@ -149,7 +163,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     try {
       emit(ReportLoadingState());
       //change nullable with original model class
-      List<ServiceByTechReportModel> serviceByTechReportModel;
+      ServiceByTechReportModel serviceByTechReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getServiceByTechnicianReport(
@@ -175,6 +189,96 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       print(e.toString());
       emit(GetServiceByTechnicianReportErrorState(
           errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to check internet connection
+  Future<void> internetConnectionBloc(
+      InternetConnectionEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      bool result =
+          await internet.InternetConnectionCheckerPlus().hasConnection;
+      if (result) {
+        emit(InternetConnectionSuccessState());
+      } else {
+        emit(InternerConnectionErrorState());
+      }
+    } catch (e) {
+      print(e.toString());
+      emit(InternerConnectionErrorState());
+    }
+  }
+
+  //bloc to get all technicain data
+  getAllTechnicianBloc(
+    GetAllTechnicianEvent event,
+    Emitter<ReportState> emit,
+  ) async {
+    try {
+      emit(ReportLoadingState());
+      TechnicianOnlyModel technicianModel;
+
+      final token = await AppUtils.getToken();
+      Response getTechnicianResponse = await apiRepo.getTechniciansOnly(token);
+      if (getTechnicianResponse.statusCode == 200) {
+        technicianModel =
+            technicianOnlyModelFromJson(getTechnicianResponse.body);
+        emit(GetAllTechnicianState(technicianModel: technicianModel));
+      } else {
+        emit(GetAllTechnicianErrorState(errorMessage: "Something went wrong"));
+      }
+    } catch (e) {
+      print(e.toString());
+      emit(GetAllTechnicianErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to export report
+  Future<void> exportReportBloc(
+      ExportReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ExportReportLoadingState());
+      //change nullable with original model class
+
+      final token = await AppUtils.getToken();
+
+      // dio.Response response = await dio.Dio()
+      //     .download(event.downloadUrl, event.downloadPath + "file.pdf");
+      // if (response.statusCode == 200 || response.statusCode == 201) {
+      //   emit(ExportReportState());
+      // } else {
+      //   emit(ExportReportErrorState(
+      //       errorMessage: "Download Failed.Please try again"));
+      // }
+
+      //You can download a single file
+      if (Platform.isAndroid) {
+        FileDownloader.downloadFile(
+            url: event.downloadUrl,
+            name: "Report", //(optional)
+
+            onDownloadCompleted: (String path) {
+              print('FILE DOWNLOADED TO PATH: $path');
+              // emit(ExportReportState(
+              //     message: "File downloaded to $path", time: DateTime.now()));
+
+              CommonWidgets()
+                  .showDialog(event.context, "File downloaded to $path");
+            },
+            onDownloadError: (String error) {
+              print('DOWNLOAD ERROR: $error');
+              CommonWidgets().showDialog(event.context, "Download Failed");
+              emit(ExportReportErrorState(errorMessage: error));
+            });
+      } else {
+        // function to download file in ios
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(ExportReportErrorState(errorMessage: "Something went wrong"));
     }
   }
 }

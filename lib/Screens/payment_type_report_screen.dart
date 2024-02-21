@@ -16,7 +16,7 @@ class PaymentTypeReportScreen extends StatefulWidget {
 
 class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  final List<PaymentTypeReportModel> paymentTypeReportList = [];
+  PaymentTypeReportModel? paymentTypeReportModel;
   List<String> monthOptions = ["This Month", "Last Month"];
   int _rowsPerPage = 5;
   // final List<DataRow> rows = List.generate(
@@ -37,21 +37,22 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReportBloc()
-        ..add(GetPaymentTypeReportEvent(
-            monthFilter: "", searchQuery: "", currentPage: 1)),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           if (state is GetPaymentTypeReportSuccessState) {
-            paymentTypeReportList.addAll(state.paymentReportModel);
+            paymentTypeReportModel = state.paymentReportModel;
 
-            paymentTypeReportList.forEach((element) {
+            paymentTypeReportModel?.data.totals.forEach((element) {
               rows.add(DataRow(cells: [
-                DataCell(Text(element.paymentType)),
-                DataCell(Text(element.percentOfTotal.toString())),
+                DataCell(Text(element.type)),
+                DataCell(Text(element.percentage.toString())),
                 DataCell(Text(element.total.toString())),
               ]));
             });
+          } else if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetPaymentTypeReportEvent(
+                monthFilter: "", searchQuery: "", currentPage: 1));
           }
           // TODO: implement listener
         },
@@ -108,29 +109,46 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
                   ? Center(
                       child: CupertinoActivityIndicator(),
                     )
-                  : SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 15.0,
-                          left: 24,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              "Payment Types",
-                              style: TextStyle(
-                                  color: AppColors.primaryTitleColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600),
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
                             ),
-                            monthDropdown("Creation"),
-                            searchBar(),
-                            tableWidget()
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay))
                           ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 15.0,
+                              left: 24,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Payment Types",
+                                  style: TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                monthDropdown("Creation"),
+                                searchBar(),
+                                tableWidget()
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
             );
           },
         ),
@@ -285,44 +303,44 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            children: [
-              Text('Rows per page: '),
-              DropdownButton<int>(
-                value: _rowsPerPage,
-                underline: const SizedBox(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _rowsPerPage = newValue!;
-                  });
-                },
-                items: [5, 10, 20, 50]
-                    .map((value) => DropdownMenuItem<int>(
-                          value: value,
-                          child: Text(value.toString()),
-                        ))
-                    .toList(),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Transform.scale(
-                  scale: 0.7,
-                  child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-              Text(
-                "Dense",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        )
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 8.0),
+        //   child: Row(
+        //     children: [
+        //       Text('Rows per page: '),
+        //       DropdownButton<int>(
+        //         value: _rowsPerPage,
+        //         underline: const SizedBox(),
+        //         onChanged: (newValue) {
+        //           setState(() {
+        //             _rowsPerPage = newValue!;
+        //           });
+        //         },
+        //         items: [5, 10, 20, 50]
+        //             .map((value) => DropdownMenuItem<int>(
+        //                   value: value,
+        //                   child: Text(value.toString()),
+        //                 ))
+        //             .toList(),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 8.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Transform.scale(
+        //           scale: 0.7,
+        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+        //       Text(
+        //         "Dense",
+        //         style: TextStyle(fontSize: 16),
+        //       ),
+        //     ],
+        //   ),
+        // )
       ],
     );
   }

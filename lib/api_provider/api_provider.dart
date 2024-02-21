@@ -2458,7 +2458,7 @@ class ApiProvider {
 
       //mock api url
       final url = Uri.parse(
-          'https://65caf767efec34d9ed8674e7.mockapi.io/api/mock/allinvoice_report');
+          'https://run.mocky.io/v3/fcb7770e-ed14-4bfb-8682-6607acb306ce');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2479,7 +2479,7 @@ class ApiProvider {
       //     '${BASE_URL}api/sales_tax_report?start_date=$startDate&end_date=$endDate&client_id=$clientId&page=$page');
       //mock api url
       final url = Uri.parse(
-          'https://65caf767efec34d9ed8674e7.mockapi.io/api/mock/sales_tax_report');
+          'https://run.mocky.io/v3/9eafb7f2-bd2a-45fb-84b6-e81a59dd143f');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2500,7 +2500,7 @@ class ApiProvider {
       //     '${BASE_URL}api/payment_type_report?month=$monthFilter&client_id=$clientId&search=$searchQuery&page=$page');
       //mock url
       final url = Uri.parse(
-          'https://run.mocky.io/v3/05dde70b-bccd-428d-81e9-0442a359d674');
+          'https://run.mocky.io/v3/0c38e7e0-1774-46fa-a61e-9b468be3a5b9');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2523,7 +2523,7 @@ class ApiProvider {
 
       //mock api url
       final url = Uri.parse(
-          'https://run.mocky.io/v3/3475c9fc-de58-4388-9532-35e957e7e051');
+          'https://run.mocky.io/v3/669aa7b0-b377-4a2c-b720-994591e6c57e');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2545,7 +2545,7 @@ class ApiProvider {
       //     '${BASE_URL}api/service_technician_report?month=$monthFilter&tech_filter=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
       //mock api url
       final url = Uri.parse(
-          "https://run.mocky.io/v3/452d88e5-2849-4034-bd29-6cc4353f4998");
+          "https://run.mocky.io/v3/84ef9e71-4038-4e03-9ccc-72046160b368");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {

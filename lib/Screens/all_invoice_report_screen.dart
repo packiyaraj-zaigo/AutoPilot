@@ -2,10 +2,13 @@ import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:auto_pilot/utils/common_widgets.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class AllInvoiceReportScreen extends StatefulWidget {
   AllInvoiceReportScreen({super.key});
@@ -17,7 +20,7 @@ class AllInvoiceReportScreen extends StatefulWidget {
 class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> monthOptions = ["This Month", "Last Month"];
-  List<AllInvoiceReportModel> allInvoiceReportList = [];
+  AllInvoiceReportModel? allInvoiceReportModel;
   int _rowsPerPage = 5;
 
   // final List<DataRow> rows = List.generate(
@@ -43,26 +46,48 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   // );
 
   List<DataRow> rows = [];
+  List<DateTime?> dateRangeList = [
+    DateTime.now(),
+    DateTime.now().add(const Duration(days: 1)),
+  ];
+
+  String startDateStr = "";
+  String endDateStr = "";
+
+  @override
+  void initState() {
+    DateFormat outputFormat = DateFormat('MMM d, yyyy');
+    startDateStr = outputFormat.format(dateRangeList[0]!);
+    endDateStr = outputFormat.format(dateRangeList[1]!);
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => ReportBloc()
-        ..add(GetAllInvoiceReportEvent(
-            monthFilter: "", paidFilter: "", searchQuery: "", currentPage: 1)),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
+          if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add((GetAllInvoiceReportEvent(
+                monthFilter: "",
+                paidFilter: "",
+                searchQuery: "",
+                currentPage: 1)));
+          }
           // TODO: implement listener
 
           if (state is GetAllInvoiceReportSuccessState) {
-            allInvoiceReportList.addAll(state.allInvoiceReportModel);
+            allInvoiceReportModel = state.allInvoiceReportModel;
 
-            allInvoiceReportList.forEach((element) {
+            allInvoiceReportModel?.data.data.forEach((element) {
               rows.add(DataRow(cells: [
-                DataCell(Text(element.firstName)),
-                DataCell(Text(element.vehicle)),
-                DataCell(Text(element.lastName)),
-                DataCell(Text(element.order)),
-                DataCell(Text(element.orderName)),
+                DataCell(Text(element.customerFirstName)),
+                DataCell(Text(element.vehicleName)),
+                DataCell(Text(element.customerLastName)),
+                DataCell(Text(element.orderNumber.toString())),
+                DataCell(Text(element.orderName ?? "")),
                 DataCell(Text(element.paymentDate.toString())),
                 DataCell(Text(element.note)),
                 DataCell(Text(element.paymentType)),
@@ -72,6 +97,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 DataCell(Text(element.paymentAmount.toString())),
               ]));
             });
+          } else if (state is ExportReportState) {
+            print("state here");
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -132,33 +159,193 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                         ),
                       ],
                     )
-                  : SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 15.0,
-                          left: 24,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              "All Invoices",
-                              style: TextStyle(
-                                  color: AppColors.primaryTitleColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600),
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
                             ),
-                            monthDropdown("Invoiced"),
-                            monthDropdown("Fully Paid"),
-                            searchBar(),
-                            tableWidget()
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
                           ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 15.0,
+                              left: 24,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "All Invoices",
+                                  style: TextStyle(
+                                      color: AppColors.primaryTitleColor,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                dateSelectionWidget(),
+                                monthDropdown("Fully Paid"),
+                                searchBar(),
+                                tableWidget(),
+                                //Add storage permission in android manifest.
+                                // exportButtonWidget(context)
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget dateSelectionWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(
+        top: 16.0,
+        right: 24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Invoiced",
+            style: TextStyle(
+                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Container(
+                    alignment: Alignment.centerLeft,
+                    width: MediaQuery.of(context).size.width,
+                    height: 55,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color(0xff919EAB33).withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.07),
+                              spreadRadius: 0,
+                              offset: Offset(0, 4),
+                              blurRadius: 10)
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: Text(
+                        "${startDateStr}- ${endDateStr}",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    )),
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      List<DateTime?> tempDateList = dateRangeList;
+                      return AlertDialog(
+                        insetPadding: EdgeInsets.zero,
+                        content: Container(
+                          height: 400,
+                          width: 300,
+                          child: Column(
+                            children: [
+                              CalendarDatePicker2(
+                                  config: CalendarDatePicker2Config(
+                                    calendarType: CalendarDatePicker2Type.range,
+                                  ),
+                                  value: dateRangeList,
+                                  onValueChanged: (dates) {
+                                    tempDateList = dates;
+                                    print(tempDateList);
+                                  }),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  TextButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          DateFormat outputFormat =
+                                              DateFormat('MMM d, yyyy');
+                                          // dateRangeList[0] = DateTime.parse(
+                                          //     outputFormat
+                                          //         .format(tempDateList[0]!));
+
+                                          // dateRangeList[1] = DateTime.parse(
+                                          //     outputFormat
+                                          //         .format(tempDateList[1]!));
+
+                                          dateRangeList = tempDateList;
+
+                                          startDateStr = outputFormat
+                                              .format(dateRangeList[0]!);
+                                          endDateStr = outputFormat
+                                              .format(dateRangeList[1]!);
+                                        });
+
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Ok")),
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text("Cancel")),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.07),
+                            spreadRadius: 0,
+                            offset: Offset(0, 4),
+                            blurRadius: 10)
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: SvgPicture.asset(
+                            "assets/images/report_calander_icon.svg")),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -342,22 +529,96 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Transform.scale(
-                  scale: 0.7,
-                  child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-              Text(
-                "Dense",
-                style: TextStyle(fontSize: 16),
-              ),
-            ],
-          ),
-        )
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 8.0),
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     children: [
+        //       Transform.scale(
+        //           scale: 0.7,
+        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+        //       Text(
+        //         "Dense",
+        //         style: TextStyle(fontSize: 16),
+        //       ),
+        //     ],
+        //   ),
+        // )
       ],
+    );
+  }
+
+  Widget exportButtonWidget(BuildContext ctx) {
+    String downloadPath = "";
+    return BlocProvider(
+      create: (context) => ReportBloc(),
+      child: BlocListener<ReportBloc, ReportState>(
+        listener: (context, state) {
+          // TODO: implement listener
+          if (state is ExportReportState) {
+            CommonWidgets().showDialog(context, state.message);
+          }
+        },
+        child: BlocBuilder<ReportBloc, ReportState>(
+          builder: (context, state) {
+            return Padding(
+                padding: const EdgeInsets.only(right: 21.0, bottom: 12),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      // context.read<ReportBloc>().add(ExportReportEvent(
+                      //     downloadPath: downloadPath,
+                      //     downloadUrl: downloadUrl,
+                      //     fileName: fileName));
+
+                      // PermissionStatus status = await Permission.storage.request();
+                      // print(status.toString() + "sttaus");
+                      // if (status.isGranted) {
+                      //   var dir =
+                      //       await DownloadsPath.downloadsDirectory().then((value) {
+                      //     downloadPath = value?.path ?? "";
+                      //     print(downloadPath + "pathhhh");
+                      //     context.read<ReportBloc>().add(ExportReportEvent(
+                      //         downloadPath: downloadPath,
+                      //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                      //         fileName: "test"));
+                      //   });
+                      // } else if (status.isDenied) {
+                      //   await Permission.storage.request();
+                      // }
+
+                      ctx.read<ReportBloc>().add(ExportReportEvent(
+                          downloadPath: downloadPath,
+                          downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                          fileName: "test",
+                          context: ctx));
+                    },
+                    style: ElevatedButton.styleFrom(
+                        alignment: Alignment.center,
+                        minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                        backgroundColor: Color(0xffF6F6F6),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                        textStyle: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w500)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.exit_to_app,
+                          color: AppColors.primaryColors,
+                        ),
+                        Text(
+                          " Export",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryColors),
+                        )
+                      ],
+                    )));
+          },
+        ),
+      ),
     );
   }
 }

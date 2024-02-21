@@ -4,34 +4,77 @@
 
 import 'dart:convert';
 
-List<PaymentTypeReportModel> paymentTypeReportModelFromJson(String str) =>
-    List<PaymentTypeReportModel>.from(
-        json.decode(str).map((x) => PaymentTypeReportModel.fromJson(x)));
+PaymentTypeReportModel paymentTypeReportModelFromJson(String str) =>
+    PaymentTypeReportModel.fromJson(json.decode(str));
 
-String paymentTypeReportModelToJson(List<PaymentTypeReportModel> data) =>
-    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
+String paymentTypeReportModelToJson(PaymentTypeReportModel data) =>
+    json.encode(data.toJson());
 
 class PaymentTypeReportModel {
-  String paymentType;
-  int percentOfTotal;
-  double total;
+  Data data;
+  String message;
 
   PaymentTypeReportModel({
-    required this.paymentType,
-    required this.percentOfTotal,
-    required this.total,
+    required this.data,
+    required this.message,
   });
 
   factory PaymentTypeReportModel.fromJson(Map<String, dynamic> json) =>
       PaymentTypeReportModel(
-        paymentType: json["payment_type"],
-        percentOfTotal: json["percent_of_total"],
-        total: json["total"],
+        data: Data.fromJson(json["data"]),
+        message: json["message"],
       );
 
   Map<String, dynamic> toJson() => {
-        "payment_type": paymentType,
-        "percent_of_total": percentOfTotal,
+        "data": data.toJson(),
+        "message": message,
+      };
+}
+
+class Data {
+  String totalPercentage;
+  String totalAmount;
+  List<Total> totals;
+
+  Data({
+    required this.totalPercentage,
+    required this.totalAmount,
+    required this.totals,
+  });
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+        totalPercentage: json["total_percentage"],
+        totalAmount: json["total_amount"],
+        totals: List<Total>.from(json["totals"].map((x) => Total.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "total_percentage": totalPercentage,
+        "total_amount": totalAmount,
+        "totals": List<dynamic>.from(totals.map((x) => x.toJson())),
+      };
+}
+
+class Total {
+  String type;
+  String total;
+  String percentage;
+
+  Total({
+    required this.type,
+    required this.total,
+    required this.percentage,
+  });
+
+  factory Total.fromJson(Map<String, dynamic> json) => Total(
+        type: json["type"],
+        total: json["total"],
+        percentage: json["percentage"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "type": type,
         "total": total,
+        "percentage": percentage,
       };
 }
