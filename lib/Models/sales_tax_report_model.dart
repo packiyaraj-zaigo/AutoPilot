@@ -47,7 +47,6 @@ class Datum {
   String type;
   String taxable;
   String nonTaxable;
-  String taxExempt;
   String discount;
   String total;
 
@@ -55,7 +54,6 @@ class Datum {
     required this.type,
     required this.taxable,
     required this.nonTaxable,
-    required this.taxExempt,
     required this.discount,
     required this.total,
   });
@@ -64,7 +62,6 @@ class Datum {
         type: json["type"],
         taxable: json["taxable"],
         nonTaxable: json["non_taxable"],
-        taxExempt: json["tax_exempt"],
         discount: json["discount"],
         total: json["total"],
       );
@@ -73,7 +70,6 @@ class Datum {
         "type": type,
         "taxable": taxable,
         "non_taxable": nonTaxable,
-        "tax_exempt": taxExempt,
         "discount": discount,
         "total": total,
       };

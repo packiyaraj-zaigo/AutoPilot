@@ -8,12 +8,14 @@ abstract class ReportEvent extends Equatable {
 }
 
 class GetAllInvoiceReportEvent extends ReportEvent {
-  final String monthFilter;
+  final String startDate;
+  final String endDate;
   final String paidFilter;
   final String searchQuery;
   final int currentPage;
   GetAllInvoiceReportEvent(
-      {required this.monthFilter,
+      {required this.startDate,
+      required this.endDate,
       required this.paidFilter,
       required this.searchQuery,
       required this.currentPage});
@@ -54,15 +56,19 @@ class GetPaymentTypeReportEvent extends ReportEvent {
 }
 
 class GetServiceByTechnicianReportEvent extends ReportEvent {
-  final String monthFilter;
+  final String startDate;
+  final String endDate;
   final String techFilter;
   final String searchQuery;
   final int currentPage;
+  final String pagination;
   GetServiceByTechnicianReportEvent(
-      {required this.monthFilter,
+      {required this.startDate,
+      required this.endDate,
       required this.searchQuery,
       required this.techFilter,
-      required this.currentPage});
+      required this.currentPage,
+      required this.pagination});
 }
 
 class InternetConnectionEvent extends ReportEvent {}

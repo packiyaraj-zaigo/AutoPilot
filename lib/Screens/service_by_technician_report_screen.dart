@@ -8,7 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
-import 'package:auto_pilot/Models/technician_only_model.dart' as techModel;
+import 'package:auto_pilot/Models/report_technician_list_model.dart'
+    as techModel;
 
 class ServicesByTechnicianReportScreen extends StatefulWidget {
   ServicesByTechnicianReportScreen({super.key});
@@ -50,12 +51,15 @@ class _ServicesByTechnicianReportScreen
 
   String startDateStr = "";
   String endDateStr = "";
+  String startDateToServer = "";
+  String endDateToServer = '';
+  List<Datum> reportList = [];
 
   @override
   void initState() {
-    DateFormat outputFormat = DateFormat('MMM d, yyyy');
-    startDateStr = outputFormat.format(dateRangeList[0]!);
-    endDateStr = outputFormat.format(dateRangeList[1]!);
+    // DateFormat outputFormat = DateFormat('MMM d, yyyy');
+    // startDateStr = outputFormat.format(dateRangeList[0]!);
+    // endDateStr = outputFormat.format(dateRangeList[1]!);
     // TODO: implement initState
     super.initState();
   }
@@ -69,24 +73,34 @@ class _ServicesByTechnicianReportScreen
           // TODO: implement listener
           if (state is GetServiceByTechnicianReportSuccessState) {
             serviceByTechReporModel = state.serviceByTechReportModel;
+            reportList.clear();
+            rows.clear();
+            reportList.addAll(state.serviceByTechReportModel.data.data);
 
-            serviceByTechReporModel?.data.data.forEach((element) {
+            reportList.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.techicianName)),
                 DataCell(Text(element.date.toString())),
                 DataCell(Text(element.order.toString())),
                 DataCell(Text(element.serviceName)),
-                DataCell(Text(element.invoicedHours.toString())),
+                // DataCell(Text(element.invoicedHours.toString())),
               ]));
             });
           } else if (state is InternetConnectionSuccessState) {
             context.read<ReportBloc>().add(GetServiceByTechnicianReportEvent(
-                monthFilter: "",
+                startDate: "",
+                endDate: "",
                 searchQuery: "",
                 techFilter: "",
-                currentPage: 1));
+                currentPage: 1,
+                pagination: ""));
 
             context.read<ReportBloc>().add(GetAllTechnicianEvent());
+          } else if (state is GetAllTechnicianState) {
+            technicianData.clear();
+            technicianData.addAll(state.technicianModel.data);
+
+            print(technicianData);
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -175,10 +189,11 @@ class _ServicesByTechnicianReportScreen
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                dateSelectionWidget(),
-                                technicianDropdown("Technician"),
+                                dateSelectionWidget(context),
+                                technicianDropdown(
+                                    "Technician", state, context),
                                 searchBar(),
-                                tableWidget()
+                                tableWidget(context, state)
                               ],
                             ),
                           ),
@@ -297,91 +312,168 @@ class _ServicesByTechnicianReportScreen
     );
   }
 
-  Widget tableWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 6,
-                      offset: Offset(10, 16)),
-                ]),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: DataTable(
-                columns: [
-                  // DataColumn(label: Text('Item')),
-                  // DataColumn(label: Text('Description')),
-                  // DataColumn(label: Text('Test')),
-                  // DataColumn(label: Text('Test 2')),
+  Widget tableWidget(BuildContext ctx, state) {
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: reportList.isEmpty
+          ? Container(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: Center(
+                child: Text("No Report Found"),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: state is TableLoadingState
+                      ? Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 200,
+                          child: Center(
+                            child: CupertinoActivityIndicator(),
+                          ),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 6,
+                                    offset: Offset(10, 16)),
+                              ]),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: DataTable(
+                              columns: [
+                                // DataColumn(label: Text('Item')),
+                                // DataColumn(label: Text('Description')),
+                                // DataColumn(label: Text('Test')),
+                                // DataColumn(label: Text('Test 2')),
 
-                  DataColumn(label: Text('Tech')),
-                  DataColumn(label: Text('Date')),
-                  DataColumn(label: Text('Order')),
-                  DataColumn(label: Text('Service')),
-                  DataColumn(label: Text('Invoiced Hours')),
-                ],
-                rows: rows,
-                columnSpacing: 80,
-                headingRowColor:
-                    MaterialStateProperty.all(const Color(0xffCEDEFF)),
-                headingRowHeight: 50,
-              ),
+                                DataColumn(label: Text('Tech')),
+                                DataColumn(label: Text('Date')),
+                                DataColumn(label: Text('Order')),
+                                DataColumn(label: Text('Service')),
+                                //  DataColumn(label: Text('Invoiced Hours')),
+                              ],
+                              rows: rows,
+                              columnSpacing: 80,
+                              headingRowColor: MaterialStateProperty.all(
+                                  const Color(0xffCEDEFF)),
+                              headingRowHeight: 50,
+                            ),
+                          ),
+                        ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Text('Rows per page: '),
+                          DropdownButton<int>(
+                            value: _rowsPerPage,
+                            underline: const SizedBox(),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _rowsPerPage = newValue!;
+                              });
+                            },
+                            items: [5, 10, 20, 50]
+                                .map((value) => DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(value.toString()),
+                                    ))
+                                .toList(),
+                          ),
+                        ],
+                      ),
+                      Transform.scale(
+                        scale: 0.7,
+                        child: Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  if (serviceByTechReporModel
+                                          ?.data.prevPageUrl !=
+                                      null) {
+                                    ctx.read<ReportBloc>().add(
+                                        GetServiceByTechnicianReportEvent(
+                                            startDate: startDateToServer,
+                                            endDate: endDateToServer,
+                                            searchQuery: "",
+                                            techFilter: technicianId,
+                                            currentPage: 1,
+                                            pagination: "prev"));
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new_outlined,
+                                  color: serviceByTechReporModel
+                                              ?.data.prevPageUrl !=
+                                          null
+                                      ? Colors.black
+                                      : Colors.grey.shade300,
+                                )),
+                            IconButton(
+                                onPressed: () {
+                                  if (serviceByTechReporModel
+                                          ?.data.nextPageUrl !=
+                                      null) {
+                                    ctx.read<ReportBloc>().add(
+                                        GetServiceByTechnicianReportEvent(
+                                            startDate: startDateToServer,
+                                            endDate: endDateToServer,
+                                            searchQuery: "",
+                                            techFilter: technicianId,
+                                            currentPage: 1,
+                                            pagination: "next"));
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  color: serviceByTechReporModel
+                                              ?.data.nextPageUrl !=
+                                          null
+                                      ? Colors.black
+                                      : Colors.grey.shade300,
+                                ))
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 8.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: [
+                //       Transform.scale(
+                //           scale: 0.7,
+                //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+                //       Text(
+                //         "Dense",
+                //         style: TextStyle(fontSize: 16),
+                //       ),
+                //     ],
+                //   ),
+                // )
+              ],
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            children: [
-              Text('Rows per page: '),
-              DropdownButton<int>(
-                value: _rowsPerPage,
-                underline: const SizedBox(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _rowsPerPage = newValue!;
-                  });
-                },
-                items: [5, 10, 20, 50]
-                    .map((value) => DropdownMenuItem<int>(
-                          value: value,
-                          child: Text(value.toString()),
-                        ))
-                    .toList(),
-              ),
-            ],
-          ),
-        ),
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 8.0),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     children: [
-        //       Transform.scale(
-        //           scale: 0.7,
-        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-        //       Text(
-        //         "Dense",
-        //         style: TextStyle(fontSize: 16),
-        //       ),
-        //     ],
-        //   ),
-        // )
-      ],
     );
   }
 
-  Widget dateSelectionWidget() {
+  Widget dateSelectionWidget(BuildContext ctx) {
     return Padding(
       padding: const EdgeInsets.only(
         top: 16.0,
@@ -404,7 +496,7 @@ class _ServicesByTechnicianReportScreen
               Flexible(
                 child: Container(
                     alignment: Alignment.centerLeft,
-                    width: MediaQuery.of(context).size.width,
+                    width: MediaQuery.of(ctx).size.width,
                     height: 55,
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -420,9 +512,36 @@ class _ServicesByTechnicianReportScreen
                         ]),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12.0),
-                      child: Text(
-                        "${startDateStr}- ${endDateStr}",
-                        style: TextStyle(fontSize: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            startDateStr != "" && endDateStr != ""
+                                ? "${startDateStr}- ${endDateStr}"
+                                : "Select Date Range",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          startDateStr != "" && endDateStr != ""
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      startDateStr = "";
+                                      endDateStr = "";
+                                      startDateToServer = "";
+                                      endDateToServer = "";
+                                    });
+                                    ctx.read<ReportBloc>().add(
+                                        GetServiceByTechnicianReportEvent(
+                                            startDate: "",
+                                            endDate: "",
+                                            searchQuery: "",
+                                            techFilter: technicianId,
+                                            currentPage: 1,
+                                            pagination: ""));
+                                  },
+                                  icon: Icon(Icons.close))
+                              : const SizedBox()
+                        ],
                       ),
                     )),
               ),
@@ -435,57 +554,81 @@ class _ServicesByTechnicianReportScreen
                     context: context,
                     builder: (context) {
                       List<DateTime?> tempDateList = dateRangeList;
-                      return AlertDialog(
-                        insetPadding: EdgeInsets.zero,
-                        content: Container(
-                          height: 400,
-                          width: 300,
-                          child: Column(
-                            children: [
-                              CalendarDatePicker2(
-                                  config: CalendarDatePicker2Config(
-                                    calendarType: CalendarDatePicker2Type.range,
-                                  ),
-                                  value: dateRangeList,
-                                  onValueChanged: (dates) {
-                                    tempDateList = dates;
-                                    print(tempDateList);
-                                  }),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          DateFormat outputFormat =
-                                              DateFormat('MMM d, yyyy');
-                                          // dateRangeList[0] = DateTime.parse(
-                                          //     outputFormat
-                                          //         .format(tempDateList[0]!));
+                      return BlocProvider.value(
+                        value: BlocProvider.of<ReportBloc>(ctx),
+                        child: AlertDialog(
+                          insetPadding: EdgeInsets.zero,
+                          content: Container(
+                            height: 400,
+                            width: 300,
+                            child: Column(
+                              children: [
+                                CalendarDatePicker2(
+                                    config: CalendarDatePicker2Config(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                    value: dateRangeList,
+                                    onValueChanged: (dates) {
+                                      tempDateList = dates;
+                                      print(tempDateList);
+                                    }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            DateFormat outputFormat =
+                                                DateFormat('MMM d, yyyy');
+                                            DateFormat serverFormat =
+                                                DateFormat('yyyy-MM-dd');
 
-                                          // dateRangeList[1] = DateTime.parse(
-                                          //     outputFormat
-                                          //         .format(tempDateList[1]!));
+                                            // dateRangeList[0] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[0]!));
 
-                                          dateRangeList = tempDateList;
+                                            // dateRangeList[1] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[1]!));
 
-                                          startDateStr = outputFormat
-                                              .format(dateRangeList[0]!);
-                                          endDateStr = outputFormat
-                                              .format(dateRangeList[1]!);
-                                        });
+                                            dateRangeList = tempDateList;
 
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Ok")),
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Cancel")),
-                                ],
-                              )
-                            ],
+                                            startDateStr = outputFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateStr = outputFormat
+                                                .format(dateRangeList[1]!);
+
+                                            startDateToServer = serverFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateToServer = serverFormat
+                                                .format(dateRangeList[1]!);
+                                          });
+
+                                          ctx.read<ReportBloc>()
+                                            ..currentPage = 1
+                                            ..add(
+                                                GetServiceByTechnicianReportEvent(
+                                                    startDate:
+                                                        startDateToServer,
+                                                    endDate: endDateToServer,
+                                                    searchQuery: "",
+                                                    techFilter: "",
+                                                    currentPage: 1,
+                                                    pagination: ""));
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Ok")),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel")),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -522,7 +665,7 @@ class _ServicesByTechnicianReportScreen
     );
   }
 
-  technicianDropdown(String label) {
+  technicianDropdown(String label, state, BuildContext ctx) {
     return Padding(
       padding: const EdgeInsets.only(top: 16.0, right: 24),
       child: Column(
@@ -537,7 +680,7 @@ class _ServicesByTechnicianReportScreen
             height: 5,
           ),
           Container(
-              width: MediaQuery.of(context).size.width,
+              width: MediaQuery.of(ctx).size.width,
               height: 55,
               decoration: BoxDecoration(
                   color: Colors.white,
@@ -556,7 +699,7 @@ class _ServicesByTechnicianReportScreen
                   showModalBottomSheet(
                     context: context,
                     builder: (context) {
-                      return technicianBottomSheet();
+                      return technicianBottomSheet(state, ctx);
                     },
                   );
                 },
@@ -567,117 +710,149 @@ class _ServicesByTechnicianReportScreen
                     contentPadding:
                         EdgeInsets.only(left: 12, right: 12, top: 0, bottom: 2),
                     hintText: "Technician",
-                    suffix: Icon(
-                      Icons.arrow_drop_down_sharp,
-                      color: Colors.black54,
-                    )),
+                    suffix: technicianId != "" &&
+                            technicianController.text != ""
+                        ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                technicianController.text = "";
+                                technicianId = "";
+                              });
+                              ctx.read<ReportBloc>()
+                                ..currentPage = 1
+                                ..add(GetServiceByTechnicianReportEvent(
+                                    startDate: startDateToServer,
+                                    endDate: endDateToServer,
+                                    searchQuery: "",
+                                    techFilter: "",
+                                    currentPage: 1,
+                                    pagination: ""));
+                            },
+                            child: SizedBox(
+                                height: 56,
+                                width: 20,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.close),
+                                  ],
+                                )),
+                          )
+                        : const SizedBox()),
               )),
         ],
       ),
     );
   }
 
-  Widget technicianBottomSheet() {
-    return BlocProvider(
-      create: (context) => ReportBloc()..add(GetAllTechnicianEvent()),
-      child: BlocListener<ReportBloc, ReportState>(
-        listener: (context, state) {
-          if (state is GetAllTechnicianState) {
-            technicianData.clear();
-            technicianData.addAll(state.technicianModel.data);
+  Widget technicianBottomSheet(state, ctx) {
+    // return BlocProvider(
+    //   create: (context) => ReportBloc()..add(GetAllTechnicianEvent()),
+    //   child: BlocListener<ReportBloc, ReportState>(
+    //     listener: (context, state) {
+    //       if (state is GetAllTechnicianState) {
+    //         technicianData.clear();
+    //         technicianData.addAll(state.technicianModel.data);
 
-            print(technicianData);
-          }
-          // TODO: implement listener
-        },
-        child: BlocBuilder<ReportBloc, ReportState>(
-          builder: (context, state) {
-            return Container(
-              height: MediaQuery.of(context).size.height / 2,
-              width: MediaQuery.of(context).size.width,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12), color: Colors.white),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: state is ReportLoadingState
-                    ? const Center(
-                        child: CupertinoActivityIndicator(),
-                      )
-                    : technicianData.isNotEmpty
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Technician",
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.primaryTitleColor),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0),
-                                child: LimitedBox(
-                                  maxHeight:
-                                      MediaQuery.of(context).size.height / 2 -
-                                          90,
-                                  child: ListView.builder(
-                                    itemBuilder: (context, index) {
-                                      return Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 12.0),
-                                        child: GestureDetector(
-                                          onTap: () {
-                                            print("heyy");
+    //         print(technicianData);
+    //       }
+    //       // TODO: implement listener
+    //     },
+    //     child: BlocBuilder<ReportBloc, ReportState>(
+    //       builder: (context, state) {
+    //         return
+    //       },
+    //     ),
+    //   ),
+    // );
 
-                                            technicianController
-                                                .text = technicianData[index]
-                                                    .firstName +
-                                                " " +
-                                                technicianData[index].lastName;
-                                            technicianId = technicianData[index]
-                                                .id
-                                                .toString();
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Container(
+        height: MediaQuery.of(ctx).size.height / 2,
+        width: MediaQuery.of(ctx).size.width,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12), color: Colors.white),
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: state is ReportLoadingState
+              ? const Center(
+                  child: CupertinoActivityIndicator(),
+                )
+              : technicianData.isNotEmpty
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Technician",
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.primaryTitleColor),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: LimitedBox(
+                            maxHeight:
+                                MediaQuery.of(context).size.height / 2 - 90,
+                            child: ListView.builder(
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 12.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      print("heyy");
 
-                                            print(technicianId + "techhh iddd");
+                                      technicianController.text =
+                                          technicianData[index].firstName +
+                                              " " +
+                                              technicianData[index].lastName;
+                                      technicianId =
+                                          technicianData[index].id.toString();
 
-                                            Navigator.pop(context);
-                                          },
-                                          child: Container(
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                                color: Colors.grey[100],
-                                                borderRadius:
-                                                    BorderRadius.circular(8)),
-                                            width: MediaQuery.of(context)
-                                                .size
-                                                .width,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
-                                              child: Text(
-                                                "${technicianData[index].firstName} ${technicianData[index].lastName}",
-                                                style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
+                                      print(technicianId + "techhh iddd");
+
+                                      context.read<ReportBloc>()
+                                        ..currentPage = 1
+                                        ..add(GetServiceByTechnicianReportEvent(
+                                            searchQuery: "",
+                                            startDate: "",
+                                            endDate: "",
+                                            techFilter: technicianId,
+                                            currentPage: 1,
+                                            pagination: ""));
+
+                                      Navigator.pop(context);
                                     },
-                                    itemCount: technicianData.length,
+                                    child: Container(
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[100],
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      width: MediaQuery.of(context).size.width,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Text(
+                                          "${technicianData[index].firstName} ${technicianData[index].lastName}",
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              )
-                            ],
-                          )
-                        : const Center(
-                            child: Text("No Technician Found!"),
+                                );
+                              },
+                              itemCount: technicianData.length,
+                            ),
                           ),
-              ),
-            );
-          },
+                        )
+                      ],
+                    )
+                  : const Center(
+                      child: Text("No Technician Found!"),
+                    ),
         ),
       ),
     );
