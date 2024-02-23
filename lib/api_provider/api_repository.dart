@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:auto_pilot/Models/appointment_create_model.dart';
 import 'package:auto_pilot/Models/canned_service_create.dart';
@@ -651,52 +652,46 @@ class ApiRepository {
   ///////////////////////////////////////////////////////////
   ///Report Module
 
-  Future<dynamic> getAllinvoiceReport(String token, String startDate,
-      String endDate, String paidFileter, int page, String searchQuery) {
+  Future<dynamic> getAllinvoiceReport(
+      String token,
+      String startDate,
+      String endDate,
+      String paidFileter,
+      int page,
+      String searchQuery,
+      String exportType) {
     return apiProvider.getAllInvoiceReport(
-        token, startDate, endDate, paidFileter, page, searchQuery);
+        token, startDate, endDate, paidFileter, page, searchQuery, exportType);
   }
 
-  Future<dynamic> getSalesTaxReport(
-    String token,
-    String startDate,
-    String endDate,
-    int page,
-  ) {
-    return apiProvider.getSalesTaxReport(token, startDate, endDate, page);
+  Future<dynamic> getSalesTaxReport(String token, String startDate,
+      String endDate, int page, String exportType) {
+    return apiProvider.getSalesTaxReport(
+        token, startDate, endDate, page, exportType);
   }
 
-  Future<dynamic> getPaymentTypeReport(
-    String token,
-    String monthFilter,
-    String searchQuery,
-    int page,
-  ) {
+  Future<dynamic> getPaymentTypeReport(String token, String typeFilter,
+      String searchQuery, int page, String exportType) {
     return apiProvider.getPaymentTypeReport(
-        token, monthFilter, searchQuery, page);
+        token, typeFilter, searchQuery, page, exportType);
   }
 
-  Future<dynamic> getTimeLogReport(
-    String token,
-    String monthFilter,
-    String techFilter,
-    String searchQuery,
-    int page,
-  ) {
+  Future<dynamic> getTimeLogReport(String token, String monthFilter,
+      String techFilter, String searchQuery, int page, String exportType) {
     return apiProvider.getTimeLogReport(
-        token, monthFilter, techFilter, searchQuery, page);
+        token, monthFilter, techFilter, searchQuery, page, exportType);
   }
 
   Future<dynamic> getServiceByTechnicianReport(
-    String token,
-    String startDate,
-    String endDate,
-    String searchQuery,
-    String techFilter,
-    int page,
-  ) {
+      String token,
+      String startDate,
+      String endDate,
+      String searchQuery,
+      String techFilter,
+      int page,
+      String exportType) {
     return apiProvider.getServiceByTechnicianReport(
-        token, startDate, endDate, searchQuery, techFilter, page);
+        token, startDate, endDate, searchQuery, techFilter, page, exportType);
   }
 
   Future<dynamic> getReportTechnicianList(String token) {

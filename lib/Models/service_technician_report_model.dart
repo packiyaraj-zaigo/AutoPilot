@@ -32,20 +32,40 @@ class ServiceByTechReportModel {
 }
 
 class Data {
+  Paginator paginator;
+  Range range;
+
+  Data({
+    required this.paginator,
+    required this.range,
+  });
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+        paginator: Paginator.fromJson(json["paginator"]),
+        range: Range.fromJson(json["range"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "paginator": paginator.toJson(),
+        "range": range.toJson(),
+      };
+}
+
+class Paginator {
   int currentPage;
   List<Datum> data;
   String? firstPageUrl;
   int? from;
   int? lastPage;
   String? lastPageUrl;
-  dynamic nextPageUrl;
+  String? nextPageUrl;
   String? path;
   int? perPage;
   dynamic prevPageUrl;
   int? to;
-  int total;
+  int? total;
 
-  Data({
+  Paginator({
     required this.currentPage,
     required this.data,
     required this.firstPageUrl,
@@ -60,7 +80,7 @@ class Data {
     required this.total,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory Paginator.fromJson(Map<String, dynamic> json) => Paginator(
         currentPage: json["current_page"],
         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
         firstPageUrl: json["first_page_url"],
@@ -112,9 +132,61 @@ class Datum {
       );
 
   Map<String, dynamic> toJson() => {
-        "techician_name": techicianName,
-        "date": date,
+        "techician_name": techicianNameValues.reverse[techicianName],
+        "date": dateValues.reverse[date],
         "order": order,
         "service_name": serviceName,
       };
+}
+
+enum Date { THE_12022024, THE_15022024, THE_22022024 }
+
+final dateValues = EnumValues({
+  "12/02/2024": Date.THE_12022024,
+  "15/02/2024": Date.THE_15022024,
+  "22/02/2024": Date.THE_22022024
+});
+
+enum TechicianName { EMPTY, EMP_ONE, TEST_EMP }
+
+final techicianNameValues = EnumValues({
+  "-": TechicianName.EMPTY,
+  "emp one": TechicianName.EMP_ONE,
+  "test emp": TechicianName.TEST_EMP
+});
+
+class Range {
+  int from;
+  int to;
+  int total;
+
+  Range({
+    required this.from,
+    required this.to,
+    required this.total,
+  });
+
+  factory Range.fromJson(Map<String, dynamic> json) => Range(
+        from: json["from"],
+        to: json["to"],
+        total: json["total"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "from": from,
+        "to": to,
+        "total": total,
+      };
+}
+
+class EnumValues<T> {
+  Map<String, T> map;
+  late Map<T, String> reverseMap;
+
+  EnumValues(this.map);
+
+  Map<T, String> get reverse {
+    reverseMap = map.map((k, v) => MapEntry(v, k));
+    return reverseMap;
+  }
 }

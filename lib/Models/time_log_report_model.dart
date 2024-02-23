@@ -13,13 +13,11 @@ String timeLogReportModelToJson(TimeLogReportModel data) =>
 class TimeLogReportModel {
   Data data;
   String hoursTracked;
-  String averageHours;
   String message;
 
   TimeLogReportModel({
     required this.data,
     required this.hoursTracked,
-    required this.averageHours,
     required this.message,
   });
 
@@ -27,33 +25,51 @@ class TimeLogReportModel {
       TimeLogReportModel(
         data: Data.fromJson(json["data"]),
         hoursTracked: json["hours_tracked"],
-        averageHours: json["average_hours"],
         message: json["message"],
       );
 
   Map<String, dynamic> toJson() => {
         "data": data.toJson(),
         "hours_tracked": hoursTracked,
-        "average_hours": averageHours,
         "message": message,
       };
 }
 
 class Data {
-  int currentPage;
-  List<Datum> data;
-  String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
-  String nextPageUrl;
-  String path;
-  int perPage;
-  dynamic prevPageUrl;
-  int to;
-  int total;
+  Paginator paginator;
+  Range range;
 
   Data({
+    required this.paginator,
+    required this.range,
+  });
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+        paginator: Paginator.fromJson(json["paginator"]),
+        range: Range.fromJson(json["range"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "paginator": paginator.toJson(),
+        "range": range.toJson(),
+      };
+}
+
+class Paginator {
+  int currentPage;
+  List<Datum> data;
+  String? firstPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
+  dynamic nextPageUrl;
+  String? path;
+  int? perPage;
+  dynamic prevPageUrl;
+  int? to;
+  int? total;
+
+  Paginator({
     required this.currentPage,
     required this.data,
     required this.firstPageUrl,
@@ -68,7 +84,7 @@ class Data {
     required this.total,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory Paginator.fromJson(Map<String, dynamic> json) => Paginator(
         currentPage: json["current_page"],
         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
         firstPageUrl: json["first_page_url"],
@@ -100,114 +116,81 @@ class Data {
 }
 
 class Datum {
-  String entry;
-  String type;
-  int techicianId;
-  Techician techician;
-  FirstName firstName;
-  LastName lastName;
-  VehicleName vehicleName;
-  String fndEndDate;
-  Activity activityType;
-  Activity activityName;
+  int? clientId;
+  String techician;
+  String firstName;
+  String lastName;
+  String vehicleName;
+  String activityType;
+  String activityName;
   String note;
   String techRate;
   String duration;
   String total;
-  DateTime createdAt;
 
   Datum({
-    required this.entry,
-    required this.type,
-    required this.techicianId,
+    required this.clientId,
     required this.techician,
     required this.firstName,
     required this.lastName,
     required this.vehicleName,
-    required this.fndEndDate,
     required this.activityType,
     required this.activityName,
     required this.note,
     required this.techRate,
     required this.duration,
     required this.total,
-    required this.createdAt,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        entry: json["entry"],
-        type: json["type"],
-        techicianId: json["techician_id"],
-        techician: techicianValues.map[json["techician"]]!,
-        firstName: firstNameValues.map[json["first_name"]]!,
-        lastName: lastNameValues.map[json["last_name"]]!,
-        vehicleName: vehicleNameValues.map[json["vehicle_name"]]!,
-        fndEndDate: json["fnd_end_date"],
-        activityType: activityValues.map[json["activity_type"]]!,
-        activityName: activityValues.map[json["activity_name"]]!,
+        clientId: json["client_id"],
+        techician: json["techician"],
+        firstName: json["first_name"],
+        lastName: json["last_name"],
+        vehicleName: json["vehicle_name"],
+        activityType: json["activity_type"],
+        activityName: json["activity_name"],
         note: json["note"],
         techRate: json["tech_rate"],
         duration: json["duration"],
         total: json["total"],
-        createdAt: DateTime.parse(json["created_at"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "entry": entry,
-        "type": type,
-        "techician_id": techicianId,
-        "techician": techicianValues.reverse[techician],
-        "first_name": firstNameValues.reverse[firstName],
-        "last_name": lastNameValues.reverse[lastName],
-        "vehicle_name": vehicleNameValues.reverse[vehicleName],
-        "fnd_end_date": fndEndDate,
-        "activity_type": activityValues.reverse[activityType],
-        "activity_name": activityValues.reverse[activityName],
+        "client_id": clientId,
+        "techician": techician,
+        "first_name": firstName,
+        "last_name": lastName,
+        "vehicle_name": vehicleName,
+        "activity_type": activityType,
+        "activity_name": activityName,
         "note": note,
         "tech_rate": techRate,
         "duration": duration,
         "total": total,
-        "created_at": createdAt.toIso8601String(),
       };
 }
 
-enum Activity { ORDER }
+class Range {
+  int from;
+  int to;
+  int total;
 
-final activityValues = EnumValues({"Order": Activity.ORDER});
+  Range({
+    required this.from,
+    required this.to,
+    required this.total,
+  });
 
-enum FirstName { ADAM, EMPTY, SANTU }
+  factory Range.fromJson(Map<String, dynamic> json) => Range(
+        from: json["from"],
+        to: json["to"],
+        total: json["total"],
+      );
 
-final firstNameValues = EnumValues(
-    {"Adam": FirstName.ADAM, "": FirstName.EMPTY, "Santu": FirstName.SANTU});
-
-enum LastName { EMPTY, JONES, SAHA_123 }
-
-final lastNameValues = EnumValues({
-  "": LastName.EMPTY,
-  "Jones": LastName.JONES,
-  "Saha 123": LastName.SAHA_123
-});
-
-enum Techician { SANTU_SAHA_SS }
-
-final techicianValues = EnumValues({"Santu Saha ss": Techician.SANTU_SAHA_SS});
-
-enum VehicleName { FFFF, HONDA, HUNDAI }
-
-final vehicleNameValues = EnumValues({
-  "Ffff": VehicleName.FFFF,
-  "Honda": VehicleName.HONDA,
-  "Hundai": VehicleName.HUNDAI
-});
-
-class EnumValues<T> {
-  Map<String, T> map;
-  late Map<T, String> reverseMap;
-
-  EnumValues(this.map);
-
-  Map<T, String> get reverse {
-    reverseMap = map.map((k, v) => MapEntry(v, k));
-    return reverseMap;
-  }
+  Map<String, dynamic> toJson() => {
+        "from": from,
+        "to": to,
+        "total": total,
+      };
 }

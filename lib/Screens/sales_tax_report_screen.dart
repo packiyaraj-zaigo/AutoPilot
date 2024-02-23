@@ -48,9 +48,9 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
 
   @override
   void initState() {
-    DateFormat outputFormat = DateFormat('MMM d, yyyy');
-    startDateStr = outputFormat.format(dateRangeList[0]!);
-    endDateStr = outputFormat.format(dateRangeList[1]!);
+    // DateFormat outputFormat = DateFormat('MMM d, yyyy');
+    // startDateStr = outputFormat.format(dateRangeList[0]!);
+    // endDateStr = outputFormat.format(dateRangeList[1]!);
     // TODO: implement initState
     super.initState();
   }
@@ -81,14 +81,27 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
           } else if (state is InternetConnectionSuccessState) {
             context.read<ReportBloc>().add(
                   GetSalesTaxReportEvent(
-                      startDate: "", endDate: "", currentPage: 1),
+                      startDate: "",
+                      endDate: "",
+                      currentPage: 1,
+                      exportType: ""),
                 );
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "SalesTaxReport",
+                downloadUrl: state.link,
+                fileName: "SalesTaxReport",
+                context: context));
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
+              bottomNavigationBar: Padding(
+                padding: const EdgeInsets.only(left: 24.0),
+                child: exportButtonWidget(context),
+              ),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -181,7 +194,18 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                                     salesTaxReportModel?.nonTaxableTotal
                                             .toString() ??
                                         ""),
-                                tableWidget()
+                                state is GetSalesTaxReportErrorState
+                                    ? Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 300,
+                                            child: Center(
+                                              child: Text(state.errorMessage),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : tableWidget(),
                               ],
                             ),
                           ),
@@ -190,6 +214,75 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
           },
         ),
       ),
+    );
+  }
+
+  Widget exportButtonWidget(BuildContext ctx) {
+    String downloadPath = "";
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Padding(
+          padding: const EdgeInsets.only(right: 21.0, bottom: 12),
+          child: ElevatedButton(
+              onPressed: () async {
+                // context.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: downloadUrl,
+                //     fileName: fileName));
+
+                // PermissionStatus status = await Permission.storage.request();
+                // print(status.toString() + "sttaus");
+                // if (status.isGranted) {
+                //   var dir =
+                //       await DownloadsPath.downloadsDirectory().then((value) {
+                //     downloadPath = value?.path ?? "";
+                //     print(downloadPath + "pathhhh");
+                //     context.read<ReportBloc>().add(ExportReportEvent(
+                //         downloadPath: downloadPath,
+                //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //         fileName: "test"));
+                //   });
+                // } else if (status.isDenied) {
+                //   await Permission.storage.request();
+                // }
+
+                // ctx.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //     fileName: "test",
+                //     context: ctx));
+
+                ctx.read<ReportBloc>().add(GetSalesTaxReportEvent(
+                    startDate: startDateToServer,
+                    endDate: endDateToServer,
+                    currentPage: 1,
+                    exportType: "excel"));
+              },
+              style: ElevatedButton.styleFrom(
+                  elevation: 0.6,
+                  alignment: Alignment.center,
+                  minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  backgroundColor: Color(0xffF6F6F6),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: AppColors.primaryColors,
+                  ),
+                  Text(
+                    " Export",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColors),
+                  )
+                ],
+              ))),
     );
   }
 
@@ -255,7 +348,8 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                                       ..add(GetSalesTaxReportEvent(
                                           startDate: startDateToServer,
                                           endDate: endDateToServer,
-                                          currentPage: 1));
+                                          currentPage: 1,
+                                          exportType: ""));
                                   },
                                   icon: Icon(Icons.close))
                               : const SizedBox()
@@ -328,7 +422,8 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                                             ..add(GetSalesTaxReportEvent(
                                                 startDate: startDateToServer,
                                                 endDate: endDateToServer,
-                                                currentPage: 1));
+                                                currentPage: 1,
+                                                exportType: ""));
 
                                           Navigator.pop(context);
                                         },

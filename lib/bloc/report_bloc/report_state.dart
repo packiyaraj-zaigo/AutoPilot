@@ -111,3 +111,12 @@ class ExportReportErrorState extends ReportState {
 }
 
 class TableLoadingState extends ReportState {}
+
+class GetExportLinkState extends ReportState {
+  final String link;
+  GetExportLinkState({required this.link});
+}
+
+class GetExportLinkLoadingState extends ReportState {}
+
+class GetExportLinkErrorState extends ReportState {}

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
@@ -19,6 +20,7 @@ import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:http/http.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart'
     as internet;
+import 'package:url_launcher/url_launcher.dart';
 
 part 'report_event.dart';
 part 'report_state.dart';
@@ -44,7 +46,11 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       GetAllInvoiceReportEvent event, Emitter<ReportState> emit) async {
     try {
       if (currentPage == 1) {
-        emit(ReportLoadingState());
+        if (event.exportType == "") {
+          emit(ReportLoadingState());
+        } else {
+          emit(GetExportLinkLoadingState());
+        }
       } else {
         emit(TableLoadingState());
       }
@@ -59,32 +65,40 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.endDate,
           event.paidFilter,
           currentPage,
-          event.searchQuery);
+          event.searchQuery,
+          event.exportType);
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
-        allInvoiceReportModel = allInvoiceReportModelFromJson(response.body);
+        ///
+        if (event.exportType == "") {
+          allInvoiceReportModel = allInvoiceReportModelFromJson(response.body);
 
-        totalPages = allInvoiceReportModel.data.lastPage ?? 1;
-        currentPage = allInvoiceReportModel.data.currentPage;
-        isFetching = false;
+          totalPages = allInvoiceReportModel.data.paginator.lastPage ?? 1;
+          currentPage = allInvoiceReportModel.data.paginator.currentPage;
+          isFetching = false;
 
-        emit(GetAllInvoiceReportSuccessState(
-            allInvoiceReportModel: allInvoiceReportModel));
+          emit(GetAllInvoiceReportSuccessState(
+              allInvoiceReportModel: allInvoiceReportModel));
 
-        if (totalPages > currentPage && currentPage != 0) {
-          currentPage += 1;
-          print("here1");
+          if (totalPages > currentPage && currentPage != 0) {
+            currentPage += 1;
+            print("here1");
+          } else {
+            currentPage = 1;
+            print("here2");
+          }
+          print(currentPage.toString() + "current here");
         } else {
-          currentPage = 1;
-          print("here2");
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
         }
-        print(currentPage.toString() + "current here");
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetAllInvoiceReportErrorState(errorMessage: decodedBody['msg']));
       }
-    } catch (e) {
+    } catch (e, s) {
+      print(s);
       print(e.toString());
       emit(GetAllInvoiceReportErrorState(errorMessage: "Something went wrong"));
     }
@@ -99,14 +113,19 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       SalesTaxReportModel salesTaxReportModel;
       final token = await AppUtils.getToken();
 
-      Response response = await apiRepo.getSalesTaxReport(
-          token, event.startDate, event.endDate, event.currentPage);
+      Response response = await apiRepo.getSalesTaxReport(token,
+          event.startDate, event.endDate, event.currentPage, event.exportType);
       if (response.statusCode == 200) {
-        salesTaxReportModel = salesTaxReportModelFromJson(response.body);
-        //decode response into model class.
-        /////////////////////////////////
-        emit(GetSalesTaxReportSuccessState(
-            salesTaxReportModel: salesTaxReportModel)); //change force null.
+        if (event.exportType == "") {
+          salesTaxReportModel = salesTaxReportModelFromJson(response.body);
+          //decode response into model class.
+          /////////////////////////////////
+          emit(GetSalesTaxReportSuccessState(
+              salesTaxReportModel: salesTaxReportModel)); //change force null.
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetSalesTaxReportErrorState(errorMessage: decodedBody['msg']));
@@ -121,7 +140,11 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   Future<void> getTimeLogReportBloc(
       GetTimeLogReportEvent event, Emitter<ReportState> emit) async {
     try {
-      emit(ReportLoadingState());
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
       //change nullable with original model class
       TimeLogReportModel timeLogReportModel;
       final token = await AppUtils.getToken();
@@ -131,13 +154,30 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.monthFilter,
           event.techFilter,
           event.searchQuery,
-          event.currentPage);
+          currentPage,
+          event.exportType);
       if (response.statusCode == 200) {
         //decode response into model class.
-        timeLogReportModel = timeLogReportModelFromJson(response.body);
 
-        emit(GetTimeLogReportSuccessState(
-            timeLogReportModel: timeLogReportModel)); //change force null.
+        if (event.exportType == "") {
+          timeLogReportModel = timeLogReportModelFromJson(response.body);
+          totalPages = timeLogReportModel.data.paginator.lastPage ?? 1;
+          currentPage = timeLogReportModel.data.paginator.currentPage;
+          isFetching = false;
+
+          emit(GetTimeLogReportSuccessState(
+              timeLogReportModel: timeLogReportModel));
+          if (totalPages > currentPage && currentPage != 0) {
+            currentPage += 1;
+            print("here1");
+          } else {
+            currentPage = 0;
+            print("here2");
+          }
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetTimeLogReportErrorState(errorMessage: decodedBody['msg']));
@@ -159,13 +199,23 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getPaymentTypeReport(
-          token, event.monthFilter, event.searchQuery, event.currentPage);
+          token,
+          event.typeFilter,
+          event.searchQuery,
+          event.currentPage,
+          event.exportType);
       if (response.statusCode == 200) {
-        paymentTypeReportModel = paymentTypeReportModelFromJson(response.body);
-        //decode response into model class.
-        /////////////////////////////////
-        emit(GetPaymentTypeReportSuccessState(
-            paymentReportModel: paymentTypeReportModel)); //change force null.
+        if (event.exportType == "") {
+          paymentTypeReportModel =
+              paymentTypeReportModelFromJson(response.body);
+          //decode response into model class.
+          /////////////////////////////////
+          emit(GetPaymentTypeReportSuccessState(
+              paymentReportModel: paymentTypeReportModel));
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetPaymentTypeReportErrorState(errorMessage: decodedBody['msg']));
@@ -200,36 +250,44 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.endDate,
           event.searchQuery,
           event.techFilter,
-          currentPage);
+          currentPage,
+          event.exportType);
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
-        serviceByTechReportModel =
-            serviceByTechReportModelFromJson(response.body);
+        ///
+        if (event.exportType == "") {
+          serviceByTechReportModel =
+              serviceByTechReportModelFromJson(response.body);
 
-        totalPages = serviceByTechReportModel.data.lastPage ?? 1;
-        currentPage = serviceByTechReportModel.data.currentPage;
-        isFetching = false;
-        emit(GetServiceByTechnicianReportSuccessState(
-            serviceByTechReportModel: serviceByTechReportModel));
+          totalPages = serviceByTechReportModel.data.paginator.lastPage ?? 1;
+          currentPage = serviceByTechReportModel.data.paginator.currentPage;
+          isFetching = false;
+          emit(GetServiceByTechnicianReportSuccessState(
+              serviceByTechReportModel: serviceByTechReportModel));
 
-        // if (event.pagination == "next") {
-        if (totalPages > currentPage && currentPage != 0) {
-          currentPage += 1;
-          print("here1");
+          // if (event.pagination == "next") {
+          if (totalPages > currentPage && currentPage != 0) {
+            currentPage += 1;
+            print("here1");
+          } else {
+            currentPage = 0;
+            print("here2");
+          }
+          // }
+          //  else {
+          //   if (totalPages > currentPage && currentPage != 0) {
+          //     currentPage -= 1;
+          //   } else {
+          //     currentPage = 0;
+          //   }
+          // }
+          print(currentPage.toString() + "current");
         } else {
-          currentPage = 0;
-          print("here2");
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
         }
-        // }
-        //  else {
-        //   if (totalPages > currentPage && currentPage != 0) {
-        //     currentPage -= 1;
-        //   } else {
-        //     currentPage = 0;
-        //   }
-        // }
-        print(currentPage.toString() + "current");
+
         //change force null.
       } else {
         var decodedBody = json.decode(response.body);
@@ -305,27 +363,38 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       // }
 
       //You can download a single file
-      if (Platform.isAndroid) {
-        FileDownloader.downloadFile(
-            url: event.downloadUrl,
-            name: "Report", //(optional)
+      //  if (Platform.isAndroid) {
+      try {
+        // FileDownloader.downloadFile(
+        //     url: event.downloadUrl,
+        //     name: event.downloadPath,
+        //     onDownloadCompleted: (String path) {
+        //       print('FILE DOWNLOADED TO PATH: $path');
+        //       // emit(ExportReportState(
+        //       //     message: "File downloaded to $path", time: DateTime.now()));
 
-            onDownloadCompleted: (String path) {
-              print('FILE DOWNLOADED TO PATH: $path');
-              // emit(ExportReportState(
-              //     message: "File downloaded to $path", time: DateTime.now()));
+        //       CommonWidgets()
+        //           .showDialog(event.context, "File downloaded to $path");
+        //     },
+        //     onDownloadError: (String error) {
+        //       print('DOWNLOAD ERROR: $error');
+        //       CommonWidgets().showDialog(event.context, "Download Failed");
+        //       emit(ExportReportErrorState(errorMessage: error));
+        //     });
 
-              CommonWidgets()
-                  .showDialog(event.context, "File downloaded to $path");
-            },
-            onDownloadError: (String error) {
-              print('DOWNLOAD ERROR: $error');
-              CommonWidgets().showDialog(event.context, "Download Failed");
-              emit(ExportReportErrorState(errorMessage: error));
-            });
-      } else {
-        // function to download file in ios
+        if (await canLaunchUrl(Uri.parse(event.downloadUrl))) {
+          await launchUrl(Uri.parse(event.downloadUrl),
+              mode: LaunchMode.externalApplication);
+        } else {
+          throw 'Could not launch ${event.downloadUrl}';
+        }
+      } catch (e, s) {
+        print(s);
+        print(e.toString());
       }
+      // } else {
+      //   // function to download file in ios
+      // }
     } catch (e, s) {
       print(e.toString());
       print(s);

@@ -2449,12 +2449,18 @@ class ApiProvider {
   ///
   ///
   ///Api call to get all invoice reports
-  Future<dynamic> getAllInvoiceReport(String token, String startDate,
-      String endDate, String paidFileter, int page, String searchQuery) async {
+  Future<dynamic> getAllInvoiceReport(
+      String token,
+      String startDate,
+      String endDate,
+      String paidFileter,
+      int page,
+      String searchQuery,
+      String exportType) async {
     try {
       //  final clientId = await AppUtils.getUserID();
       final url = Uri.parse(
-          '${BASE_URL}api/invoices?from_date=$startDate&to_date=$endDate&page=$page');
+          '${BASE_URL}api/invoices?filter=fully_paid&type=$paidFileter&file_type=$exportType&page=$page');
 
       //mock api url
       // final url = Uri.parse(
@@ -2467,16 +2473,12 @@ class ApiProvider {
   }
 
   //Api call to get sales tax report
-  Future<dynamic> getSalesTaxReport(
-    String token,
-    String startDate,
-    String endDate,
-    int page,
-  ) async {
+  Future<dynamic> getSalesTaxReport(String token, String startDate,
+      String endDate, int page, String exportType) async {
     try {
       // final clientId = await AppUtils.getUserID();
       final url = Uri.parse(
-          '${BASE_URL}api/sales_tax_report?from_date=$startDate&to_date=$endDate');
+          '${BASE_URL}api/sales_tax_report?from_date=$startDate&to_date=$endDate&file_type=$exportType');
       //mock api url
       // final url = Uri.parse(
       //     'https://run.mocky.io/v3/9eafb7f2-bd2a-45fb-84b6-e81a59dd143f');
@@ -2488,15 +2490,12 @@ class ApiProvider {
   }
 
   //Api call to get payment type report
-  Future<dynamic> getPaymentTypeReport(
-    String token,
-    String monthFilter,
-    String searchQuery,
-    int page,
-  ) async {
+  Future<dynamic> getPaymentTypeReport(String token, String typeFilter,
+      String searchQuery, int page, String exportType) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse('${BASE_URL}api/payment_types_report');
+      final url = Uri.parse(
+          '${BASE_URL}api/payment_types_report?filter=$typeFilter&file_type=$exportType');
       //mock url
       // final url = Uri.parse(
       //     'https://run.mocky.io/v3/0c38e7e0-1774-46fa-a61e-9b468be3a5b9');
@@ -2509,20 +2508,20 @@ class ApiProvider {
 
   //Api call to get time log report
   Future<dynamic> getTimeLogReport(
-    String token,
-    String monthFilter,
-    String techFilter,
-    String searchQuery,
-    int page,
-  ) async {
+      String token,
+      String monthFilter,
+      String techFilter,
+      String searchQuery,
+      int page,
+      String exportType) async {
     try {
-      final clientId = await AppUtils.getUserID();
-      // final url = Uri.parse(
-      //     '${BASE_URL}api/payment_type_report?month=$monthFilter&tech_name=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      // final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/time_log?time_in=$monthFilter&techician_id=$techFilter&file_type=$exportType&page=$page');
 
       //mock api url
-      final url = Uri.parse(
-          'https://run.mocky.io/v3/669aa7b0-b377-4a2c-b720-994591e6c57e');
+      // final url = Uri.parse(
+      //     'https://run.mocky.io/v3/669aa7b0-b377-4a2c-b720-994591e6c57e');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2532,17 +2531,17 @@ class ApiProvider {
 
   //Api call to get service by technician report.
   Future<dynamic> getServiceByTechnicianReport(
-    String token,
-    String startDate,
-    String endDate,
-    String searchQuery,
-    String techFilter,
-    int page,
-  ) async {
+      String token,
+      String startDate,
+      String endDate,
+      String searchQuery,
+      String techFilter,
+      int page,
+      String exportType) async {
     try {
       final clientId = await AppUtils.getUserID();
       final url = Uri.parse(
-          '${BASE_URL}api/service_by_techicians?techician_id=$techFilter&from_date=$startDate&to_date=$endDate&page=$page');
+          '${BASE_URL}api/service_by_techicians?techician_id=$techFilter&from_date=$startDate&to_date=$endDate&file_type=$exportType&page=$page');
       //mock api url
       // final url = Uri.parse(
       //     "https://run.mocky.io/v3/84ef9e71-4038-4e03-9ccc-72046160b368");
