@@ -75,7 +75,8 @@ class _ServicesByTechnicianReportScreen
             serviceByTechReporModel = state.serviceByTechReportModel;
             reportList.clear();
             rows.clear();
-            reportList.addAll(state.serviceByTechReportModel.data.data);
+            reportList
+                .addAll(state.serviceByTechReportModel.data.paginator.data);
 
             reportList.forEach((element) {
               rows.add(DataRow(cells: [
@@ -93,7 +94,8 @@ class _ServicesByTechnicianReportScreen
                 searchQuery: "",
                 techFilter: "",
                 currentPage: 1,
-                pagination: ""));
+                pagination: "",
+                exportType: ""));
 
             context.read<ReportBloc>().add(GetAllTechnicianEvent());
           } else if (state is GetAllTechnicianState) {
@@ -101,12 +103,19 @@ class _ServicesByTechnicianReportScreen
             technicianData.addAll(state.technicianModel.data);
 
             print(technicianData);
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "",
+                downloadUrl: state.link,
+                fileName: "ServiceByTechnicianReport",
+                context: context));
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
+              bottomNavigationBar: exportButtonWidget(context),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -192,8 +201,22 @@ class _ServicesByTechnicianReportScreen
                                 dateSelectionWidget(context),
                                 technicianDropdown(
                                     "Technician", state, context),
-                                searchBar(),
-                                tableWidget(context, state)
+                                //  searchBar(),
+                                const SizedBox(
+                                  height: 32,
+                                ),
+                                state is GetServiceByTechnicianReportErrorState
+                                    ? Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 300,
+                                            child: Center(
+                                              child: Text(state.errorMessage),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : tableWidget(context, state)
                               ],
                             ),
                           ),
@@ -202,6 +225,79 @@ class _ServicesByTechnicianReportScreen
           },
         ),
       ),
+    );
+  }
+
+  Widget exportButtonWidget(BuildContext ctx) {
+    String downloadPath = "";
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Padding(
+          padding:
+              const EdgeInsets.only(right: 21.0, bottom: 12, left: 21, top: 12),
+          child: ElevatedButton(
+              onPressed: () async {
+                // context.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: downloadUrl,
+                //     fileName: fileName));
+
+                // PermissionStatus status = await Permission.storage.request();
+                // print(status.toString() + "sttaus");
+                // if (status.isGranted) {
+                //   var dir =
+                //       await DownloadsPath.downloadsDirectory().then((value) {
+                //     downloadPath = value?.path ?? "";
+                //     print(downloadPath + "pathhhh");
+                //     context.read<ReportBloc>().add(ExportReportEvent(
+                //         downloadPath: downloadPath,
+                //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //         fileName: "test"));
+                //   });
+                // } else if (status.isDenied) {
+                //   await Permission.storage.request();
+                // }
+
+                // ctx.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //     fileName: "test",
+                //     context: ctx));
+
+                ctx.read<ReportBloc>().add(GetServiceByTechnicianReportEvent(
+                    startDate: startDateToServer,
+                    endDate: endDateToServer,
+                    searchQuery: "",
+                    techFilter: technicianId,
+                    currentPage: 1,
+                    pagination: "",
+                    exportType: "excel"));
+              },
+              style: ElevatedButton.styleFrom(
+                  elevation: 0.6,
+                  alignment: Alignment.center,
+                  minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  backgroundColor: Color(0xffF6F6F6),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: AppColors.primaryColors,
+                  ),
+                  Text(
+                    " Export",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColors),
+                  )
+                ],
+              ))),
     );
   }
 
@@ -379,22 +475,28 @@ class _ServicesByTechnicianReportScreen
                     children: [
                       Row(
                         children: [
-                          Text('Rows per page: '),
-                          DropdownButton<int>(
-                            value: _rowsPerPage,
-                            underline: const SizedBox(),
-                            onChanged: (newValue) {
-                              setState(() {
-                                _rowsPerPage = newValue!;
-                              });
-                            },
-                            items: [5, 10, 20, 50]
-                                .map((value) => DropdownMenuItem<int>(
-                                      value: value,
-                                      child: Text(value.toString()),
-                                    ))
-                                .toList(),
+                          Text('Rows per page:10 '),
+                          // DropdownButton<int>(
+                          //   value: _rowsPerPage,
+                          //   underline: const SizedBox(),
+                          //   onChanged: (newValue) {
+                          //     setState(() {
+                          //       _rowsPerPage = newValue!;
+                          //     });
+                          //   },
+                          //   items: [5, 10, 20, 50]
+                          //       .map((value) => DropdownMenuItem<int>(
+                          //             value: value,
+                          //             child: Text(value.toString()),
+                          //           ))
+                          //       .toList(),
+                          // ),
+                          const SizedBox(
+                            width: 16,
                           ),
+
+                          Text(
+                              "${serviceByTechReporModel?.data.range.from} - ${serviceByTechReporModel?.data.range.to} to ${serviceByTechReporModel?.data.range.total}")
                         ],
                       ),
                       Transform.scale(
@@ -404,7 +506,7 @@ class _ServicesByTechnicianReportScreen
                             IconButton(
                                 onPressed: () {
                                   if (serviceByTechReporModel
-                                          ?.data.prevPageUrl !=
+                                          ?.data.paginator.prevPageUrl !=
                                       null) {
                                     ctx.read<ReportBloc>().add(
                                         GetServiceByTechnicianReportEvent(
@@ -413,13 +515,14 @@ class _ServicesByTechnicianReportScreen
                                             searchQuery: "",
                                             techFilter: technicianId,
                                             currentPage: 1,
-                                            pagination: "prev"));
+                                            pagination: "prev",
+                                            exportType: ""));
                                   }
                                 },
                                 icon: Icon(
                                   Icons.arrow_back_ios_new_outlined,
                                   color: serviceByTechReporModel
-                                              ?.data.prevPageUrl !=
+                                              ?.data.paginator.prevPageUrl !=
                                           null
                                       ? Colors.black
                                       : Colors.grey.shade300,
@@ -427,7 +530,7 @@ class _ServicesByTechnicianReportScreen
                             IconButton(
                                 onPressed: () {
                                   if (serviceByTechReporModel
-                                          ?.data.nextPageUrl !=
+                                          ?.data.paginator.nextPageUrl !=
                                       null) {
                                     ctx.read<ReportBloc>().add(
                                         GetServiceByTechnicianReportEvent(
@@ -436,13 +539,14 @@ class _ServicesByTechnicianReportScreen
                                             searchQuery: "",
                                             techFilter: technicianId,
                                             currentPage: 1,
-                                            pagination: "next"));
+                                            pagination: "next",
+                                            exportType: ""));
                                   }
                                 },
                                 icon: Icon(
                                   Icons.arrow_forward_ios_outlined,
                                   color: serviceByTechReporModel
-                                              ?.data.nextPageUrl !=
+                                              ?.data.paginator.nextPageUrl !=
                                           null
                                       ? Colors.black
                                       : Colors.grey.shade300,
@@ -537,7 +641,8 @@ class _ServicesByTechnicianReportScreen
                                             searchQuery: "",
                                             techFilter: technicianId,
                                             currentPage: 1,
-                                            pagination: ""));
+                                            pagination: "",
+                                            exportType: ""));
                                   },
                                   icon: Icon(Icons.close))
                               : const SizedBox()
@@ -615,7 +720,8 @@ class _ServicesByTechnicianReportScreen
                                                     searchQuery: "",
                                                     techFilter: "",
                                                     currentPage: 1,
-                                                    pagination: ""));
+                                                    pagination: "",
+                                                    exportType: ""));
 
                                           Navigator.pop(context);
                                         },
@@ -726,7 +832,8 @@ class _ServicesByTechnicianReportScreen
                                     searchQuery: "",
                                     techFilter: "",
                                     currentPage: 1,
-                                    pagination: ""));
+                                    pagination: "",
+                                    exportType: ""));
                             },
                             child: SizedBox(
                                 height: 56,
@@ -820,7 +927,8 @@ class _ServicesByTechnicianReportScreen
                                             endDate: "",
                                             techFilter: technicianId,
                                             currentPage: 1,
-                                            pagination: ""));
+                                            pagination: "",
+                                            exportType: ""));
 
                                       Navigator.pop(context);
                                     },

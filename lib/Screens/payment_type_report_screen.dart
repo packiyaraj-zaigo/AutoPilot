@@ -17,8 +17,10 @@ class PaymentTypeReportScreen extends StatefulWidget {
 class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   PaymentTypeReportModel? paymentTypeReportModel;
-  List<String> monthOptions = ["This Month", "Last Month"];
+  List<String> typeList = ["Cash", "Card", "Check", "Others"];
   int _rowsPerPage = 5;
+  String? currentType;
+  List<Total> reportList = [];
   // final List<DataRow> rows = List.generate(
   //   10, // Replace with your actual data
   //   (index) => DataRow(
@@ -42,8 +44,11 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
         listener: (context, state) {
           if (state is GetPaymentTypeReportSuccessState) {
             paymentTypeReportModel = state.paymentReportModel;
+            reportList.clear();
+            rows.clear();
+            reportList.addAll(state.paymentReportModel.data.totals);
 
-            paymentTypeReportModel?.data.totals.forEach((element) {
+            reportList.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.type)),
                 DataCell(Text(element.percentage.toString())),
@@ -52,7 +57,16 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
             });
           } else if (state is InternetConnectionSuccessState) {
             context.read<ReportBloc>().add(GetPaymentTypeReportEvent(
-                monthFilter: "", searchQuery: "", currentPage: 1));
+                typeFilter: "",
+                searchQuery: "",
+                currentPage: 1,
+                exportType: ""));
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "",
+                downloadUrl: state.link,
+                fileName: "PaymentTypeReport",
+                context: context));
           }
           // TODO: implement listener
         },
@@ -60,6 +74,7 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
+              bottomNavigationBar: exportButtonWidget(context),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -142,9 +157,23 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                monthDropdown("Creation"),
-                                searchBar(),
-                                tableWidget()
+                                typeDropDown("Type", context),
+                                // searchBar(),
+                                const SizedBox(
+                                  height: 36,
+                                ),
+                                state is GetPaymentTypeReportErrorState
+                                    ? Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 300,
+                                            child: Center(
+                                              child: Text(state.errorMessage),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : tableWidget()
                               ],
                             ),
                           ),
@@ -156,53 +185,157 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
     );
   }
 
-  monthDropdown(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30.0, right: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 55,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
-                      spreadRadius: 0,
-                      offset: Offset(0, 4),
-                      blurRadius: 10)
-                ]),
-            child: DropdownButton<String>(
-              value: monthOptions.isNotEmpty ? monthOptions[0] : null,
-              onChanged: (String? selectedMonth) {
-                // Handle selected month
-                print('Selected Month: $selectedMonth');
-              },
-              items: monthOptions
-                  .map((String month) => DropdownMenuItem<String>(
-                        value: month,
-                        child: Text(month),
-                      ))
-                  .toList(),
-              isExpanded: true,
-              underline: const SizedBox(),
-              padding: EdgeInsets.only(left: 12, right: 12),
+  typeDropDown(String label, BuildContext ctx) {
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 30.0, right: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
             ),
-          ),
-        ],
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 55,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  border:
+                      Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        spreadRadius: 0,
+                        offset: Offset(0, 4),
+                        blurRadius: 10)
+                  ]),
+              child: DropdownButton<String>(
+                icon: currentType != null && currentType != ""
+                    ? GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            currentType = null;
+                          });
+                          ctx.read<ReportBloc>()
+                            ..currentPage = 1
+                            ..add(GetPaymentTypeReportEvent(
+                                typeFilter: "",
+                                searchQuery: "",
+                                currentPage: 1,
+                                exportType: ""));
+                        },
+                        child: Icon(Icons.close))
+                    : const SizedBox(),
+                hint: Text("Select Type"),
+                value: currentType,
+                onChanged: (String? selectedType) {
+                  // Handle selected month
+                  print('Selected Month: $selectedType');
+
+                  setState(() {
+                    currentType = selectedType;
+                  });
+
+                  ctx.read<ReportBloc>()
+                    ..currentPage = 1
+                    ..add(GetPaymentTypeReportEvent(
+                        typeFilter: currentType?.toLowerCase() ?? "",
+                        searchQuery: "",
+                        currentPage: 1,
+                        exportType: ""));
+                },
+                items: typeList
+                    .map((String type) => DropdownMenuItem<String>(
+                          value: type,
+                          child: Text(type),
+                        ))
+                    .toList(),
+                isExpanded: true,
+                underline: const SizedBox(),
+                padding: EdgeInsets.only(left: 12, right: 12),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget exportButtonWidget(BuildContext ctx) {
+    String downloadPath = "";
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Padding(
+          padding: const EdgeInsets.only(right: 21.0, bottom: 12, left: 21),
+          child: ElevatedButton(
+              onPressed: () async {
+                // context.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: downloadUrl,
+                //     fileName: fileName));
+
+                // PermissionStatus status = await Permission.storage.request();
+                // print(status.toString() + "sttaus");
+                // if (status.isGranted) {
+                //   var dir =
+                //       await DownloadsPath.downloadsDirectory().then((value) {
+                //     downloadPath = value?.path ?? "";
+                //     print(downloadPath + "pathhhh");
+                //     context.read<ReportBloc>().add(ExportReportEvent(
+                //         downloadPath: downloadPath,
+                //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //         fileName: "test"));
+                //   });
+                // } else if (status.isDenied) {
+                //   await Permission.storage.request();
+                // }
+
+                // ctx.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //     fileName: "test",
+                //     context: ctx));
+
+                ctx.read<ReportBloc>().add(GetPaymentTypeReportEvent(
+                    typeFilter: currentType?.toLowerCase() ?? "",
+                    searchQuery: "",
+                    currentPage: 1,
+                    exportType: "excel"));
+              },
+              style: ElevatedButton.styleFrom(
+                  elevation: 0.6,
+                  alignment: Alignment.center,
+                  minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  backgroundColor: Color(0xffF6F6F6),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: AppColors.primaryColors,
+                  ),
+                  Text(
+                    " Export",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColors),
+                  )
+                ],
+              ))),
     );
   }
 
@@ -264,85 +397,93 @@ class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
   }
 
   Widget tableWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 6,
-                      offset: Offset(10, 16)),
-                ]),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: DataTable(
-                columns: [
-                  // DataColumn(label: Text('Item')),
-                  // DataColumn(label: Text('Description')),
-                  // DataColumn(label: Text('Test')),
-                  // DataColumn(label: Text('Test 2')),
-
-                  DataColumn(label: Text('Payment Type')),
-                  DataColumn(label: Text('% of Total')),
-                  DataColumn(label: Text('Total')),
-                ],
-                rows: rows,
-                columnSpacing: 80,
-                headingRowColor:
-                    MaterialStateProperty.all(const Color(0xffCEDEFF)),
-                headingRowHeight: 50,
-              ),
+    return reportList.isEmpty
+        ? Container(
+            width: MediaQuery.of(context).size.width,
+            height: 300,
+            child: Center(
+              child: Text("No Report Found"),
             ),
-          ),
-        ),
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 8.0),
-        //   child: Row(
-        //     children: [
-        //       Text('Rows per page: '),
-        //       DropdownButton<int>(
-        //         value: _rowsPerPage,
-        //         underline: const SizedBox(),
-        //         onChanged: (newValue) {
-        //           setState(() {
-        //             _rowsPerPage = newValue!;
-        //           });
-        //         },
-        //         items: [5, 10, 20, 50]
-        //             .map((value) => DropdownMenuItem<int>(
-        //                   value: value,
-        //                   child: Text(value.toString()),
-        //                 ))
-        //             .toList(),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 8.0),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     children: [
-        //       Transform.scale(
-        //           scale: 0.7,
-        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-        //       Text(
-        //         "Dense",
-        //         style: TextStyle(fontSize: 16),
-        //       ),
-        //     ],
-        //   ),
-        // )
-      ],
-    );
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 10,
+                            spreadRadius: 6,
+                            offset: Offset(10, 16)),
+                      ]),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: DataTable(
+                      columns: [
+                        // DataColumn(label: Text('Item')),
+                        // DataColumn(label: Text('Description')),
+                        // DataColumn(label: Text('Test')),
+                        // DataColumn(label: Text('Test 2')),
+
+                        DataColumn(label: Text('Payment Type')),
+                        DataColumn(label: Text('% of Total')),
+                        DataColumn(label: Text('Total')),
+                      ],
+                      rows: rows,
+                      columnSpacing: 80,
+                      headingRowColor:
+                          MaterialStateProperty.all(const Color(0xffCEDEFF)),
+                      headingRowHeight: 50,
+                    ),
+                  ),
+                ),
+              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 8.0),
+              //   child: Row(
+              //     children: [
+              //       Text('Rows per page: '),
+              //       DropdownButton<int>(
+              //         value: _rowsPerPage,
+              //         underline: const SizedBox(),
+              //         onChanged: (newValue) {
+              //           setState(() {
+              //             _rowsPerPage = newValue!;
+              //           });
+              //         },
+              //         items: [5, 10, 20, 50]
+              //             .map((value) => DropdownMenuItem<int>(
+              //                   value: value,
+              //                   child: Text(value.toString()),
+              //                 ))
+              //             .toList(),
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 8.0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.start,
+              //     children: [
+              //       Transform.scale(
+              //           scale: 0.7,
+              //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+              //       Text(
+              //         "Dense",
+              //         style: TextStyle(fontSize: 16),
+              //       ),
+              //     ],
+              //   ),
+              // )
+            ],
+          );
   }
 }
 

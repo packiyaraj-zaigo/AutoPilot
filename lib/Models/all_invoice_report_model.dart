@@ -32,6 +32,26 @@ class AllInvoiceReportModel {
 }
 
 class Data {
+  Paginator paginator;
+  Range range;
+
+  Data({
+    required this.paginator,
+    required this.range,
+  });
+
+  factory Data.fromJson(Map<String, dynamic> json) => Data(
+        paginator: Paginator.fromJson(json["paginator"]),
+        range: Range.fromJson(json["range"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "paginator": paginator.toJson(),
+        "range": range.toJson(),
+      };
+}
+
+class Paginator {
   int currentPage;
   List<Datum> data;
   String? firstPageUrl;
@@ -45,7 +65,7 @@ class Data {
   int? to;
   int? total;
 
-  Data({
+  Paginator({
     required this.currentPage,
     required this.data,
     required this.firstPageUrl,
@@ -60,7 +80,7 @@ class Data {
     required this.total,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory Paginator.fromJson(Map<String, dynamic> json) => Paginator(
         currentPage: json["current_page"],
         data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
         firstPageUrl: json["first_page_url"],
@@ -96,8 +116,8 @@ class Datum {
   String customerLastName;
   String vehicleName;
   int orderNumber;
-  dynamic orderName;
-  dynamic paymentDate;
+  String? orderName;
+  String paymentDate;
   String note;
   String paymentType;
   String totalOrderAmount;
@@ -136,7 +156,7 @@ class Datum {
         "customer_first_name":
             customerFirstNameValues.reverse[customerFirstName],
         "customer_last_name": customerLastNameValues.reverse[customerLastName],
-        "vehicle_name": vehicleName,
+        "vehicle_name": vehicleNameValues.reverse[vehicleName],
         "order_number": orderNumber,
         "order_name": orderName,
         "payment_date": paymentDate,
@@ -148,21 +168,14 @@ class Datum {
       };
 }
 
-enum CustomerFirstName { CUSTOMER, CUSTOMER_NAME_ONE, FAZIL }
+enum CustomerFirstName { CUSTOMER }
 
-final customerFirstNameValues = EnumValues({
-  "customer": CustomerFirstName.CUSTOMER,
-  "Customer name one": CustomerFirstName.CUSTOMER_NAME_ONE,
-  "Fazil": CustomerFirstName.FAZIL
-});
+final customerFirstNameValues =
+    EnumValues({"customer": CustomerFirstName.CUSTOMER});
 
-enum CustomerLastName { JJH, ONE, SREE }
+enum CustomerLastName { ONE }
 
-final customerLastNameValues = EnumValues({
-  "Jjh": CustomerLastName.JJH,
-  "one": CustomerLastName.ONE,
-  "Sree": CustomerLastName.SREE
-});
+final customerLastNameValues = EnumValues({"one": CustomerLastName.ONE});
 
 enum Note { EMPTY, TESTING_PAYMENT }
 
@@ -174,6 +187,11 @@ enum Amount { THE_000, THE_52000 }
 final amountValues = EnumValues(
     {"\u00240.00": Amount.THE_000, "\u0024520.00": Amount.THE_52000});
 
+enum VehicleName { BMW, EMPTY }
+
+final vehicleNameValues =
+    EnumValues({"BMW": VehicleName.BMW, "-": VehicleName.EMPTY});
+
 enum PaymentType { CASH, EMPTY }
 
 final paymentTypeValues =
@@ -183,6 +201,30 @@ enum RemainingAmount { THE_0, THE_520 }
 
 final remainingAmountValues = EnumValues(
     {"\u00240": RemainingAmount.THE_0, "\u0024520": RemainingAmount.THE_520});
+
+class Range {
+  int from;
+  int to;
+  int total;
+
+  Range({
+    required this.from,
+    required this.to,
+    required this.total,
+  });
+
+  factory Range.fromJson(Map<String, dynamic> json) => Range(
+        from: json["from"],
+        to: json["to"],
+        total: json["total"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "from": from,
+        "to": to,
+        "total": total,
+      };
+}
 
 class EnumValues<T> {
   Map<String, T> map;

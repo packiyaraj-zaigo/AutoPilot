@@ -19,10 +19,17 @@ class AllInvoiceReportScreen extends StatefulWidget {
 
 class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
-  List<String> monthOptions = ["This Month", "Last Month"];
+  List<String> paidFilterList = [
+    "Today",
+    "Yesterday",
+    "This Week",
+    "This Month",
+    "This Year"
+  ];
   AllInvoiceReportModel? allInvoiceReportModel;
   List<Datum> reportList = [];
   int _rowsPerPage = 5;
+  String? currentPaidFilter;
 
   // final List<DataRow> rows = List.generate(
   //   18, // Replace with your actual data
@@ -78,7 +85,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 endDate: endDateToServer,
                 paidFilter: "",
                 searchQuery: "",
-                currentPage: 1)));
+                currentPage: 1,
+                exportType: "")));
           }
           // TODO: implement listener
 
@@ -87,7 +95,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
 
             rows.clear();
             allInvoiceReportModel = state.allInvoiceReportModel;
-            reportList.addAll(state.allInvoiceReportModel.data.data);
+            reportList.addAll(state.allInvoiceReportModel.data.paginator.data);
 
             reportList.forEach((element) {
               rows.add(DataRow(cells: [
@@ -107,12 +115,19 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
             });
           } else if (state is ExportReportState) {
             print("state here");
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "All invoice report",
+                downloadUrl: state.link,
+                fileName: "test",
+                context: context));
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
+              bottomNavigationBar: exportButtonWidget(context),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -200,12 +215,25 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                dateSelectionWidget(context),
-                                monthDropdown("Fully Paid"),
-                                searchBar(),
-                                tableWidget(context, state),
+                                //  dateSelectionWidget(context),
+                                paidDropDown("Fully Paid", context),
+                                // searchBar(),
+                                const SizedBox(
+                                  height: 36,
+                                ),
+                                state is GetAllInvoiceReportErrorState
+                                    ? Column(
+                                        children: [
+                                          SizedBox(
+                                            height: 300,
+                                            child: Center(
+                                              child: Text(state.errorMessage),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : tableWidget(context, state),
                                 //Add storage permission in android manifest.
-                                // exportButtonWidget(context)
                               ],
                             ),
                           ),
@@ -281,7 +309,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                           endDate: endDateToServer,
                                           paidFilter: "",
                                           searchQuery: "",
-                                          currentPage: 1));
+                                          currentPage: 1,
+                                          exportType: ""));
                                   },
                                   icon: Icon(Icons.close))
                               : const SizedBox()
@@ -349,17 +378,10 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                                 .format(dateRangeList[1]!);
                                           });
 
-                                          ctx.read<ReportBloc>()
-                                            ..currentPage = 1
-                                            ..add(
-                                                GetServiceByTechnicianReportEvent(
-                                                    startDate:
-                                                        startDateToServer,
-                                                    endDate: endDateToServer,
-                                                    searchQuery: "",
-                                                    techFilter: "",
-                                                    currentPage: 1,
-                                                    pagination: ""));
+                                          // ctx.read<ReportBloc>()
+                                          //   ..currentPage = 1
+                                          //   ..add(
+                                          //       GetAllInvoiceReportEvent(startDate: startDateToServer, endDate: endDateToServer, paidFilter: currentPaidFilter, searchQuery: searchQuery, currentPage: currentPage, exportType: exportType));
 
                                           Navigator.pop(context);
                                         },
@@ -409,52 +431,94 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
     );
   }
 
-  monthDropdown(String label) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30.0, right: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
-          ),
-          const SizedBox(
-            height: 5,
-          ),
-          Container(
-            width: MediaQuery.of(context).size.width,
-            height: 55,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
-                      spreadRadius: 0,
-                      offset: Offset(0, 4),
-                      blurRadius: 10)
-                ]),
-            child: DropdownButton<String>(
-              value: monthOptions.isNotEmpty ? monthOptions[0] : null,
-              onChanged: (String? selectedMonth) {
-                // Handle selected month
-                print('Selected Month: $selectedMonth');
-              },
-              items: monthOptions
-                  .map((String month) => DropdownMenuItem<String>(
-                        value: month,
-                        child: Text(month),
-                      ))
-                  .toList(),
-              isExpanded: true,
-              underline: const SizedBox(),
-              padding: EdgeInsets.only(left: 12, right: 12),
+  paidDropDown(String label, BuildContext ctx) {
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 30.0, right: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500),
             ),
-          ),
-        ],
+            const SizedBox(
+              height: 5,
+            ),
+            Container(
+              width: MediaQuery.of(context).size.width,
+              height: 55,
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  border:
+                      Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.07),
+                        spreadRadius: 0,
+                        offset: Offset(0, 4),
+                        blurRadius: 10)
+                  ]),
+              child: DropdownButton<String>(
+                icon: currentPaidFilter != "" && currentPaidFilter != null
+                    ? GestureDetector(
+                        onTap: () {
+                          ctx.read<ReportBloc>()
+                            ..currentPage = 1
+                            ..add(GetAllInvoiceReportEvent(
+                                startDate: "",
+                                endDate: "",
+                                paidFilter: "",
+                                searchQuery: "",
+                                currentPage: 1,
+                                exportType: ""));
+
+                          setState(() {
+                            currentPaidFilter = null;
+                          });
+                        },
+                        child: Icon(Icons.close))
+                    : const SizedBox(),
+                hint: Text("Select an option"),
+                value: currentPaidFilter,
+                onChanged: (String? paidFilter) {
+                  setState(() {
+                    currentPaidFilter = paidFilter;
+                  });
+                  // Handle selected month
+                  print('Selected Month: $paidFilter');
+                  ctx.read<ReportBloc>()
+                    ..currentPage = 1
+                    ..add(GetAllInvoiceReportEvent(
+                        startDate: "",
+                        endDate: "",
+                        paidFilter: currentPaidFilter
+                                ?.toLowerCase()
+                                .trim()
+                                .replaceAll("this", "") ??
+                            "",
+                        searchQuery: "",
+                        currentPage: 1,
+                        exportType: ""));
+                },
+                items: paidFilterList
+                    .map((String paidFilter) => DropdownMenuItem<String>(
+                          value: paidFilter,
+                          child: Text(paidFilter),
+                        ))
+                    .toList(),
+                isExpanded: true,
+                underline: const SizedBox(),
+                padding: EdgeInsets.only(left: 12, right: 12),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -580,22 +644,29 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
               children: [
                 Row(
                   children: [
-                    Text('Rows per page: '),
-                    DropdownButton<int>(
-                      value: _rowsPerPage,
-                      underline: const SizedBox(),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _rowsPerPage = newValue!;
-                        });
-                      },
-                      items: [5, 10, 20, 50]
-                          .map((value) => DropdownMenuItem<int>(
-                                value: value,
-                                child: Text(value.toString()),
-                              ))
-                          .toList(),
+                    Text('Rows per page: 10'),
+                    // DropdownButton<int>(
+                    //   value: _rowsPerPage,
+                    //   underline: const SizedBox(),
+                    //   onChanged: (newValue) {
+                    //     setState(() {
+                    //       _rowsPerPage = newValue!;
+                    //     });
+                    //   },
+                    //   items: [5, 10, 20, 50]
+                    //       .map((value) => DropdownMenuItem<int>(
+                    //             value: value,
+                    //             child: Text(value.toString()),
+                    //           ))
+                    //       .toList(),
+                    // ),
+
+                    const SizedBox(
+                      width: 16,
                     ),
+
+                    Text(
+                        "${allInvoiceReportModel?.data.range.from} - ${allInvoiceReportModel?.data.range.to} to ${allInvoiceReportModel?.data.range.total}")
                   ],
                 ),
                 Transform.scale(
@@ -604,7 +675,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                     children: [
                       IconButton(
                           onPressed: () {
-                            if (allInvoiceReportModel?.data.prevPageUrl !=
+                            if (allInvoiceReportModel
+                                    ?.data.paginator.prevPageUrl !=
                                 null) {
                               ctx.read<ReportBloc>().add(
                                   GetAllInvoiceReportEvent(
@@ -612,19 +684,22 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                       endDate: endDateToServer,
                                       paidFilter: "",
                                       searchQuery: "",
-                                      currentPage: 1));
+                                      currentPage: 1,
+                                      exportType: ""));
                             }
                           },
                           icon: Icon(
                             Icons.arrow_back_ios_new_outlined,
-                            color:
-                                allInvoiceReportModel?.data.prevPageUrl != null
-                                    ? Colors.black
-                                    : Colors.grey.shade300,
+                            color: allInvoiceReportModel
+                                        ?.data.paginator.prevPageUrl !=
+                                    null
+                                ? Colors.black
+                                : Colors.grey.shade300,
                           )),
                       IconButton(
                           onPressed: () {
-                            if (allInvoiceReportModel?.data.nextPageUrl !=
+                            if (allInvoiceReportModel
+                                    ?.data.paginator.nextPageUrl !=
                                 null) {
                               ctx.read<ReportBloc>().add(
                                   GetAllInvoiceReportEvent(
@@ -632,15 +707,17 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                       endDate: endDateToServer,
                                       paidFilter: "",
                                       searchQuery: "",
-                                      currentPage: 1));
+                                      currentPage: 1,
+                                      exportType: ""));
                             }
                           },
                           icon: Icon(
                             Icons.arrow_forward_ios_outlined,
-                            color:
-                                allInvoiceReportModel?.data.nextPageUrl != null
-                                    ? Colors.black
-                                    : Colors.grey.shade300,
+                            color: allInvoiceReportModel
+                                        ?.data.paginator.nextPageUrl !=
+                                    null
+                                ? Colors.black
+                                : Colors.grey.shade300,
                           ))
                     ],
                   ),
@@ -670,75 +747,73 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
 
   Widget exportButtonWidget(BuildContext ctx) {
     String downloadPath = "";
-    return BlocProvider(
-      create: (context) => ReportBloc(),
-      child: BlocListener<ReportBloc, ReportState>(
-        listener: (context, state) {
-          // TODO: implement listener
-          if (state is ExportReportState) {
-            CommonWidgets().showDialog(context, state.message);
-          }
-        },
-        child: BlocBuilder<ReportBloc, ReportState>(
-          builder: (context, state) {
-            return Padding(
-                padding: const EdgeInsets.only(right: 21.0, bottom: 12),
-                child: ElevatedButton(
-                    onPressed: () async {
-                      // context.read<ReportBloc>().add(ExportReportEvent(
-                      //     downloadPath: downloadPath,
-                      //     downloadUrl: downloadUrl,
-                      //     fileName: fileName));
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Padding(
+          padding:
+              const EdgeInsets.only(right: 21.0, bottom: 12, left: 21, top: 12),
+          child: ElevatedButton(
+              onPressed: () async {
+                // context.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: downloadUrl,
+                //     fileName: fileName));
 
-                      // PermissionStatus status = await Permission.storage.request();
-                      // print(status.toString() + "sttaus");
-                      // if (status.isGranted) {
-                      //   var dir =
-                      //       await DownloadsPath.downloadsDirectory().then((value) {
-                      //     downloadPath = value?.path ?? "";
-                      //     print(downloadPath + "pathhhh");
-                      //     context.read<ReportBloc>().add(ExportReportEvent(
-                      //         downloadPath: downloadPath,
-                      //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
-                      //         fileName: "test"));
-                      //   });
-                      // } else if (status.isDenied) {
-                      //   await Permission.storage.request();
-                      // }
+                // PermissionStatus status = await Permission.storage.request();
+                // print(status.toString() + "sttaus");
+                // if (status.isGranted) {
+                //   var dir =
+                //       await DownloadsPath.downloadsDirectory().then((value) {
+                //     downloadPath = value?.path ?? "";
+                //     print(downloadPath + "pathhhh");
+                //     context.read<ReportBloc>().add(ExportReportEvent(
+                //         downloadPath: downloadPath,
+                //         downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //         fileName: "test"));
+                //   });
+                // } else if (status.isDenied) {
+                //   await Permission.storage.request();
+                // }
 
-                      ctx.read<ReportBloc>().add(ExportReportEvent(
-                          downloadPath: downloadPath,
-                          downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
-                          fileName: "test",
-                          context: ctx));
-                    },
-                    style: ElevatedButton.styleFrom(
-                        alignment: Alignment.center,
-                        minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
-                        backgroundColor: Color(0xffF6F6F6),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 20),
-                        textStyle: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w500)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.exit_to_app,
-                          color: AppColors.primaryColors,
-                        ),
-                        Text(
-                          " Export",
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.primaryColors),
-                        )
-                      ],
-                    )));
-          },
-        ),
-      ),
+                // ctx.read<ReportBloc>().add(ExportReportEvent(
+                //     downloadPath: downloadPath,
+                //     downloadUrl: "https://pdfobject.com/pdf/sample.pdf",
+                //     fileName: "test",
+                //     context: ctx));
+
+                ctx.read<ReportBloc>().add(GetAllInvoiceReportEvent(
+                    startDate: "",
+                    endDate: "",
+                    paidFilter: currentPaidFilter?.toLowerCase() ?? "",
+                    searchQuery: "",
+                    currentPage: 1,
+                    exportType: "excel"));
+              },
+              style: ElevatedButton.styleFrom(
+                  elevation: 0.6,
+                  alignment: Alignment.center,
+                  minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
+                  backgroundColor: Color(0xffF6F6F6),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  textStyle:
+                      TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.exit_to_app,
+                    color: AppColors.primaryColors,
+                  ),
+                  Text(
+                    " Export",
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primaryColors),
+                  )
+                ],
+              ))),
     );
   }
 }
