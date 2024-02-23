@@ -82,7 +82,7 @@ class InternetConnectionSuccessState extends ReportState {}
 class InternerConnectionErrorState extends ReportState {}
 
 class GetAllTechnicianState extends ReportState {
-  final TechnicianOnlyModel technicianModel;
+  final ReportTechnicianListModel technicianModel;
   GetAllTechnicianState({required this.technicianModel});
 
   @override
@@ -109,3 +109,5 @@ class ExportReportErrorState extends ReportState {
   final String errorMessage;
   ExportReportErrorState({required this.errorMessage});
 }
+
+class TableLoadingState extends ReportState {}

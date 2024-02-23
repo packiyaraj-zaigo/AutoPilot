@@ -1,4 +1,4 @@
-import 'package:auto_pilot/Models/technician_only_model.dart'
+import 'package:auto_pilot/Models/report_technician_list_model.dart'
     as technicianModel;
 import 'package:auto_pilot/Models/time_log_report_model.dart';
 import 'package:auto_pilot/Screens/all_invoice_report_screen.dart';

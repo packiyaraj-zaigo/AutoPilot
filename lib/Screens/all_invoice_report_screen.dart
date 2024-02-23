@@ -21,6 +21,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<String> monthOptions = ["This Month", "Last Month"];
   AllInvoiceReportModel? allInvoiceReportModel;
+  List<Datum> reportList = [];
   int _rowsPerPage = 5;
 
   // final List<DataRow> rows = List.generate(
@@ -53,12 +54,14 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
 
   String startDateStr = "";
   String endDateStr = "";
+  String startDateToServer = "";
+  String endDateToServer = "";
 
   @override
   void initState() {
-    DateFormat outputFormat = DateFormat('MMM d, yyyy');
-    startDateStr = outputFormat.format(dateRangeList[0]!);
-    endDateStr = outputFormat.format(dateRangeList[1]!);
+    // DateFormat outputFormat = DateFormat('MMM d, yyyy');
+    // startDateStr = outputFormat.format(dateRangeList[0]!);
+    // endDateStr = outputFormat.format(dateRangeList[1]!);
     // TODO: implement initState
     super.initState();
   }
@@ -71,17 +74,22 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
         listener: (context, state) {
           if (state is InternetConnectionSuccessState) {
             context.read<ReportBloc>().add((GetAllInvoiceReportEvent(
-                monthFilter: "",
+                startDate: startDateToServer,
+                endDate: endDateToServer,
                 paidFilter: "",
                 searchQuery: "",
                 currentPage: 1)));
           }
           // TODO: implement listener
 
-          if (state is GetAllInvoiceReportSuccessState) {
-            allInvoiceReportModel = state.allInvoiceReportModel;
+          else if (state is GetAllInvoiceReportSuccessState) {
+            reportList.clear();
 
-            allInvoiceReportModel?.data.data.forEach((element) {
+            rows.clear();
+            allInvoiceReportModel = state.allInvoiceReportModel;
+            reportList.addAll(state.allInvoiceReportModel.data.data);
+
+            reportList.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.customerFirstName)),
                 DataCell(Text(element.vehicleName)),
@@ -91,7 +99,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 DataCell(Text(element.paymentDate.toString())),
                 DataCell(Text(element.note)),
                 DataCell(Text(element.paymentType)),
-                DataCell(Text(element.cardType)),
+                // DataCell(Text(element.paymentType)),
                 DataCell(Text(element.totalOrderAmount.toString())),
                 DataCell(Text(element.remainingAmount.toString())),
                 DataCell(Text(element.paymentAmount.toString())),
@@ -192,10 +200,10 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                dateSelectionWidget(),
+                                dateSelectionWidget(context),
                                 monthDropdown("Fully Paid"),
                                 searchBar(),
-                                tableWidget(),
+                                tableWidget(context, state),
                                 //Add storage permission in android manifest.
                                 // exportButtonWidget(context)
                               ],
@@ -209,7 +217,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
     );
   }
 
-  Widget dateSelectionWidget() {
+  Widget dateSelectionWidget(BuildContext ctx) {
     return Padding(
       padding: const EdgeInsets.only(
         top: 16.0,
@@ -232,7 +240,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
               Flexible(
                 child: Container(
                     alignment: Alignment.centerLeft,
-                    width: MediaQuery.of(context).size.width,
+                    width: MediaQuery.of(ctx).size.width,
                     height: 55,
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -248,9 +256,36 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                         ]),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12.0),
-                      child: Text(
-                        "${startDateStr}- ${endDateStr}",
-                        style: TextStyle(fontSize: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            startDateStr != "" && endDateStr != ""
+                                ? "${startDateStr}- ${endDateStr}"
+                                : "Select Date Range",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          startDateStr != "" && endDateStr != ""
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      startDateStr = "";
+                                      endDateStr = "";
+                                      startDateToServer = "";
+                                      endDateToServer = "";
+                                    });
+                                    ctx.read<ReportBloc>()
+                                      ..currentPage = 1
+                                      ..add(GetAllInvoiceReportEvent(
+                                          startDate: startDateToServer,
+                                          endDate: endDateToServer,
+                                          paidFilter: "",
+                                          searchQuery: "",
+                                          currentPage: 1));
+                                  },
+                                  icon: Icon(Icons.close))
+                              : const SizedBox()
+                        ],
                       ),
                     )),
               ),
@@ -263,57 +298,81 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                     context: context,
                     builder: (context) {
                       List<DateTime?> tempDateList = dateRangeList;
-                      return AlertDialog(
-                        insetPadding: EdgeInsets.zero,
-                        content: Container(
-                          height: 400,
-                          width: 300,
-                          child: Column(
-                            children: [
-                              CalendarDatePicker2(
-                                  config: CalendarDatePicker2Config(
-                                    calendarType: CalendarDatePicker2Type.range,
-                                  ),
-                                  value: dateRangeList,
-                                  onValueChanged: (dates) {
-                                    tempDateList = dates;
-                                    print(tempDateList);
-                                  }),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          DateFormat outputFormat =
-                                              DateFormat('MMM d, yyyy');
-                                          // dateRangeList[0] = DateTime.parse(
-                                          //     outputFormat
-                                          //         .format(tempDateList[0]!));
+                      return BlocProvider.value(
+                        value: BlocProvider.of<ReportBloc>(ctx),
+                        child: AlertDialog(
+                          insetPadding: EdgeInsets.zero,
+                          content: Container(
+                            height: 400,
+                            width: 300,
+                            child: Column(
+                              children: [
+                                CalendarDatePicker2(
+                                    config: CalendarDatePicker2Config(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                    value: dateRangeList,
+                                    onValueChanged: (dates) {
+                                      tempDateList = dates;
+                                      print(tempDateList);
+                                    }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            DateFormat outputFormat =
+                                                DateFormat('MMM d, yyyy');
+                                            DateFormat serverFormat =
+                                                DateFormat('yyyy-MM-dd');
 
-                                          // dateRangeList[1] = DateTime.parse(
-                                          //     outputFormat
-                                          //         .format(tempDateList[1]!));
+                                            // dateRangeList[0] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[0]!));
 
-                                          dateRangeList = tempDateList;
+                                            // dateRangeList[1] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[1]!));
 
-                                          startDateStr = outputFormat
-                                              .format(dateRangeList[0]!);
-                                          endDateStr = outputFormat
-                                              .format(dateRangeList[1]!);
-                                        });
+                                            dateRangeList = tempDateList;
 
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Ok")),
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Cancel")),
-                                ],
-                              )
-                            ],
+                                            startDateStr = outputFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateStr = outputFormat
+                                                .format(dateRangeList[1]!);
+
+                                            startDateToServer = serverFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateToServer = serverFormat
+                                                .format(dateRangeList[1]!);
+                                          });
+
+                                          ctx.read<ReportBloc>()
+                                            ..currentPage = 1
+                                            ..add(
+                                                GetServiceByTechnicianReportEvent(
+                                                    startDate:
+                                                        startDateToServer,
+                                                    endDate: endDateToServer,
+                                                    searchQuery: "",
+                                                    techFilter: "",
+                                                    currentPage: 1,
+                                                    pagination: ""));
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Ok")),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel")),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -457,94 +516,155 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
     );
   }
 
-  Widget tableWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Container(
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      spreadRadius: 6,
-                      offset: Offset(10, 16)),
-                ]),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: DataTable(
-                columns: [
-                  // DataColumn(label: Text('Item')),
-                  // DataColumn(label: Text('Description')),
-                  // DataColumn(label: Text('Test')),
-                  // DataColumn(label: Text('Test 2')),
+  Widget tableWidget(BuildContext ctx, state) {
+    return BlocProvider.value(
+      value: BlocProvider.of<ReportBloc>(ctx),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: state is TableLoadingState
+                ? SizedBox(
+                    height: 200,
+                    width: MediaQuery.of(context).size.width,
+                    child: CupertinoActivityIndicator(),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 10,
+                              spreadRadius: 6,
+                              offset: Offset(10, 16)),
+                        ]),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: DataTable(
+                        columns: [
+                          // DataColumn(label: Text('Item')),
+                          // DataColumn(label: Text('Description')),
+                          // DataColumn(label: Text('Test')),
+                          // DataColumn(label: Text('Test 2')),
 
-                  DataColumn(label: Text('First Name')),
-                  DataColumn(label: Text('Vehicle')),
-                  DataColumn(label: Text('Last Name')),
-                  DataColumn(label: Text('Order')),
-                  DataColumn(label: Text('Order Name')),
-                  DataColumn(label: Text('Payment Date')),
-                  DataColumn(label: Text('Note')),
-                  DataColumn(label: Text('Payment Type')),
-                  DataColumn(label: Text('Card Type')),
-                  DataColumn(label: Text('Total Order Amount')),
-                  DataColumn(label: Text('Remaining Amount')),
-                  DataColumn(label: Text('Payment Amount')),
-                ],
-                rows: rows,
-                columnSpacing: 80,
-                headingRowColor:
-                    MaterialStateProperty.all(const Color(0xffCEDEFF)),
-                headingRowHeight: 50,
-              ),
+                          DataColumn(label: Text('First Name')),
+                          DataColumn(label: Text('Vehicle')),
+                          DataColumn(label: Text('Last Name')),
+                          DataColumn(label: Text('Order')),
+                          DataColumn(label: Text('Order Name')),
+                          DataColumn(label: Text('Payment Date')),
+                          DataColumn(label: Text('Note')),
+                          DataColumn(label: Text('Payment Type')),
+                          // DataColumn(label: Text('Card Type')),
+                          DataColumn(label: Text('Total Order Amount')),
+                          DataColumn(label: Text('Remaining Amount')),
+                          DataColumn(label: Text('Payment Amount')),
+                        ],
+                        rows: rows,
+                        columnSpacing: 80,
+                        headingRowColor:
+                            MaterialStateProperty.all(const Color(0xffCEDEFF)),
+                        headingRowHeight: 50,
+                      ),
+                    ),
+                  ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text('Rows per page: '),
+                    DropdownButton<int>(
+                      value: _rowsPerPage,
+                      underline: const SizedBox(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _rowsPerPage = newValue!;
+                        });
+                      },
+                      items: [5, 10, 20, 50]
+                          .map((value) => DropdownMenuItem<int>(
+                                value: value,
+                                child: Text(value.toString()),
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+                Transform.scale(
+                  scale: 0.7,
+                  child: Row(
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            if (allInvoiceReportModel?.data.prevPageUrl !=
+                                null) {
+                              ctx.read<ReportBloc>().add(
+                                  GetAllInvoiceReportEvent(
+                                      startDate: startDateToServer,
+                                      endDate: endDateToServer,
+                                      paidFilter: "",
+                                      searchQuery: "",
+                                      currentPage: 1));
+                            }
+                          },
+                          icon: Icon(
+                            Icons.arrow_back_ios_new_outlined,
+                            color:
+                                allInvoiceReportModel?.data.prevPageUrl != null
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
+                          )),
+                      IconButton(
+                          onPressed: () {
+                            if (allInvoiceReportModel?.data.nextPageUrl !=
+                                null) {
+                              ctx.read<ReportBloc>().add(
+                                  GetAllInvoiceReportEvent(
+                                      startDate: startDateToServer,
+                                      endDate: endDateToServer,
+                                      paidFilter: "",
+                                      searchQuery: "",
+                                      currentPage: 1));
+                            }
+                          },
+                          icon: Icon(
+                            Icons.arrow_forward_ios_outlined,
+                            color:
+                                allInvoiceReportModel?.data.nextPageUrl != null
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
+                          ))
+                    ],
+                  ),
+                )
+              ],
             ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            children: [
-              Text('Rows per page: '),
-              DropdownButton<int>(
-                value: _rowsPerPage,
-                underline: const SizedBox(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _rowsPerPage = newValue!;
-                  });
-                },
-                items: [5, 10, 20, 50]
-                    .map((value) => DropdownMenuItem<int>(
-                          value: value,
-                          child: Text(value.toString()),
-                        ))
-                    .toList(),
-              ),
-            ],
-          ),
-        ),
-        // Padding(
-        //   padding: const EdgeInsets.only(top: 8.0),
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     children: [
-        //       Transform.scale(
-        //           scale: 0.7,
-        //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-        //       Text(
-        //         "Dense",
-        //         style: TextStyle(fontSize: 16),
-        //       ),
-        //     ],
-        //   ),
-        // )
-      ],
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 8.0),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.start,
+          //     children: [
+          //       Transform.scale(
+          //           scale: 0.7,
+          //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+          //       Text(
+          //         "Dense",
+          //         style: TextStyle(fontSize: 16),
+          //       ),
+          //     ],
+          //   ),
+          // )
+        ],
+      ),
     );
   }
 

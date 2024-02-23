@@ -2449,16 +2449,16 @@ class ApiProvider {
   ///
   ///
   ///Api call to get all invoice reports
-  Future<dynamic> getAllInvoiceReport(String token, String monthFilter,
-      String paidFileter, int page, String searchQuery) async {
+  Future<dynamic> getAllInvoiceReport(String token, String startDate,
+      String endDate, String paidFileter, int page, String searchQuery) async {
     try {
-      final clientId = await AppUtils.getUserID();
-      // final url = Uri.parse(
-      //     '${BASE_URL}api/invoice_report?month=$monthFilter&page=$page&client_id=$clientId&paid_filter=$paidFileter&search=$searchQuery');
+      //  final clientId = await AppUtils.getUserID();
+      final url = Uri.parse(
+          '${BASE_URL}api/invoices?from_date=$startDate&to_date=$endDate&page=$page');
 
       //mock api url
-      final url = Uri.parse(
-          'https://run.mocky.io/v3/fcb7770e-ed14-4bfb-8682-6607acb306ce');
+      // final url = Uri.parse(
+      //     'https://run.mocky.io/v3/fcb7770e-ed14-4bfb-8682-6607acb306ce');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2474,12 +2474,12 @@ class ApiProvider {
     int page,
   ) async {
     try {
-      final clientId = await AppUtils.getUserID();
-      // final url = Uri.parse(
-      //     '${BASE_URL}api/sales_tax_report?start_date=$startDate&end_date=$endDate&client_id=$clientId&page=$page');
-      //mock api url
+      // final clientId = await AppUtils.getUserID();
       final url = Uri.parse(
-          'https://run.mocky.io/v3/9eafb7f2-bd2a-45fb-84b6-e81a59dd143f');
+          '${BASE_URL}api/sales_tax_report?from_date=$startDate&to_date=$endDate');
+      //mock api url
+      // final url = Uri.parse(
+      //     'https://run.mocky.io/v3/9eafb7f2-bd2a-45fb-84b6-e81a59dd143f');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2496,11 +2496,10 @@ class ApiProvider {
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
-      // final url = Uri.parse(
-      //     '${BASE_URL}api/payment_type_report?month=$monthFilter&client_id=$clientId&search=$searchQuery&page=$page');
+      final url = Uri.parse('${BASE_URL}api/payment_types_report');
       //mock url
-      final url = Uri.parse(
-          'https://run.mocky.io/v3/0c38e7e0-1774-46fa-a61e-9b468be3a5b9');
+      // final url = Uri.parse(
+      //     'https://run.mocky.io/v3/0c38e7e0-1774-46fa-a61e-9b468be3a5b9');
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2534,22 +2533,44 @@ class ApiProvider {
   //Api call to get service by technician report.
   Future<dynamic> getServiceByTechnicianReport(
     String token,
-    String monthFilter,
+    String startDate,
+    String endDate,
     String searchQuery,
     String techFilter,
     int page,
   ) async {
     try {
       final clientId = await AppUtils.getUserID();
-      // final url = Uri.parse(
-      //     '${BASE_URL}api/service_technician_report?month=$monthFilter&tech_filter=$techFilter&client_id=$clientId&search=$searchQuery&page=$page');
-      //mock api url
       final url = Uri.parse(
-          "https://run.mocky.io/v3/84ef9e71-4038-4e03-9ccc-72046160b368");
+          '${BASE_URL}api/service_by_techicians?techician_id=$techFilter&from_date=$startDate&to_date=$endDate&page=$page');
+      //mock api url
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/84ef9e71-4038-4e03-9ccc-72046160b368");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
       log('Error on getting local response');
+    }
+  }
+
+//Api call to get technican list for report module.
+  Future<dynamic> getReportTechnicanList(String token) async {
+    print("into provider");
+
+    try {
+      var url = Uri.parse(
+        "${BASE_URL}api/techicians_list",
+      );
+      var request = http.MultipartRequest("GET", url);
+
+      request.headers.addAll(getHeader(token));
+      var response = await request.send();
+      inspect(response);
+      print(response.statusCode.toString() + "provider status code");
+      print(response.toString() + "provider response");
+      return http.Response.fromStream(response);
+    } catch (e) {
+      print(e.toString() + "provider error");
     }
   }
 }

@@ -34,16 +34,16 @@ class AllInvoiceReportModel {
 class Data {
   int currentPage;
   List<Datum> data;
-  String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
-  String nextPageUrl;
-  String path;
+  String? firstPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
+  String? nextPageUrl;
+  String? path;
   int perPage;
   dynamic prevPageUrl;
-  int to;
-  int total;
+  int? to;
+  int? total;
 
   Data({
     required this.currentPage,
@@ -92,98 +92,97 @@ class Data {
 }
 
 class Datum {
-  int orderId;
-  int orderNumber;
-  String? orderName;
   String customerFirstName;
   String customerLastName;
   String vehicleName;
-  String? paymentDate;
+  int orderNumber;
+  dynamic orderName;
+  dynamic paymentDate;
   String note;
   String paymentType;
-  String cardType;
   String totalOrderAmount;
   String remainingAmount;
   String paymentAmount;
 
   Datum({
-    required this.orderId,
-    required this.orderNumber,
-    required this.orderName,
     required this.customerFirstName,
     required this.customerLastName,
     required this.vehicleName,
+    required this.orderNumber,
+    required this.orderName,
     required this.paymentDate,
     required this.note,
     required this.paymentType,
-    required this.cardType,
     required this.totalOrderAmount,
     required this.remainingAmount,
     required this.paymentAmount,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        orderId: json["order_id"],
-        orderNumber: json["order_number"],
-        orderName: json["order_name"],
         customerFirstName: json["customer_first_name"],
         customerLastName: json["customer_last_name"],
         vehicleName: json["vehicle_name"],
+        orderNumber: json["order_number"],
+        orderName: json["order_name"],
         paymentDate: json["payment_date"],
-        note: json['note'],
+        note: json["note"],
         paymentType: json["payment_type"],
-        cardType: json["card_type"],
         totalOrderAmount: json["total_order_amount"],
         remainingAmount: json["remaining_amount"],
         paymentAmount: json["payment_amount"],
       );
 
   Map<String, dynamic> toJson() => {
-        "order_id": orderId,
+        "customer_first_name":
+            customerFirstNameValues.reverse[customerFirstName],
+        "customer_last_name": customerLastNameValues.reverse[customerLastName],
+        "vehicle_name": vehicleName,
         "order_number": orderNumber,
         "order_name": orderName,
-        "customer_first_name": customerFirstName,
-        "customer_last_name": customerLastName,
-        "vehicle_name": vehicleName,
         "payment_date": paymentDate,
         "note": noteValues.reverse[note],
         "payment_type": paymentTypeValues.reverse[paymentType],
-        "card_type": cardType,
-        "total_order_amount": totalOrderAmountValues.reverse[totalOrderAmount],
+        "total_order_amount": amountValues.reverse[totalOrderAmount],
         "remaining_amount": remainingAmountValues.reverse[remainingAmount],
-        "payment_amount": paymentAmountValues.reverse[paymentAmount],
+        "payment_amount": amountValues.reverse[paymentAmount],
       };
 }
 
-enum Note { EMPTY, TEST }
+enum CustomerFirstName { CUSTOMER, CUSTOMER_NAME_ONE, FAZIL }
 
-final noteValues = EnumValues({"": Note.EMPTY, "test": Note.TEST});
-
-enum PaymentAmount { THE_000, THE_1889700 }
-
-final paymentAmountValues = EnumValues({
-  "\u00240.00": PaymentAmount.THE_000,
-  "\u002418897.00": PaymentAmount.THE_1889700
+final customerFirstNameValues = EnumValues({
+  "customer": CustomerFirstName.CUSTOMER,
+  "Customer name one": CustomerFirstName.CUSTOMER_NAME_ONE,
+  "Fazil": CustomerFirstName.FAZIL
 });
 
-enum PaymentType { EMPTY, ONLINE }
+enum CustomerLastName { JJH, ONE, SREE }
+
+final customerLastNameValues = EnumValues({
+  "Jjh": CustomerLastName.JJH,
+  "one": CustomerLastName.ONE,
+  "Sree": CustomerLastName.SREE
+});
+
+enum Note { EMPTY, TESTING_PAYMENT }
+
+final noteValues =
+    EnumValues({"-": Note.EMPTY, "testing payment ": Note.TESTING_PAYMENT});
+
+enum Amount { THE_000, THE_52000 }
+
+final amountValues = EnumValues(
+    {"\u00240.00": Amount.THE_000, "\u0024520.00": Amount.THE_52000});
+
+enum PaymentType { CASH, EMPTY }
 
 final paymentTypeValues =
-    EnumValues({"": PaymentType.EMPTY, "Online": PaymentType.ONLINE});
+    EnumValues({"Cash": PaymentType.CASH, "-": PaymentType.EMPTY});
 
-enum RemainingAmount { THE_0, THE_119375 }
+enum RemainingAmount { THE_0, THE_520 }
 
-final remainingAmountValues = EnumValues({
-  "\u00240": RemainingAmount.THE_0,
-  "\u002411937.5": RemainingAmount.THE_119375
-});
-
-enum TotalOrderAmount { THE_000, THE_695950 }
-
-final totalOrderAmountValues = EnumValues({
-  "\u00240.00": TotalOrderAmount.THE_000,
-  "\u00246959.50": TotalOrderAmount.THE_695950
-});
+final remainingAmountValues = EnumValues(
+    {"\u00240": RemainingAmount.THE_0, "\u0024520": RemainingAmount.THE_520});
 
 class EnumValues<T> {
   Map<String, T> map;

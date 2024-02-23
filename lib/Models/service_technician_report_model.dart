@@ -34,15 +34,15 @@ class ServiceByTechReportModel {
 class Data {
   int currentPage;
   List<Datum> data;
-  String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
-  String nextPageUrl;
-  String path;
-  int perPage;
+  String? firstPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
+  dynamic nextPageUrl;
+  String? path;
+  int? perPage;
   dynamic prevPageUrl;
-  int to;
+  int? to;
   int total;
 
   Data({
@@ -92,37 +92,29 @@ class Data {
 }
 
 class Datum {
-  dynamic techicianId;
   String techicianName;
   String date;
   int order;
   String serviceName;
-  String invoicedHours;
 
   Datum({
-    required this.techicianId,
     required this.techicianName,
     required this.date,
     required this.order,
     required this.serviceName,
-    required this.invoicedHours,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        techicianId: json["techician_id"],
         techicianName: json["techician_name"],
         date: json["date"],
         order: json["order"],
         serviceName: json["service_name"],
-        invoicedHours: json["invoiced_hours"],
       );
 
   Map<String, dynamic> toJson() => {
-        "techician_id": techicianId,
         "techician_name": techicianName,
         "date": date,
         "order": order,
         "service_name": serviceName,
-        "invoiced_hours": invoicedHours,
       };
 }

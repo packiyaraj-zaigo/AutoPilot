@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
+import 'package:auto_pilot/Models/report_technician_list_model.dart';
 import 'package:auto_pilot/Models/sales_tax_report_model.dart';
 import 'package:auto_pilot/Models/service_technician_report_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
@@ -24,6 +25,9 @@ part 'report_state.dart';
 
 class ReportBloc extends Bloc<ReportEvent, ReportState> {
   final apiRepo = ApiRepository();
+  int currentPage = 1;
+  int totalPages = 0;
+  bool isFetching = false;
   ReportBloc() : super(ReportInitial()) {
     on<GetAllInvoiceReportEvent>(getAllInvoiceReportBloc);
     on<GetSalesTaxReportEvent>(getSalesTaxReportBloc);
@@ -39,7 +43,11 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   Future<void> getAllInvoiceReportBloc(
       GetAllInvoiceReportEvent event, Emitter<ReportState> emit) async {
     try {
-      emit(ReportLoadingState());
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
       //change nullable with original model class
       AllInvoiceReportModel allInvoiceReportModel;
 
@@ -47,16 +55,31 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
 
       Response response = await apiRepo.getAllinvoiceReport(
           token,
-          event.monthFilter,
+          event.startDate,
+          event.endDate,
           event.paidFilter,
-          event.currentPage,
+          currentPage,
           event.searchQuery);
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
         allInvoiceReportModel = allInvoiceReportModelFromJson(response.body);
+
+        totalPages = allInvoiceReportModel.data.lastPage ?? 1;
+        currentPage = allInvoiceReportModel.data.currentPage;
+        isFetching = false;
+
         emit(GetAllInvoiceReportSuccessState(
-            allInvoiceReportModel: allInvoiceReportModel)); //change force null.
+            allInvoiceReportModel: allInvoiceReportModel));
+
+        if (totalPages > currentPage && currentPage != 0) {
+          currentPage += 1;
+          print("here1");
+        } else {
+          currentPage = 1;
+          print("here2");
+        }
+        print(currentPage.toString() + "current here");
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetAllInvoiceReportErrorState(errorMessage: decodedBody['msg']));
@@ -161,25 +184,53 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       GetServiceByTechnicianReportEvent event,
       Emitter<ReportState> emit) async {
     try {
-      emit(ReportLoadingState());
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
+
       //change nullable with original model class
       ServiceByTechReportModel serviceByTechReportModel;
       final token = await AppUtils.getToken();
 
       Response response = await apiRepo.getServiceByTechnicianReport(
           token,
-          event.monthFilter,
+          event.startDate,
+          event.endDate,
           event.searchQuery,
           event.techFilter,
-          event.currentPage);
+          currentPage);
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
         serviceByTechReportModel =
             serviceByTechReportModelFromJson(response.body);
+
+        totalPages = serviceByTechReportModel.data.lastPage ?? 1;
+        currentPage = serviceByTechReportModel.data.currentPage;
+        isFetching = false;
         emit(GetServiceByTechnicianReportSuccessState(
-            serviceByTechReportModel:
-                serviceByTechReportModel)); //change force null.
+            serviceByTechReportModel: serviceByTechReportModel));
+
+        // if (event.pagination == "next") {
+        if (totalPages > currentPage && currentPage != 0) {
+          currentPage += 1;
+          print("here1");
+        } else {
+          currentPage = 0;
+          print("here2");
+        }
+        // }
+        //  else {
+        //   if (totalPages > currentPage && currentPage != 0) {
+        //     currentPage -= 1;
+        //   } else {
+        //     currentPage = 0;
+        //   }
+        // }
+        print(currentPage.toString() + "current");
+        //change force null.
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetServiceByTechnicianReportErrorState(
@@ -217,13 +268,14 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   ) async {
     try {
       emit(ReportLoadingState());
-      TechnicianOnlyModel technicianModel;
+      ReportTechnicianListModel technicianModel;
 
       final token = await AppUtils.getToken();
-      Response getTechnicianResponse = await apiRepo.getTechniciansOnly(token);
+      Response getTechnicianResponse =
+          await apiRepo.getReportTechnicianList(token);
       if (getTechnicianResponse.statusCode == 200) {
         technicianModel =
-            technicianOnlyModelFromJson(getTechnicianResponse.body);
+            reportTechnicianListModelFromJson(getTechnicianResponse.body);
         emit(GetAllTechnicianState(technicianModel: technicianModel));
       } else {
         emit(GetAllTechnicianErrorState(errorMessage: "Something went wrong"));

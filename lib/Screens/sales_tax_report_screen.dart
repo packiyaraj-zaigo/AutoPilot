@@ -41,7 +41,10 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
 
   String startDateStr = "";
   String endDateStr = "";
+  String startDateToServer = "";
+  String endDateToServer = "";
   SalesTaxReportModel? salesTaxReportModel;
+  List<Datum> reportList = [];
 
   @override
   void initState() {
@@ -61,13 +64,16 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
           // TODO: implement listener
           if (state is GetSalesTaxReportSuccessState) {
             salesTaxReportModel = state.salesTaxReportModel;
+            reportList.clear();
+            rows.clear();
+            reportList.addAll(state.salesTaxReportModel.data);
 
-            salesTaxReportModel?.data.forEach((element) {
+            reportList.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.type)),
                 DataCell(Text(element.taxable.toString())),
                 DataCell(Text(element.nonTaxable.toString())),
-                DataCell(Text(element.taxExempt.toString())),
+                DataCell(Text(element.nonTaxable.toString())),
                 DataCell(Text(element.discount.toString())),
                 DataCell(Text(element.total.toString())),
               ]));
@@ -161,7 +167,7 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                dateSelectionWidget(),
+                                dateSelectionWidget(context),
                                 const SizedBox(
                                   height: 6,
                                 ),
@@ -187,14 +193,17 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
     );
   }
 
-  Widget dateSelectionWidget() {
+  Widget dateSelectionWidget(BuildContext ctx) {
     return Padding(
-      padding: const EdgeInsets.only(top: 16.0, right: 24, bottom: 24),
+      padding: const EdgeInsets.only(
+        top: 16.0,
+        right: 24,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Date",
+            "Invoiced",
             style: TextStyle(
                 color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
           ),
@@ -207,7 +216,7 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
               Flexible(
                 child: Container(
                     alignment: Alignment.centerLeft,
-                    width: MediaQuery.of(context).size.width,
+                    width: MediaQuery.of(ctx).size.width,
                     height: 55,
                     decoration: BoxDecoration(
                         color: Colors.white,
@@ -223,9 +232,34 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                         ]),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 12.0),
-                      child: Text(
-                        "${startDateStr}- ${endDateStr}",
-                        style: TextStyle(fontSize: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            startDateStr != "" && endDateStr != ""
+                                ? "${startDateStr}- ${endDateStr}"
+                                : "Select Date Range",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          startDateStr != "" && endDateStr != ""
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      startDateStr = "";
+                                      endDateStr = "";
+                                      startDateToServer = "";
+                                      endDateToServer = "";
+                                    });
+                                    ctx.read<ReportBloc>()
+                                      ..currentPage = 1
+                                      ..add(GetSalesTaxReportEvent(
+                                          startDate: startDateToServer,
+                                          endDate: endDateToServer,
+                                          currentPage: 1));
+                                  },
+                                  icon: Icon(Icons.close))
+                              : const SizedBox()
+                        ],
                       ),
                     )),
               ),
@@ -238,57 +272,76 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                     context: context,
                     builder: (context) {
                       List<DateTime?> tempDateList = dateRangeList;
-                      return AlertDialog(
-                        insetPadding: EdgeInsets.zero,
-                        content: Container(
-                          height: 400,
-                          width: 300,
-                          child: Column(
-                            children: [
-                              CalendarDatePicker2(
-                                  config: CalendarDatePicker2Config(
-                                    calendarType: CalendarDatePicker2Type.range,
-                                  ),
-                                  value: dateRangeList,
-                                  onValueChanged: (dates) {
-                                    tempDateList = dates;
-                                    print(tempDateList);
-                                  }),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          DateFormat outputFormat =
-                                              DateFormat('MMM d, yyyy');
-                                          // dateRangeList[0] = DateTime.parse(
-                                          //     outputFormat
-                                          //         .format(tempDateList[0]!));
+                      return BlocProvider.value(
+                        value: BlocProvider.of<ReportBloc>(ctx),
+                        child: AlertDialog(
+                          insetPadding: EdgeInsets.zero,
+                          content: Container(
+                            height: 400,
+                            width: 300,
+                            child: Column(
+                              children: [
+                                CalendarDatePicker2(
+                                    config: CalendarDatePicker2Config(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                    value: dateRangeList,
+                                    onValueChanged: (dates) {
+                                      tempDateList = dates;
+                                      print(tempDateList);
+                                    }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            DateFormat outputFormat =
+                                                DateFormat('MMM d, yyyy');
+                                            DateFormat serverFormat =
+                                                DateFormat('yyyy-MM-dd');
 
-                                          // dateRangeList[1] = DateTime.parse(
-                                          //     outputFormat
-                                          //         .format(tempDateList[1]!));
+                                            // dateRangeList[0] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[0]!));
 
-                                          dateRangeList = tempDateList;
+                                            // dateRangeList[1] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[1]!));
 
-                                          startDateStr = outputFormat
-                                              .format(dateRangeList[0]!);
-                                          endDateStr = outputFormat
-                                              .format(dateRangeList[1]!);
-                                        });
+                                            dateRangeList = tempDateList;
 
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Ok")),
-                                  TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text("Cancel")),
-                                ],
-                              )
-                            ],
+                                            startDateStr = outputFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateStr = outputFormat
+                                                .format(dateRangeList[1]!);
+
+                                            startDateToServer = serverFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateToServer = serverFormat
+                                                .format(dateRangeList[1]!);
+                                          });
+
+                                          ctx.read<ReportBloc>()
+                                            ..currentPage = 1
+                                            ..add(GetSalesTaxReportEvent(
+                                                startDate: startDateToServer,
+                                                endDate: endDateToServer,
+                                                currentPage: 1));
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Ok")),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel")),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                       );
@@ -405,29 +458,29 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Row(
-            children: [
-              Text('Rows per page: '),
-              DropdownButton<int>(
-                value: _rowsPerPage,
-                underline: const SizedBox(),
-                onChanged: (newValue) {
-                  setState(() {
-                    _rowsPerPage = newValue!;
-                  });
-                },
-                items: [5, 10, 20, 50]
-                    .map((value) => DropdownMenuItem<int>(
-                          value: value,
-                          child: Text(value.toString()),
-                        ))
-                    .toList(),
-              ),
-            ],
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.only(top: 8.0),
+        //   child: Row(
+        //     children: [
+        //       Text('Rows per page: '),
+        //       DropdownButton<int>(
+        //         value: _rowsPerPage,
+        //         underline: const SizedBox(),
+        //         onChanged: (newValue) {
+        //           setState(() {
+        //             _rowsPerPage = newValue!;
+        //           });
+        //         },
+        //         items: [5, 10, 20, 50]
+        //             .map((value) => DropdownMenuItem<int>(
+        //                   value: value,
+        //                   child: Text(value.toString()),
+        //                 ))
+        //             .toList(),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         // Padding(
         //   padding: const EdgeInsets.only(top: 8.0),
         //   child: Row(

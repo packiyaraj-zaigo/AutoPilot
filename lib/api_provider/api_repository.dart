@@ -651,10 +651,10 @@ class ApiRepository {
   ///////////////////////////////////////////////////////////
   ///Report Module
 
-  Future<dynamic> getAllinvoiceReport(String token, String monthFilter,
-      String paidFileter, int page, String searchQuery) {
+  Future<dynamic> getAllinvoiceReport(String token, String startDate,
+      String endDate, String paidFileter, int page, String searchQuery) {
     return apiProvider.getAllInvoiceReport(
-        token, monthFilter, paidFileter, page, searchQuery);
+        token, startDate, endDate, paidFileter, page, searchQuery);
   }
 
   Future<dynamic> getSalesTaxReport(
@@ -689,13 +689,18 @@ class ApiRepository {
 
   Future<dynamic> getServiceByTechnicianReport(
     String token,
-    String monthFilter,
+    String startDate,
+    String endDate,
     String searchQuery,
     String techFilter,
     int page,
   ) {
     return apiProvider.getServiceByTechnicianReport(
-        token, monthFilter, searchQuery, techFilter, page);
+        token, startDate, endDate, searchQuery, techFilter, page);
+  }
+
+  Future<dynamic> getReportTechnicianList(String token) {
+    return apiProvider.getReportTechnicanList(token);
   }
 }
 
