@@ -1044,17 +1044,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
                             onTap: () {
-                              context.read<EstimateBloc>().add(
-                                  SendEstimateToCustomerEvent(
-                                      customerId: widget
-                                              .estimateDetails.data.customer?.id
-                                              .toString() ??
-                                          "",
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
-                                      subject: widget
-                                          .estimateDetails.data.orderNumber
-                                          .toString()));
+                              if (widget.estimateDetails.data.customer !=
+                                      null &&
+                                  isCustomerEdit == false) {
+                                context.read<EstimateBloc>().add(
+                                    SendEstimateToCustomerEvent(
+                                        customerId: widget.estimateDetails.data
+                                                .customer?.id
+                                                .toString() ??
+                                            "",
+                                        orderId: widget.estimateDetails.data.id
+                                            .toString(),
+                                        subject: widget
+                                            .estimateDetails.data.orderNumber
+                                            .toString()));
+                              }
                             },
                             child: Container(
                               height: 56,
@@ -1068,12 +1072,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   ? const Center(
                                       child: CupertinoActivityIndicator(),
                                     )
-                                  : const Text(
+                                  : Text(
                                       "Send to customer",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryColors,
+                                        color: widget.estimateDetails.data
+                                                        .customer !=
+                                                    null &&
+                                                isCustomerEdit == false
+                                            ? AppColors.primaryColors
+                                            : Colors.grey,
                                       ),
                                     ),
                             ),
@@ -2209,19 +2218,25 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               "");
                         }
                       } else if (label == "Service") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              // return AddServiceScreen(
-                              //   navigation: "partial_estimate",
-                              // );
+                        if (widget.estimateDetails.data.customer != null) {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                // return AddServiceScreen(
+                                //   navigation: "partial_estimate",
+                                // );
 
-                              return AddOrderServiceScreen(
-                                  orderId: widget.estimateDetails.data.id
-                                      .toString());
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
+                                return AddOrderServiceScreen(
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString());
+                              },
+                              isScrollControlled: true,
+                              useSafeArea: true);
+                        } else {
+                          //show dialog
+                          CommonWidgets().showDialog(context,
+                              "Please select a customer before adding a service");
+                        }
                       }
                     },
                     child: const Row(
@@ -3646,7 +3661,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   orderId: widget
                                                       .estimateDetails.data.id
                                                       .toString(),
-                                                  paymentMode: "DebitCard",
+                                                  paymentMode: "check",
                                                   // tabController.index == 0
                                                   //     ? "Cash"
                                                   //     : tabController.index == 1

@@ -66,7 +66,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.paidFilter,
           currentPage,
           event.searchQuery,
-          event.exportType);
+          event.exportType,
+          event.sortBy,
+          event.tableName,
+          event.fieldName);
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////
@@ -155,7 +158,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.techFilter,
           event.searchQuery,
           currentPage,
-          event.exportType);
+          event.exportType,
+          event.sortBy,
+          event.tableName,
+          event.fieldName);
       if (response.statusCode == 200) {
         //decode response into model class.
 
@@ -251,7 +257,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.searchQuery,
           event.techFilter,
           currentPage,
-          event.exportType);
+          event.exportType,
+          event.sort,
+          event.tableName,
+          event.fieldName);
       if (response.statusCode == 200) {
         //decode response into model class.
         /////////////////////////////////

@@ -14,13 +14,19 @@ class GetAllInvoiceReportEvent extends ReportEvent {
   final String searchQuery;
   final int currentPage;
   final String exportType;
+  final String? sortBy;
+  final String? tableName;
+  final String? fieldName;
   GetAllInvoiceReportEvent(
       {required this.startDate,
       required this.endDate,
       required this.paidFilter,
       required this.searchQuery,
       required this.currentPage,
-      required this.exportType});
+      required this.exportType,
+      this.sortBy,
+      this.tableName,
+      this.fieldName});
 }
 
 class GetSalesTaxReportEvent extends ReportEvent {
@@ -41,13 +47,19 @@ class GetTimeLogReportEvent extends ReportEvent {
   final String searchQuery;
   final int currentPage;
   final String exportType;
+  final String? sortBy;
+  final String? tableName;
+  final String? fieldName;
 
   GetTimeLogReportEvent(
       {required this.monthFilter,
       required this.techFilter,
       required this.searchQuery,
       required this.currentPage,
-      required this.exportType});
+      required this.exportType,
+      this.sortBy,
+      this.tableName,
+      this.fieldName});
 }
 
 class GetPaymentTypeReportEvent extends ReportEvent {
@@ -71,6 +83,9 @@ class GetServiceByTechnicianReportEvent extends ReportEvent {
   final int currentPage;
   final String pagination;
   final String exportType;
+  final String? sort;
+  final String? tableName;
+  final String? fieldName;
   GetServiceByTechnicianReportEvent(
       {required this.startDate,
       required this.endDate,
@@ -78,7 +93,10 @@ class GetServiceByTechnicianReportEvent extends ReportEvent {
       required this.techFilter,
       required this.currentPage,
       required this.pagination,
-      required this.exportType});
+      required this.exportType,
+      this.sort,
+      this.tableName,
+      this.fieldName});
 }
 
 class InternetConnectionEvent extends ReportEvent {}

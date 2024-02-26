@@ -30,6 +30,15 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   List<Datum> reportList = [];
   int _rowsPerPage = 5;
   String? currentPaidFilter;
+  String sortBy = "asc";
+  String? tableName;
+  String? fieldName;
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
 
   // final List<DataRow> rows = List.generate(
   //   18, // Replace with your actual data
@@ -100,8 +109,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
             reportList.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.customerFirstName)),
-                DataCell(Text(element.vehicleName)),
                 DataCell(Text(element.customerLastName)),
+                DataCell(Text(element.vehicleName)),
                 DataCell(Text(element.orderNumber.toString())),
                 DataCell(Text(element.orderName ?? "")),
                 DataCell(Text(element.paymentDate.toString())),
@@ -480,6 +489,9 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
 
                           setState(() {
                             currentPaidFilter = null;
+                            sortBy = "asc";
+                            fieldName = null;
+                            tableName = null;
                           });
                         },
                         child: Icon(Icons.close))
@@ -497,14 +509,19 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                     ..add(GetAllInvoiceReportEvent(
                         startDate: "",
                         endDate: "",
-                        paidFilter: currentPaidFilter
-                                ?.toLowerCase()
-                                .trim()
-                                .replaceAll("this", "") ??
-                            "",
+                        paidFilter: currentPaidFilter == "This Week"
+                            ? "week"
+                            : currentPaidFilter == "This Month"
+                                ? "month"
+                                : currentPaidFilter == "This Year"
+                                    ? "year"
+                                    : currentPaidFilter?.toLowerCase() ?? "",
                         searchQuery: "",
                         currentPage: 1,
-                        exportType: ""));
+                        exportType: "",
+                        sortBy: sortBy,
+                        fieldName: fieldName,
+                        tableName: tableName));
                 },
                 items: paidFilterList
                     .map((String paidFilter) => DropdownMenuItem<String>(
@@ -583,165 +600,269 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   Widget tableWidget(BuildContext ctx, state) {
     return BlocProvider.value(
       value: BlocProvider.of<ReportBloc>(ctx),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: state is TableLoadingState
-                ? SizedBox(
-                    height: 200,
-                    width: MediaQuery.of(context).size.width,
-                    child: CupertinoActivityIndicator(),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              spreadRadius: 6,
-                              offset: Offset(10, 16)),
-                        ]),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: DataTable(
-                        columns: [
-                          // DataColumn(label: Text('Item')),
-                          // DataColumn(label: Text('Description')),
-                          // DataColumn(label: Text('Test')),
-                          // DataColumn(label: Text('Test 2')),
-
-                          DataColumn(label: Text('First Name')),
-                          DataColumn(label: Text('Vehicle')),
-                          DataColumn(label: Text('Last Name')),
-                          DataColumn(label: Text('Order')),
-                          DataColumn(label: Text('Order Name')),
-                          DataColumn(label: Text('Payment Date')),
-                          DataColumn(label: Text('Note')),
-                          DataColumn(label: Text('Payment Type')),
-                          // DataColumn(label: Text('Card Type')),
-                          DataColumn(label: Text('Total Order Amount')),
-                          DataColumn(label: Text('Remaining Amount')),
-                          DataColumn(label: Text('Payment Amount')),
-                        ],
-                        rows: rows,
-                        columnSpacing: 80,
-                        headingRowColor:
-                            MaterialStateProperty.all(const Color(0xffCEDEFF)),
-                        headingRowHeight: 50,
-                      ),
-                    ),
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: reportList.isEmpty
+          ? Container(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: Center(
+                child: Text("No Report Found"),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text('Rows per page: 10'),
-                    // DropdownButton<int>(
-                    //   value: _rowsPerPage,
-                    //   underline: const SizedBox(),
-                    //   onChanged: (newValue) {
-                    //     setState(() {
-                    //       _rowsPerPage = newValue!;
-                    //     });
-                    //   },
-                    //   items: [5, 10, 20, 50]
-                    //       .map((value) => DropdownMenuItem<int>(
-                    //             value: value,
-                    //             child: Text(value.toString()),
-                    //           ))
-                    //       .toList(),
-                    // ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: state is TableLoadingState
+                      ? SizedBox(
+                          height: 200,
+                          width: MediaQuery.of(context).size.width,
+                          child: CupertinoActivityIndicator(),
+                        )
+                      : Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 6,
+                                    offset: Offset(10, 16)),
+                              ]),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: DataTable(
+                              columns: [
+                                // DataColumn(label: Text('Item')),
+                                // DataColumn(label: Text('Description')),
+                                // DataColumn(label: Text('Test')),
+                                // DataColumn(label: Text('Test 2')),
 
-                    const SizedBox(
-                      width: 16,
-                    ),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          tableName = "customer";
+                                          fieldName = "first_name";
+                                        });
+                                        //sort table
+                                        sortTable(ctx, tableName, fieldName);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                    Text('First Name'),
+                                  ],
+                                )),
 
-                    Text(
-                        "${allInvoiceReportModel?.data.range.from} - ${allInvoiceReportModel?.data.range.to} to ${allInvoiceReportModel?.data.range.total}")
-                  ],
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          tableName = "customer";
+                                          fieldName = "last_name";
+                                        });
+
+                                        sortTable(ctx, tableName, fieldName);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                    Text('Last Name'),
+                                  ],
+                                )),
+
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          fieldName = "vehicle_make";
+                                          tableName = "vehicle";
+                                        });
+
+                                        sortTable(ctx, tableName, fieldName);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                    Text('Vehicle'),
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          tableName = "order";
+                                          fieldName = "order_number";
+                                        });
+
+                                        sortTable(ctx, tableName, fieldName);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                    Text('Order'),
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          tableName = "order";
+                                          fieldName = "estimation_name";
+                                        });
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                    Text('Order Name'),
+                                  ],
+                                )),
+                                DataColumn(label: Text('Payment Date')),
+                                DataColumn(label: Text('Note')),
+                                DataColumn(label: Text('Payment Type')),
+                                // DataColumn(label: Text('Card Type')),
+                                DataColumn(label: Text('Total Order Amount')),
+                                DataColumn(label: Text('Remaining Amount')),
+                                DataColumn(label: Text('Payment Amount')),
+                              ],
+                              rows: rows,
+                              columnSpacing: 80,
+                              headingRowColor: MaterialStateProperty.all(
+                                  const Color(0xffCEDEFF)),
+                              headingRowHeight: 50,
+                            ),
+                          ),
+                        ),
                 ),
-                Transform.scale(
-                  scale: 0.7,
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
                   child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      IconButton(
-                          onPressed: () {
-                            if (allInvoiceReportModel
-                                    ?.data.paginator.prevPageUrl !=
-                                null) {
-                              ctx.read<ReportBloc>().add(
-                                  GetAllInvoiceReportEvent(
-                                      startDate: startDateToServer,
-                                      endDate: endDateToServer,
-                                      paidFilter: "",
-                                      searchQuery: "",
-                                      currentPage: 1,
-                                      exportType: ""));
-                            }
-                          },
-                          icon: Icon(
-                            Icons.arrow_back_ios_new_outlined,
-                            color: allInvoiceReportModel
-                                        ?.data.paginator.prevPageUrl !=
-                                    null
-                                ? Colors.black
-                                : Colors.grey.shade300,
-                          )),
-                      IconButton(
-                          onPressed: () {
-                            if (allInvoiceReportModel
-                                    ?.data.paginator.nextPageUrl !=
-                                null) {
-                              ctx.read<ReportBloc>().add(
-                                  GetAllInvoiceReportEvent(
-                                      startDate: startDateToServer,
-                                      endDate: endDateToServer,
-                                      paidFilter: "",
-                                      searchQuery: "",
-                                      currentPage: 1,
-                                      exportType: ""));
-                            }
-                          },
-                          icon: Icon(
-                            Icons.arrow_forward_ios_outlined,
-                            color: allInvoiceReportModel
-                                        ?.data.paginator.nextPageUrl !=
-                                    null
-                                ? Colors.black
-                                : Colors.grey.shade300,
-                          ))
+                      Row(
+                        children: [
+                          Text('Rows per page: 10'),
+                          // DropdownButton<int>(
+                          //   value: _rowsPerPage,
+                          //   underline: const SizedBox(),
+                          //   onChanged: (newValue) {
+                          //     setState(() {
+                          //       _rowsPerPage = newValue!;
+                          //     });
+                          //   },
+                          //   items: [5, 10, 20, 50]
+                          //       .map((value) => DropdownMenuItem<int>(
+                          //             value: value,
+                          //             child: Text(value.toString()),
+                          //           ))
+                          //       .toList(),
+                          // ),
+
+                          const SizedBox(
+                            width: 16,
+                          ),
+
+                          Text(
+                              "${allInvoiceReportModel?.data.range.from} - ${allInvoiceReportModel?.data.range.to} to ${allInvoiceReportModel?.data.range.total}")
+                        ],
+                      ),
+                      Transform.scale(
+                        scale: 0.7,
+                        child: Row(
+                          children: [
+                            IconButton(
+                                onPressed: () {
+                                  if (allInvoiceReportModel
+                                          ?.data.paginator.prevPageUrl !=
+                                      null) {
+                                    ctx.read<ReportBloc>().add(
+                                        GetAllInvoiceReportEvent(
+                                            startDate: startDateToServer,
+                                            endDate: endDateToServer,
+                                            paidFilter: "",
+                                            searchQuery: "",
+                                            currentPage: 1,
+                                            exportType: "",
+                                            sortBy: sortBy,
+                                            fieldName: fieldName,
+                                            tableName: tableName));
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.arrow_back_ios_new_outlined,
+                                  color: allInvoiceReportModel
+                                              ?.data.paginator.prevPageUrl !=
+                                          null
+                                      ? Colors.black
+                                      : Colors.grey.shade300,
+                                )),
+                            IconButton(
+                                onPressed: () {
+                                  if (allInvoiceReportModel
+                                          ?.data.paginator.nextPageUrl !=
+                                      null) {
+                                    ctx.read<ReportBloc>().add(
+                                        GetAllInvoiceReportEvent(
+                                            startDate: startDateToServer,
+                                            endDate: endDateToServer,
+                                            paidFilter: "",
+                                            searchQuery: "",
+                                            currentPage: 1,
+                                            exportType: "",
+                                            sortBy: sortBy,
+                                            fieldName: fieldName,
+                                            tableName: tableName));
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  color: allInvoiceReportModel
+                                              ?.data.paginator.nextPageUrl !=
+                                          null
+                                      ? Colors.black
+                                      : Colors.grey.shade300,
+                                ))
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                )
+                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 8.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: [
+                //       Transform.scale(
+                //           scale: 0.7,
+                //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
+                //       Text(
+                //         "Dense",
+                //         style: TextStyle(fontSize: 16),
+                //       ),
+                //     ],
+                //   ),
+                // )
               ],
             ),
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 8.0),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.start,
-          //     children: [
-          //       Transform.scale(
-          //           scale: 0.7,
-          //           child: CupertinoSwitch(value: false, onChanged: (vlaue) {})),
-          //       Text(
-          //         "Dense",
-          //         style: TextStyle(fontSize: 16),
-          //       ),
-          //     ],
-          //   ),
-          // )
-        ],
-      ),
     );
   }
 
@@ -784,7 +905,13 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 ctx.read<ReportBloc>().add(GetAllInvoiceReportEvent(
                     startDate: "",
                     endDate: "",
-                    paidFilter: currentPaidFilter?.toLowerCase() ?? "",
+                    paidFilter: currentPaidFilter == "This Week"
+                        ? "week"
+                        : currentPaidFilter == "This Month"
+                            ? "month"
+                            : currentPaidFilter == "This Year"
+                                ? "year"
+                                : currentPaidFilter?.toLowerCase() ?? "",
                     searchQuery: "",
                     currentPage: 1,
                     exportType: "excel"));
@@ -815,6 +942,28 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 ],
               ))),
     );
+  }
+
+  sortTable(BuildContext ctx, String? tableName, String? fieldName) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>()
+      ..currentPage = 1
+      ..add(GetAllInvoiceReportEvent(
+          startDate: "",
+          endDate: "",
+          paidFilter: currentPaidFilter == "This Week"
+              ? "week"
+              : currentPaidFilter == "This Month"
+                  ? "month"
+                  : currentPaidFilter == "This Year"
+                      ? "year"
+                      : currentPaidFilter?.toLowerCase() ?? "",
+          searchQuery: "",
+          currentPage: 1,
+          exportType: "",
+          sortBy: sortBy,
+          tableName: tableName,
+          fieldName: fieldName));
   }
 }
 

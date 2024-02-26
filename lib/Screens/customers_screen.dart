@@ -225,7 +225,11 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                                 },
                                                 child: ListTile(
                                                   title: Text(
-                                                      '${item.firstName ?? ''}'),
+                                                    '${item.firstName ?? ''} ${item.lastName ?? ''}',
+                                                    style: TextStyle(
+                                                        overflow: TextOverflow
+                                                            .ellipsis),
+                                                  ),
                                                   subtitle: Text(
                                                       '${item.phone ?? ''}'),
                                                   // trailing: Icon(Icons.add),

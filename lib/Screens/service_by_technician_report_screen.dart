@@ -30,6 +30,9 @@ class _ServicesByTechnicianReportScreen
   List<techModel.Datum> technicianData = [];
   String technicianId = '';
   final TextEditingController technicianController = TextEditingController();
+  String sortBy = "asc";
+  String? tableName;
+  String? fieldName;
   // final List<DataRow> rows = List.generate(
   //   10, // Replace with your actual data
   //   (index) => DataRow(
@@ -62,6 +65,13 @@ class _ServicesByTechnicianReportScreen
     // endDateStr = outputFormat.format(dateRangeList[1]!);
     // TODO: implement initState
     super.initState();
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
   }
 
   @override
@@ -447,16 +457,110 @@ class _ServicesByTechnicianReportScreen
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: DataTable(
+                              decoration: BoxDecoration(),
+                              horizontalMargin: 12,
                               columns: [
                                 // DataColumn(label: Text('Item')),
                                 // DataColumn(label: Text('Description')),
                                 // DataColumn(label: Text('Test')),
                                 // DataColumn(label: Text('Test 2')),
 
-                                DataColumn(label: Text('Tech')),
+                                DataColumn(
+                                    label: Center(
+                                  child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                fieldName = "first_name";
+                                                tableName = "technician";
+                                              });
+                                              toggleSortOrder();
+                                              ctx.read<ReportBloc>().add(
+                                                  GetServiceByTechnicianReportEvent(
+                                                      startDate:
+                                                          startDateToServer,
+                                                      endDate: endDateToServer,
+                                                      searchQuery: "",
+                                                      techFilter: technicianId,
+                                                      currentPage: 1,
+                                                      pagination: "",
+                                                      exportType: "",
+                                                      sort: sortBy,
+                                                      fieldName: fieldName,
+                                                      tableName: tableName));
+                                            },
+                                            child: Icon(sortBy == "asc"
+                                                ? Icons.arrow_upward_rounded
+                                                : Icons
+                                                    .arrow_downward_rounded)),
+                                        Text(
+                                          'Tech',
+                                          textAlign: TextAlign.center,
+                                        )
+                                      ]),
+                                )),
                                 DataColumn(label: Text('Date')),
-                                DataColumn(label: Text('Order')),
-                                DataColumn(label: Text('Service')),
+                                DataColumn(
+                                    label: Row(children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        tableName = "order_service";
+                                        fieldName = "service_name";
+                                      });
+                                      toggleSortOrder();
+                                      ctx.read<ReportBloc>().add(
+                                          GetServiceByTechnicianReportEvent(
+                                              startDate: startDateToServer,
+                                              endDate: endDateToServer,
+                                              searchQuery: "",
+                                              techFilter: technicianId,
+                                              currentPage: 1,
+                                              pagination: "",
+                                              exportType: "",
+                                              sort: sortBy,
+                                              fieldName: "service_name",
+                                              tableName: "order_service"));
+                                    },
+                                    child: Icon(sortBy == "asc"
+                                        ? Icons.arrow_upward_rounded
+                                        : Icons.arrow_downward_rounded),
+                                  ),
+                                  Text('Order')
+                                ])),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          fieldName = "order_number";
+                                          tableName = "order";
+                                        });
+                                        toggleSortOrder();
+                                        ctx.read<ReportBloc>().add(
+                                            GetServiceByTechnicianReportEvent(
+                                                startDate: startDateToServer,
+                                                endDate: endDateToServer,
+                                                searchQuery: "",
+                                                techFilter: technicianId,
+                                                currentPage: 1,
+                                                pagination: "",
+                                                exportType: "",
+                                                sort: sortBy,
+                                                fieldName: "order_number",
+                                                tableName: "order"));
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                    Text('Service'),
+                                  ],
+                                )),
                                 //  DataColumn(label: Text('Invoiced Hours')),
                               ],
                               rows: rows,
@@ -516,7 +620,10 @@ class _ServicesByTechnicianReportScreen
                                             techFilter: technicianId,
                                             currentPage: 1,
                                             pagination: "prev",
-                                            exportType: ""));
+                                            exportType: "",
+                                            fieldName: fieldName,
+                                            tableName: tableName,
+                                            sort: sortBy));
                                   }
                                 },
                                 icon: Icon(
@@ -540,7 +647,10 @@ class _ServicesByTechnicianReportScreen
                                             techFilter: technicianId,
                                             currentPage: 1,
                                             pagination: "next",
-                                            exportType: ""));
+                                            exportType: "",
+                                            fieldName: fieldName,
+                                            sort: sortBy,
+                                            tableName: tableName));
                                   }
                                 },
                                 icon: Icon(
@@ -633,16 +743,19 @@ class _ServicesByTechnicianReportScreen
                                       endDateStr = "";
                                       startDateToServer = "";
                                       endDateToServer = "";
+                                      sortBy = "asc";
                                     });
-                                    ctx.read<ReportBloc>().add(
-                                        GetServiceByTechnicianReportEvent(
-                                            startDate: "",
-                                            endDate: "",
-                                            searchQuery: "",
-                                            techFilter: technicianId,
-                                            currentPage: 1,
-                                            pagination: "",
-                                            exportType: ""));
+                                    ctx.read<ReportBloc>()
+                                      ..currentPage = 1
+                                      ..add(GetServiceByTechnicianReportEvent(
+                                        startDate: "",
+                                        endDate: "",
+                                        searchQuery: "",
+                                        techFilter: technicianId,
+                                        currentPage: 1,
+                                        pagination: "",
+                                        exportType: "",
+                                      ));
                                   },
                                   icon: Icon(Icons.close))
                               : const SizedBox()
