@@ -3496,8 +3496,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //         ? "Credit Card"
                                                   //         : "Check",
                                                   date: cashDateToServer,
-                                                  note:
-                                                      cashNoteController.text),
+                                                  note: cashNoteController.text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     } else if (tabController.index == 1) {
@@ -3599,7 +3600,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                           .trim(),
                                                   transactionId:
                                                       creditRefNumberController
-                                                          .text),
+                                                          .text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     } else if (tabController.index == 2) {
@@ -3668,8 +3671,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //         ? "Credit Card"
                                                   //         : "Check",
                                                   date: cashDateToServer,
-                                                  note:
-                                                      cashNoteController.text),
+                                                  note: cashNoteController.text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     } else {
@@ -3738,8 +3742,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //         ? "Credit Card"
                                                   //         : "Check",
                                                   date: cashDateToServer,
-                                                  note:
-                                                      cashNoteController.text),
+                                                  note: cashNoteController.text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     }
@@ -4579,6 +4584,45 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             print("map in if");
                             materialAddModel.add(
                               CannedServiceAddModel(
+                                  cannedServiceId: e.orderServiceId,
+                                  itemName: e.itemName,
+                                  unitPrice: e.unitPrice,
+                                  discount: e.discount,
+                                  subTotal: e.subTotal,
+                                  note: e.itemServiceNote ?? "",
+                                  part: e.partName ?? "",
+                                  discountType: e.discountType,
+                                  id: e.id.toString(),
+                                  itemType: e.itemType,
+                                  position: e.position,
+                                  quanityHours: e.quanityHours,
+                                  tax: e.tax,
+                                  vendorId: e.vendorId,
+                                  cost: e.markup,
+                                  taxAmount: e.taxAmt,
+                                  discountAmount: e.discountAmt),
+                            );
+                          } else if (e.itemType.toLowerCase() == "part") {
+                            partAddModel.add(CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? '',
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                                cost: e.markup,
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
+                          } else if (e.itemType.toLowerCase() == "labor") {
+                            laborAddModel.add(CannedServiceAddModel(
                                 cannedServiceId: e.orderServiceId,
                                 itemName: e.itemName,
                                 unitPrice: e.unitPrice,
@@ -4594,81 +4638,47 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 tax: e.tax,
                                 vendorId: e.vendorId,
                                 cost: e.markup,
-                              ),
-                            );
-                          } else if (e.itemType.toLowerCase() == "part") {
-                            partAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? '',
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
-                          } else if (e.itemType.toLowerCase() == "labor") {
-                            laborAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? "",
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
                           } else if (e.itemType.toLowerCase() == "fee") {
                             feeAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? "",
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                                cost: e.markup,
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
                           } else if (e.itemType.toLowerCase() ==
                               "subcontract") {
                             subContractAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? "",
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                                cost: e.markup,
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
                           }
                         });
                       }

@@ -674,11 +674,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final token = await AppUtils.getToken();
       Response createOrderServiceItem =
-          await _apiRepository.createOrderServiceItem(
-        token,
-        event.item,
-        event.cannedServiceId.toString(),
-      );
+          await _apiRepository.createOrderServiceItem(token, event.item,
+              event.cannedServiceId.toString(), event.taxAmount);
 
       log("res${createOrderServiceItem.body}");
 
@@ -836,7 +833,8 @@ class EstimateBloc extends Bloc<EstimateEvent, EstimateState> {
           event.amount,
           event.date,
           event.note,
-          event.transactionId);
+          event.transactionId,
+          event.totalAmount);
 
       log("res${collectPaymentRes.body}");
 

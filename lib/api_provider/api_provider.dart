@@ -1833,8 +1833,8 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> createOrderServiceItems(
-      String token, CannedServiceAddModel model, String serviceId) async {
+  Future<dynamic> createOrderServiceItems(String token,
+      CannedServiceAddModel model, String serviceId, String taxAmount) async {
     try {
       final url = Uri.parse('${BASE_URL}api/order_service_items');
       final map = model.toJson();
@@ -1842,6 +1842,7 @@ class ApiProvider {
         map.remove('vendor_id');
       }
       map.remove('canned_service_id');
+
       map['order_service_id'] = serviceId;
       final request = http.MultipartRequest(
         'POST',
@@ -2195,7 +2196,8 @@ class ApiProvider {
       String amount,
       String date,
       String notes,
-      String? transactionId) async {
+      String? transactionId,
+      String totalAmount) async {
     try {
       final body = {
         "customer_id": customerId,
@@ -2203,7 +2205,8 @@ class ApiProvider {
         "payment_mode": paymentMode,
         "paid_amount": amount,
         "payment_date": date,
-        "note": notes
+        "note": notes,
+        "full_amount": totalAmount
       };
       if (transactionId != null) {
         body['transaction_id'] = transactionId;

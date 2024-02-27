@@ -1751,32 +1751,39 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                               FocusNode().requestFocus();
                               if (index != null) {
                                 material[index] = CannedServiceAddModel(
-                                  id: item!.id,
-                                  cannedServiceId: int.parse(serviceId),
-                                  note: addMaterialDescriptionController.text,
-                                  part: addMaterialBatchController.text,
-                                  itemName: addMaterialNameController.text,
-                                  unitPrice: addMaterialPriceController.text,
-                                  discount: addMaterialDiscountController.text
-                                          .trim()
-                                          .isEmpty
-                                      ? "0"
-                                      : addMaterialDiscountController.text
-                                          .trim(),
-                                  discountType: isPercentage &&
-                                          addMaterialDiscountController
-                                              .text.isNotEmpty
-                                      ? "Percentage"
-                                      : "Fixed",
-                                  quanityHours:
-                                      addMaterialQuantityController.text.trim(),
-                                  tax: client?.taxOnMaterial == "Y"
-                                      ? client?.materialTaxRate ?? '0'
-                                      : '0',
-                                  itemType: "Material",
-                                  subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addMaterialCostController.text.trim(),
-                                );
+                                    id: item!.id,
+                                    cannedServiceId: int.parse(serviceId),
+                                    note: addMaterialDescriptionController.text,
+                                    part: addMaterialBatchController.text,
+                                    itemName: addMaterialNameController.text,
+                                    unitPrice: addMaterialPriceController.text,
+                                    discount: addMaterialDiscountController.text
+                                            .trim()
+                                            .isEmpty
+                                        ? "0"
+                                        : addMaterialDiscountController.text
+                                            .trim(),
+                                    discountType: isPercentage &&
+                                            addMaterialDiscountController
+                                                .text.isNotEmpty
+                                        ? "Percentage"
+                                        : "Fixed",
+                                    quanityHours: addMaterialQuantityController
+                                        .text
+                                        .trim(),
+                                    tax: client?.taxOnMaterial == "Y"
+                                        ? client?.materialTaxRate ?? '0'
+                                        : '0',
+                                    itemType: "Material",
+                                    subTotal: subTotal.toStringAsFixed(2),
+                                    cost: addMaterialCostController.text.trim(),
+                                    taxAmount: (total - subTotal).toString(),
+                                    discountAmount:
+                                        ((double.parse(addMaterialPriceController.text) *
+                                                    double.parse(
+                                                        addMaterialQuantityController.text)) -
+                                                total)
+                                            .toString());
                                 if (item.id != '') {
                                   final ind = editedItems.indexWhere(
                                       (element) => element.id == item.id);
@@ -1812,8 +1819,14 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                         : '0',
                                     itemType: "Material",
                                     subTotal: subTotal.toStringAsFixed(2),
-                                    cost:
-                                        addMaterialCostController.text.trim()));
+                                    cost: addMaterialCostController.text.trim(),
+                                    taxAmount: (total - subTotal).toString(),
+                                    discountAmount:
+                                        ((double.parse(addMaterialPriceController.text) *
+                                                    double.parse(
+                                                        addMaterialQuantityController.text)) -
+                                                total)
+                                            .toString()));
                               }
                               setState(() {});
                               Navigator.pop(context);
@@ -2334,7 +2347,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       ? client?.salesTaxRate ?? '0'
                                       : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addPartCostController.text.trim());
+                                  cost: addPartCostController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: ((double.parse(
+                                                  addPartPriceController.text) *
+                                              double.parse(
+                                                  addPartQuantityController
+                                                      .text)) -
+                                          total)
+                                      .toString());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -2367,7 +2388,15 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : '0',
                                   itemType: "Part",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addPartCostController.text.trim()));
+                                  cost: addPartCostController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: ((double.parse(
+                                                  addPartPriceController.text) *
+                                              double.parse(
+                                                  addPartQuantityController
+                                                      .text)) -
+                                          total)
+                                      .toString()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -2805,7 +2834,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   tax: addLaborTaxController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addLaborPriceController.text.trim());
+                                  cost: addLaborPriceController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: ((double.parse(
+                                                  addLaborPriceController
+                                                      .text) *
+                                              double.parse(
+                                                  addLaborHoursController
+                                                      .text)) -
+                                          total)
+                                      .toString());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -2837,8 +2875,16 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   quanityHours: addLaborHoursController.text,
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost:
-                                      addLaborBaseCostController.text.trim()));
+                                  cost: addLaborBaseCostController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: ((double.parse(
+                                                  addLaborPriceController
+                                                      .text) *
+                                              double.parse(
+                                                  addLaborHoursController
+                                                      .text)) -
+                                          total)
+                                      .toString()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -3164,7 +3210,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       ? client?.laborTaxRate ?? '0'
                                       : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addFeeCostController.text.trim());
+                                  cost: addFeeCostController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: "0");
 
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
@@ -3189,7 +3237,9 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       ? client?.laborTaxRate ?? '0'
                                       : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
-                                  cost: addFeeCostController.text.trim()));
+                                  cost: addFeeCostController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: "0"));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -3670,7 +3720,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   itemType: "SubContract",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost:
-                                      addSubContractCostController.text.trim());
+                                      addSubContractCostController.text.trim(),
+                                  taxAmount: (total - subTotal).toString(),
+                                  discountAmount: (double.parse(
+                                              addSubContractPriceController
+                                                  .text) -
+                                          total)
+                                      .toString());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -3710,7 +3766,13 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     itemType: "SubContract",
                                     subTotal: subTotal.toStringAsFixed(2),
                                     cost: addSubContractCostController.text
-                                        .trim()),
+                                        .trim(),
+                                    taxAmount: (total - subTotal).toString(),
+                                    discountAmount: (double.parse(
+                                                addSubContractPriceController
+                                                    .text) -
+                                            total)
+                                        .toString()),
                               );
                             }
                             setState(() {});

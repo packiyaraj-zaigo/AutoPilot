@@ -39,20 +39,21 @@ class _CannedServiceDetailsPageState extends State<CannedServiceDetailsPage> {
         widget.service.cannedServiceItems!.isNotEmpty) {
       for (var element in widget.service.cannedServiceItems!) {
         final item = CannedServiceAddModel(
-          id: element.id.toString(),
-          cannedServiceId: element.cannedServiceId,
-          discount: element.discount,
-          itemName: element.itemName,
-          unitPrice: element.unitPrice,
-          cost: element.markup,
-          part: element.partName ?? '',
-          subTotal: element.subTotal,
-          discountType: 'Percentage',
-          itemType: element.itemType,
-          position: element.position,
-          quanityHours: element.quanityHours,
-          note: element.itemServiceNote ?? '',
-        );
+            id: element.id.toString(),
+            cannedServiceId: element.cannedServiceId,
+            discount: element.discount,
+            itemName: element.itemName,
+            unitPrice: element.unitPrice,
+            cost: element.markup,
+            part: element.partName ?? '',
+            subTotal: element.subTotal,
+            discountType: 'Percentage',
+            itemType: element.itemType,
+            position: element.position,
+            quanityHours: element.quanityHours,
+            note: element.itemServiceNote ?? '',
+            taxAmount: "0",
+            discountAmount: "0");
         if (element.itemType == 'Material') {
           material.add(item);
         } else if (element.itemType == 'Part') {
