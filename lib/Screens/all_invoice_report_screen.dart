@@ -112,7 +112,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 DataCell(Text(element.customerLastName)),
                 DataCell(Text(element.vehicleName)),
                 DataCell(Text(element.orderNumber.toString())),
-                DataCell(Text(element.orderName ?? "")),
+                // DataCell(Text(element.orderName ?? "")),
                 DataCell(Text(element.paymentDate.toString())),
                 DataCell(Text(element.note)),
                 DataCell(Text(element.paymentType)),
@@ -718,23 +718,23 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                     Text('Order'),
                                   ],
                                 )),
-                                DataColumn(
-                                    label: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          tableName = "order";
-                                          fieldName = "estimation_name";
-                                        });
-                                      },
-                                      child: Icon(sortBy == "asc"
-                                          ? Icons.arrow_upward_rounded
-                                          : Icons.arrow_downward_rounded),
-                                    ),
-                                    Text('Order Name'),
-                                  ],
-                                )),
+                                // DataColumn(
+                                //     label: Row(
+                                //   children: [
+                                //     GestureDetector(
+                                //       onTap: () {
+                                //         setState(() {
+                                //           tableName = "order";
+                                //           fieldName = "estimation_name";
+                                //         });
+                                //       },
+                                //       child: Icon(sortBy == "asc"
+                                //           ? Icons.arrow_upward_rounded
+                                //           : Icons.arrow_downward_rounded),
+                                //     ),
+                                //     Text('Order Name'),
+                                //   ],
+                                // )),
                                 DataColumn(label: Text('Payment Date')),
                                 DataColumn(label: Text('Note')),
                                 DataColumn(label: Text('Payment Type')),

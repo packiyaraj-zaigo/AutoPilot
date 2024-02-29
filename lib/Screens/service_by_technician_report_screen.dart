@@ -478,19 +478,23 @@ class _ServicesByTechnicianReportScreen
                                                 tableName = "technician";
                                               });
                                               toggleSortOrder();
-                                              ctx.read<ReportBloc>().add(
-                                                  GetServiceByTechnicianReportEvent(
-                                                      startDate:
-                                                          startDateToServer,
-                                                      endDate: endDateToServer,
-                                                      searchQuery: "",
-                                                      techFilter: technicianId,
-                                                      currentPage: 1,
-                                                      pagination: "",
-                                                      exportType: "",
-                                                      sort: sortBy,
-                                                      fieldName: fieldName,
-                                                      tableName: tableName));
+                                              ctx.read<ReportBloc>()
+                                                ..currentPage = 1
+                                                ..add(
+                                                    GetServiceByTechnicianReportEvent(
+                                                        startDate:
+                                                            startDateToServer,
+                                                        endDate:
+                                                            endDateToServer,
+                                                        searchQuery: "",
+                                                        techFilter:
+                                                            technicianId,
+                                                        currentPage: 1,
+                                                        pagination: "",
+                                                        exportType: "",
+                                                        sort: sortBy,
+                                                        fieldName: fieldName,
+                                                        tableName: tableName));
                                             },
                                             child: Icon(sortBy == "asc"
                                                 ? Icons.arrow_upward_rounded
@@ -512,18 +516,19 @@ class _ServicesByTechnicianReportScreen
                                         fieldName = "service_name";
                                       });
                                       toggleSortOrder();
-                                      ctx.read<ReportBloc>().add(
-                                          GetServiceByTechnicianReportEvent(
-                                              startDate: startDateToServer,
-                                              endDate: endDateToServer,
-                                              searchQuery: "",
-                                              techFilter: technicianId,
-                                              currentPage: 1,
-                                              pagination: "",
-                                              exportType: "",
-                                              sort: sortBy,
-                                              fieldName: "service_name",
-                                              tableName: "order_service"));
+                                      ctx.read<ReportBloc>()
+                                        ..currentPage = 1
+                                        ..add(GetServiceByTechnicianReportEvent(
+                                            startDate: startDateToServer,
+                                            endDate: endDateToServer,
+                                            searchQuery: "",
+                                            techFilter: technicianId,
+                                            currentPage: 1,
+                                            pagination: "",
+                                            exportType: "",
+                                            sort: sortBy,
+                                            fieldName: "order_number",
+                                            tableName: "order"));
                                     },
                                     child: Icon(sortBy == "asc"
                                         ? Icons.arrow_upward_rounded
@@ -537,22 +542,24 @@ class _ServicesByTechnicianReportScreen
                                     GestureDetector(
                                       onTap: () {
                                         setState(() {
-                                          fieldName = "order_number";
-                                          tableName = "order";
+                                          fieldName = "service_name";
+                                          tableName = "order_service";
                                         });
                                         toggleSortOrder();
-                                        ctx.read<ReportBloc>().add(
-                                            GetServiceByTechnicianReportEvent(
-                                                startDate: startDateToServer,
-                                                endDate: endDateToServer,
-                                                searchQuery: "",
-                                                techFilter: technicianId,
-                                                currentPage: 1,
-                                                pagination: "",
-                                                exportType: "",
-                                                sort: sortBy,
-                                                fieldName: "order_number",
-                                                tableName: "order"));
+                                        ctx.read<ReportBloc>()
+                                          ..currentPage = 1
+                                          ..add(
+                                              GetServiceByTechnicianReportEvent(
+                                                  startDate: startDateToServer,
+                                                  endDate: endDateToServer,
+                                                  searchQuery: "",
+                                                  techFilter: technicianId,
+                                                  currentPage: 1,
+                                                  pagination: "",
+                                                  exportType: "",
+                                                  sort: sortBy,
+                                                  fieldName: fieldName,
+                                                  tableName: tableName));
                                       },
                                       child: Icon(sortBy == "asc"
                                           ? Icons.arrow_upward_rounded

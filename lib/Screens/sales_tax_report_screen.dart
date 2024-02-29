@@ -72,10 +72,10 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.type)),
                 DataCell(Text(element.taxable.toString())),
-                DataCell(Text(element.nonTaxable.toString())),
-                DataCell(Text(element.nonTaxable.toString())),
+                // DataCell(Text(element.nonTaxable.toString())),
+                // DataCell(Text(element.nonTaxable.toString())),
                 DataCell(Text(element.discount.toString())),
-                DataCell(Text(element.total.toString())),
+                //  DataCell(Text(element.total.toString())),
               ]));
             });
           } else if (state is InternetConnectionSuccessState) {
@@ -182,18 +182,18 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                                 ),
                                 dateSelectionWidget(context),
                                 const SizedBox(
-                                  height: 6,
+                                  height: 34,
                                 ),
-                                taxTileWidget(
-                                    "Taxes collected",
-                                    salesTaxReportModel?.taxCollected
-                                            .toString() ??
-                                        ""),
-                                taxTileWidget(
-                                    "Taxe owed",
-                                    salesTaxReportModel?.nonTaxableTotal
-                                            .toString() ??
-                                        ""),
+                                // taxTileWidget(
+                                //     "Taxes collected",
+                                //     salesTaxReportModel?.taxCollected
+                                //             .toString() ??
+                                //         ""),
+                                // taxTileWidget(
+                                //     "Taxe owed",
+                                //     salesTaxReportModel?.nonTaxableTotal
+                                //             .toString() ??
+                                //         ""),
                                 state is GetSalesTaxReportErrorState
                                     ? Column(
                                         children: [
@@ -539,10 +539,10 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
 
                   DataColumn(label: Text('Type')),
                   DataColumn(label: Text('Taxable')),
-                  DataColumn(label: Text('Non-Taxable')),
-                  DataColumn(label: Text('Tax Exempt')),
+                  // DataColumn(label: Text('Non-Taxable')),
+                  // DataColumn(label: Text('Tax Exempt')),
                   DataColumn(label: Text('Discounts')),
-                  DataColumn(label: Text('Total')),
+                  // DataColumn(label: Text('Total')),
                 ],
                 rows: rows,
                 columnSpacing: 80,

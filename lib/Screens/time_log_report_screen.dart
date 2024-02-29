@@ -82,14 +82,14 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                 //  DataCell(Text(element.entry.toString())),
                 // DataCell(Text(element.type)),
                 DataCell(Text(element.techician)),
-                DataCell(Text(element.firstName)),
-                DataCell(Text(element.lastName)),
-                DataCell(Text(element.vehicleName)),
+                // DataCell(Text(element.firstName)),
+                //DataCell(Text(element.lastName)),
+                // DataCell(Text(element.vehicleName)),
                 //  DataCell(Text(element.fndEndDate.toString())),
                 DataCell(Text(element.activityType)),
                 DataCell(Text(element.activityName)),
                 DataCell(Text(element.note)),
-                DataCell(Text(element.techRate.toString())),
+                // DataCell(Text(element.techRate.toString())),
                 DataCell(Text(element.duration.toString())),
                 DataCell(Text(element.total.toString())),
               ]));
@@ -679,66 +679,66 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                     Text('Technician'),
                                   ],
                                 )),
-                                DataColumn(
-                                    label: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          tableName = "customer";
-                                          fieldName = "first_name";
-                                        });
-                                        sortTable(ctx);
-                                      },
-                                      child: Icon(sortBy == "asc"
-                                          ? Icons.arrow_upward_rounded
-                                          : Icons.arrow_downward_rounded),
-                                    ),
-                                    Text('First Name'),
-                                  ],
-                                )),
-                                DataColumn(
-                                    label: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          tableName = "customer";
-                                          fieldName = "last_name";
-                                        });
+                                // DataColumn(
+                                //     label: Row(
+                                //   children: [
+                                //     GestureDetector(
+                                //       onTap: () {
+                                //         setState(() {
+                                //           tableName = "customer";
+                                //           fieldName = "first_name";
+                                //         });
+                                //         sortTable(ctx);
+                                //       },
+                                //       child: Icon(sortBy == "asc"
+                                //           ? Icons.arrow_upward_rounded
+                                //           : Icons.arrow_downward_rounded),
+                                //     ),
+                                //     Text('First Name'),
+                                //   ],
+                                // )),
+                                // DataColumn(
+                                //     label: Row(
+                                //   children: [
+                                //     GestureDetector(
+                                //       onTap: () {
+                                //         setState(() {
+                                //           tableName = "customer";
+                                //           fieldName = "last_name";
+                                //         });
 
-                                        sortTable(ctx);
-                                      },
-                                      child: Icon(sortBy == "asc"
-                                          ? Icons.arrow_upward_rounded
-                                          : Icons.arrow_downward_rounded),
-                                    ),
-                                    Text('Last Name'),
-                                  ],
-                                )),
-                                DataColumn(
-                                    label: Row(
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          tableName = "vehicle";
-                                          fieldName = "vehicle_make";
-                                        });
-                                        sortTable(ctx);
-                                      },
-                                      child: Icon(sortBy == "asc"
-                                          ? Icons.arrow_upward_rounded
-                                          : Icons.arrow_downward_rounded),
-                                    ),
-                                    Text('Vehicle'),
-                                  ],
-                                )),
+                                //         sortTable(ctx);
+                                //       },
+                                //       child: Icon(sortBy == "asc"
+                                //           ? Icons.arrow_upward_rounded
+                                //           : Icons.arrow_downward_rounded),
+                                //     ),
+                                //     Text('Last Name'),
+                                //   ],
+                                // )),
+                                // DataColumn(
+                                //     label: Row(
+                                //   children: [
+                                //     GestureDetector(
+                                //       onTap: () {
+                                //         setState(() {
+                                //           tableName = "vehicle";
+                                //           fieldName = "vehicle_make";
+                                //         });
+                                //         sortTable(ctx);
+                                //       },
+                                //       child: Icon(sortBy == "asc"
+                                //           ? Icons.arrow_upward_rounded
+                                //           : Icons.arrow_downward_rounded),
+                                //     ),
+                                //     Text('Vehicle'),
+                                //   ],
+                                // )),
                                 // DataColumn(label: Text('Fnd Date Time')),
                                 DataColumn(label: Text('Activity Type')),
                                 DataColumn(label: Text('Activity Name')),
                                 DataColumn(label: Text('Note')),
-                                DataColumn(label: Text('Tech Rate')),
+                                // DataColumn(label: Text('Tech Rate')),
                                 DataColumn(label: Text('Duration')),
                                 DataColumn(label: Text('Total')),
                               ],

@@ -1123,7 +1123,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .orderService !=
                                           null &&
                                       widget.estimateDetails.data.orderService!
-                                          .isNotEmpty) {
+                                          .isNotEmpty &&
+                                      !widget.estimateDetails.data.orderService!
+                                          .any((mapItem) {
+                                        print(mapItem.isAuthorized);
+                                        return mapItem.isAuthorized == 'N';
+                                      })) {
                                     showModalBottomSheet(
                                       context: context,
                                       backgroundColor: Colors.transparent,
@@ -1147,7 +1152,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               // );
                             },
                             child: widget.estimateDetails.data.orderStatus ==
-                                    "Estimate"
+                                        "Estimate"|| ( widget.estimateDetails.data.orderService!
+                                        .any((mapItem) {
+                                      print(mapItem.isAuthorized);
+                                      print("hereee");
+                                      return mapItem.isAuthorized == 'N';
+                                    }))
+                                   
                                 ? Container(
                                     height: 56,
                                     alignment: Alignment.center,
@@ -1842,6 +1853,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           fontWeight: FontWeight.w600),
                     ),
                   ),
+                  //heree
                   Row(
                     children: [
                       widget.estimateDetails.data.orderService![serviceIndex]
@@ -1872,10 +1884,23 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   },
                                 );
                               },
-                              child: const Icon(
-                                Icons.more_horiz,
-                                color: AppColors.primaryColors,
-                              ),
+                              child: widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService?[serviceIndex]
+                                              .isAuthorized ==
+                                          "Y" &&
+                                      widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService?[serviceIndex]
+                                              .isAuthorizedCustomer ==
+                                          "Y"
+                                  ? const SizedBox()
+                                  : const Icon(
+                                      Icons.more_horiz,
+                                      color: AppColors.primaryColors,
+                                    ),
                             )
                           : Row(
                               children: [
@@ -3664,7 +3689,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   orderId: widget
                                                       .estimateDetails.data.id
                                                       .toString(),
-                                                  paymentMode: "check",
+                                                  paymentMode: "DebitCard",
                                                   // tabController.index == 0
                                                   //     ? "Cash"
                                                   //     : tabController.index == 1

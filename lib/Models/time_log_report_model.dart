@@ -118,26 +118,26 @@ class Paginator {
 class Datum {
   int? clientId;
   String techician;
-  String firstName;
-  String lastName;
-  String vehicleName;
+  String? firstName;
+  String? lastName;
+  String? vehicleName;
   String activityType;
   String activityName;
   String note;
-  String techRate;
+  String? techRate;
   String duration;
   String total;
 
   Datum({
     required this.clientId,
     required this.techician,
-    required this.firstName,
-    required this.lastName,
-    required this.vehicleName,
+    this.firstName,
+    this.lastName,
+    this.vehicleName,
     required this.activityType,
     required this.activityName,
     required this.note,
-    required this.techRate,
+    this.techRate,
     required this.duration,
     required this.total,
   });

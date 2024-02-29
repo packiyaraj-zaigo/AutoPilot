@@ -46,16 +46,16 @@ class SalesTaxReportModel {
 class Datum {
   String type;
   String taxable;
-  String nonTaxable;
+  String? nonTaxable;
   String discount;
-  String total;
+  String? total;
 
   Datum({
     required this.type,
     required this.taxable,
-    required this.nonTaxable,
+    this.nonTaxable,
     required this.discount,
-    required this.total,
+    this.total,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
