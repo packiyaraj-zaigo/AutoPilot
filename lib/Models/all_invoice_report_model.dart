@@ -129,7 +129,7 @@ class Datum {
     required this.customerLastName,
     required this.vehicleName,
     required this.orderNumber,
-    required this.orderName,
+    this.orderName,
     required this.paymentDate,
     required this.note,
     required this.paymentType,

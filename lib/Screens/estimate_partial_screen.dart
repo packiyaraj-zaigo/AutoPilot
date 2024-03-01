@@ -1152,13 +1152,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               // );
                             },
                             child: widget.estimateDetails.data.orderStatus ==
-                                        "Estimate"|| ( widget.estimateDetails.data.orderService!
+                                        "Estimate" ||
+                                    (widget.estimateDetails.data.orderService!
                                         .any((mapItem) {
                                       print(mapItem.isAuthorized);
                                       print("hereee");
                                       return mapItem.isAuthorized == 'N';
                                     }))
-                                   
                                 ? Container(
                                     height: 56,
                                     alignment: Alignment.center,
@@ -2484,13 +2484,20 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             .where((element) => element.isNotEmpty)
                             .toList()
                             .isNotEmpty) {
-                      showPopUpBeforeService(
-                          context,
-                          SelectServiceScreen(
-                            orderId: widget.estimateDetails.data.id.toString(),
-                            navigation: widget.navigation,
-                          ),
-                          "");
+                      if (widget.estimateDetails.data.customer != null) {
+                        showPopUpBeforeService(
+                            context,
+                            SelectServiceScreen(
+                              orderId:
+                                  widget.estimateDetails.data.id.toString(),
+                              navigation: widget.navigation,
+                            ),
+                            "");
+                      } else {
+                        //add popup here
+                        CommonWidgets().showDialog(context,
+                            "Please select a customer before adding a service");
+                      }
                     }
                   }
                 }

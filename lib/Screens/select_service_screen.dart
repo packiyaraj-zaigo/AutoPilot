@@ -527,7 +527,7 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                         CreateOrderServiceItemEvent(
                           cannedServiceId: state.orderServiceId,
                           //change this after getting total tax
-                          taxAmount: "",
+                          taxAmount: item.cannedServiceItems![i].taxAmt,
                           item: CannedServiceAddModel(
                               cannedServiceId: 0,
                               itemName: item.cannedServiceItems![i].itemName,
