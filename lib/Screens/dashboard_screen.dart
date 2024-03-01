@@ -246,6 +246,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                         ],
                                         series: <CartesianSeries>[
                                           ColumnSeries<ChartData, String>(
+                                              width: 0.3,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(8),
+                                                  topRight: Radius.circular(8)),
+                                              spacing: 0.2,
                                               dataSource: chartData,
                                               xValueMapper:
                                                   (ChartData data, _) => data.x,
@@ -253,6 +258,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                                   (ChartData data, _) =>
                                                       data.y),
                                           ColumnSeries<ChartData, String>(
+                                              width: 0.3,
+                                              spacing: 0.2,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(8),
+                                                  topRight: Radius.circular(8)),
                                               dataSource: chartData2,
                                               xValueMapper:
                                                   (ChartData data, _) => data.x,
