@@ -1820,7 +1820,8 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     itemType: "Material",
                                     subTotal: subTotal.toStringAsFixed(2),
                                     cost: addMaterialCostController.text.trim(),
-                                    taxAmount: (total - subTotal).toString(),
+                                    taxAmount: (subTotal-total).toString(),
+                                    //hereee
                                     discountAmount:
                                         ((double.parse(addMaterialPriceController.text) *
                                                     double.parse(
@@ -2389,7 +2390,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   itemType: "Part",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addPartCostController.text.trim(),
-                                  taxAmount: (total - subTotal).toString(),
+                                  taxAmount: (subTotal - total).toString(),
                                   discountAmount: ((double.parse(
                                                   addPartPriceController.text) *
                                               double.parse(
@@ -2876,7 +2877,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   itemType: "Labor",
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addLaborBaseCostController.text.trim(),
-                                  taxAmount: (total - subTotal).toString(),
+                                  taxAmount: (subTotal - total).toString(),
                                   discountAmount: ((double.parse(
                                                   addLaborPriceController
                                                       .text) *
@@ -3238,7 +3239,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                       : '0',
                                   subTotal: subTotal.toStringAsFixed(2),
                                   cost: addFeeCostController.text.trim(),
-                                  taxAmount: (total - subTotal).toString(),
+                                  taxAmount: (subTotal - total).toString(),
                                   discountAmount: "0"));
                             }
                             setState(() {});
@@ -3767,7 +3768,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                     subTotal: subTotal.toStringAsFixed(2),
                                     cost: addSubContractCostController.text
                                         .trim(),
-                                    taxAmount: (total - subTotal).toString(),
+                                    taxAmount: (subTotal - total).toString(),
                                     discountAmount: (double.parse(
                                                 addSubContractPriceController
                                                     .text) -
