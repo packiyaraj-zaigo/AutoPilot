@@ -1044,17 +1044,21 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           padding: const EdgeInsets.only(top: 45.0),
                           child: GestureDetector(
                             onTap: () {
-                              context.read<EstimateBloc>().add(
-                                  SendEstimateToCustomerEvent(
-                                      customerId: widget
-                                              .estimateDetails.data.customer?.id
-                                              .toString() ??
-                                          "",
-                                      orderId: widget.estimateDetails.data.id
-                                          .toString(),
-                                      subject: widget
-                                          .estimateDetails.data.orderNumber
-                                          .toString()));
+                              if (widget.estimateDetails.data.customer !=
+                                      null &&
+                                  isCustomerEdit == false) {
+                                context.read<EstimateBloc>().add(
+                                    SendEstimateToCustomerEvent(
+                                        customerId: widget.estimateDetails.data
+                                                .customer?.id
+                                                .toString() ??
+                                            "",
+                                        orderId: widget.estimateDetails.data.id
+                                            .toString(),
+                                        subject: widget
+                                            .estimateDetails.data.orderNumber
+                                            .toString()));
+                              }
                             },
                             child: Container(
                               height: 56,
@@ -1068,12 +1072,17 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   ? const Center(
                                       child: CupertinoActivityIndicator(),
                                     )
-                                  : const Text(
+                                  : Text(
                                       "Send to customer",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
-                                        color: AppColors.primaryColors,
+                                        color: widget.estimateDetails.data
+                                                        .customer !=
+                                                    null &&
+                                                isCustomerEdit == false
+                                            ? AppColors.primaryColors
+                                            : Colors.grey,
                                       ),
                                     ),
                             ),
@@ -1114,7 +1123,12 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                               .orderService !=
                                           null &&
                                       widget.estimateDetails.data.orderService!
-                                          .isNotEmpty) {
+                                          .isNotEmpty &&
+                                      !widget.estimateDetails.data.orderService!
+                                          .any((mapItem) {
+                                        print(mapItem.isAuthorized);
+                                        return mapItem.isAuthorized == 'N';
+                                      })) {
                                     showModalBottomSheet(
                                       context: context,
                                       backgroundColor: Colors.transparent,
@@ -1138,7 +1152,13 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               // );
                             },
                             child: widget.estimateDetails.data.orderStatus ==
-                                    "Estimate"
+                                        "Estimate"|| ( widget.estimateDetails.data.orderService!
+                                        .any((mapItem) {
+                                      print(mapItem.isAuthorized);
+                                      print("hereee");
+                                      return mapItem.isAuthorized == 'N';
+                                    }))
+                                   
                                 ? Container(
                                     height: 56,
                                     alignment: Alignment.center,
@@ -1833,6 +1853,7 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                           fontWeight: FontWeight.w600),
                     ),
                   ),
+                  //heree
                   Row(
                     children: [
                       widget.estimateDetails.data.orderService![serviceIndex]
@@ -1863,10 +1884,23 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                   },
                                 );
                               },
-                              child: const Icon(
-                                Icons.more_horiz,
-                                color: AppColors.primaryColors,
-                              ),
+                              child: widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService?[serviceIndex]
+                                              .isAuthorized ==
+                                          "Y" &&
+                                      widget
+                                              .estimateDetails
+                                              .data
+                                              .orderService?[serviceIndex]
+                                              .isAuthorizedCustomer ==
+                                          "Y"
+                                  ? const SizedBox()
+                                  : const Icon(
+                                      Icons.more_horiz,
+                                      color: AppColors.primaryColors,
+                                    ),
                             )
                           : Row(
                               children: [
@@ -2209,19 +2243,25 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                               "");
                         }
                       } else if (label == "Service") {
-                        showModalBottomSheet(
-                            context: context,
-                            builder: (context) {
-                              // return AddServiceScreen(
-                              //   navigation: "partial_estimate",
-                              // );
+                        if (widget.estimateDetails.data.customer != null) {
+                          showModalBottomSheet(
+                              context: context,
+                              builder: (context) {
+                                // return AddServiceScreen(
+                                //   navigation: "partial_estimate",
+                                // );
 
-                              return AddOrderServiceScreen(
-                                  orderId: widget.estimateDetails.data.id
-                                      .toString());
-                            },
-                            isScrollControlled: true,
-                            useSafeArea: true);
+                                return AddOrderServiceScreen(
+                                    orderId: widget.estimateDetails.data.id
+                                        .toString());
+                              },
+                              isScrollControlled: true,
+                              useSafeArea: true);
+                        } else {
+                          //show dialog
+                          CommonWidgets().showDialog(context,
+                              "Please select a customer before adding a service");
+                        }
                       }
                     },
                     child: const Row(
@@ -3481,8 +3521,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //         ? "Credit Card"
                                                   //         : "Check",
                                                   date: cashDateToServer,
-                                                  note:
-                                                      cashNoteController.text),
+                                                  note: cashNoteController.text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     } else if (tabController.index == 1) {
@@ -3584,7 +3625,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                           .trim(),
                                                   transactionId:
                                                       creditRefNumberController
-                                                          .text),
+                                                          .text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     } else if (tabController.index == 2) {
@@ -3653,8 +3696,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //         ? "Credit Card"
                                                   //         : "Check",
                                                   date: cashDateToServer,
-                                                  note:
-                                                      cashNoteController.text),
+                                                  note: cashNoteController.text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     } else {
@@ -3723,8 +3767,9 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                                   //         ? "Credit Card"
                                                   //         : "Check",
                                                   date: cashDateToServer,
-                                                  note:
-                                                      cashNoteController.text),
+                                                  note: cashNoteController.text,
+                                                  totalAmount:
+                                                      totalAmount.toString()),
                                             );
                                       }
                                     }
@@ -4564,6 +4609,45 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                             print("map in if");
                             materialAddModel.add(
                               CannedServiceAddModel(
+                                  cannedServiceId: e.orderServiceId,
+                                  itemName: e.itemName,
+                                  unitPrice: e.unitPrice,
+                                  discount: e.discount,
+                                  subTotal: e.subTotal,
+                                  note: e.itemServiceNote ?? "",
+                                  part: e.partName ?? "",
+                                  discountType: e.discountType,
+                                  id: e.id.toString(),
+                                  itemType: e.itemType,
+                                  position: e.position,
+                                  quanityHours: e.quanityHours,
+                                  tax: e.tax,
+                                  vendorId: e.vendorId,
+                                  cost: e.markup,
+                                  taxAmount: e.taxAmt,
+                                  discountAmount: e.discountAmt),
+                            );
+                          } else if (e.itemType.toLowerCase() == "part") {
+                            partAddModel.add(CannedServiceAddModel(
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? '',
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                                cost: e.markup,
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
+                          } else if (e.itemType.toLowerCase() == "labor") {
+                            laborAddModel.add(CannedServiceAddModel(
                                 cannedServiceId: e.orderServiceId,
                                 itemName: e.itemName,
                                 unitPrice: e.unitPrice,
@@ -4579,81 +4663,47 @@ class _EstimatePartialScreenState extends State<EstimatePartialScreen>
                                 tax: e.tax,
                                 vendorId: e.vendorId,
                                 cost: e.markup,
-                              ),
-                            );
-                          } else if (e.itemType.toLowerCase() == "part") {
-                            partAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? '',
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
-                          } else if (e.itemType.toLowerCase() == "labor") {
-                            laborAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? "",
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
                           } else if (e.itemType.toLowerCase() == "fee") {
                             feeAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? "",
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                                cost: e.markup,
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
                           } else if (e.itemType.toLowerCase() ==
                               "subcontract") {
                             subContractAddModel.add(CannedServiceAddModel(
-                              cannedServiceId: e.orderServiceId,
-                              itemName: e.itemName,
-                              unitPrice: e.unitPrice,
-                              discount: e.discount,
-                              subTotal: e.subTotal,
-                              note: e.itemServiceNote ?? "",
-                              part: e.partName ?? "",
-                              discountType: e.discountType,
-                              id: e.id.toString(),
-                              itemType: e.itemType,
-                              position: e.position,
-                              quanityHours: e.quanityHours,
-                              tax: e.tax,
-                              vendorId: e.vendorId,
-                              cost: e.markup,
-                            ));
+                                cannedServiceId: e.orderServiceId,
+                                itemName: e.itemName,
+                                unitPrice: e.unitPrice,
+                                discount: e.discount,
+                                subTotal: e.subTotal,
+                                note: e.itemServiceNote ?? "",
+                                part: e.partName ?? "",
+                                discountType: e.discountType,
+                                id: e.id.toString(),
+                                itemType: e.itemType,
+                                position: e.position,
+                                quanityHours: e.quanityHours,
+                                tax: e.tax,
+                                vendorId: e.vendorId,
+                                cost: e.markup,
+                                taxAmount: e.taxAmt,
+                                discountAmount: e.discountAmt));
                           }
                         });
                       }

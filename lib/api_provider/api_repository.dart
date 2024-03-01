@@ -486,9 +486,10 @@ class ApiRepository {
         serviceNotes, laborRate, tax, servicePrice, technicianId);
   }
 
-  Future<dynamic> createOrderServiceItem(
-      String token, CannedServiceAddModel model, String serviceId) {
-    return apiProvider.createOrderServiceItems(token, model, serviceId);
+  Future<dynamic> createOrderServiceItem(String token,
+      CannedServiceAddModel model, String serviceId, String taxAmount) {
+    return apiProvider.createOrderServiceItems(
+        token, model, serviceId, taxAmount);
   }
 
   Future deleteCannedService(String token, String serviceId) {
@@ -554,9 +555,10 @@ class ApiRepository {
       String amount,
       String date,
       String notes,
-      String? transactionId) async {
+      String? transactionId,
+      String totalAmount) async {
     return apiProvider.collectPayment(token, customerId, orderId, paymentMode,
-        amount, date, notes, transactionId);
+        amount, date, notes, transactionId, totalAmount);
   }
 
   Future<dynamic> deleteEstimate(dynamic token, String id) async {
@@ -659,9 +661,21 @@ class ApiRepository {
       String paidFileter,
       int page,
       String searchQuery,
-      String exportType) {
+      String exportType,
+      String? sortBy,
+      String? tableName,
+      String? fieldName) {
     return apiProvider.getAllInvoiceReport(
-        token, startDate, endDate, paidFileter, page, searchQuery, exportType);
+        token,
+        startDate,
+        endDate,
+        paidFileter,
+        page,
+        searchQuery,
+        exportType,
+        sortBy,
+        tableName,
+        fieldName);
   }
 
   Future<dynamic> getSalesTaxReport(String token, String startDate,
@@ -676,10 +690,18 @@ class ApiRepository {
         token, typeFilter, searchQuery, page, exportType);
   }
 
-  Future<dynamic> getTimeLogReport(String token, String monthFilter,
-      String techFilter, String searchQuery, int page, String exportType) {
-    return apiProvider.getTimeLogReport(
-        token, monthFilter, techFilter, searchQuery, page, exportType);
+  Future<dynamic> getTimeLogReport(
+      String token,
+      String monthFilter,
+      String techFilter,
+      String searchQuery,
+      int page,
+      String exportType,
+      String? sortBy,
+      String? tableName,
+      String? fieldName) {
+    return apiProvider.getTimeLogReport(token, monthFilter, techFilter,
+        searchQuery, page, exportType, sortBy, tableName, fieldName);
   }
 
   Future<dynamic> getServiceByTechnicianReport(
@@ -689,9 +711,12 @@ class ApiRepository {
       String searchQuery,
       String techFilter,
       int page,
-      String exportType) {
-    return apiProvider.getServiceByTechnicianReport(
-        token, startDate, endDate, searchQuery, techFilter, page, exportType);
+      String exportType,
+      String? sort,
+      String? tableName,
+      String? fieldName) {
+    return apiProvider.getServiceByTechnicianReport(token, startDate, endDate,
+        searchQuery, techFilter, page, exportType, sort, tableName, fieldName);
   }
 
   Future<dynamic> getReportTechnicianList(String token) {

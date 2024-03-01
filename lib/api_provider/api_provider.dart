@@ -1833,8 +1833,8 @@ class ApiProvider {
     }
   }
 
-  Future<dynamic> createOrderServiceItems(
-      String token, CannedServiceAddModel model, String serviceId) async {
+  Future<dynamic> createOrderServiceItems(String token,
+      CannedServiceAddModel model, String serviceId, String taxAmount) async {
     try {
       final url = Uri.parse('${BASE_URL}api/order_service_items');
       final map = model.toJson();
@@ -1842,6 +1842,7 @@ class ApiProvider {
         map.remove('vendor_id');
       }
       map.remove('canned_service_id');
+
       map['order_service_id'] = serviceId;
       final request = http.MultipartRequest(
         'POST',
@@ -2195,7 +2196,8 @@ class ApiProvider {
       String amount,
       String date,
       String notes,
-      String? transactionId) async {
+      String? transactionId,
+      String totalAmount) async {
     try {
       final body = {
         "customer_id": customerId,
@@ -2203,7 +2205,8 @@ class ApiProvider {
         "payment_mode": paymentMode,
         "paid_amount": amount,
         "payment_date": date,
-        "note": notes
+        "note": notes,
+        "full_amount": totalAmount
       };
       if (transactionId != null) {
         body['transaction_id'] = transactionId;
@@ -2456,11 +2459,17 @@ class ApiProvider {
       String paidFileter,
       int page,
       String searchQuery,
-      String exportType) async {
+      String exportType,
+      String? sortBy,
+      String? tableName,
+      String? fieldName) async {
     try {
       //  final clientId = await AppUtils.getUserID();
-      final url = Uri.parse(
-          '${BASE_URL}api/invoices?filter=fully_paid&type=$paidFileter&file_type=$exportType&page=$page');
+      final url = sortBy != null && tableName != null && fieldName != null
+          ? Uri.parse(
+              '${BASE_URL}api/invoices?filter=fully_paid&type=$paidFileter&file_type=$exportType&page=$page&sort_by=$sortBy&table=$tableName&field_name=$fieldName')
+          : Uri.parse(
+              '${BASE_URL}api/invoices?filter=fully_paid&type=$paidFileter&file_type=$exportType&page=$page');
 
       //mock api url
       // final url = Uri.parse(
@@ -2513,11 +2522,17 @@ class ApiProvider {
       String techFilter,
       String searchQuery,
       int page,
-      String exportType) async {
+      String exportType,
+      String? sortBy,
+      String? tableName,
+      String? fieldName) async {
     try {
       // final clientId = await AppUtils.getUserID();
-      final url = Uri.parse(
-          '${BASE_URL}api/time_log?time_in=$monthFilter&techician_id=$techFilter&file_type=$exportType&page=$page');
+      final url = sortBy != null && fieldName != null && tableName != null
+          ? Uri.parse(
+              '${BASE_URL}api/time_log?time_in=$monthFilter&techician_id=$techFilter&file_type=$exportType&page=$page&sort_by=$sortBy&field_name=$fieldName&table=$tableName')
+          : Uri.parse(
+              '${BASE_URL}api/time_log?time_in=$monthFilter&techician_id=$techFilter&file_type=$exportType&page=$page');
 
       //mock api url
       // final url = Uri.parse(
@@ -2537,11 +2552,17 @@ class ApiProvider {
       String searchQuery,
       String techFilter,
       int page,
-      String exportType) async {
+      String exportType,
+      String? sort,
+      String? tableName,
+      String? fieldName) async {
     try {
       final clientId = await AppUtils.getUserID();
-      final url = Uri.parse(
-          '${BASE_URL}api/service_by_techicians?techician_id=$techFilter&from_date=$startDate&to_date=$endDate&file_type=$exportType&page=$page');
+      final url = sort != null && tableName != null && fieldName != null
+          ? Uri.parse(
+              '${BASE_URL}api/service_by_techicians?techician_id=$techFilter&from_date=$startDate&to_date=$endDate&file_type=$exportType&page=$page&sort_by=$sort&field_name=$fieldName&table=$tableName')
+          : Uri.parse(
+              '${BASE_URL}api/service_by_techicians?techician_id=$techFilter&from_date=$startDate&to_date=$endDate&file_type=$exportType&page=$page');
       //mock api url
       // final url = Uri.parse(
       //     "https://run.mocky.io/v3/84ef9e71-4038-4e03-9ccc-72046160b368");

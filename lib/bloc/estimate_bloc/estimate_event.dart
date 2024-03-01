@@ -144,11 +144,12 @@ class CreateOrderServiceEvent extends EstimateEvent {
 class CreateOrderServiceItemEvent extends EstimateEvent {
   final String cannedServiceId;
   final CannedServiceAddModel item;
+  final String taxAmount;
 
-  CreateOrderServiceItemEvent({
-    required this.cannedServiceId,
-    required this.item,
-  });
+  CreateOrderServiceItemEvent(
+      {required this.cannedServiceId,
+      required this.item,
+      required this.taxAmount});
 }
 
 class DeleteOrderServiceEvent extends EstimateEvent {
@@ -172,15 +173,16 @@ class DeleteAppointmentEstimateEvent extends EstimateEvent {
 class CollectPaymentEstimateEvent extends EstimateEvent {
   final String customerId, orderId, paymentMode, amount, date, note;
   final String? transactionId;
-  CollectPaymentEstimateEvent({
-    required this.amount,
-    required this.customerId,
-    required this.orderId,
-    required this.paymentMode,
-    required this.date,
-    required this.note,
-    this.transactionId,
-  });
+  final String totalAmount;
+  CollectPaymentEstimateEvent(
+      {required this.amount,
+      required this.customerId,
+      required this.orderId,
+      required this.paymentMode,
+      required this.date,
+      required this.note,
+      this.transactionId,
+      required this.totalAmount});
 }
 
 class DeleteEstimateEvent extends EstimateEvent {

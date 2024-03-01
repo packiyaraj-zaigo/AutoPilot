@@ -17,7 +17,7 @@ class PaymentTypeReportScreen extends StatefulWidget {
 class _PaymentTypeReportScreen extends State<PaymentTypeReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   PaymentTypeReportModel? paymentTypeReportModel;
-  List<String> typeList = ["Cash", "Card", "Check", "Others"];
+  List<String> typeList = ["Cash", "Card", "Others"];
   int _rowsPerPage = 5;
   String? currentType;
   List<Total> reportList = [];

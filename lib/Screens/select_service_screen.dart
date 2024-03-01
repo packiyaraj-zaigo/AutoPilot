@@ -526,29 +526,35 @@ class _SelectServiceScreenState extends State<SelectServiceScreen> {
                   context.read<EstimateBloc>().add(
                         CreateOrderServiceItemEvent(
                           cannedServiceId: state.orderServiceId,
+                          //change this after getting total tax
+                          taxAmount: "",
                           item: CannedServiceAddModel(
-                            cannedServiceId: 0,
-                            itemName: item.cannedServiceItems![i].itemName,
-                            itemType: item.cannedServiceItems![i].itemType,
-                            discount: item.cannedServiceItems![i].discount,
-                            discountType:
-                                item.cannedServiceItems![i].discountType,
-                            quanityHours:
-                                item.cannedServiceItems![i].quanityHours,
-                            subTotal: item.cannedServiceItems![i].subTotal,
-                            unitPrice: item.cannedServiceItems![i].unitPrice,
-                            tax: item.cannedServiceItems![i].itemType ==
-                                    "Material"
-                                ? materialTax
-                                : item.cannedServiceItems![i].itemType == "Part"
-                                    ? partTax
-                                    : laborTax,
-                            cost: item.cannedServiceItems![i].markup,
-                            note: item.cannedServiceItems![i].itemServiceNote ??
-                                '',
-                            part: item.cannedServiceItems![i].partName ?? '',
-                            vendorId: item.cannedServiceItems![i].vendorId,
-                          ),
+                              cannedServiceId: 0,
+                              itemName: item.cannedServiceItems![i].itemName,
+                              itemType: item.cannedServiceItems![i].itemType,
+                              discount: item.cannedServiceItems![i].discount,
+                              discountType:
+                                  item.cannedServiceItems![i].discountType,
+                              quanityHours:
+                                  item.cannedServiceItems![i].quanityHours,
+                              subTotal: item.cannedServiceItems![i].subTotal,
+                              unitPrice: item.cannedServiceItems![i].unitPrice,
+                              tax: item.cannedServiceItems![i].itemType ==
+                                      "Material"
+                                  ? materialTax
+                                  : item.cannedServiceItems![i].itemType ==
+                                          "Part"
+                                      ? partTax
+                                      : laborTax,
+                              cost: item.cannedServiceItems![i].markup,
+                              note:
+                                  item.cannedServiceItems![i].itemServiceNote ??
+                                      '',
+                              part: item.cannedServiceItems![i].partName ?? '',
+                              vendorId: item.cannedServiceItems![i].vendorId,
+                              taxAmount: item.cannedServiceItems![i].taxAmt,
+                              discountAmount:
+                                  item.cannedServiceItems![i].discountAmt),
                         ),
                       );
                 }

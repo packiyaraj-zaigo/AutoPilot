@@ -42,20 +42,34 @@ class _ResetPasswordState extends State<ResetPassword> {
       child: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is ResetPasswordGetOtpState) {
-            widgetIndex++;
+            //  widgetIndex++;
             displayBottomSheet(context, state);
           } else if (state is ResetPasswordSendOtpErrorState) {
             otpErrorMsg = state.errorMsg;
           } else if (state is ResetPasswordGetOtpErrorState) {
             emailErrorMsg = state.errorMsg;
             emailErrorStatus = true;
+          } else if (state is ResetPasswordSendOtpErrorState) {
+            otpErrorStatus = true;
+            otpErrorMsg = state.errorMsg;
           }
-          // else if(state is ResetPasswordSendOtpState){
+          //  else if (state is ResetPasswordSendOtpState) {
+          //   print(widgetIndex.toString() + "intex");
+          //   print("here");
+          //   setState(() {
+          //     widgetIndex = 2;
+          //     otpErrorStatus = false;
+          //     otpErrorMsg = "";
+          //   });
+          //   Navigator.pop(context);
+
+          //   newToken = state.newToken;
+          // }
+          // else if (state is ResetPasswordSendOtpState) {
           //   // print("state emitted");
           //   // Navigator.pop(context);
-          //   // widgetIndex++;
+          //   widgetIndex++;
           //   // newToken=state.newToken;
-
           // }
           else if (state is CreateNewPasswordState) {
             Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
@@ -285,7 +299,8 @@ class _ResetPasswordState extends State<ResetPassword> {
     );
   }
 
-  displayBottomSheet(BuildContext context, state) {
+  displayBottomSheet(BuildContext ctx, state) {
+    otpErrorStatus = false;
     return showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -302,10 +317,13 @@ class _ResetPasswordState extends State<ResetPassword> {
                       otpErrorStatus = true;
                       otpErrorMsg = state.errorMsg;
                     } else if (state is ResetPasswordSendOtpState) {
-                      Navigator.pop(ctx);
+                      print(widgetIndex.toString() + "intex");
                       setState(() {
-                        widgetIndex++;
+                        widgetIndex = 2;
+                        otpErrorStatus = false;
+                        otpErrorMsg = "";
                       });
+                      Navigator.pop(ctx);
 
                       newToken = state.newToken;
                     }

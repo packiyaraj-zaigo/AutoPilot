@@ -26,6 +26,8 @@ class CannedServiceAddModel {
   int? vendorId;
   int position;
   String cost;
+  String taxAmount;
+  String discountAmount;
 
   CannedServiceAddModel(
       {required this.cannedServiceId,
@@ -35,6 +37,8 @@ class CannedServiceAddModel {
       required this.subTotal,
       required this.note,
       required this.part,
+      required this.taxAmount,
+      required this.discountAmount,
       this.id = '',
       this.itemType = 'Material',
       this.quanityHours = '1',
@@ -59,7 +63,9 @@ class CannedServiceAddModel {
           part: json["part_name"],
           tax: json["is_tax"],
           vendorId: json["vendor_id"],
-          cost: json['markup']);
+          cost: json['markup'],
+          taxAmount: json['tax_amt'],
+          discountAmount: json['discount_amt']);
 
   Map<String, dynamic> toJson() => {
         "canned_service_id": cannedServiceId,
@@ -75,6 +81,8 @@ class CannedServiceAddModel {
         "part_name": part,
         "is_tax": tax,
         "vendor_id": vendorId ?? 0,
-        "markup": cost
+        "markup": cost,
+        "tax_amt": taxAmount,
+        "discount_amt": discountAmount
       };
 }
