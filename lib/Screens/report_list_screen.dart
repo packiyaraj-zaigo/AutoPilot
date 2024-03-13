@@ -1,9 +1,16 @@
 import 'package:auto_pilot/Screens/all_invoice_report_screen.dart';
+import 'package:auto_pilot/Screens/all_orders_report.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/customer_summary_report_screen.dart';
+import 'package:auto_pilot/Screens/end_of_day_report_screen.dart';
+import 'package:auto_pilot/Screens/invoice_by_servicewriter_report_screen.dart';
+import 'package:auto_pilot/Screens/line_item_detail_report_screen.dart';
 import 'package:auto_pilot/Screens/payment_type_report_screen.dart';
 import 'package:auto_pilot/Screens/sales_tax_report_screen.dart';
 import 'package:auto_pilot/Screens/service_by_technician_report_screen.dart';
+import 'package:auto_pilot/Screens/shop_performance_summary_report_screen.dart';
 import 'package:auto_pilot/Screens/time_log_report_screen.dart';
+import 'package:auto_pilot/Screens/transaction_report_screen.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -61,6 +68,16 @@ class _ReportListScreen extends State<ReportListScreen> {
             reportTileWidget("Payment Types", PaymentTypeReportScreen()),
             reportTileWidget(
                 "Services By Technician", ServicesByTechnicianReportScreen()),
+            reportTileWidget(
+                "Shop Performance Summary", ShopPerformanceSummaryScreen()),
+            reportTileWidget(
+                "Summary By Customer", CustomerSummaryReportScreen()),
+            reportTileWidget("Transactions", TransactionReportScreen()),
+            reportTileWidget("All Orders", AllOrdersReportScreen()),
+            reportTileWidget("Invoice By Service Writer",
+                InvoiceByServiceWriterReportScreen()),
+            reportTileWidget("Line Item Detail", LineItemDetailReportScreen()),
+            reportTileWidget("End of Day", EndOfDayReportScreen()),
           ],
         ),
       ),
