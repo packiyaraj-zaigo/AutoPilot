@@ -32,6 +32,7 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
+              key: scaffoldKey,
               drawer: showDrawer(context),
               bottomNavigationBar: exportButtonWidget(context),
               appBar: AppBar(

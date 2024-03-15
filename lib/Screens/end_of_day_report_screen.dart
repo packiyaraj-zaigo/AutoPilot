@@ -31,6 +31,7 @@ class _EndOfDayReportScreen extends State<EndOfDayReportScreen> {
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
+              key: scaffoldKey,
               drawer: showDrawer(context),
               bottomNavigationBar: exportButtonWidget(context),
               appBar: AppBar(

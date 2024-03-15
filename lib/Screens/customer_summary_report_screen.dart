@@ -24,7 +24,16 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
   final List<ChartData> chartData = [
     ChartData("Mark", 35),
     ChartData("Kevin", 23),
-    ChartData("Casey", 34),
+    ChartData("san", 38),
+    ChartData("san2", 30),
+    ChartData("san3", 33),
+    ChartData("san4", 36),
+    ChartData("san5", 32),
+    ChartData("san6", 35),
+    ChartData("san7", 30),
+    ChartData("san8", 33),
+    ChartData("san9", 31),
+    ChartData("san10", 32),
   ];
 
   String? currentType;
@@ -39,6 +48,7 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
+              key: scaffoldKey,
               drawer: showDrawer(context),
               bottomNavigationBar: exportButtonWidget(context),
               appBar: AppBar(
@@ -135,23 +145,34 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
                 ),
                 SizedBox(
                   height: 180,
-                  child: SfCartesianChart(
-                      primaryXAxis: CategoryAxis(),
-                      // Palette colors
-                      palette: const <Color>[
-                        AppColors.primaryColors,
-                      ],
-                      series: <CartesianSeries>[
-                        ColumnSeries<ChartData, String>(
-                            width: 0.3,
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(8),
-                                topRight: Radius.circular(8)),
-                            spacing: 0.2,
-                            dataSource: chartData,
-                            xValueMapper: (ChartData data, _) => data.x,
-                            yValueMapper: (ChartData data, _) => data.y),
-                      ]),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SfCartesianChart(
+                        primaryXAxis: CategoryAxis(
+                            visibleMaximum: 3,
+                            maximumLabelWidth: 30,
+                            maximumLabels: 20,
+                            autoScrollingMode: AutoScrollingMode.start),
+                        zoomPanBehavior: ZoomPanBehavior(
+                          enablePanning: true,
+                        ),
+
+                        // Palette colors
+                        palette: const <Color>[
+                          AppColors.primaryColors,
+                        ],
+                        series: <CartesianSeries>[
+                          ColumnSeries<ChartData, String>(
+                              width: 0.3,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8)),
+                              //spacing: 0.2,
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y),
+                        ]),
+                  ),
                 )
               ],
             ),
