@@ -1,11 +1,13 @@
 import 'package:auto_pilot/Screens/all_invoice_report_screen.dart';
 import 'package:auto_pilot/Screens/all_orders_report.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
+import 'package:auto_pilot/Screens/canned_service_report_screen.dart';
 import 'package:auto_pilot/Screens/customer_summary_report_screen.dart';
 import 'package:auto_pilot/Screens/end_of_day_report_screen.dart';
 import 'package:auto_pilot/Screens/invoice_by_servicewriter_report_screen.dart';
 import 'package:auto_pilot/Screens/line_item_detail_report_screen.dart';
 import 'package:auto_pilot/Screens/payment_type_report_screen.dart';
+import 'package:auto_pilot/Screens/profitability_report_screen.dart';
 import 'package:auto_pilot/Screens/sales_tax_report_screen.dart';
 import 'package:auto_pilot/Screens/service_by_technician_report_screen.dart';
 import 'package:auto_pilot/Screens/shop_performance_summary_report_screen.dart';
@@ -45,40 +47,46 @@ class _ReportListScreen extends State<ReportListScreen> {
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            const Text(
-              'Reports',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primaryTitleColor,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              const Text(
+                'Reports',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primaryTitleColor,
+                ),
               ),
-            ),
-            const SizedBox(
-              height: 24,
-            ),
-            reportTileWidget("All Invoice", AllInvoiceReportScreen()),
-            reportTileWidget("Sales Tax", SalesTaxReportScreen()),
-            reportTileWidget("Time Log", TimeLogReportScreen()),
-            reportTileWidget("Payment Types", PaymentTypeReportScreen()),
-            reportTileWidget(
-                "Services By Technician", ServicesByTechnicianReportScreen()),
-            reportTileWidget(
-                "Shop Performance Summary", ShopPerformanceSummaryScreen()),
-            reportTileWidget(
-                "Summary By Customer", CustomerSummaryReportScreen()),
-            reportTileWidget("Transactions", TransactionReportScreen()),
-            reportTileWidget("All Orders", AllOrdersReportScreen()),
-            reportTileWidget("Invoice By Service Writer",
-                InvoiceByServiceWriterReportScreen()),
-            reportTileWidget("Line Item Detail", LineItemDetailReportScreen()),
-            reportTileWidget("End of Day", EndOfDayReportScreen()),
-          ],
+              const SizedBox(
+                height: 24,
+              ),
+              reportTileWidget("All Invoice", AllInvoiceReportScreen()),
+              reportTileWidget("Sales Tax", SalesTaxReportScreen()),
+              reportTileWidget("Time Log", TimeLogReportScreen()),
+              reportTileWidget("Payment Types", PaymentTypeReportScreen()),
+              reportTileWidget(
+                  "Services By Technician", ServicesByTechnicianReportScreen()),
+              reportTileWidget(
+                  "Shop Performance Summary", ShopPerformanceSummaryScreen()),
+              reportTileWidget(
+                  "Summary By Customer", CustomerSummaryReportScreen()),
+              reportTileWidget("Transactions", TransactionReportScreen()),
+              reportTileWidget("All Orders", AllOrdersReportScreen()),
+              reportTileWidget("Invoice By Service Writer",
+                  InvoiceByServiceWriterReportScreen()),
+              reportTileWidget(
+                  "Line Item Detail", LineItemDetailReportScreen()),
+              reportTileWidget("End of Day", EndOfDayReportScreen()),
+              reportTileWidget("Profitability", ProfitabilityReportScreen()),
+              reportTileWidget(
+                  "Canned Service Summary", CannedServiceReportScreen()),
+            ],
+          ),
         ),
       ),
     );

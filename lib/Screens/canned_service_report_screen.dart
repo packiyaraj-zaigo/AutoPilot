@@ -1,23 +1,43 @@
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
+
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 
-class TransactionReportScreen extends StatefulWidget {
-  const TransactionReportScreen({super.key});
+class CannedServiceReportScreen extends StatefulWidget {
+  const CannedServiceReportScreen({super.key});
 
   @override
-  State<TransactionReportScreen> createState() => _TransactionReportScreen();
+  State<CannedServiceReportScreen> createState() =>
+      _CannedServiceReportScreen();
 }
 
-class _TransactionReportScreen extends State<TransactionReportScreen> {
+class _CannedServiceReportScreen extends State<CannedServiceReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
-  List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+
+  final List<ChartData> chartData = [
+    ChartData("Mark", 35),
+    ChartData("Kevin", 23),
+    ChartData("Casey", 34),
+  ];
+
+  List<DateTime?> dateRangeList = [
+    DateTime.now(),
+    DateTime.now().add(const Duration(days: 1)),
+  ];
+
+  String startDateStr = "";
+  String endDateStr = "";
+  String startDateToServer = "";
+  String endDateToServer = "";
 
   String? currentType;
   @override
@@ -72,22 +92,20 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Transactions",
+                      "Canned Service Summary",
                       style: TextStyle(
                           color: AppColors.primaryTitleColor,
                           fontSize: 18,
                           fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(
-                      height: 14,
+                      height: 12,
                     ),
-                    summaryTile("Gross Revenue", "\$675"),
-                    summaryTile("Fees", "\$575"),
-                    summaryTile("Net Revenue", "\$775"),
-                    creationDropDown("Creation", context),
+                    dateSelectionWidget(context),
                     const SizedBox(
                       height: 24,
                     ),
+                    topServiceGraphWidget(),
                     const SizedBox(
                       height: 24,
                     ),
@@ -102,126 +120,260 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
     );
   }
 
-  Widget summaryTile(String label, String value) {
+  //Function to render date selection widget
+  Widget dateSelectionWidget(BuildContext ctx) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, right: 24),
-      child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 55,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.07),
-                    spreadRadius: 0,
-                    offset: Offset(0, 4),
-                    blurRadius: 10)
-              ]),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(fontSize: 16),
+      padding: const EdgeInsets.only(
+        top: 16.0,
+        right: 24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Invoiced",
+            style: TextStyle(
+                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Container(
+                    alignment: Alignment.centerLeft,
+                    width: MediaQuery.of(ctx).size.width,
+                    height: 55,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color(0xff919EAB33).withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.07),
+                              spreadRadius: 0,
+                              offset: Offset(0, 4),
+                              blurRadius: 10)
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            startDateStr != "" && endDateStr != ""
+                                ? "${startDateStr}- ${endDateStr}"
+                                : "Select Date Range",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          startDateStr != "" && endDateStr != ""
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      startDateStr = "";
+                                      endDateStr = "";
+                                      startDateToServer = "";
+                                      endDateToServer = "";
+                                    });
+                                    ctx.read<ReportBloc>()
+                                      ..currentPage = 1
+                                      ..add(GetSalesTaxReportEvent(
+                                          startDate: startDateToServer,
+                                          endDate: endDateToServer,
+                                          currentPage: 1,
+                                          exportType: ""));
+                                  },
+                                  icon: Icon(Icons.close))
+                              : const SizedBox()
+                        ],
+                      ),
+                    )),
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      List<DateTime?> tempDateList = dateRangeList;
+                      return BlocProvider.value(
+                        value: BlocProvider.of<ReportBloc>(ctx),
+                        child: AlertDialog(
+                          insetPadding: EdgeInsets.zero,
+                          content: Container(
+                            height: 400,
+                            width: 300,
+                            child: Column(
+                              children: [
+                                CalendarDatePicker2(
+                                    config: CalendarDatePicker2Config(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                    value: dateRangeList,
+                                    onValueChanged: (dates) {
+                                      tempDateList = dates;
+                                      print(tempDateList);
+                                    }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            DateFormat outputFormat =
+                                                DateFormat('MMM d, yyyy');
+                                            DateFormat serverFormat =
+                                                DateFormat('yyyy-MM-dd');
+
+                                            // dateRangeList[0] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[0]!));
+
+                                            // dateRangeList[1] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[1]!));
+
+                                            dateRangeList = tempDateList;
+
+                                            startDateStr = outputFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateStr = outputFormat
+                                                .format(dateRangeList[1]!);
+
+                                            startDateToServer = serverFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateToServer = serverFormat
+                                                .format(dateRangeList[1]!);
+                                          });
+
+                                          // ctx.read<ReportBloc>()
+                                          //   ..currentPage = 1
+                                          //   ..add(GetSalesTaxReportEvent(
+                                          //       startDate: startDateToServer,
+                                          //       endDate: endDateToServer,
+                                          //       currentPage: 1,
+                                          //       exportType: ""));
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Ok")),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel")),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.07),
+                            spreadRadius: 0,
+                            offset: Offset(0, 4),
+                            blurRadius: 10)
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: SvgPicture.asset(
+                            "assets/images/report_calander_icon.svg")),
+                  ),
                 ),
-                Text(
-                  value,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          )),
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  //Widget to render creation dropdown
-
-  creationDropDown(String label, BuildContext ctx) {
-    return BlocProvider.value(
-      value: BlocProvider.of<ReportBloc>(ctx),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 30.0, right: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500),
+  //Function to render top service graph widget
+  Widget topServiceGraphWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 24.0),
+      child: Container(
+          width: MediaQuery.of(context).size.width,
+          height: 225,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    spreadRadius: 0,
+                    offset: Offset(0, 4))
+              ]),
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Top Services",
+                  style: TextStyle(
+                      color: AppColors.primaryTitleColor,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+                SizedBox(
+                  height: 180,
+                  child: RotatedBox(
+                    quarterTurns: 1,
+                    child: SfCartesianChart(
+                        primaryXAxis: CategoryAxis(),
+                        primaryYAxis: CategoryAxis(isVisible: false),
+                        // Palette colors
+                        palette: const <Color>[
+                          AppColors.primaryColors,
+                          Color(0xff00B591)
+                        ],
+                        series: <CartesianSeries>[
+                          ColumnSeries<ChartData, String>(
+                              width: 0.5,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8)),
+                              spacing: 0.2,
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y),
+                          ColumnSeries<ChartData, String>(
+                              width: 0.5,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8)),
+                              spacing: 0.2,
+                              dataSource: chartData,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y),
+                        ]),
+                  ),
+                )
+              ],
             ),
-            const SizedBox(
-              height: 5,
-            ),
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: 55,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  border:
-                      Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withOpacity(0.07),
-                        spreadRadius: 0,
-                        offset: Offset(0, 4),
-                        blurRadius: 10)
-                  ]),
-              child: DropdownButton<String>(
-                icon: currentType != null && currentType != ""
-                    ? GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            currentType = null;
-                          });
-                          ctx.read<ReportBloc>()
-                            ..currentPage = 1
-                            ..add(GetPaymentTypeReportEvent(
-                                typeFilter: "",
-                                searchQuery: "",
-                                currentPage: 1,
-                                exportType: ""));
-                        },
-                        child: Icon(Icons.close))
-                    : const SizedBox(),
-                hint: Text("Select Type"),
-                value: currentType,
-                onChanged: (String? selectedType) {
-                  // Handle selected month
-                  print('Selected Month: $selectedType');
-
-                  setState(() {
-                    currentType = selectedType;
-                  });
-
-                  ctx.read<ReportBloc>()
-                    ..currentPage = 1
-                    ..add(GetPaymentTypeReportEvent(
-                        typeFilter: currentType?.toLowerCase() ?? "",
-                        searchQuery: "",
-                        currentPage: 1,
-                        exportType: ""));
-                },
-                items: typeList
-                    .map((String type) => DropdownMenuItem<String>(
-                          value: type,
-                          child: Text(type),
-                        ))
-                    .toList(),
-                isExpanded: true,
-                underline: const SizedBox(),
-                padding: EdgeInsets.only(left: 12, right: 12),
-              ),
-            ),
-          ],
-        ),
-      ),
+          )),
     );
   }
 
@@ -274,14 +426,14 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                       child: DataTable(
                         columns: [
                           DataColumn(
-                            label: Text('Date'),
+                            label: Text('Canned Service'),
                           ),
-                          DataColumn(label: Text('Order')),
-                          DataColumn(label: Text('Customer')),
-                          DataColumn(label: Text('Location')),
-                          DataColumn(label: Text('Total')),
-                          DataColumn(label: Text('Fee')),
-                          DataColumn(label: Text('Net')),
+                          DataColumn(label: Text('Category')),
+                          DataColumn(label: Text('Sold')),
+                          DataColumn(label: Text('Total Cost')),
+                          DataColumn(label: Text('Total Retail')),
+                          DataColumn(label: Text('Total Profit')),
+                          DataColumn(label: Text('Total Fees')),
                         ],
                         rows: rows,
                         columnSpacing: 120,

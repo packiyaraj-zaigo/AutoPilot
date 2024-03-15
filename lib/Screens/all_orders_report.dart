@@ -1,5 +1,5 @@
 import 'package:auto_pilot/Screens/app_drawer.dart';
-import 'package:auto_pilot/Screens/dashboard_screen.dart';
+
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,6 +31,7 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
+              key: scaffoldKey,
               drawer: showDrawer(context),
               bottomNavigationBar: exportButtonWidget(context),
               appBar: AppBar(

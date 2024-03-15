@@ -1,23 +1,36 @@
 import 'package:auto_pilot/Screens/app_drawer.dart';
-import 'package:auto_pilot/Screens/dashboard_screen.dart';
+
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
-class TransactionReportScreen extends StatefulWidget {
-  const TransactionReportScreen({super.key});
+class ProfitabilityReportScreen extends StatefulWidget {
+  const ProfitabilityReportScreen({super.key});
 
   @override
-  State<TransactionReportScreen> createState() => _TransactionReportScreen();
+  State<ProfitabilityReportScreen> createState() =>
+      _ProfitabilityReportScreen();
 }
 
-class _TransactionReportScreen extends State<TransactionReportScreen> {
+class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
   List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+
+  List<DateTime?> dateRangeList = [
+    DateTime.now(),
+    DateTime.now().add(const Duration(days: 1)),
+  ];
+
+  String startDateStr = "";
+  String endDateStr = "";
+  String startDateToServer = "";
+  String endDateToServer = "";
 
   String? currentType;
   @override
@@ -72,22 +85,17 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Transactions",
+                      "Profitability",
                       style: TextStyle(
                           color: AppColors.primaryTitleColor,
                           fontSize: 18,
                           fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(
-                      height: 14,
+                      height: 12,
                     ),
-                    summaryTile("Gross Revenue", "\$675"),
-                    summaryTile("Fees", "\$575"),
-                    summaryTile("Net Revenue", "\$775"),
-                    creationDropDown("Creation", context),
-                    const SizedBox(
-                      height: 24,
-                    ),
+                    dateSelectionWidget(context),
+                    serviceWriterDropdown("Service Writers", context),
                     const SizedBox(
                       height: 24,
                     ),
@@ -102,45 +110,197 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
     );
   }
 
-  Widget summaryTile(String label, String value) {
+  //Function to render date selection widget
+  Widget dateSelectionWidget(BuildContext ctx) {
     return Padding(
-      padding: const EdgeInsets.only(top: 10.0, right: 24),
-      child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 55,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Color(0xff919EAB33).withOpacity(0.2)),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black.withOpacity(0.07),
-                    spreadRadius: 0,
-                    offset: Offset(0, 4),
-                    blurRadius: 10)
-              ]),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(fontSize: 16),
+      padding: const EdgeInsets.only(
+        top: 16.0,
+        right: 24,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Invoiced",
+            style: TextStyle(
+                color: Colors.grey, fontSize: 14, fontWeight: FontWeight.w500),
+          ),
+          const SizedBox(
+            height: 5,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Container(
+                    alignment: Alignment.centerLeft,
+                    width: MediaQuery.of(ctx).size.width,
+                    height: 55,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Color(0xff919EAB33).withOpacity(0.2)),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                              color: Colors.black.withOpacity(0.07),
+                              spreadRadius: 0,
+                              offset: Offset(0, 4),
+                              blurRadius: 10)
+                        ]),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            startDateStr != "" && endDateStr != ""
+                                ? "${startDateStr}- ${endDateStr}"
+                                : "Select Date Range",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          startDateStr != "" && endDateStr != ""
+                              ? IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      startDateStr = "";
+                                      endDateStr = "";
+                                      startDateToServer = "";
+                                      endDateToServer = "";
+                                    });
+                                    ctx.read<ReportBloc>()
+                                      ..currentPage = 1
+                                      ..add(GetSalesTaxReportEvent(
+                                          startDate: startDateToServer,
+                                          endDate: endDateToServer,
+                                          currentPage: 1,
+                                          exportType: ""));
+                                  },
+                                  icon: Icon(Icons.close))
+                              : const SizedBox()
+                        ],
+                      ),
+                    )),
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      List<DateTime?> tempDateList = dateRangeList;
+                      return BlocProvider.value(
+                        value: BlocProvider.of<ReportBloc>(ctx),
+                        child: AlertDialog(
+                          insetPadding: EdgeInsets.zero,
+                          content: Container(
+                            height: 400,
+                            width: 300,
+                            child: Column(
+                              children: [
+                                CalendarDatePicker2(
+                                    config: CalendarDatePicker2Config(
+                                      calendarType:
+                                          CalendarDatePicker2Type.range,
+                                    ),
+                                    value: dateRangeList,
+                                    onValueChanged: (dates) {
+                                      tempDateList = dates;
+                                      print(tempDateList);
+                                    }),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            DateFormat outputFormat =
+                                                DateFormat('MMM d, yyyy');
+                                            DateFormat serverFormat =
+                                                DateFormat('yyyy-MM-dd');
+
+                                            // dateRangeList[0] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[0]!));
+
+                                            // dateRangeList[1] = DateTime.parse(
+                                            //     outputFormat
+                                            //         .format(tempDateList[1]!));
+
+                                            dateRangeList = tempDateList;
+
+                                            startDateStr = outputFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateStr = outputFormat
+                                                .format(dateRangeList[1]!);
+
+                                            startDateToServer = serverFormat
+                                                .format(dateRangeList[0]!);
+                                            endDateToServer = serverFormat
+                                                .format(dateRangeList[1]!);
+                                          });
+
+                                          // ctx.read<ReportBloc>()
+                                          //   ..currentPage = 1
+                                          //   ..add(GetSalesTaxReportEvent(
+                                          //       startDate: startDateToServer,
+                                          //       endDate: endDateToServer,
+                                          //       currentPage: 1,
+                                          //       exportType: ""));
+
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Ok")),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text("Cancel")),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(100),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.07),
+                            spreadRadius: 0,
+                            offset: Offset(0, 4),
+                            blurRadius: 10)
+                      ]),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: SvgPicture.asset(
+                            "assets/images/report_calander_icon.svg")),
+                  ),
                 ),
-                Text(
-                  value,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ),
-          )),
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  //Widget to render creation dropdown
+  //Function to render creation dropdown
 
-  creationDropDown(String label, BuildContext ctx) {
+  serviceWriterDropdown(String label, BuildContext ctx) {
     return BlocProvider.value(
       value: BlocProvider.of<ReportBloc>(ctx),
       child: Padding(
@@ -274,14 +434,22 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                       child: DataTable(
                         columns: [
                           DataColumn(
-                            label: Text('Date'),
+                            label: Text('Order'),
                           ),
-                          DataColumn(label: Text('Order')),
-                          DataColumn(label: Text('Customer')),
-                          DataColumn(label: Text('Location')),
-                          DataColumn(label: Text('Total')),
-                          DataColumn(label: Text('Fee')),
-                          DataColumn(label: Text('Net')),
+                          DataColumn(label: Text('First Name')),
+                          DataColumn(label: Text('Parts Retail')),
+                          DataColumn(label: Text('Parts Cost')),
+                          DataColumn(label: Text('Labor Retail')),
+                          DataColumn(label: Text('Labor Cost')),
+                          DataColumn(label: Text('Subcontract Retail')),
+                          DataColumn(label: Text('Subcontract Cost')),
+                          DataColumn(label: Text('Fees')),
+                          DataColumn(label: Text('Part Profit')),
+                          DataColumn(label: Text('Labor Profit')),
+                          DataColumn(label: Text('Subcontract Profit')),
+                          DataColumn(label: Text('Discount')),
+                          DataColumn(label: Text('Total Profit')),
+                          DataColumn(label: Text('Total Profit %')),
                         ],
                         rows: rows,
                         columnSpacing: 120,
