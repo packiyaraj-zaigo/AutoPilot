@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/transaction_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
@@ -18,22 +19,44 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
   List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+  TransactionReportModel? transactionReportModel;
+  List<Datum> reportList = [];
 
   String? currentType;
   @override
   Widget build(BuildContext) {
     return BlocProvider(
-      create: (context) => ReportBloc(),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           // TODO: implement listener
+
+          if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetTransactionReportEvent());
+          } else if (state is GetTransactionReportState) {
+            transactionReportModel = state.transactionReportModel;
+            reportList.addAll(state.transactionReportModel.data.paginator.data);
+            reportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.date)),
+                DataCell(Text(element.order)),
+                DataCell(Text(element.customer)),
+                DataCell(Text(element.location)),
+                DataCell(Text(element.total)),
+                DataCell(Text(element.fee)),
+                DataCell(Text(element.net)),
+              ]));
+            });
+          }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
               drawer: showDrawer(context),
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -65,36 +88,74 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                           color: AppColors.primaryColors,
                         ))
                   ]),
-              body: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Transactions",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 14,
-                    ),
-                    summaryTile("Gross Revenue", "\$675"),
-                    summaryTile("Fees", "\$575"),
-                    summaryTile("Net Revenue", "\$775"),
-                    creationDropDown("Creation", context),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    tableWidget(context, state)
-                  ],
-                ),
-              )),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0, left: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Transactions",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(
+                                height: 14,
+                              ),
+                              summaryTile(
+                                  "Gross Revenue",
+                                  transactionReportModel?.data.paginator
+                                          .transactions.grossRevenue ??
+                                      "0"),
+                              summaryTile(
+                                  "Fees",
+                                  transactionReportModel
+                                          ?.data.paginator.transactions.fee ??
+                                      "0"),
+                              summaryTile(
+                                  "Net Revenue",
+                                  transactionReportModel?.data.paginator
+                                          .transactions.netRevenue ??
+                                      "0"),
+                              creationDropDown("Creation", context),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              tableWidget(context, state)
+                            ],
+                          ),
+                        )),
             );
           },
         ),

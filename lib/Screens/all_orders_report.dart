@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/all_orders_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
@@ -20,20 +21,46 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
   List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
 
   String? currentType;
+  AllOrdersReportModel? allOrdersReportModel;
+  List<Datum> reportList = [];
   @override
   Widget build(BuildContext) {
     return BlocProvider(
-      create: (context) => ReportBloc(),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           // TODO: implement listener
+
+          if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetAllOrderReportEvent());
+          } else if (state is GetAllOrdersReportState) {
+            allOrdersReportModel = state.allOrdersReportModel;
+            reportList.addAll(state.allOrdersReportModel.data.paginator.data);
+
+            reportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.order)),
+                DataCell(Text(element.orderStatus)),
+                DataCell(Text(element.firstName)),
+                DataCell(Text(element.lastName)),
+                DataCell(Text(element.vehicle)),
+                DataCell(Text(element.serviceWriter)),
+                DataCell(Text(element.createdDate)),
+                DataCell(Text(element.dateInvoiced)),
+                DataCell(Text(element.paymentType)),
+                DataCell(Text(element.total)),
+              ]));
+            });
+          }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
               drawer: showDrawer(context),
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -65,27 +92,53 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                           color: AppColors.primaryColors,
                         ))
                   ]),
-              body: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "All Orders",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    creationDropDown("Creation", context),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    tableWidget(context, state)
-                  ],
-                ),
-              )),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0, left: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "All Orders",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              creationDropDown("Creation", context),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              tableWidget(context, state)
+                            ],
+                          ),
+                        )),
             );
           },
         ),
@@ -270,7 +323,8 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                           DataColumn(label: Text('Order Status')),
                           DataColumn(label: Text('First Name')),
                           DataColumn(label: Text('Last Name')),
-                          DataColumn(label: Text('Service Write')),
+                          DataColumn(label: Text('Vehicle')),
+                          DataColumn(label: Text('Service Writer')),
                           DataColumn(label: Text('Created Date')),
                           DataColumn(label: Text('Date Invoiced')),
                           DataColumn(label: Text('Payment Type')),

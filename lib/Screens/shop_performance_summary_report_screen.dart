@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/shop_performance_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
@@ -17,13 +18,29 @@ class ShopPerformanceSummaryScreen extends StatefulWidget {
 class _ShopPerformanceSummaryScreen
     extends State<ShopPerformanceSummaryScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  ShopPerformanceReportModel? shopPerformanceReportModel;
   List<DataRow> rows = [];
+  List<Datum> reportList = [];
   @override
   Widget build(BuildContext) {
     return BlocProvider(
-      create: (context) => ReportBloc(),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
+          if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetShopPerformanceReportEvent());
+          } else if (state is GetShopPerformanceReportState) {
+            shopPerformanceReportModel = state.shopPerformanceReportModel;
+            reportList
+                .addAll(state.shopPerformanceReportModel.data.paginator.data);
+            reportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.type)),
+                DataCell(Text(element.percent)),
+                DataCell(Text(element.revenue)),
+              ]));
+            });
+          }
           // TODO: implement listener
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -31,7 +48,9 @@ class _ShopPerformanceSummaryScreen
             return Scaffold(
               key: scaffoldKey,
               drawer: showDrawer(context),
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -63,41 +82,87 @@ class _ShopPerformanceSummaryScreen
                           color: AppColors.primaryColors,
                         ))
                   ]),
-              body: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Sales Summary",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    summaryTile("Invoiced", "10"),
-                    summaryTile("Payments Collected", "10"),
-                    summaryTile("Paying Customers", "10"),
-                    summaryTile("Profit", "\$25000"),
-                    summaryTile("Profit Percentage", "43%"),
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    Text(
-                      "Revenue Breakdown",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    tableWidget(context, state)
-                  ],
-                ),
-              )),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0, left: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Sales Summary",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              summaryTile(
+                                  "Invoiced",
+                                  shopPerformanceReportModel?.data.paginator
+                                          .salesSummary.invoiced ??
+                                      "0"),
+                              summaryTile(
+                                  "Payments Collected",
+                                  shopPerformanceReportModel?.data.paginator
+                                          .salesSummary.paymentsCollected ??
+                                      "0"),
+                              summaryTile(
+                                  "Paying Customers",
+                                  shopPerformanceReportModel?.data.paginator
+                                          .salesSummary.payingCustomers ??
+                                      "0"),
+                              summaryTile(
+                                  "Profit",
+                                  shopPerformanceReportModel?.data.paginator
+                                          .salesSummary.profit ??
+                                      "0"),
+                              summaryTile(
+                                  "Profit Percentage",
+                                  shopPerformanceReportModel?.data.paginator
+                                          .salesSummary.profitPercent ??
+                                      "0"),
+                              const SizedBox(
+                                height: 32,
+                              ),
+                              Text(
+                                "Revenue Breakdown",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(
+                                height: 12,
+                              ),
+                              tableWidget(context, state)
+                            ],
+                          ),
+                        )),
             );
           },
         ),

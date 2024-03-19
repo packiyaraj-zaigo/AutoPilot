@@ -2593,4 +2593,43 @@ class ApiProvider {
       print(e.toString() + "provider error");
     }
   }
+
+  // api to get shopperformance summary
+  Future<dynamic> getShopPerformanceSummary(String token, int page) async {
+    try {
+      //mock api url. change to live api url
+      final url = Uri.parse(
+          "https://run.mocky.io/v3/133183fa-775c-471f-a347-b75e8eb83c94");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  // api to get transaction report
+  Future<dynamic> getTransactionReport(String token, int page) async {
+    try {
+      //mock api url. change to live api url
+      final url = Uri.parse(
+          "https://run.mocky.io/v3/ea7e833c-f3f5-4933-adbb-6339ca70d34d");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  // api to get all orders report
+  Future<dynamic> getAllOrdersReport(String token, int page) async {
+    try {
+      //mock api url. change to live api url
+      final url = Uri.parse(
+          "https://run.mocky.io/v3/896d959d-c8b0-4f53-b47b-2a045c9f0ad5");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
 }
