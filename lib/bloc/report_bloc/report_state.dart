@@ -120,3 +120,36 @@ class GetExportLinkState extends ReportState {
 class GetExportLinkLoadingState extends ReportState {}
 
 class GetExportLinkErrorState extends ReportState {}
+
+class GetShopPerformanceReportState extends ReportState {
+  final ShopPerformanceReportModel shopPerformanceReportModel;
+  GetShopPerformanceReportState({required this.shopPerformanceReportModel});
+
+  @override
+  List<Object> get props => [shopPerformanceReportModel];
+}
+
+class GetShopPerformanceReportErrorState extends ReportState {
+  final String errorMessage;
+  GetShopPerformanceReportErrorState({required this.errorMessage});
+}
+
+class GetTransactionReportState extends ReportState {
+  final TransactionReportModel transactionReportModel;
+  GetTransactionReportState({required this.transactionReportModel});
+}
+
+class GetTransactionReportErrorState extends ReportState {
+  final String errorMessage;
+  GetTransactionReportErrorState({required this.errorMessage});
+}
+
+class GetAllOrdersReportState extends ReportState {
+  final AllOrdersReportModel allOrdersReportModel;
+  GetAllOrdersReportState({required this.allOrdersReportModel});
+}
+
+class GetAllOrdersReportErrorState extends ReportState {
+  final String errorMessage;
+  GetAllOrdersReportErrorState({required this.errorMessage});
+}

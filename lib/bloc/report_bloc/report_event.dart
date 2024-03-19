@@ -114,3 +114,9 @@ class ExportReportEvent extends ReportEvent {
       required this.fileName,
       required this.context});
 }
+
+class GetShopPerformanceReportEvent extends ReportEvent {}
+
+class GetTransactionReportEvent extends ReportEvent {}
+
+class GetAllOrderReportEvent extends ReportEvent {}

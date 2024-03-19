@@ -722,6 +722,18 @@ class ApiRepository {
   Future<dynamic> getReportTechnicianList(String token) {
     return apiProvider.getReportTechnicanList(token);
   }
+
+  Future<dynamic> getShopPerformanceReport(String token, int page) {
+    return apiProvider.getShopPerformanceSummary(token, page);
+  }
+
+  Future<dynamic> getTransactionReport(String token, int page) {
+    return apiProvider.getTransactionReport(token, page);
+  }
+
+  Future<dynamic> getAllOrdersReport(String token, int page) {
+    return apiProvider.getAllOrdersReport(token, page);
+  }
 }
 
 class NetworkError extends Error {}

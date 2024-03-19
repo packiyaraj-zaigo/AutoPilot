@@ -3,12 +3,15 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:auto_pilot/Models/all_invoice_report_model.dart';
+import 'package:auto_pilot/Models/all_orders_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
 import 'package:auto_pilot/Models/report_technician_list_model.dart';
 import 'package:auto_pilot/Models/sales_tax_report_model.dart';
 import 'package:auto_pilot/Models/service_technician_report_model.dart';
+import 'package:auto_pilot/Models/shop_performance_report_model.dart';
 import 'package:auto_pilot/Models/technician_only_model.dart';
 import 'package:auto_pilot/Models/time_log_report_model.dart';
+import 'package:auto_pilot/Models/transaction_report_model.dart';
 import 'package:auto_pilot/api_provider/api_repository.dart';
 import 'package:auto_pilot/utils/app_utils.dart';
 import 'package:auto_pilot/utils/common_widgets.dart';
@@ -39,6 +42,9 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<InternetConnectionEvent>(internetConnectionBloc);
     on<GetAllTechnicianEvent>(getAllTechnicianBloc);
     on<ExportReportEvent>(exportReportBloc);
+    on<GetShopPerformanceReportEvent>(getShopPerformanceReportBloc);
+    on<GetTransactionReportEvent>(getTransactionReportBloc);
+    on<GetAllOrderReportEvent>(getAllOrdersReportBloc);
   }
 
   //Bloc to get all invoice report.
@@ -409,6 +415,91 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       print(s);
 
       emit(ExportReportErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to get shop performance report
+  Future<void> getShopPerformanceReportBloc(
+      GetShopPerformanceReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      //change nullable with original model class
+      ShopPerformanceReportModel shopPerformanceReportModel;
+      final token = await AppUtils.getToken();
+
+      Response response = await apiRepo.getShopPerformanceReport(token, 0);
+      if (response.statusCode == 200) {
+        shopPerformanceReportModel =
+            shopPerformanceReportModelFromJson(response.body);
+
+        emit(GetShopPerformanceReportState(
+            shopPerformanceReportModel: shopPerformanceReportModel));
+      } else {
+        var decodedBody = json.decode(response.body);
+        emit(GetShopPerformanceReportErrorState(
+            errorMessage: decodedBody['msg']));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(GetShopPerformanceReportErrorState(
+          errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to get transaction report
+  Future<void> getTransactionReportBloc(
+      GetTransactionReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      //change nullable with original model class
+      TransactionReportModel transactionReportModel;
+      final token = await AppUtils.getToken();
+
+      Response response = await apiRepo.getTransactionReport(token, 0);
+      if (response.statusCode == 200) {
+        transactionReportModel = transactionReportModelFromJson(response.body);
+
+        emit(GetTransactionReportState(
+            transactionReportModel: transactionReportModel));
+      } else {
+        var decodedBody = json.decode(response.body);
+        emit(GetTransactionReportErrorState(errorMessage: decodedBody['msg']));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(
+          GetTransactionReportErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to get all orders report
+  Future<void> getAllOrdersReportBloc(
+      GetAllOrderReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      //change nullable with original model class
+      AllOrdersReportModel allOrdersReportModel;
+      final token = await AppUtils.getToken();
+
+      Response response = await apiRepo.getAllOrdersReport(token, 0);
+      if (response.statusCode == 200) {
+        allOrdersReportModel = allOrdersReportModelFromJson(response.body);
+
+        emit(GetAllOrdersReportState(
+            allOrdersReportModel: allOrdersReportModel));
+      } else {
+        var decodedBody = json.decode(response.body);
+        emit(GetAllOrdersReportErrorState(errorMessage: decodedBody['msg']));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(GetAllOrdersReportErrorState(errorMessage: "Something went wrong"));
     }
   }
 }
