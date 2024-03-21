@@ -117,6 +117,29 @@ class ExportReportEvent extends ReportEvent {
 
 class GetShopPerformanceReportEvent extends ReportEvent {}
 
-class GetTransactionReportEvent extends ReportEvent {}
+class GetTransactionReportEvent extends ReportEvent {
+  final String page;
+  final String exportType;
+  final String createFilter;
+  GetTransactionReportEvent(
+      {required this.page,
+      required this.exportType,
+      required this.createFilter});
+}
 
-class GetAllOrderReportEvent extends ReportEvent {}
+class GetAllOrderReportEvent extends ReportEvent {
+  final String exportType;
+  final String page;
+  final String createFilter;
+  GetAllOrderReportEvent(
+      {required this.exportType,
+      required this.page,
+      required this.createFilter});
+}
+
+class GetLineItemDetailReportEvent extends ReportEvent {}
+
+class GetEndOfDayReportEvent extends ReportEvent {
+  final String exportType;
+  GetEndOfDayReportEvent({required this.exportType});
+}

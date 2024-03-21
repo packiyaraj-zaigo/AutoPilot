@@ -1,36 +1,32 @@
 // To parse this JSON data, do
 //
-//     final transactionReportModel = transactionReportModelFromJson(jsonString);
+//     final lineItemDetailReportModel = lineItemDetailReportModelFromJson(jsonString);
 
 import 'dart:convert';
 
-TransactionReportModel transactionReportModelFromJson(String str) =>
-    TransactionReportModel.fromJson(json.decode(str));
+LineItemDetailReportModel lineItemDetailReportModelFromJson(String str) =>
+    LineItemDetailReportModel.fromJson(json.decode(str));
 
-String transactionReportModelToJson(TransactionReportModel data) =>
+String lineItemDetailReportModelToJson(LineItemDetailReportModel data) =>
     json.encode(data.toJson());
 
-class TransactionReportModel {
+class LineItemDetailReportModel {
   Data data;
-  String grossRevenue;
   String message;
 
-  TransactionReportModel({
+  LineItemDetailReportModel({
     required this.data,
-    required this.grossRevenue,
     required this.message,
   });
 
-  factory TransactionReportModel.fromJson(Map<String, dynamic> json) =>
-      TransactionReportModel(
+  factory LineItemDetailReportModel.fromJson(Map<String, dynamic> json) =>
+      LineItemDetailReportModel(
         data: Data.fromJson(json["data"]),
-        grossRevenue: json["gross_revenue"],
         message: json["message"],
       );
 
   Map<String, dynamic> toJson() => {
         "data": data.toJson(),
-        "gross_revenue": grossRevenue,
         "message": message,
       };
 }
@@ -116,34 +112,54 @@ class Paginator {
 }
 
 class Datum {
-  String date;
-  int orderNumber;
-  String customer;
-  String location;
-  String total;
+  String order;
+  String invoicedDate;
+  String vehicle;
+  String type;
+  String typeDescription;
+  String technician;
+  String vendor;
+  String cost;
+  String price;
+  String quantity;
 
   Datum({
-    required this.date,
-    required this.orderNumber,
-    required this.customer,
-    required this.location,
-    required this.total,
+    required this.order,
+    required this.invoicedDate,
+    required this.vehicle,
+    required this.type,
+    required this.typeDescription,
+    required this.technician,
+    required this.vendor,
+    required this.cost,
+    required this.price,
+    required this.quantity,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        date: json["date"],
-        orderNumber: json["order_number"],
-        customer: json["customer"],
-        location: json["location"],
-        total: json["total"],
+        order: json["order"],
+        invoicedDate: json["invoiced_date"],
+        vehicle: json["vehicle"],
+        type: json["type"],
+        typeDescription: json["type_description"],
+        technician: json["technician"],
+        vendor: json["vendor"],
+        cost: json["cost"],
+        price: json["price"],
+        quantity: json["quantity"],
       );
 
   Map<String, dynamic> toJson() => {
-        "date": date,
-        "order_number": orderNumber,
-        "customer": customer,
-        "location": location,
-        "total": total,
+        "order": order,
+        "invoiced_date": invoicedDate,
+        "vehicle": vehicle,
+        "type": type,
+        "type_description": typeDescription,
+        "technician": technician,
+        "vendor": vendor,
+        "cost": cost,
+        "price": price,
+        "quantity": quantity,
       };
 }
 

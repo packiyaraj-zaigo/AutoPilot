@@ -55,15 +55,15 @@ class Paginator {
   int currentPage;
   List<Datum> data;
   String firstPageUrl;
-  int from;
-  int lastPage;
-  String lastPageUrl;
+  int? from;
+  int? lastPage;
+  String? lastPageUrl;
   dynamic nextPageUrl;
-  String path;
-  int perPage;
+  String? path;
+  int? perPage;
   dynamic prevPageUrl;
-  int to;
-  int total;
+  int? to;
+  int? total;
 
   Paginator({
     required this.currentPage,
@@ -112,51 +112,55 @@ class Paginator {
 }
 
 class Datum {
-  String order;
+  int orderNumber;
   String orderStatus;
   String firstName;
   String lastName;
-  String vehicle;
+  String vehicleName;
+  String paidStatus;
   String serviceWriter;
-  String createdDate;
+  String dateCreated;
   String dateInvoiced;
   String paymentType;
   String total;
 
   Datum({
-    required this.order,
+    required this.orderNumber,
     required this.orderStatus,
     required this.firstName,
     required this.lastName,
-    required this.vehicle,
+    required this.vehicleName,
+    required this.paidStatus,
     required this.serviceWriter,
-    required this.createdDate,
+    required this.dateCreated,
     required this.dateInvoiced,
     required this.paymentType,
     required this.total,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        order: json["order"],
+        orderNumber: json["order_number"],
         orderStatus: json["order_status"],
         firstName: json["first_name"],
         lastName: json["last_name"],
-        vehicle: json["vehicle"],
+        vehicleName: json["vehicle_name"],
+        paidStatus: json["paid_status"],
         serviceWriter: json["service_writer"],
-        createdDate: json["created_date"],
+        dateCreated: json["date_created"],
         dateInvoiced: json["date_invoiced"],
         paymentType: json["payment_type"],
         total: json["total"],
       );
 
   Map<String, dynamic> toJson() => {
-        "order": order,
+        "order_number": orderNumber,
         "order_status": orderStatus,
         "first_name": firstName,
         "last_name": lastName,
-        "vehicle": vehicle,
+        "vehicle_name": vehicleName,
+        "paid_status": paidStatus,
         "service_writer": serviceWriter,
-        "created_date": createdDate,
+        "date_created": dateCreated,
         "date_invoiced": dateInvoiced,
         "payment_type": paymentType,
         "total": total,

@@ -727,12 +727,24 @@ class ApiRepository {
     return apiProvider.getShopPerformanceSummary(token, page);
   }
 
-  Future<dynamic> getTransactionReport(String token, int page) {
-    return apiProvider.getTransactionReport(token, page);
+  Future<dynamic> getTransactionReport(
+      String token, int page, String exportType, String createFilter) {
+    return apiProvider.getTransactionReport(
+        token, page, exportType, createFilter);
   }
 
-  Future<dynamic> getAllOrdersReport(String token, int page) {
-    return apiProvider.getAllOrdersReport(token, page);
+  Future<dynamic> getAllOrdersReport(
+      String token, int page, String exportType, String createFilter) {
+    return apiProvider.getAllOrdersReport(
+        token, page, exportType, createFilter);
+  }
+
+  Future<dynamic> getLineItemDetailReport(String token, int page) {
+    return apiProvider.getLineItemDetailReport(token, page);
+  }
+
+  Future<dynamic> getEndOfDayReport(String token, String exportType) {
+    return apiProvider.getEndOfDayReport(token, exportType);
   }
 }
 

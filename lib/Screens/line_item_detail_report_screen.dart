@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/line_item_detail_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
@@ -19,22 +20,49 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
   List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+  LineItemDetailReportModel? lineItemDetailReportModel;
+  List<Datum> reportList = [];
 
   String? currentType;
   @override
   Widget build(BuildContext) {
     return BlocProvider(
-      create: (context) => ReportBloc(),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           // TODO: implement listener
+
+          if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetLineItemDetailReportEvent());
+          } else if (state is GetLineItemDetailReportState) {
+            lineItemDetailReportModel = state.lineItemDetailReportModel;
+            reportList
+                .addAll(state.lineItemDetailReportModel.data.paginator.data);
+
+            reportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.order)),
+                DataCell(Text(element.invoicedDate)),
+                DataCell(Text(element.vehicle)),
+                DataCell(Text(element.type)),
+                DataCell(Text(element.typeDescription)),
+                DataCell(Text(element.technician)),
+                DataCell(Text(element.vendor)),
+                DataCell(Text(element.cost)),
+                DataCell(Text(element.price)),
+                DataCell(Text(element.quantity)),
+              ]));
+            });
+          }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
               drawer: showDrawer(context),
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -66,27 +94,53 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                           color: AppColors.primaryColors,
                         ))
                   ]),
-              body: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Line Item Detail",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    creationDropDown("Creation", context),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    tableWidget(context, state)
-                  ],
-                ),
-              )),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0, left: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Line Item Detail",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              creationDropDown("Creation", context),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              tableWidget(context, state)
+                            ],
+                          ),
+                        )),
             );
           },
         ),

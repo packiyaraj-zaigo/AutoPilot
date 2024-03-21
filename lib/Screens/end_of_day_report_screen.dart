@@ -1,5 +1,6 @@
+import 'package:auto_pilot/Models/end_of_day_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
-import 'package:auto_pilot/Screens/dashboard_screen.dart';
+
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
 import 'package:auto_pilot/utils/app_colors.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,22 +19,49 @@ class _EndOfDayReportScreen extends State<EndOfDayReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
   List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+  EndOfDayReportModel? endOfDayReportModel;
+  List<Type> reportList = [];
 
   String? currentType;
   @override
   Widget build(BuildContext) {
     return BlocProvider(
-      create: (context) => ReportBloc(),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
-          // TODO: implement listener
+          if (state is InternetConnectionSuccessState) {
+            context
+                .read<ReportBloc>()
+                .add(GetEndOfDayReportEvent(exportType: ""));
+          } else if (state is GetEndOfDayReportState) {
+            rows.clear();
+            reportList.clear();
+            endOfDayReportModel = state.endOfDayReportModel;
+            reportList.addAll(state.endOfDayReportModel.data.type);
+
+            reportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.type)),
+                DataCell(Text(element.amount)),
+                DataCell(Text(element.count.toString())),
+              ]));
+            });
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "",
+                downloadUrl: state.link,
+                fileName: "",
+                context: context));
+          }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
               drawer: showDrawer(context),
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -65,81 +93,103 @@ class _EndOfDayReportScreen extends State<EndOfDayReportScreen> {
                           color: AppColors.primaryColors,
                         ))
                   ]),
-              body: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "End of Day",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    Text(
-                      "Sales Summary",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    summaryTile("Total Estimate", "0"),
-                    summaryTile("Total Invoice", "0"),
-                    summaryTile("Total Orders", "0"),
-                    summaryTile("Unpaid/Partial Invoice", "0"),
-                    summaryTile("Fully Paid Invoice", "0"),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Text(
-                      "Performance Summary",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    summaryTile("Avg. Sales", "0"),
-                    summaryTile("Avg. Order Profit", "0"),
-                    summaryTile("Avg. Order Profit Margin", "0"),
-                    summaryTile("Gross Sales", "0"),
-                    summaryTile("Gross Profit", "0"),
-                    summaryTile("Total Labor Cost", "0"),
-                    summaryTile("Effective Labor Rate", "0"),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    Text(
-                      "Order Summary",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(
-                      height: 12,
-                    ),
-                    summaryTile("Line Item Total", "0"),
-                    summaryTile("Discounts", "0"),
-                    summaryTile("Taxes", "0"),
-                    summaryTile("Total", "0"),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    tableWidget(context, state)
-                  ],
-                ),
-              )),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0, left: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "End of Day",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(
+                                height: 32,
+                              ),
+                              Text(
+                                "Sales Summary",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(
+                                height: 12,
+                              ),
+                              summaryTile(
+                                  "Total Estimate",
+                                  endOfDayReportModel
+                                          ?.salesSummary.totalEstimates
+                                          .toString() ??
+                                      "0"),
+                              summaryTile(
+                                  "Total Invoice",
+                                  endOfDayReportModel
+                                          ?.salesSummary.totalInvoices
+                                          .toString() ??
+                                      "0"),
+                              summaryTile(
+                                  "Total Orders",
+                                  endOfDayReportModel?.salesSummary.totalOrder
+                                          .toString() ??
+                                      "0"),
+                              summaryTile(
+                                  "Partial Invoice",
+                                  endOfDayReportModel?.salesSummary.unpaidOrder
+                                          .toString() ??
+                                      "0"),
+                              summaryTile(
+                                  "Fully Paid Invoice",
+                                  endOfDayReportModel
+                                          ?.salesSummary.fullyPaidOrder
+                                          .toString() ??
+                                      "0"),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              Text(
+                                "Payment Summary",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              tableWidget(context, state)
+                            ],
+                          ),
+                        )),
             );
           },
         ),
@@ -333,72 +383,75 @@ class _EndOfDayReportScreen extends State<EndOfDayReportScreen> {
                     ),
                   ),
                 ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text('Rows per page: 10'),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  // Text(
-                  //     "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
-                ],
-              ),
-              Transform.scale(
-                scale: 0.7,
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.prevPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.prevPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.nextPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
-                        },
-                        icon: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.nextPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
-                        ))
-                  ],
-                ),
-              )
-            ],
-          ),
+          const SizedBox(
+            height: 24,
+          )
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     Row(
+          //       children: [
+          //         Text('Rows per page: 10'),
+          //         const SizedBox(
+          //           width: 16,
+          //         ),
+          //         // Text(
+          //         //     "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
+          //       ],
+          //     ),
+          //     Transform.scale(
+          //       scale: 0.7,
+          //       child: Row(
+          //         children: [
+          //           IconButton(
+          //               onPressed: () {
+          //                 // if (timeLogReportModel
+          //                 //         ?.data.paginator.prevPageUrl !=
+          //                 //     null) {
+          //                 //   ctx.read<ReportBloc>().add(
+          //                 //       GetTimeLogReportEvent(
+          //                 //           monthFilter: "",
+          //                 //           techFilter: technicianId,
+          //                 //           searchQuery: "",
+          //                 //           currentPage: 1,
+          //                 //           exportType: ""));
+          //                 // }
+          //               },
+          //               icon: Icon(
+          //                 Icons.arrow_back_ios_new_outlined,
+          //                 // color: timeLogReportModel
+          //                 //             ?.data.paginator.prevPageUrl !=
+          //                 //         null
+          //                 //     ? Colors.black
+          //                 //     : Colors.grey.shade300,
+          //               )),
+          //           IconButton(
+          //               onPressed: () {
+          //                 // if (timeLogReportModel
+          //                 //         ?.data.paginator.nextPageUrl !=
+          //                 //     null) {
+          //                 //   ctx.read<ReportBloc>().add(
+          //                 //       GetTimeLogReportEvent(
+          //                 //           monthFilter: "",
+          //                 //           techFilter: technicianId,
+          //                 //           searchQuery: "",
+          //                 //           currentPage: 1,
+          //                 //           exportType: ""));
+          //                 // }
+          //               },
+          //               icon: Icon(
+          //                 Icons.arrow_forward_ios_outlined,
+          //                 // color: timeLogReportModel
+          //                 //             ?.data.paginator.nextPageUrl !=
+          //                 //         null
+          //                 //     ? Colors.black
+          //                 //     : Colors.grey.shade300,
+          //               ))
+          //         ],
+          //       ),
+          //     )
+          //   ],
+          // ),
           // Padding(
           //   padding: const EdgeInsets.only(top: 8.0),
           //   child: Row(
@@ -458,18 +511,9 @@ class _EndOfDayReportScreen extends State<EndOfDayReportScreen> {
           padding: const EdgeInsets.only(right: 21.0, bottom: 12, left: 21),
           child: ElevatedButton(
               onPressed: () async {
-                // ctx.read<ReportBloc>().add(GetTimeLogReportEvent(
-                //     monthFilter: currentTimeIn == "Last Week"
-                //         ? "last_week"
-                //         : currentTimeIn == "Last Month"
-                //             ? "last_month"
-                //             : currentTimeIn == "Last Year"
-                //                 ? "last_year"
-                //                 : currentTimeIn?.toLowerCase() ?? "",
-                //     techFilter: technicianId,
-                //     searchQuery: "",
-                //     currentPage: 1,
-                //     exportType: "excel"));
+                ctx
+                    .read<ReportBloc>()
+                    .add(GetEndOfDayReportEvent(exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(
                   elevation: 0.6,

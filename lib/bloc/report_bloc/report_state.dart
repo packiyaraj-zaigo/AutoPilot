@@ -137,6 +137,9 @@ class GetShopPerformanceReportErrorState extends ReportState {
 class GetTransactionReportState extends ReportState {
   final TransactionReportModel transactionReportModel;
   GetTransactionReportState({required this.transactionReportModel});
+
+  @override
+  List<Object> get props => [transactionReportModel];
 }
 
 class GetTransactionReportErrorState extends ReportState {
@@ -147,9 +150,39 @@ class GetTransactionReportErrorState extends ReportState {
 class GetAllOrdersReportState extends ReportState {
   final AllOrdersReportModel allOrdersReportModel;
   GetAllOrdersReportState({required this.allOrdersReportModel});
+
+  @override
+  List<Object> get props => [allOrdersReportModel];
 }
 
 class GetAllOrdersReportErrorState extends ReportState {
   final String errorMessage;
   GetAllOrdersReportErrorState({required this.errorMessage});
+}
+
+class GetLineItemDetailReportState extends ReportState {
+  final LineItemDetailReportModel lineItemDetailReportModel;
+  GetLineItemDetailReportState({required this.lineItemDetailReportModel});
+
+  @override
+  List<Object> get props => [lineItemDetailReportModel];
+}
+
+class GetLineItemDetailReportErrorState extends ReportState {
+  final String errorMessage;
+  GetLineItemDetailReportErrorState({required this.errorMessage});
+}
+
+class GetEndOfDayReportState extends ReportState {
+  final EndOfDayReportModel endOfDayReportModel;
+  GetEndOfDayReportState({required this.endOfDayReportModel});
+
+  @override
+  List<Object> get props => [endOfDayReportModel];
+}
+
+class GetEndOfDayReportErrorState extends ReportState {
+  final String errorMessage;
+
+  GetEndOfDayReportErrorState({required this.errorMessage});
 }
