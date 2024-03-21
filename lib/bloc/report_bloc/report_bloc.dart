@@ -4,6 +4,8 @@ import 'dart:math';
 
 import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Models/all_orders_report_model.dart';
+import 'package:auto_pilot/Models/end_of_day_report_model.dart';
+import 'package:auto_pilot/Models/line_item_detail_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
 import 'package:auto_pilot/Models/report_technician_list_model.dart';
 import 'package:auto_pilot/Models/sales_tax_report_model.dart';
@@ -45,6 +47,8 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<GetShopPerformanceReportEvent>(getShopPerformanceReportBloc);
     on<GetTransactionReportEvent>(getTransactionReportBloc);
     on<GetAllOrderReportEvent>(getAllOrdersReportBloc);
+    on<GetLineItemDetailReportEvent>(getLineItemDetailReportBloc);
+    on<GetEndOfDayReportEvent>(getEndOfDayReportBloc);
   }
 
   //Bloc to get all invoice report.
@@ -452,17 +456,46 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   Future<void> getTransactionReportBloc(
       GetTransactionReportEvent event, Emitter<ReportState> emit) async {
     try {
-      emit(ReportLoadingState());
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
       //change nullable with original model class
       TransactionReportModel transactionReportModel;
       final token = await AppUtils.getToken();
+      if (event.page == "next") {
+        if (currentPage < totalPages) {
+          currentPage++; // Increment the current page value
+        }
+      } else if (event.page == "prev") {
+        if (currentPage > 1) {
+          currentPage--; // Decrement the current page value
+        }
+      } else {
+        currentPage =
+            1; // Reset to the first page if not navigating forward or backward
+      }
 
-      Response response = await apiRepo.getTransactionReport(token, 0);
+      Response response = await apiRepo.getTransactionReport(
+          token, currentPage, event.exportType, event.createFilter);
       if (response.statusCode == 200) {
-        transactionReportModel = transactionReportModelFromJson(response.body);
+        if (event.exportType == "") {
+          transactionReportModel =
+              transactionReportModelFromJson(response.body);
 
-        emit(GetTransactionReportState(
-            transactionReportModel: transactionReportModel));
+          totalPages = transactionReportModel.data.paginator.lastPage ?? 1;
+          currentPage = transactionReportModel.data.paginator.currentPage;
+          isFetching = false;
+
+          emit(GetTransactionReportState(
+              transactionReportModel: transactionReportModel));
+
+          print(currentPage.toString() + "current here");
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetTransactionReportErrorState(errorMessage: decodedBody['msg']));
@@ -480,17 +513,46 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   Future<void> getAllOrdersReportBloc(
       GetAllOrderReportEvent event, Emitter<ReportState> emit) async {
     try {
-      emit(ReportLoadingState());
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
       //change nullable with original model class
       AllOrdersReportModel allOrdersReportModel;
       final token = await AppUtils.getToken();
 
-      Response response = await apiRepo.getAllOrdersReport(token, 0);
-      if (response.statusCode == 200) {
-        allOrdersReportModel = allOrdersReportModelFromJson(response.body);
+      if (event.page == "next") {
+        if (currentPage < totalPages) {
+          currentPage++; // Increment the current page value
+        }
+      } else if (event.page == "prev") {
+        if (currentPage > 1) {
+          currentPage--; // Decrement the current page value
+        }
+      } else {
+        currentPage =
+            1; // Reset to the first page if not navigating forward or backward
+      }
 
-        emit(GetAllOrdersReportState(
-            allOrdersReportModel: allOrdersReportModel));
+      Response response = await apiRepo.getAllOrdersReport(
+          token, currentPage, event.exportType, event.createFilter);
+      if (response.statusCode == 200) {
+        if (event.exportType == "") {
+          allOrdersReportModel = allOrdersReportModelFromJson(response.body);
+
+          totalPages = allOrdersReportModel.data.paginator.lastPage ?? 1;
+          currentPage = allOrdersReportModel.data.paginator.currentPage;
+          isFetching = false;
+
+          emit(GetAllOrdersReportState(
+              allOrdersReportModel: allOrdersReportModel));
+
+          print(currentPage.toString() + "current here");
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetAllOrdersReportErrorState(errorMessage: decodedBody['msg']));
@@ -500,6 +562,69 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       print(s);
 
       emit(GetAllOrdersReportErrorState(errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to get line item detail report
+  Future<void> getLineItemDetailReportBloc(
+      GetLineItemDetailReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      //change nullable with original model class
+      LineItemDetailReportModel lineItemDetailReportModel;
+      final token = await AppUtils.getToken();
+
+      Response response = await apiRepo.getLineItemDetailReport(token, 0);
+      if (response.statusCode == 200) {
+        lineItemDetailReportModel =
+            lineItemDetailReportModelFromJson(response.body);
+
+        emit(GetLineItemDetailReportState(
+            lineItemDetailReportModel: lineItemDetailReportModel));
+      } else {
+        var decodedBody = json.decode(response.body);
+        emit(GetLineItemDetailReportErrorState(
+            errorMessage: decodedBody['msg']));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(GetLineItemDetailReportErrorState(
+          errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to get end of day report
+  Future<void> getEndOfDayReportBloc(
+      GetEndOfDayReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      emit(ReportLoadingState());
+      //change nullable with original model class
+      EndOfDayReportModel endOfDayReportModel;
+      final token = await AppUtils.getToken();
+
+      Response response =
+          await apiRepo.getEndOfDayReport(token, event.exportType);
+      if (response.statusCode == 200) {
+        if (event.exportType == "") {
+          endOfDayReportModel = endOfDayReportModelFromJson(response.body);
+
+          emit(
+              GetEndOfDayReportState(endOfDayReportModel: endOfDayReportModel));
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
+      } else {
+        var decodedBody = json.decode(response.body);
+        emit(GetEndOfDayReportErrorState(errorMessage: decodedBody['msg']));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(GetEndOfDayReportErrorState(errorMessage: "Something went wrong"));
     }
   }
 }

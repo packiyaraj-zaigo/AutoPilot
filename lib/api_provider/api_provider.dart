@@ -2608,11 +2608,14 @@ class ApiProvider {
   }
 
   // api to get transaction report
-  Future<dynamic> getTransactionReport(String token, int page) async {
+  Future<dynamic> getTransactionReport(
+      String token, int page, String exportType, String createFilter) async {
     try {
       //mock api url. change to live api url
-      final url = Uri.parse(
-          "https://run.mocky.io/v3/ea7e833c-f3f5-4933-adbb-6339ca70d34d");
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/298211eb-6a30-4993-9116-9e42c60d7142");
+      var url = Uri.parse(
+          "${BASE_URL}api/transaction?page=$page&file_type=$exportType&type=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2621,11 +2624,41 @@ class ApiProvider {
   }
 
   // api to get all orders report
-  Future<dynamic> getAllOrdersReport(String token, int page) async {
+  Future<dynamic> getAllOrdersReport(
+      String token, int page, String exportType, createFilter) async {
+    try {
+      //mock api url. change to live api url
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/09a5e963-57f9-44ef-9c4f-647845583683");
+      var url = Uri.parse(
+          "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&type=$createFilter");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  // api to get line item detail report
+  Future<dynamic> getLineItemDetailReport(String token, int page) async {
     try {
       //mock api url. change to live api url
       final url = Uri.parse(
-          "https://run.mocky.io/v3/896d959d-c8b0-4f53-b47b-2a045c9f0ad5");
+          "https://run.mocky.io/v3/e989e845-a8eb-493d-b4d9-0085082415e2");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  // api to get end of day report
+  Future<dynamic> getEndOfDayReport(String token, String exportType) async {
+    try {
+      //mock api url. change to live api url
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/7e8c5207-0834-473d-8a4d-0054cc7b10a1");
+      var url = Uri.parse("${BASE_URL}api/end_of_day?file_type=$exportType");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
