@@ -99,6 +99,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                 monthFilter: "",
                 techFilter: "",
                 searchQuery: "",
+                page: "",
                 currentPage: 1,
                 exportType: ""));
 
@@ -293,6 +294,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                     techFilter: technicianId,
                     searchQuery: "",
                     currentPage: 1,
+                    page: "",
                     exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(
@@ -368,6 +370,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                 techFilter: technicianId,
                                 searchQuery: "",
                                 currentPage: 1,
+                                page: "",
                                 exportType: ""));
 
                           setState(() {
@@ -397,6 +400,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                         techFilter: technicianId,
                         searchQuery: "",
                         currentPage: 1,
+                        page: "",
                         exportType: ""));
                 },
                 items: monthOptions
@@ -482,6 +486,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                                         ?.toLowerCase() ??
                                                     "",
                                     techFilter: "",
+                                    page: "",
                                     searchQuery: "",
                                     currentPage: 1,
                                     exportType: ""));
@@ -778,6 +783,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                           monthFilter: "",
                                           techFilter: technicianId,
                                           searchQuery: "",
+                                          page: "prev",
                                           currentPage: 1,
                                           exportType: ""));
                                 }
@@ -800,6 +806,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                           monthFilter: "",
                                           techFilter: technicianId,
                                           searchQuery: "",
+                                          page: "next",
                                           currentPage: 1,
                                           exportType: ""));
                                 }
@@ -883,6 +890,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
           techFilter: technicianId,
           searchQuery: "",
           currentPage: 1,
+          page: "",
           exportType: "",
           sortBy: sortBy,
           fieldName: fieldName,
@@ -962,6 +970,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                             monthFilter: "",
                                             techFilter: technicianId,
                                             searchQuery: "",
+                                            page: "",
                                             currentPage: 1,
                                             exportType: ""));
 

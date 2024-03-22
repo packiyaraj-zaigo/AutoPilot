@@ -723,8 +723,8 @@ class ApiRepository {
     return apiProvider.getReportTechnicanList(token);
   }
 
-  Future<dynamic> getShopPerformanceReport(String token, int page) {
-    return apiProvider.getShopPerformanceSummary(token, page);
+  Future<dynamic> getShopPerformanceReport(String token, String exportType) {
+    return apiProvider.getShopPerformanceSummary(token, exportType);
   }
 
   Future<dynamic> getTransactionReport(
@@ -745,6 +745,16 @@ class ApiRepository {
 
   Future<dynamic> getEndOfDayReport(String token, String exportType) {
     return apiProvider.getEndOfDayReport(token, exportType);
+  }
+
+  Future<dynamic> getProfitablityReport(String token, String fromDate,
+      String toDate, String serviceId, String exportType, int page) {
+    return apiProvider.getProfitablityReport(
+        token, fromDate, toDate, serviceId, exportType, page);
+  }
+
+  Future<dynamic> getServiceWriter(String token) {
+    return apiProvider.getServiceWriter(token);
   }
 }
 

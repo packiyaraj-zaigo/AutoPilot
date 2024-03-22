@@ -2595,11 +2595,14 @@ class ApiProvider {
   }
 
   // api to get shopperformance summary
-  Future<dynamic> getShopPerformanceSummary(String token, int page) async {
+  Future<dynamic> getShopPerformanceSummary(
+      String token, String exportType) async {
     try {
       //mock api url. change to live api url
-      final url = Uri.parse(
-          "https://run.mocky.io/v3/133183fa-775c-471f-a347-b75e8eb83c94");
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/133183fa-775c-471f-a347-b75e8eb83c94");
+      var url = Uri.parse(
+          "${BASE_URL}api/shop_performace_summary?file_type=$exportType");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2659,6 +2662,33 @@ class ApiProvider {
       // final url = Uri.parse(
       //     "https://run.mocky.io/v3/7e8c5207-0834-473d-8a4d-0054cc7b10a1");
       var url = Uri.parse("${BASE_URL}api/end_of_day?file_type=$exportType");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  // api to get profitablity report
+  Future<dynamic> getProfitablityReport(String token, String fromDate,
+      String toDate, String serviceId, String exportType, int page) async {
+    try {
+      //mock api url. change to live api url
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/7e8c5207-0834-473d-8a4d-0054cc7b10a1");
+      var url = Uri.parse(
+          "${BASE_URL}api/profitablity?from_date=$fromDate&to_date=$toDate&service_id=$serviceId&file_type=$exportType&page=$page");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+    // api to get service writer data
+  }
+
+  Future<dynamic> getServiceWriter(String token) async {
+    try {
+      var url = Uri.parse("${BASE_URL}api/service_writer");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {

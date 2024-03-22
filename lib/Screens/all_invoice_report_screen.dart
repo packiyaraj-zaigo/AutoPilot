@@ -92,6 +92,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
             context.read<ReportBloc>().add((GetAllInvoiceReportEvent(
                 startDate: startDateToServer,
                 endDate: endDateToServer,
+                page: "",
                 paidFilter: "",
                 searchQuery: "",
                 currentPage: 1,
@@ -318,6 +319,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                           endDate: endDateToServer,
                                           paidFilter: "",
                                           searchQuery: "",
+                                          page: "",
                                           currentPage: 1,
                                           exportType: ""));
                                   },
@@ -484,6 +486,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                 endDate: "",
                                 paidFilter: "",
                                 searchQuery: "",
+                                page: "",
                                 currentPage: 1,
                                 exportType: ""));
 
@@ -509,6 +512,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                     ..add(GetAllInvoiceReportEvent(
                         startDate: "",
                         endDate: "",
+                        page: "",
                         paidFilter: currentPaidFilter == "This Week"
                             ? "week"
                             : currentPaidFilter == "This Month"
@@ -799,6 +803,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                             endDate: endDateToServer,
                                             paidFilter: "",
                                             searchQuery: "",
+                                            page: "prev",
                                             currentPage: 1,
                                             exportType: "",
                                             sortBy: sortBy,
@@ -824,6 +829,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                             startDate: startDateToServer,
                                             endDate: endDateToServer,
                                             paidFilter: "",
+                                            page: "next",
                                             searchQuery: "",
                                             currentPage: 1,
                                             exportType: "",
@@ -913,6 +919,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                 ? "year"
                                 : currentPaidFilter?.toLowerCase() ?? "",
                     searchQuery: "",
+                    page: "",
                     currentPage: 1,
                     exportType: "excel"));
               },
@@ -961,6 +968,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
           searchQuery: "",
           currentPage: 1,
           exportType: "",
+          page: "",
           sortBy: sortBy,
           tableName: tableName,
           fieldName: fieldName));
