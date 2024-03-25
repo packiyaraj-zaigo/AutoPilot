@@ -210,3 +210,16 @@ class GetServiceWriterErrorState extends ReportState {
   final String errorMessage;
   GetServiceWriterErrorState({required this.errorMessage});
 }
+
+class GetCustomerSummaryReportState extends ReportState {
+  final CustomerSummaryReportModel customerSummaryReportModel;
+  GetCustomerSummaryReportState({required this.customerSummaryReportModel});
+
+  @override
+  List<Object> get props => [customerSummaryReportModel];
+}
+
+class GetCustomerSummaryReportErrorState extends ReportState {
+  final String errorMessage;
+  GetCustomerSummaryReportErrorState({required this.errorMessage});
+}

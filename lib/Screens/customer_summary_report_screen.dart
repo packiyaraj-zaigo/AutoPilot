@@ -1,3 +1,4 @@
+import 'package:auto_pilot/Models/customer_summary_report_model.dart';
 import 'package:auto_pilot/Screens/app_drawer.dart';
 import 'package:auto_pilot/Screens/dashboard_screen.dart';
 import 'package:auto_pilot/bloc/report_bloc/report_bloc.dart';
@@ -19,30 +20,74 @@ class CustomerSummaryReportScreen extends StatefulWidget {
 class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
-  List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+  Map<String, String> dropdownValuesMap = {
+    'Today': 'today',
+    'Yesterday': 'yesterday',
+    'This week': 'week',
+    'This month': 'month',
+    'This year': 'year',
+  };
+  CustomerSummaryReportModel? customerSummaryReportModel;
+  List<Datum> reportList = [];
+  String sortBy = "desc";
+  String? fieldName;
+  String? table;
 
-  final List<ChartData> chartData = [
-    ChartData("Mark", 35),
-    ChartData("Kevin", 23),
-    ChartData("san", 38),
-    ChartData("san2", 30),
-    ChartData("san3", 33),
-    ChartData("san4", 36),
-    ChartData("san5", 32),
-    ChartData("san6", 35),
-    ChartData("san7", 30),
-    ChartData("san8", 33),
-    ChartData("san9", 31),
-    ChartData("san10", 32),
-  ];
+  // final List<ChartData> chartData = [
+  //   ChartData("Mark", 35),
+  //   ChartData("Kevin", 23),
+  //   ChartData("san", 38),
+  //   ChartData("san2", 30),
+  //   ChartData("san3", 33),
+  //   ChartData("san4", 36),
+  //   ChartData("san5", 32),
+  //   ChartData("san6", 35),
+  //   ChartData("san7", 30),
+  //   ChartData("san8", 33),
+  //   ChartData("san9", 31),
+  //   ChartData("san10", 32),
+  // ];
+
+  final List<ChartData> chartData = [];
 
   String? currentType;
   @override
   Widget build(BuildContext) {
     return BlocProvider(
-      create: (context) => ReportBloc(),
+      create: (context) => ReportBloc()..add(InternetConnectionEvent()),
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
+          if (state is InternetConnectionSuccessState) {
+            context.read<ReportBloc>().add(GetCustomerSummaryReportEvent(
+                createFilter: "", page: "", exportType: ""));
+          } else if (state is GetCustomerSummaryReportState) {
+            reportList.clear();
+            rows.clear();
+            chartData.clear();
+            customerSummaryReportModel = state.customerSummaryReportModel;
+            reportList
+                .addAll(state.customerSummaryReportModel.data.paginator.data);
+
+            reportList.forEach((element) {
+              rows.add(DataRow(cells: [
+                DataCell(Text(element.firstName)),
+                DataCell(Text(element.lastName)),
+                DataCell(Text(element.totalPayments)),
+                DataCell(Text(element.profitablity)),
+              ]));
+            });
+
+            customerSummaryReportModel?.graphArr.forEach((element) {
+              chartData.add(ChartData(
+                  element.firstName, double.parse(element.totalPayments)));
+            });
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "",
+                downloadUrl: state.link,
+                fileName: "",
+                context: context));
+          }
           // TODO: implement listener
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -50,7 +95,9 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
             return Scaffold(
               key: scaffoldKey,
               drawer: showDrawer(context),
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -82,31 +129,57 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
                           color: AppColors.primaryColors,
                         ))
                   ]),
-              body: SingleChildScrollView(
-                  child: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Summary By Customer",
-                      style: TextStyle(
-                          color: AppColors.primaryTitleColor,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                    creationDropDown("Creation", context),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    customerPaymentGraphWidget(),
-                    const SizedBox(
-                      height: 24,
-                    ),
-                    tableWidget(context, state)
-                  ],
-                ),
-              )),
+              body: state is ReportLoadingState
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: CupertinoActivityIndicator(),
+                        ),
+                      ],
+                    )
+                  : state is InternerConnectionErrorState
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Center(
+                              child:
+                                  Text("Please check your internet connection"),
+                            ),
+                            IconButton(
+                                onPressed: () {
+                                  context
+                                      .read<ReportBloc>()
+                                      .add(InternetConnectionEvent());
+                                },
+                                icon: Icon(Icons.replay_outlined))
+                          ],
+                        )
+                      : SingleChildScrollView(
+                          child: Padding(
+                          padding: const EdgeInsets.only(top: 15.0, left: 24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Summary By Customer",
+                                style: TextStyle(
+                                    color: AppColors.primaryTitleColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                              creationDropDown("Creation", context),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              customerPaymentGraphWidget(),
+                              const SizedBox(
+                                height: 24,
+                              ),
+                              tableWidget(context, state)
+                            ],
+                          ),
+                        )),
             );
           },
         ),
@@ -260,11 +333,8 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
                           });
                           ctx.read<ReportBloc>()
                             ..currentPage = 1
-                            ..add(GetPaymentTypeReportEvent(
-                                typeFilter: "",
-                                searchQuery: "",
-                                currentPage: 1,
-                                exportType: ""));
+                            ..add(GetCustomerSummaryReportEvent(
+                                createFilter: "", page: "", exportType: ""));
                         },
                         child: Icon(Icons.close))
                     : const SizedBox(),
@@ -280,18 +350,17 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
 
                   ctx.read<ReportBloc>()
                     ..currentPage = 1
-                    ..add(GetPaymentTypeReportEvent(
-                        typeFilter: currentType?.toLowerCase() ?? "",
-                        searchQuery: "",
-                        currentPage: 1,
+                    ..add(GetCustomerSummaryReportEvent(
+                        createFilter: dropdownValuesMap[currentType] ?? "",
+                        page: "",
                         exportType: ""));
                 },
-                items: typeList
-                    .map((String type) => DropdownMenuItem<String>(
-                          value: type,
-                          child: Text(type),
-                        ))
-                    .toList(),
+                items: dropdownValuesMap.keys.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
                 isExpanded: true,
                 underline: const SizedBox(),
                 padding: EdgeInsets.only(left: 12, right: 12),
@@ -308,179 +377,212 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
   Widget tableWidget(BuildContext ctx, state) {
     return BlocProvider.value(
       value: BlocProvider.of<ReportBloc>(ctx),
-      child:
-          //  reportList.isEmpty
-          //     ? Container(
-          //         width: MediaQuery.of(context).size.width,
-          //         height: 300,
-          //         child: Center(
-          //           child: Text("No Report Found"),
-          //         ),
-          //       )
-          //     :
-          Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          state is TableLoadingState
-              ? Column(
+      child: reportList.isEmpty
+          ? Container(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: Center(
+                child: Text("No Report Found"),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                state is TableLoadingState
+                    ? Column(
+                        children: [
+                          Center(
+                            child: SizedBox(
+                              height: 200,
+                              width: MediaQuery.of(context).size.width,
+                              child: CupertinoActivityIndicator(),
+                            ),
+                          )
+                        ],
+                      )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 6,
+                                    offset: Offset(10, 16)),
+                              ]),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: DataTable(
+                              columns: [
+                                DataColumn(
+                                  label: Row(
+                                    children: [
+                                      Text('First Name'),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            table = "customer";
+                                            fieldName = "first_name";
+                                          });
+
+                                          sortTable(ctx);
+                                        },
+                                        child: Icon(sortBy == "asc"
+                                            ? Icons.arrow_upward_rounded
+                                            : Icons.arrow_downward_rounded),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Last Name'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "customer";
+                                          fieldName = "last_name";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
+                                DataColumn(label: Text('Total Payments')),
+                                DataColumn(label: Text('Profitability')),
+                              ],
+                              rows: rows,
+                              columnSpacing: 120,
+                              headingRowColor: MaterialStateProperty.all(
+                                  const Color(0xffCEDEFF)),
+                              headingRowHeight: 50,
+                            ),
+                          ),
+                        ),
+                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Center(
-                      child: SizedBox(
-                        height: 200,
-                        width: MediaQuery.of(context).size.width,
-                        child: CupertinoActivityIndicator(),
+                    Row(
+                      children: [
+                        Text('Rows per page: 10'),
+                        const SizedBox(
+                          width: 16,
+                        ),
+                        Text(
+                            "${customerSummaryReportModel?.data.range.from} - ${customerSummaryReportModel?.data.range.to} to ${customerSummaryReportModel?.data.range.total}")
+                      ],
+                    ),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (customerSummaryReportModel
+                                        ?.data.paginator.prevPageUrl !=
+                                    null) {
+                                  ctx.read<ReportBloc>().add(
+                                      GetCustomerSummaryReportEvent(
+                                          createFilter:
+                                              dropdownValuesMap[currentType] ??
+                                                  "",
+                                          page: "prev",
+                                          exportType: ""));
+                                }
+                              },
+                              icon: Icon(
+                                Icons.arrow_back_ios_new_outlined,
+                                color: customerSummaryReportModel
+                                            ?.data.paginator.prevPageUrl !=
+                                        null
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
+                              )),
+                          IconButton(
+                              onPressed: () {
+                                if (customerSummaryReportModel
+                                        ?.data.paginator.nextPageUrl !=
+                                    null) {
+                                  ctx.read<ReportBloc>().add(
+                                      GetCustomerSummaryReportEvent(
+                                          createFilter:
+                                              dropdownValuesMap[currentType] ??
+                                                  "",
+                                          page: "next",
+                                          exportType: ""));
+                                }
+                              },
+                              icon: Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                color: customerSummaryReportModel
+                                            ?.data.paginator.nextPageUrl !=
+                                        null
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
+                              ))
+                        ],
                       ),
                     )
                   ],
-                )
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              spreadRadius: 6,
-                              offset: Offset(10, 16)),
-                        ]),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: DataTable(
-                        columns: [
-                          DataColumn(
-                            label: Text('First Name'),
-                          ),
-                          DataColumn(label: Text('Last Name')),
-                          DataColumn(label: Text('Total Payments')),
-                          DataColumn(label: Text('Profitability')),
-                        ],
-                        rows: rows,
-                        columnSpacing: 120,
-                        headingRowColor:
-                            MaterialStateProperty.all(const Color(0xffCEDEFF)),
-                        headingRowHeight: 50,
-                      ),
-                    ),
-                  ),
                 ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text('Rows per page: 10'),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  // Text(
-                  //     "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
-                ],
-              ),
-              Transform.scale(
-                scale: 0.7,
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.prevPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.prevPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.nextPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
-                        },
-                        icon: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.nextPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
-                        ))
-                  ],
-                ),
-              )
-            ],
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 8.0),
-          //   child: Row(
-          //     children: [
-          //       Text('Rows per page: 10'),
-          //       // DropdownButton<int>(
-          //       //   value: _rowsPerPage,
-          //       //   underline: const SizedBox(),
-          //       //   onChanged: (newValue) {
-          //       //     setState(() {
-          //       //       _rowsPerPage = newValue!;
-          //       //     });
-          //       //   },
-          //       //   items: [5, 10, 20, 50]
-          //       //       .map((value) => DropdownMenuItem<int>(
-          //       //             value: value,
-          //       //             child: Text(value.toString()),
-          //       //           ))
-          //       //       .toList(),
-          //       // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 8.0),
+                //   child: Row(
+                //     children: [
+                //       Text('Rows per page: 10'),
+                //       // DropdownButton<int>(
+                //       //   value: _rowsPerPage,
+                //       //   underline: const SizedBox(),
+                //       //   onChanged: (newValue) {
+                //       //     setState(() {
+                //       //       _rowsPerPage = newValue!;
+                //       //     });
+                //       //   },
+                //       //   items: [5, 10, 20, 50]
+                //       //       .map((value) => DropdownMenuItem<int>(
+                //       //             value: value,
+                //       //             child: Text(value.toString()),
+                //       //           ))
+                //       //       .toList(),
+                //       // ),
 
-          //       const SizedBox(
-          //         width: 16,
-          //       ),
+                //       const SizedBox(
+                //         width: 16,
+                //       ),
 
-          //       Text(
-          //           "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
-          //     ],
-          //   ),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 8.0),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.start,
-          //     children: [
-          //       Transform.scale(
-          //           scale: 0.7,
-          //           child: CupertinoSwitch(
-          //               value: false, onChanged: (vlaue) {})),
-          //       Text(
-          //         "Dense",
-          //         style: TextStyle(fontSize: 16),
-          //       ),
-          //     ],
-          //   ),
-          // )
-        ],
-      ),
+                //       Text(
+                //           "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
+                //     ],
+                //   ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 8.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: [
+                //       Transform.scale(
+                //           scale: 0.7,
+                //           child: CupertinoSwitch(
+                //               value: false, onChanged: (vlaue) {})),
+                //       Text(
+                //         "Dense",
+                //         style: TextStyle(fontSize: 16),
+                //       ),
+                //     ],
+                //   ),
+                // )
+              ],
+            ),
     );
   }
 
@@ -492,18 +594,8 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
           padding: const EdgeInsets.only(right: 21.0, bottom: 12, left: 21),
           child: ElevatedButton(
               onPressed: () async {
-                // ctx.read<ReportBloc>().add(GetTimeLogReportEvent(
-                //     monthFilter: currentTimeIn == "Last Week"
-                //         ? "last_week"
-                //         : currentTimeIn == "Last Month"
-                //             ? "last_month"
-                //             : currentTimeIn == "Last Year"
-                //                 ? "last_year"
-                //                 : currentTimeIn?.toLowerCase() ?? "",
-                //     techFilter: technicianId,
-                //     searchQuery: "",
-                //     currentPage: 1,
-                //     exportType: "excel"));
+                ctx.read<ReportBloc>().add(GetCustomerSummaryReportEvent(
+                    createFilter: "", page: "", exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(
                   elevation: 0.6,
@@ -531,5 +623,23 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
                 ],
               ))),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetCustomerSummaryReportEvent(
+        createFilter: dropdownValuesMap[currentType] ?? "",
+        page: "",
+        exportType: "",
+        fieldName: fieldName,
+        sortBy: sortBy,
+        table: table));
   }
 }

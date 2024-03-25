@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:auto_pilot/Models/all_invoice_report_model.dart';
 import 'package:auto_pilot/Models/all_orders_report_model.dart';
+import 'package:auto_pilot/Models/customer_summary_report_model.dart';
 import 'package:auto_pilot/Models/end_of_day_report_model.dart';
 import 'package:auto_pilot/Models/line_item_detail_report_model.dart';
 import 'package:auto_pilot/Models/payment_type_report_model.dart';
@@ -53,6 +54,7 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
     on<GetEndOfDayReportEvent>(getEndOfDayReportBloc);
     on<GetProfitablityReportEvent>(getProfitablityReportBloc);
     on<GetServiceWriterEvent>(getAllServiceWriterBloc);
+    on<GetCustomerSummaryReportEvent>(getCustomerSummaryReportBloc);
   }
 
   //Bloc to get all invoice report.
@@ -506,7 +508,13 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       }
 
       Response response = await apiRepo.getTransactionReport(
-          token, currentPage, event.exportType, event.createFilter);
+          token,
+          currentPage,
+          event.exportType,
+          event.createFilter,
+          event.sortBy,
+          event.fieldName,
+          event.table);
       if (response.statusCode == 200) {
         if (event.exportType == "") {
           transactionReportModel =
@@ -564,7 +572,13 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       }
 
       Response response = await apiRepo.getAllOrdersReport(
-          token, currentPage, event.exportType, event.createFilter);
+          token,
+          currentPage,
+          event.exportType,
+          event.createFilter,
+          event.sortBy,
+          event.table,
+          event.fieldName);
       if (response.statusCode == 200) {
         if (event.exportType == "") {
           allOrdersReportModel = allOrdersReportModelFromJson(response.body);
@@ -688,7 +702,10 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.toDate,
           event.serviceId,
           event.exportType,
-          currentPage);
+          currentPage,
+          event.sortBy,
+          event.fieldName,
+          event.table);
       if (response.statusCode == 200) {
         if (event.exportType == "") {
           profitablityReportModel =
@@ -715,6 +732,71 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
       print(s);
 
       emit(GetProfitablityReportErrorState(
+          errorMessage: "Something went wrong"));
+    }
+  }
+
+  //bloc to get summary by customer report
+  Future<void> getCustomerSummaryReportBloc(
+      GetCustomerSummaryReportEvent event, Emitter<ReportState> emit) async {
+    try {
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
+      //change nullable with original model class
+      CustomerSummaryReportModel customerSummaryReportModel;
+      final token = await AppUtils.getToken();
+
+      if (event.page == "next") {
+        if (currentPage < totalPages) {
+          currentPage++; // Increment the current page value
+        }
+      } else if (event.page == "prev") {
+        if (currentPage > 1) {
+          currentPage--; // Decrement the current page value
+        }
+      } else {
+        currentPage =
+            1; // Reset to the first page if not navigating forward or backward
+      }
+
+      Response response = await apiRepo.getCustomerSummaryReport(
+          token,
+          event.createFilter,
+          event.exportType,
+          currentPage,
+          event.sortBy,
+          event.fieldName,
+          event.table);
+      if (response.statusCode == 200) {
+        if (event.exportType == "") {
+          customerSummaryReportModel =
+              customerSummaryReportModelFromJson(response.body);
+
+          totalPages = customerSummaryReportModel.data.paginator.lastPage ?? 1;
+          currentPage = customerSummaryReportModel.data.paginator.currentPage;
+          isFetching = false;
+
+          emit(GetCustomerSummaryReportState(
+              customerSummaryReportModel: customerSummaryReportModel));
+
+          print(currentPage.toString() + "current here");
+        } else {
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
+      } else {
+        var decodedBody = json.decode(response.body);
+        emit(GetCustomerSummaryReportErrorState(
+            errorMessage: decodedBody['msg']));
+      }
+    } catch (e, s) {
+      print(e.toString());
+      print(s);
+
+      emit(GetCustomerSummaryReportErrorState(
           errorMessage: "Something went wrong"));
     }
   }

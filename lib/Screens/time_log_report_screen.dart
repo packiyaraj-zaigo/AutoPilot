@@ -29,7 +29,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
   String? currentTimeIn;
   int _rowsPerPage = 5;
   TimeLogReportModel? timeLogReportModel;
-  String sortBy = "asc";
+  String sortBy = "desc";
   String? tableName;
   String? fieldName;
 

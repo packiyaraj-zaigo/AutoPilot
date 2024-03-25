@@ -27,6 +27,9 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
   };
   TransactionReportModel? transactionReportModel;
   List<Datum> reportList = [];
+  String sortBy = "asc";
+  String? table;
+  String? fieldName;
 
   String? currentType;
   @override
@@ -333,8 +336,44 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                                 DataColumn(
                                   label: Text('Date'),
                                 ),
-                                DataColumn(label: Text('Order')),
-                                DataColumn(label: Text('Customer')),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Order'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "order";
+                                          fieldName = "order_number";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Customer'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          fieldName = "first_name";
+                                          table = "customer";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
                                 DataColumn(label: Text('Location')),
                                 DataColumn(label: Text('Total')),
                               ],
@@ -503,5 +542,23 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                 ],
               ))),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetTransactionReportEvent(
+        page: "",
+        exportType: "",
+        createFilter: dropdownValuesMap[currentType] ?? "",
+        fieldName: fieldName,
+        sortBy: sortBy,
+        table: table));
   }
 }

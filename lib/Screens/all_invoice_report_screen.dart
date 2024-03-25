@@ -30,7 +30,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   List<Datum> reportList = [];
   int _rowsPerPage = 5;
   String? currentPaidFilter;
-  String sortBy = "asc";
+  String sortBy = "desc";
   String? tableName;
   String? fieldName;
   void toggleSortOrder() {

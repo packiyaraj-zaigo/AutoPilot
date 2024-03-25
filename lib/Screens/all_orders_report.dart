@@ -29,6 +29,10 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
   String? currentType;
   AllOrdersReportModel? allOrdersReportModel;
   List<Datum> reportList = [];
+  String sortBy = "asc";
+  String? table;
+  String? fieldName;
+
   @override
   Widget build(BuildContext) {
     return BlocProvider(
@@ -328,12 +332,83 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                             child: DataTable(
                               columns: [
                                 DataColumn(
-                                  label: Text('Order'),
+                                  label: Row(
+                                    children: [
+                                      Text('Order'),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            table = "order";
+                                            fieldName = "order_number";
+                                          });
+
+                                          sortTable(ctx);
+                                        },
+                                        child: Icon(sortBy == "asc"
+                                            ? Icons.arrow_upward_rounded
+                                            : Icons.arrow_downward_rounded),
+                                      )
+                                    ],
+                                  ),
                                 ),
                                 DataColumn(label: Text('Order Status')),
-                                DataColumn(label: Text('First Name')),
-                                DataColumn(label: Text('Last Name')),
-                                DataColumn(label: Text('Vehicle')),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('First Name'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "customer";
+                                          fieldName = "first_name";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Last Name'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "customer";
+                                          fieldName = "last_name";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Vehicle'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "vehicle";
+                                          fieldName = "vehicle_make";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
                                 DataColumn(label: Text('Service Writer')),
                                 DataColumn(label: Text('Created Date')),
                                 DataColumn(label: Text('Date Invoiced')),
@@ -503,5 +578,23 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                 ],
               ))),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetAllOrderReportEvent(
+        exportType: "",
+        page: "",
+        createFilter: dropdownValuesMap[currentType] ?? "",
+        sortBy: sortBy,
+        fieldName: fieldName,
+        table: table));
   }
 }

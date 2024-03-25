@@ -28,6 +28,9 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
   String serviceId = '';
   List<sm.Datum> serviceWriterList = [];
   final TextEditingController serviceWriterController = TextEditingController();
+  String sortBy = "asc";
+  String? table;
+  String? fieldName;
 
   List<DateTime?> dateRangeList = [
     DateTime.now(),
@@ -514,9 +517,43 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
                             child: DataTable(
                               columns: [
                                 DataColumn(
-                                  label: Text('Order'),
+                                  label: Row(
+                                    children: [
+                                      Text('Order'),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            fieldName = "order_number";
+                                            table = "order";
+                                          });
+
+                                          sortTable(ctx);
+                                        },
+                                        child: Icon(sortBy == "asc"
+                                            ? Icons.arrow_upward_rounded
+                                            : Icons.arrow_downward_rounded),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                                DataColumn(label: Text('First Name')),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('First Name'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "customer";
+                                          fieldName = "first_name";
+                                        });
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
                                 DataColumn(label: Text('Parts Retail')),
                                 DataColumn(label: Text('Parts Cost')),
                                 DataColumn(label: Text('Labor Retail')),
@@ -804,5 +841,25 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
         ),
       ),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetProfitablityReportEvent(
+        fromDate: startDateToServer,
+        toDate: endDateToServer,
+        serviceId: serviceId,
+        page: "",
+        exportType: "",
+        sortBy: sortBy,
+        fieldName: fieldName,
+        table: table));
   }
 }

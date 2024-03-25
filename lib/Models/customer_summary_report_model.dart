@@ -1,36 +1,37 @@
 // To parse this JSON data, do
 //
-//     final transactionReportModel = transactionReportModelFromJson(jsonString);
+//     final customerSummaryReportModel = customerSummaryReportModelFromJson(jsonString);
 
 import 'dart:convert';
 
-TransactionReportModel transactionReportModelFromJson(String str) =>
-    TransactionReportModel.fromJson(json.decode(str));
+CustomerSummaryReportModel customerSummaryReportModelFromJson(String str) =>
+    CustomerSummaryReportModel.fromJson(json.decode(str));
 
-String transactionReportModelToJson(TransactionReportModel data) =>
+String customerSummaryReportModelToJson(CustomerSummaryReportModel data) =>
     json.encode(data.toJson());
 
-class TransactionReportModel {
+class CustomerSummaryReportModel {
   Data data;
-  String grossRevenue;
+  List<GraphArr> graphArr;
   String message;
 
-  TransactionReportModel({
+  CustomerSummaryReportModel({
     required this.data,
-    required this.grossRevenue,
+    required this.graphArr,
     required this.message,
   });
 
-  factory TransactionReportModel.fromJson(Map<String, dynamic> json) =>
-      TransactionReportModel(
+  factory CustomerSummaryReportModel.fromJson(Map<String, dynamic> json) =>
+      CustomerSummaryReportModel(
         data: Data.fromJson(json["data"]),
-        grossRevenue: json["gross_revenue"],
+        graphArr: List<GraphArr>.from(
+            json["graphArr"].map((x) => GraphArr.fromJson(x))),
         message: json["message"],
       );
 
   Map<String, dynamic> toJson() => {
         "data": data.toJson(),
-        "gross_revenue": grossRevenue,
+        "graphArr": List<dynamic>.from(graphArr.map((x) => x.toJson())),
         "message": message,
       };
 }
@@ -116,34 +117,30 @@ class Paginator {
 }
 
 class Datum {
-  String date;
-  int orderNumber;
-  String customer;
-  String location;
-  String total;
+  String firstName;
+  String lastName;
+  String totalPayments;
+  String profitablity;
 
   Datum({
-    required this.date,
-    required this.orderNumber,
-    required this.customer,
-    required this.location,
-    required this.total,
+    required this.firstName,
+    required this.lastName,
+    required this.totalPayments,
+    required this.profitablity,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        date: json["date"],
-        orderNumber: json["order_number"],
-        customer: json["customer"],
-        location: json["location"],
-        total: json["total"],
+        firstName: json["first_name"],
+        lastName: json["last_name"],
+        totalPayments: json["total_payments"],
+        profitablity: json["profitablity"],
       );
 
   Map<String, dynamic> toJson() => {
-        "date": date,
-        "order_number": orderNumber,
-        "customer": customer,
-        "location": location,
-        "total": total,
+        "first_name": firstName,
+        "last_name": lastName,
+        "total_payments": totalPayments,
+        "profitablity": profitablity,
       };
 }
 
@@ -168,5 +165,25 @@ class Range {
         "from": from,
         "to": to,
         "total": total,
+      };
+}
+
+class GraphArr {
+  String firstName;
+  String totalPayments;
+
+  GraphArr({
+    required this.firstName,
+    required this.totalPayments,
+  });
+
+  factory GraphArr.fromJson(Map<String, dynamic> json) => GraphArr(
+        firstName: json["first_name"],
+        totalPayments: json["total_payments"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "first_name": firstName,
+        "total_payments": totalPayments,
       };
 }

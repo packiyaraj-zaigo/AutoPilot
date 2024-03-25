@@ -130,20 +130,32 @@ class GetTransactionReportEvent extends ReportEvent {
   final String page;
   final String exportType;
   final String createFilter;
+  final String? sortBy;
+  final String? fieldName;
+  final String? table;
   GetTransactionReportEvent(
       {required this.page,
       required this.exportType,
-      required this.createFilter});
+      required this.createFilter,
+      this.sortBy,
+      this.fieldName,
+      this.table});
 }
 
 class GetAllOrderReportEvent extends ReportEvent {
   final String exportType;
   final String page;
   final String createFilter;
+  final String? sortBy;
+  final String? fieldName;
+  final String? table;
   GetAllOrderReportEvent(
       {required this.exportType,
       required this.page,
-      required this.createFilter});
+      required this.createFilter,
+      this.sortBy,
+      this.fieldName,
+      this.table});
 }
 
 class GetLineItemDetailReportEvent extends ReportEvent {}
@@ -159,13 +171,36 @@ class GetProfitablityReportEvent extends ReportEvent {
   final String serviceId;
   final String exportType;
   final String page;
+  final String? sortBy;
+  final String? fieldName;
+  final String? table;
 
   GetProfitablityReportEvent(
       {required this.fromDate,
       required this.toDate,
       required this.serviceId,
       required this.page,
-      required this.exportType});
+      required this.exportType,
+      this.sortBy,
+      this.fieldName,
+      this.table});
+}
+
+class GetCustomerSummaryReportEvent extends ReportEvent {
+  final String createFilter;
+  final String exportType;
+  final String page;
+  final String? sortBy;
+  final String? fieldName;
+  final String? table;
+
+  GetCustomerSummaryReportEvent(
+      {required this.createFilter,
+      required this.page,
+      required this.exportType,
+      this.sortBy,
+      this.fieldName,
+      this.table});
 }
 
 class GetServiceWriterEvent extends ReportEvent {}
