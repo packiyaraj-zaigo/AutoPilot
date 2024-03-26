@@ -71,6 +71,8 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.orderNumber.toString())),
                 DataCell(Text(element.firstName)),
+                DataCell(Text(element.materialRetail)),
+                DataCell(Text(element.materialCost)),
                 DataCell(Text(element.partRetail)),
                 DataCell(Text(element.partCost)),
                 DataCell(Text(element.laborRetail)),
@@ -78,6 +80,8 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
                 DataCell(Text(element.subContractRetail)),
                 DataCell(Text(element.subContractCost)),
                 DataCell(Text(element.fees)),
+                DataCell(Text(element.feeCost)),
+                DataCell(Text(element.materialProfit)),
                 DataCell(Text(element.partProfit)),
                 DataCell(Text(element.laborProfit)),
                 DataCell(Text(element.subContractProfit)),
@@ -104,7 +108,9 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
               drawer: showDrawer(context),
               bottomNavigationBar: state is ReportLoadingState
                   ? const SizedBox()
-                  : exportButtonWidget(context),
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -554,13 +560,17 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
                                     )
                                   ],
                                 )),
+                                DataColumn(label: Text('Material Retail')),
+                                DataColumn(label: Text('Material Cost')),
                                 DataColumn(label: Text('Parts Retail')),
                                 DataColumn(label: Text('Parts Cost')),
                                 DataColumn(label: Text('Labor Retail')),
                                 DataColumn(label: Text('Labor Cost')),
                                 DataColumn(label: Text('Subcontract Retail')),
                                 DataColumn(label: Text('Subcontract Cost')),
-                                DataColumn(label: Text('Fees')),
+                                DataColumn(label: Text('Fees Retail')),
+                                DataColumn(label: Text('Fees Cost')),
+                                DataColumn(label: Text('Material Profit')),
                                 DataColumn(label: Text('Part Profit')),
                                 DataColumn(label: Text('Labor Profit')),
                                 DataColumn(label: Text('Subcontract Profit')),
@@ -718,9 +728,9 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
                 ctx.read<ReportBloc>()
                   ..currentPage = 1
                   ..add(GetProfitablityReportEvent(
-                      fromDate: "",
-                      toDate: "",
-                      serviceId: "",
+                      fromDate: startDateToServer,
+                      toDate: endDateToServer,
+                      serviceId: serviceId,
                       page: "",
                       exportType: "excel"));
               },
@@ -730,7 +740,7 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(

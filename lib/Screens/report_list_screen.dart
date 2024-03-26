@@ -75,14 +75,14 @@ class _ReportListScreen extends State<ReportListScreen> {
                   "Shop Performance Summary", ShopPerformanceSummaryScreen()),
               reportTileWidget(
                   "Summary By Customer", CustomerSummaryReportScreen()),
-              // reportTileWidget("Transactions", TransactionReportScreen()),
-              // reportTileWidget("All Orders", AllOrdersReportScreen()),
+              reportTileWidget("Transactions", TransactionReportScreen()),
+              reportTileWidget("All Orders", AllOrdersReportScreen()),
               // reportTileWidget("Invoice By Service Writer",
               //     InvoiceByServiceWriterReportScreen()),
               reportTileWidget(
                   "Line Item Detail", LineItemDetailReportScreen()),
-              // reportTileWidget("End of Day", EndOfDayReportScreen()),
-              // reportTileWidget("Profitability", ProfitabilityReportScreen()),
+              reportTileWidget("End of Day", EndOfDayReportScreen()),
+              reportTileWidget("Profitability", ProfitabilityReportScreen()),
               // reportTileWidget(
               //     "Canned Service Summary", CannedServiceReportScreen()),
             ],

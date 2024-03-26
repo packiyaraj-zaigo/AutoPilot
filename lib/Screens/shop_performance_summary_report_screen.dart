@@ -57,7 +57,9 @@ class _ShopPerformanceSummaryScreen
               drawer: showDrawer(context),
               bottomNavigationBar: state is ReportLoadingState
                   ? const SizedBox()
-                  : exportButtonWidget(context),
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -356,7 +358,7 @@ class _ShopPerformanceSummaryScreen
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(

@@ -80,7 +80,9 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
               drawer: showDrawer(context),
               bottomNavigationBar: state is ReportLoadingState
                   ? const SizedBox()
-                  : exportButtonWidget(context),
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -290,187 +292,187 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
   Widget tableWidget(BuildContext ctx, state) {
     return BlocProvider.value(
       value: BlocProvider.of<ReportBloc>(ctx),
-      child:
-          //  reportList.isEmpty
-          //     ? Container(
-          //         width: MediaQuery.of(context).size.width,
-          //         height: 300,
-          //         child: Center(
-          //           child: Text("No Report Found"),
-          //         ),
-          //       )
-          //     :
-          Column(
-        // crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          state is TableLoadingState
-              ? Column(
+      child: reportList.isEmpty
+          ? Container(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: Center(
+                child: Text("No Report Found"),
+              ),
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                state is TableLoadingState
+                    ? Column(
+                        children: [
+                          Center(
+                            child: SizedBox(
+                              height: 200,
+                              width: MediaQuery.of(context).size.width,
+                              child: CupertinoActivityIndicator(),
+                            ),
+                          )
+                        ],
+                      )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
+                                BoxShadow(
+                                    color: Colors.black.withOpacity(0.2),
+                                    blurRadius: 10,
+                                    spreadRadius: 6,
+                                    offset: Offset(10, 16)),
+                              ]),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: DataTable(
+                              columns: [
+                                DataColumn(
+                                  label: Row(
+                                    children: [
+                                      Text('Order'),
+                                    ],
+                                  ),
+                                ),
+                                DataColumn(label: Text('Invoiced Date')),
+                                DataColumn(label: Text('Vehicle')),
+                                DataColumn(label: Text('Type')),
+                                DataColumn(label: Text('Type Description')),
+                                DataColumn(label: Text('Technician')),
+                                DataColumn(label: Text('Vendor')),
+                                DataColumn(label: Text('Cost')),
+                                DataColumn(label: Text('Price')),
+                                DataColumn(label: Text('Quantity')),
+                              ],
+                              rows: rows,
+                              columnSpacing: 120,
+                              headingRowColor: MaterialStateProperty.all(
+                                  const Color(0xffCEDEFF)),
+                              headingRowHeight: 50,
+                            ),
+                          ),
+                        ),
+                      ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Center(
-                      child: SizedBox(
-                        height: 200,
-                        width: MediaQuery.of(context).size.width,
-                        child: CupertinoActivityIndicator(),
+                    Row(
+                      children: [
+                        Text('Rows per page: 10'),
+                        const SizedBox(
+                          width: 16,
+                        ),
+                        Text(
+                            "${lineItemDetailReportModel?.data.range.from} - ${lineItemDetailReportModel?.data.range.to} to ${lineItemDetailReportModel?.data.range.total}")
+                      ],
+                    ),
+                    Transform.scale(
+                      scale: 0.7,
+                      child: Row(
+                        children: [
+                          IconButton(
+                              onPressed: () {
+                                if (lineItemDetailReportModel
+                                        ?.data.paginator.prevPageUrl !=
+                                    null) {
+                                  ctx.read<ReportBloc>().add(
+                                      GetLineItemDetailReportEvent(
+                                          createFilter:
+                                              dropdownValuesMap[currentType] ??
+                                                  "",
+                                          exportType: "",
+                                          page: "prev"));
+                                }
+                              },
+                              icon: Icon(
+                                Icons.arrow_back_ios_new_outlined,
+                                color: lineItemDetailReportModel
+                                            ?.data.paginator.prevPageUrl !=
+                                        null
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
+                              )),
+                          IconButton(
+                              onPressed: () {
+                                if (lineItemDetailReportModel
+                                        ?.data.paginator.nextPageUrl !=
+                                    null) {
+                                  ctx.read<ReportBloc>().add(
+                                      GetLineItemDetailReportEvent(
+                                          createFilter:
+                                              dropdownValuesMap[currentType] ??
+                                                  "",
+                                          exportType: "",
+                                          page: "next"));
+                                }
+                              },
+                              icon: Icon(
+                                Icons.arrow_forward_ios_outlined,
+                                color: lineItemDetailReportModel
+                                            ?.data.paginator.nextPageUrl !=
+                                        null
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
+                              ))
+                        ],
                       ),
                     )
                   ],
-                )
-              : SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          // BoxShadow(color: Color(0xff919EAB), blurRadius: 2),
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
-                              spreadRadius: 6,
-                              offset: Offset(10, 16)),
-                        ]),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(12),
-                      child: DataTable(
-                        columns: [
-                          DataColumn(
-                            label: Row(
-                              children: [
-                                Text('Order'),
-                              ],
-                            ),
-                          ),
-                          DataColumn(label: Text('Invoiced Date')),
-                          DataColumn(label: Text('Vehicle')),
-                          DataColumn(label: Text('Type')),
-                          DataColumn(label: Text('Type Description')),
-                          DataColumn(label: Text('Technician')),
-                          DataColumn(label: Text('Vendor')),
-                          DataColumn(label: Text('Cost')),
-                          DataColumn(label: Text('Price')),
-                          DataColumn(label: Text('Quantity')),
-                        ],
-                        rows: rows,
-                        columnSpacing: 120,
-                        headingRowColor:
-                            MaterialStateProperty.all(const Color(0xffCEDEFF)),
-                        headingRowHeight: 50,
-                      ),
-                    ),
-                  ),
                 ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text('Rows per page: 10'),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  Text(
-                      "${lineItemDetailReportModel?.data.range.from} - ${lineItemDetailReportModel?.data.range.to} to ${lineItemDetailReportModel?.data.range.total}")
-                ],
-              ),
-              Transform.scale(
-                scale: 0.7,
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          if (lineItemDetailReportModel
-                                  ?.data.paginator.prevPageUrl !=
-                              null) {
-                            ctx.read<ReportBloc>().add(
-                                GetLineItemDetailReportEvent(
-                                    createFilter:
-                                        dropdownValuesMap[currentType] ?? "",
-                                    exportType: "",
-                                    page: "prev"));
-                          }
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_outlined,
-                          color: lineItemDetailReportModel
-                                      ?.data.paginator.prevPageUrl !=
-                                  null
-                              ? Colors.black
-                              : Colors.grey.shade300,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          if (lineItemDetailReportModel
-                                  ?.data.paginator.nextPageUrl !=
-                              null) {
-                            ctx.read<ReportBloc>().add(
-                                GetLineItemDetailReportEvent(
-                                    createFilter:
-                                        dropdownValuesMap[currentType] ?? "",
-                                    exportType: "",
-                                    page: "next"));
-                          }
-                        },
-                        icon: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          color: lineItemDetailReportModel
-                                      ?.data.paginator.nextPageUrl !=
-                                  null
-                              ? Colors.black
-                              : Colors.grey.shade300,
-                        ))
-                  ],
-                ),
-              )
-            ],
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 8.0),
-          //   child: Row(
-          //     children: [
-          //       Text('Rows per page: 10'),
-          //       // DropdownButton<int>(
-          //       //   value: _rowsPerPage,
-          //       //   underline: const SizedBox(),
-          //       //   onChanged: (newValue) {
-          //       //     setState(() {
-          //       //       _rowsPerPage = newValue!;
-          //       //     });
-          //       //   },
-          //       //   items: [5, 10, 20, 50]
-          //       //       .map((value) => DropdownMenuItem<int>(
-          //       //             value: value,
-          //       //             child: Text(value.toString()),
-          //       //           ))
-          //       //       .toList(),
-          //       // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 8.0),
+                //   child: Row(
+                //     children: [
+                //       Text('Rows per page: 10'),
+                //       // DropdownButton<int>(
+                //       //   value: _rowsPerPage,
+                //       //   underline: const SizedBox(),
+                //       //   onChanged: (newValue) {
+                //       //     setState(() {
+                //       //       _rowsPerPage = newValue!;
+                //       //     });
+                //       //   },
+                //       //   items: [5, 10, 20, 50]
+                //       //       .map((value) => DropdownMenuItem<int>(
+                //       //             value: value,
+                //       //             child: Text(value.toString()),
+                //       //           ))
+                //       //       .toList(),
+                //       // ),
 
-          //       const SizedBox(
-          //         width: 16,
-          //       ),
+                //       const SizedBox(
+                //         width: 16,
+                //       ),
 
-          //       Text(
-          //           "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
-          //     ],
-          //   ),
-          // ),
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 8.0),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.start,
-          //     children: [
-          //       Transform.scale(
-          //           scale: 0.7,
-          //           child: CupertinoSwitch(
-          //               value: false, onChanged: (vlaue) {})),
-          //       Text(
-          //         "Dense",
-          //         style: TextStyle(fontSize: 16),
-          //       ),
-          //     ],
-          //   ),
-          // )
-        ],
-      ),
+                //       Text(
+                //           "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
+                //     ],
+                //   ),
+                // ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 8.0),
+                //   child: Row(
+                //     mainAxisAlignment: MainAxisAlignment.start,
+                //     children: [
+                //       Transform.scale(
+                //           scale: 0.7,
+                //           child: CupertinoSwitch(
+                //               value: false, onChanged: (vlaue) {})),
+                //       Text(
+                //         "Dense",
+                //         style: TextStyle(fontSize: 16),
+                //       ),
+                //     ],
+                //   ),
+                // )
+              ],
+            ),
     );
   }
 
@@ -483,15 +485,17 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
           child: ElevatedButton(
               onPressed: () async {
                 ctx.read<ReportBloc>().add(GetLineItemDetailReportEvent(
-                    createFilter: "", exportType: "excel", page: ""));
+                    createFilter: dropdownValuesMap[currentType] ?? "",
+                    exportType: "excel",
+                    page: ""));
               },
               style: ElevatedButton.styleFrom(
                   elevation: 0.6,
-                  alignment: Alignment.center,
+                  //  alignment: Alignment.center,
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(
@@ -503,6 +507,7 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                   ),
                   Text(
                     " Export",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,

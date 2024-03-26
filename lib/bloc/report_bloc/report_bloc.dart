@@ -641,11 +641,18 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
           event.fieldName,
           event.table);
       if (response.statusCode == 200) {
-        lineItemDetailReportModel =
-            lineItemDetailReportModelFromJson(response.body);
-
-        emit(GetLineItemDetailReportState(
-            lineItemDetailReportModel: lineItemDetailReportModel));
+        if (event.exportType == "") {
+          lineItemDetailReportModel =
+              lineItemDetailReportModelFromJson(response.body);
+          totalPages = lineItemDetailReportModel.data.paginator.lastPage ?? 1;
+          currentPage = lineItemDetailReportModel.data.paginator.currentPage;
+          emit(GetLineItemDetailReportState(
+              lineItemDetailReportModel: lineItemDetailReportModel));
+        } else {
+          //export decode.
+          var decodedBody = json.decode(response.body);
+          emit(GetExportLinkState(link: decodedBody['data']));
+        }
       } else {
         var decodedBody = json.decode(response.body);
         emit(GetLineItemDetailReportErrorState(

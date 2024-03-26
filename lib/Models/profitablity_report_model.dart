@@ -95,6 +95,7 @@ class Datum {
   String subContractRetail;
   String subContractCost;
   String fees;
+  String feeCost;
   String partProfit;
   String laborProfit;
   String materialProfit;
@@ -115,6 +116,7 @@ class Datum {
     required this.subContractRetail,
     required this.subContractCost,
     required this.fees,
+    required this.feeCost,
     required this.partProfit,
     required this.laborProfit,
     required this.subContractProfit,
@@ -136,6 +138,7 @@ class Datum {
         subContractRetail: json["subContract_retail"],
         subContractCost: json["subContract_cost"],
         fees: json["fees"],
+        feeCost: json["fee_cost"],
         partProfit: json["part_profit"],
         laborProfit: json["labor_profit"],
         subContractProfit: json["subContract_profit"],
