@@ -158,7 +158,21 @@ class GetAllOrderReportEvent extends ReportEvent {
       this.table});
 }
 
-class GetLineItemDetailReportEvent extends ReportEvent {}
+class GetLineItemDetailReportEvent extends ReportEvent {
+  final String createFilter;
+  final String exportType;
+  final String page;
+  final String? sortBy;
+  final String? fieldName;
+  final String? table;
+  GetLineItemDetailReportEvent(
+      {required this.createFilter,
+      required this.exportType,
+      required this.page,
+      this.sortBy,
+      this.fieldName,
+      this.table});
+}
 
 class GetEndOfDayReportEvent extends ReportEvent {
   final String exportType;

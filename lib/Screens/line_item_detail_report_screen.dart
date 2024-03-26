@@ -19,9 +19,18 @@ class LineItemDetailReportScreen extends StatefulWidget {
 class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   List<DataRow> rows = [];
-  List<String> typeList = ["Today", "Yesterday", "This Month", "This Year"];
+  Map<String, String> dropdownValuesMap = {
+    'Today': 'today',
+    'Yesterday': 'yesterday',
+    'This week': 'week',
+    'This month': 'month',
+    'This year': 'year',
+  };
   LineItemDetailReportModel? lineItemDetailReportModel;
   List<Datum> reportList = [];
+  String sortBy = "desc";
+  String? fieldName;
+  String? table;
 
   String? currentType;
   @override
@@ -33,19 +42,22 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
           // TODO: implement listener
 
           if (state is InternetConnectionSuccessState) {
-            context.read<ReportBloc>().add(GetLineItemDetailReportEvent());
+            context.read<ReportBloc>().add(GetLineItemDetailReportEvent(
+                createFilter: "", exportType: "", page: ""));
           } else if (state is GetLineItemDetailReportState) {
+            reportList.clear();
+            rows.clear();
             lineItemDetailReportModel = state.lineItemDetailReportModel;
             reportList
                 .addAll(state.lineItemDetailReportModel.data.paginator.data);
 
             reportList.forEach((element) {
               rows.add(DataRow(cells: [
-                DataCell(Text(element.order)),
+                DataCell(Text(element.orderNumber.toString())),
                 DataCell(Text(element.invoicedDate)),
                 DataCell(Text(element.vehicle)),
                 DataCell(Text(element.type)),
-                DataCell(Text(element.typeDescription)),
+                DataCell(Text(element.itemDescription)),
                 DataCell(Text(element.technician)),
                 DataCell(Text(element.vendor)),
                 DataCell(Text(element.cost)),
@@ -53,6 +65,12 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                 DataCell(Text(element.quantity)),
               ]));
             });
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "",
+                downloadUrl: state.link,
+                fileName: "",
+                context: context));
           }
         },
         child: BlocBuilder<ReportBloc, ReportState>(
@@ -228,11 +246,8 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                           });
                           ctx.read<ReportBloc>()
                             ..currentPage = 1
-                            ..add(GetPaymentTypeReportEvent(
-                                typeFilter: "",
-                                searchQuery: "",
-                                currentPage: 1,
-                                exportType: ""));
+                            ..add(GetLineItemDetailReportEvent(
+                                createFilter: "", exportType: "", page: ""));
                         },
                         child: Icon(Icons.close))
                     : const SizedBox(),
@@ -248,18 +263,17 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
 
                   ctx.read<ReportBloc>()
                     ..currentPage = 1
-                    ..add(GetPaymentTypeReportEvent(
-                        typeFilter: currentType?.toLowerCase() ?? "",
-                        searchQuery: "",
-                        currentPage: 1,
+                    ..add(GetLineItemDetailReportEvent(
+                        createFilter: dropdownValuesMap[currentType] ?? "",
+                        page: "",
                         exportType: ""));
                 },
-                items: typeList
-                    .map((String type) => DropdownMenuItem<String>(
-                          value: type,
-                          child: Text(type),
-                        ))
-                    .toList(),
+                items: dropdownValuesMap.keys.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
                 isExpanded: true,
                 underline: const SizedBox(),
                 padding: EdgeInsets.only(left: 12, right: 12),
@@ -320,7 +334,11 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                       child: DataTable(
                         columns: [
                           DataColumn(
-                            label: Text('Order'),
+                            label: Row(
+                              children: [
+                                Text('Order'),
+                              ],
+                            ),
                           ),
                           DataColumn(label: Text('Invoiced Date')),
                           DataColumn(label: Text('Vehicle')),
@@ -350,8 +368,8 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                   const SizedBox(
                     width: 16,
                   ),
-                  // Text(
-                  //     "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
+                  Text(
+                      "${lineItemDetailReportModel?.data.range.from} - ${lineItemDetailReportModel?.data.range.to} to ${lineItemDetailReportModel?.data.range.total}")
                 ],
               ),
               Transform.scale(
@@ -360,47 +378,45 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                   children: [
                     IconButton(
                         onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.prevPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
+                          if (lineItemDetailReportModel
+                                  ?.data.paginator.prevPageUrl !=
+                              null) {
+                            ctx.read<ReportBloc>().add(
+                                GetLineItemDetailReportEvent(
+                                    createFilter:
+                                        dropdownValuesMap[currentType] ?? "",
+                                    exportType: "",
+                                    page: "prev"));
+                          }
                         },
                         icon: Icon(
                           Icons.arrow_back_ios_new_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.prevPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
+                          color: lineItemDetailReportModel
+                                      ?.data.paginator.prevPageUrl !=
+                                  null
+                              ? Colors.black
+                              : Colors.grey.shade300,
                         )),
                     IconButton(
                         onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.nextPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
+                          if (lineItemDetailReportModel
+                                  ?.data.paginator.nextPageUrl !=
+                              null) {
+                            ctx.read<ReportBloc>().add(
+                                GetLineItemDetailReportEvent(
+                                    createFilter:
+                                        dropdownValuesMap[currentType] ?? "",
+                                    exportType: "",
+                                    page: "next"));
+                          }
                         },
                         icon: Icon(
                           Icons.arrow_forward_ios_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.nextPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
+                          color: lineItemDetailReportModel
+                                      ?.data.paginator.nextPageUrl !=
+                                  null
+                              ? Colors.black
+                              : Colors.grey.shade300,
                         ))
                   ],
                 ),
@@ -466,18 +482,8 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
           padding: const EdgeInsets.only(right: 21.0, bottom: 12, left: 21),
           child: ElevatedButton(
               onPressed: () async {
-                // ctx.read<ReportBloc>().add(GetTimeLogReportEvent(
-                //     monthFilter: currentTimeIn == "Last Week"
-                //         ? "last_week"
-                //         : currentTimeIn == "Last Month"
-                //             ? "last_month"
-                //             : currentTimeIn == "Last Year"
-                //                 ? "last_year"
-                //                 : currentTimeIn?.toLowerCase() ?? "",
-                //     techFilter: technicianId,
-                //     searchQuery: "",
-                //     currentPage: 1,
-                //     exportType: "excel"));
+                ctx.read<ReportBloc>().add(GetLineItemDetailReportEvent(
+                    createFilter: "", exportType: "excel", page: ""));
               },
               style: ElevatedButton.styleFrom(
                   elevation: 0.6,
@@ -505,5 +511,23 @@ class _LineItemDetailReportScreen extends State<LineItemDetailReportScreen> {
                 ],
               ))),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetLineItemDetailReportEvent(
+        createFilter: dropdownValuesMap[currentType] ?? "",
+        exportType: "",
+        page: "",
+        sortBy: sortBy,
+        fieldName: fieldName,
+        table: table));
   }
 }

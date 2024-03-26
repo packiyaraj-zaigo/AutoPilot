@@ -112,24 +112,26 @@ class Paginator {
 }
 
 class Datum {
-  String order;
+  int orderNumber;
   String invoicedDate;
   String vehicle;
   String type;
-  String typeDescription;
+  String itemDescription;
   String technician;
+  String note;
   String vendor;
   String cost;
   String price;
   String quantity;
 
   Datum({
-    required this.order,
+    required this.orderNumber,
     required this.invoicedDate,
     required this.vehicle,
     required this.type,
-    required this.typeDescription,
+    required this.itemDescription,
     required this.technician,
+    required this.note,
     required this.vendor,
     required this.cost,
     required this.price,
@@ -137,12 +139,13 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        order: json["order"],
+        orderNumber: json["order_number"],
         invoicedDate: json["invoiced_date"],
         vehicle: json["vehicle"],
         type: json["type"],
-        typeDescription: json["type_description"],
+        itemDescription: json["item_description"],
         technician: json["technician"],
+        note: json["note"],
         vendor: json["vendor"],
         cost: json["cost"],
         price: json["price"],
@@ -150,12 +153,13 @@ class Datum {
       );
 
   Map<String, dynamic> toJson() => {
-        "order": order,
+        "order_number": orderNumber,
         "invoiced_date": invoicedDate,
         "vehicle": vehicle,
         "type": type,
-        "type_description": typeDescription,
+        "item_description": itemDescription,
         "technician": technician,
+        "note": note,
         "vendor": vendor,
         "cost": cost,
         "price": price,

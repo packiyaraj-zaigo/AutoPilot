@@ -611,12 +611,35 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   Future<void> getLineItemDetailReportBloc(
       GetLineItemDetailReportEvent event, Emitter<ReportState> emit) async {
     try {
-      emit(ReportLoadingState());
+      if (currentPage == 1) {
+        emit(ReportLoadingState());
+      } else {
+        emit(TableLoadingState());
+      }
       //change nullable with original model class
       LineItemDetailReportModel lineItemDetailReportModel;
       final token = await AppUtils.getToken();
+      if (event.page == "next") {
+        if (currentPage < totalPages) {
+          currentPage++; // Increment the current page value
+        }
+      } else if (event.page == "prev") {
+        if (currentPage > 1) {
+          currentPage--; // Decrement the current page value
+        }
+      } else {
+        currentPage =
+            1; // Reset to the first page if not navigating forward or backward
+      }
 
-      Response response = await apiRepo.getLineItemDetailReport(token, 0);
+      Response response = await apiRepo.getLineItemDetailReport(
+          token,
+          currentPage,
+          event.createFilter,
+          event.exportType,
+          event.sortBy,
+          event.fieldName,
+          event.table);
       if (response.statusCode == 200) {
         lineItemDetailReportModel =
             lineItemDetailReportModelFromJson(response.body);

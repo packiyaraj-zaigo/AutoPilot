@@ -79,8 +79,8 @@ class _ReportListScreen extends State<ReportListScreen> {
               // reportTileWidget("All Orders", AllOrdersReportScreen()),
               // reportTileWidget("Invoice By Service Writer",
               //     InvoiceByServiceWriterReportScreen()),
-              // reportTileWidget(
-              //     "Line Item Detail", LineItemDetailReportScreen()),
+              reportTileWidget(
+                  "Line Item Detail", LineItemDetailReportScreen()),
               // reportTileWidget("End of Day", EndOfDayReportScreen()),
               // reportTileWidget("Profitability", ProfitabilityReportScreen()),
               // reportTileWidget(

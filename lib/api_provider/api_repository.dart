@@ -745,8 +745,16 @@ class ApiRepository {
         token, page, exportType, createFilter, sortBy, fieldName, table);
   }
 
-  Future<dynamic> getLineItemDetailReport(String token, int page) {
-    return apiProvider.getLineItemDetailReport(token, page);
+  Future<dynamic> getLineItemDetailReport(
+      String token,
+      int page,
+      String createFilter,
+      String exportType,
+      String? sortBy,
+      String? fieldName,
+      String? table) {
+    return apiProvider.getLineItemDetailReport(
+        token, page, exportType, createFilter, sortBy, fieldName, table);
   }
 
   Future<dynamic> getEndOfDayReport(String token, String exportType) {

@@ -2661,11 +2661,25 @@ class ApiProvider {
   }
 
   // api to get line item detail report
-  Future<dynamic> getLineItemDetailReport(String token, int page) async {
+  Future<dynamic> getLineItemDetailReport(
+      String token,
+      int page,
+      String exportType,
+      String createFilter,
+      String? sortBy,
+      String? fieldName,
+      String? table) async {
     try {
       //mock api url. change to live api url
-      final url = Uri.parse(
-          "https://run.mocky.io/v3/e989e845-a8eb-493d-b4d9-0085082415e2");
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/e989e845-a8eb-493d-b4d9-0085082415e2");
+
+      //  sortBy != null && table != null && fieldName != null
+      //     ? Uri.parse(
+      //         "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
+      //     :
+      var url = Uri.parse(
+          "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&type=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
