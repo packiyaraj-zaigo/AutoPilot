@@ -556,6 +556,9 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                 ctx.read<ReportBloc>().add(GetAllOrderReportEvent(
                     exportType: "excel",
                     page: "",
+                    fieldName: fieldName,
+                    sortBy: sortBy,
+                    table: table,
                     createFilter: dropdownValuesMap[currentType] ?? ""));
               },
               style: ElevatedButton.styleFrom(

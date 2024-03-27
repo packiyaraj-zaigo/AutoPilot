@@ -925,6 +925,9 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                     searchQuery: "",
                     page: "",
                     currentPage: 1,
+                    fieldName: fieldName,
+                    sortBy: sortBy,
+                    tableName: tableName,
                     exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(

@@ -601,6 +601,9 @@ class _CustomerSummaryReportScreen extends State<CustomerSummaryReportScreen> {
                 ctx.read<ReportBloc>().add(GetCustomerSummaryReportEvent(
                     createFilter: dropdownValuesMap[currentType] ?? "",
                     page: "",
+                    fieldName: fieldName,
+                    sortBy: sortBy,
+                    table: table,
                     exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(

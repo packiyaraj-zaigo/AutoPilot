@@ -287,6 +287,9 @@ class _ServicesByTechnicianReportScreen
                     page: "",
                     currentPage: 1,
                     pagination: "",
+                    fieldName: fieldName,
+                    sort: sortBy,
+                    tableName: tableName,
                     exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(
