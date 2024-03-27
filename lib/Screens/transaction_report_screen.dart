@@ -27,6 +27,9 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
   };
   TransactionReportModel? transactionReportModel;
   List<Datum> reportList = [];
+  String sortBy = "asc";
+  String? table;
+  String? fieldName;
 
   String? currentType;
   @override
@@ -71,7 +74,9 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
               drawer: showDrawer(context),
               bottomNavigationBar: state is ReportLoadingState
                   ? const SizedBox()
-                  : exportButtonWidget(context),
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -333,8 +338,44 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                                 DataColumn(
                                   label: Text('Date'),
                                 ),
-                                DataColumn(label: Text('Order')),
-                                DataColumn(label: Text('Customer')),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Order'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "order";
+                                          fieldName = "order_number";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    ),
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Customer'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          fieldName = "first_name";
+                                          table = "customer";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
                                 DataColumn(label: Text('Location')),
                                 DataColumn(label: Text('Total')),
                               ],
@@ -475,7 +516,9 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                 ctx.read<ReportBloc>()
                   ..currentPage = 1
                   ..add(GetTransactionReportEvent(
-                      page: "", exportType: "excel", createFilter: ""));
+                      page: "",
+                      exportType: "excel",
+                      createFilter: dropdownValuesMap[currentType] ?? ""));
               },
               style: ElevatedButton.styleFrom(
                   elevation: 0.6,
@@ -483,7 +526,7 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(
@@ -503,5 +546,23 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                 ],
               ))),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetTransactionReportEvent(
+        page: "",
+        exportType: "",
+        createFilter: dropdownValuesMap[currentType] ?? "",
+        fieldName: fieldName,
+        sortBy: sortBy,
+        table: table));
   }
 }

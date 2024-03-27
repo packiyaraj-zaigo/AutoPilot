@@ -2595,11 +2595,14 @@ class ApiProvider {
   }
 
   // api to get shopperformance summary
-  Future<dynamic> getShopPerformanceSummary(String token, int page) async {
+  Future<dynamic> getShopPerformanceSummary(
+      String token, String exportType) async {
     try {
       //mock api url. change to live api url
-      final url = Uri.parse(
-          "https://run.mocky.io/v3/133183fa-775c-471f-a347-b75e8eb83c94");
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/133183fa-775c-471f-a347-b75e8eb83c94");
+      var url = Uri.parse(
+          "${BASE_URL}api/shop_performace_summary?file_type=$exportType");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2609,13 +2612,22 @@ class ApiProvider {
 
   // api to get transaction report
   Future<dynamic> getTransactionReport(
-      String token, int page, String exportType, String createFilter) async {
+      String token,
+      int page,
+      String exportType,
+      String createFilter,
+      String? sortBy,
+      String? fieldName,
+      String? table) async {
     try {
       //mock api url. change to live api url
       // final url = Uri.parse(
       //     "https://run.mocky.io/v3/298211eb-6a30-4993-9116-9e42c60d7142");
-      var url = Uri.parse(
-          "${BASE_URL}api/transaction?page=$page&file_type=$exportType&type=$createFilter");
+      var url = sortBy != null && fieldName != null && table != null
+          ? Uri.parse(
+              "${BASE_URL}api/transaction?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
+          : Uri.parse(
+              "${BASE_URL}api/transaction?page=$page&file_type=$exportType&type=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2625,13 +2637,22 @@ class ApiProvider {
 
   // api to get all orders report
   Future<dynamic> getAllOrdersReport(
-      String token, int page, String exportType, createFilter) async {
+      String token,
+      int page,
+      String exportType,
+      String createFilter,
+      String? sortBy,
+      String? fieldName,
+      String? table) async {
     try {
       //mock api url. change to live api url
       // final url = Uri.parse(
       //     "https://run.mocky.io/v3/09a5e963-57f9-44ef-9c4f-647845583683");
-      var url = Uri.parse(
-          "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&type=$createFilter");
+      var url = sortBy != null && table != null && fieldName != null
+          ? Uri.parse(
+              "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
+          : Uri.parse(
+              "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&type=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2640,11 +2661,25 @@ class ApiProvider {
   }
 
   // api to get line item detail report
-  Future<dynamic> getLineItemDetailReport(String token, int page) async {
+  Future<dynamic> getLineItemDetailReport(
+      String token,
+      int page,
+      String exportType,
+      String createFilter,
+      String? sortBy,
+      String? fieldName,
+      String? table) async {
     try {
       //mock api url. change to live api url
-      final url = Uri.parse(
-          "https://run.mocky.io/v3/e989e845-a8eb-493d-b4d9-0085082415e2");
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/e989e845-a8eb-493d-b4d9-0085082415e2");
+
+      //  sortBy != null && table != null && fieldName != null
+      //     ? Uri.parse(
+      //         "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
+      //     :
+      var url = Uri.parse(
+          "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&type=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2659,6 +2694,72 @@ class ApiProvider {
       // final url = Uri.parse(
       //     "https://run.mocky.io/v3/7e8c5207-0834-473d-8a4d-0054cc7b10a1");
       var url = Uri.parse("${BASE_URL}api/end_of_day?file_type=$exportType");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+  }
+
+  // api to get profitablity report
+  Future<dynamic> getProfitablityReport(
+      String token,
+      String fromDate,
+      String toDate,
+      String serviceId,
+      String exportType,
+      int page,
+      String? sortBy,
+      String? fieldName,
+      String? table) async {
+    try {
+      //mock api url. change to live api url
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/7e8c5207-0834-473d-8a4d-0054cc7b10a1");
+      var url = sortBy != null && fieldName != null && table != null
+          ? Uri.parse(
+              "${BASE_URL}api/profitablity?from_date=$fromDate&to_date=$toDate&service_id=$serviceId&file_type=$exportType&page=$page&sort_by=$sortBy&field_name=$fieldName&table=$table")
+          : Uri.parse(
+              "${BASE_URL}api/profitablity?from_date=$fromDate&to_date=$toDate&service_id=$serviceId&file_type=$exportType&page=$page");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+    // api to get service writer data
+  }
+
+  // api to get summary by customer report
+  Future<dynamic> getCustomerSummaryReport(
+      String token,
+      String createFilter,
+      String exportType,
+      int page,
+      String? sortBy,
+      String? fieldName,
+      String? table) async {
+    try {
+      //mock api url. change to live api url
+      // final url = Uri.parse(
+      //     "https://run.mocky.io/v3/7e8c5207-0834-473d-8a4d-0054cc7b10a1");
+      var url = sortBy != null && fieldName != null && table != null
+          ? Uri.parse(
+              "${BASE_URL}api/summary_by_customer?type=$createFilter&file_type=$exportType&page=$page&sort_by=$sortBy&field_name=$fieldName&table=$table")
+          : Uri.parse(
+              "${BASE_URL}api/summary_by_customer?type=$createFilter&file_type=$exportType&page=$page");
+      final response = http.get(url, headers: getHeader(token));
+      return response;
+    } catch (e) {
+      log('Error on getting local response');
+    }
+    // api to get service writer data
+  }
+
+  //Api to get all service writer data
+
+  Future<dynamic> getServiceWriter(String token) async {
+    try {
+      var url = Uri.parse("${BASE_URL}api/service_writer");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {

@@ -233,6 +233,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                               cannedServiceId: state.orderServiceId,
                               item: element,
                               taxAmount: taxAmount));
+
+                      log(element.taxAmount + "taxxx mat");
                     });
                   }
                   if (part.isNotEmpty) {
@@ -242,6 +244,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                               cannedServiceId: state.orderServiceId,
                               item: element,
                               taxAmount: taxAmount));
+                               log(element.taxAmount + "taxxx part");
                     });
                   }
                   if (fee.isNotEmpty) {
@@ -251,6 +254,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                               cannedServiceId: state.orderServiceId,
                               item: element,
                               taxAmount: taxAmount));
+
+                               log(element.taxAmount + "taxxx fee");
                     });
                   }
                   if (labor.isNotEmpty) {
@@ -260,6 +265,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                               cannedServiceId: state.orderServiceId,
                               item: element,
                               taxAmount: taxAmount));
+
+                               log(element.taxAmount + "taxxx labor");
                     });
                   }
                   if (subContract.isNotEmpty) {
@@ -269,6 +276,8 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                               cannedServiceId: state.orderServiceId,
                               item: element,
                               taxAmount: taxAmount));
+
+                               log(element.taxAmount + "taxxx sub");
                     });
                   }
                 } else if (state is CreateOrderServiceItemState) {
@@ -1945,7 +1954,11 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                     cost: addMaterialCostController.text.trim(),
                                     taxAmount:
                                         (subTotal - total).toStringAsFixed(2),
-                                    discountAmount: ((double.parse(addMaterialPriceController.text)*double.parse(addMaterialQuantityController.text)) -total).toString());
+                                    discountAmount:
+                                        ((double.parse(addMaterialPriceController.text) *
+                                                    double.parse(addMaterialQuantityController.text)) -
+                                                total)
+                                            .toString());
                                 if (item.id != '') {
                                   final ind = editedItems.indexWhere(
                                       (element) => element.id == item.id);
@@ -1984,8 +1997,11 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                     cost: addMaterialCostController.text.trim(),
                                     taxAmount:
                                         (subTotal - total).toStringAsFixed(2),
-                                       discountAmount: ((double.parse(addMaterialPriceController.text)*double.parse(addMaterialQuantityController.text)) -total).toString()));
-                                log(material.last.toJson().toString());
+                                    discountAmount:
+                                        ((double.parse(addMaterialPriceController.text) *
+                                                    double.parse(addMaterialQuantityController.text)) -
+                                                total)
+                                            .toString()));
                               }
                               setState(() {});
                               Navigator.pop(context);
@@ -2510,7 +2526,13 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   cost: addPartCostController.text.trim(),
                                   taxAmount:
                                       (subTotal - total).toStringAsFixed(2),
-                                      discountAmount: ((double.parse(addPartPriceController.text)*double.parse(addPartQuantityController.text)) -total).toString());
+                                  discountAmount:
+                                      ((double.parse(addPartPriceController.text) *
+                                                  double.parse(
+                                                      addPartQuantityController
+                                                          .text)) -
+                                              total)
+                                          .toString());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -2546,7 +2568,13 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   cost: addPartCostController.text.trim(),
                                   taxAmount:
                                       (subTotal - total).toStringAsFixed(2),
-                                      discountAmount: ((double.parse(addPartPriceController.text)*double.parse(addPartQuantityController.text)) -total).toString()));
+                                  discountAmount:
+                                      ((double.parse(addPartPriceController.text) *
+                                                  double.parse(
+                                                      addPartQuantityController
+                                                          .text)) -
+                                              total)
+                                          .toString()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -2987,8 +3015,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                               .text.isNotEmpty
                                       ? "Percentage"
                                       : "Fixed",
-                                  tax: (double.tryParse(addLaborTaxController
-                                              .text
+                                  tax: (double.tryParse(addLaborTaxController.text
                                               .trim()) ??
                                           0.0)
                                       .toStringAsFixed(2),
@@ -2998,7 +3025,11 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   cost: addLaborPriceController.text.trim(),
                                   taxAmount:
                                       (subTotal - total).toStringAsFixed(2),
-                                      discountAmount: ((double.parse(addLaborPriceController.text)*double.parse(addLaborHoursController.text)) -total).toString());
+                                  discountAmount:
+                                      ((double.parse(addLaborPriceController.text) *
+                                                  double.parse(addLaborHoursController.text)) -
+                                              total)
+                                          .toString());
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
                                     (element) => element.id == item.id);
@@ -3026,8 +3057,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                               .text.isNotEmpty
                                       ? "Percentage"
                                       : "Fixed",
-                                  tax: (double.tryParse(addLaborTaxController
-                                              .text
+                                  tax: (double.tryParse(addLaborTaxController.text
                                               .trim()) ??
                                           0.0)
                                       .toStringAsFixed(2),
@@ -3037,7 +3067,11 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   cost: addLaborBaseCostController.text.trim(),
                                   taxAmount:
                                       (subTotal - total).toStringAsFixed(2),
-                                     discountAmount: ((double.parse(addLaborPriceController.text)*double.parse(addLaborHoursController.text)) -total).toString()));
+                                  discountAmount:
+                                      ((double.parse(addLaborPriceController.text) *
+                                                  double.parse(addLaborHoursController.text)) -
+                                              total)
+                                          .toString()));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -3368,7 +3402,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   cost: addFeeCostController.text.trim(),
                                   taxAmount:
                                       (subTotal - total).toStringAsFixed(2),
-                                      discountAmount:"0");
+                                  discountAmount: "0");
 
                               if (item.id != '') {
                                 final ind = editedItems.indexWhere(
@@ -3396,7 +3430,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                   cost: addFeeCostController.text.trim(),
                                   taxAmount:
                                       (subTotal - total).toStringAsFixed(2),
-                                      discountAmount: "0"));
+                                  discountAmount: "0"));
                             }
                             setState(() {});
                             Navigator.pop(context);
@@ -3912,7 +3946,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                                   subTotal.toStringAsFixed(2),
                                               cost: addSubContractCostController.text.trim(),
                                               taxAmount: (subTotal - total).toStringAsFixed(2),
-                                              discountAmount:(double.parse(addSubContractPriceController.text)-total).toString());
+                                              discountAmount: (double.parse(addSubContractPriceController.text) - total).toString());
                                       if (item.id != '') {
                                         final ind = editedItems.indexWhere(
                                             (element) => element.id == item.id);
@@ -3934,15 +3968,14 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                             part: '',
                                             itemName: addSubContractNameController
                                                 .text,
-                                            discount:
-                                                addSubContractDiscountController
-                                                        .text
-                                                        .trim()
-                                                        .isEmpty
-                                                    ? "0"
-                                                    : addSubContractDiscountController
-                                                        .text
-                                                        .trim(),
+                                            discount: addSubContractDiscountController
+                                                    .text
+                                                    .trim()
+                                                    .isEmpty
+                                                ? "0"
+                                                : addSubContractDiscountController
+                                                    .text
+                                                    .trim(),
                                             discountType: isPercentage &&
                                                     addSubContractDiscountController
                                                         .text.isNotEmpty
@@ -3952,18 +3985,16 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                                 ? client?.laborTaxRate ?? '0'
                                                 : '0',
                                             vendorId: vendorId,
-                                            unitPrice:
-                                                addSubContractPriceController
-                                                    .text,
+                                            unitPrice: addSubContractPriceController
+                                                .text,
                                             itemType: "SubContract",
                                             subTotal:
                                                 subTotal.toStringAsFixed(2),
-                                            cost: addSubContractCostController
-                                                .text
+                                            cost: addSubContractCostController.text
                                                 .trim(),
                                             taxAmount: (subTotal - total)
                                                 .toStringAsFixed(2),
-                                                 discountAmount:
+                                            discountAmount:
                                                 (double.parse(addSubContractPriceController.text) - total)
                                                     .toString()),
                                       );

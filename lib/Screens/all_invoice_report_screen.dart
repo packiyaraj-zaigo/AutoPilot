@@ -30,7 +30,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
   List<Datum> reportList = [];
   int _rowsPerPage = 5;
   String? currentPaidFilter;
-  String sortBy = "asc";
+  String sortBy = "desc";
   String? tableName;
   String? fieldName;
   void toggleSortOrder() {
@@ -92,6 +92,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
             context.read<ReportBloc>().add((GetAllInvoiceReportEvent(
                 startDate: startDateToServer,
                 endDate: endDateToServer,
+                page: "",
                 paidFilter: "",
                 searchQuery: "",
                 currentPage: 1,
@@ -136,7 +137,11 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -318,6 +323,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                           endDate: endDateToServer,
                                           paidFilter: "",
                                           searchQuery: "",
+                                          page: "",
                                           currentPage: 1,
                                           exportType: ""));
                                   },
@@ -484,6 +490,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                 endDate: "",
                                 paidFilter: "",
                                 searchQuery: "",
+                                page: "",
                                 currentPage: 1,
                                 exportType: ""));
 
@@ -509,6 +516,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                     ..add(GetAllInvoiceReportEvent(
                         startDate: "",
                         endDate: "",
+                        page: "",
                         paidFilter: currentPaidFilter == "This Week"
                             ? "week"
                             : currentPaidFilter == "This Month"
@@ -799,6 +807,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                             endDate: endDateToServer,
                                             paidFilter: "",
                                             searchQuery: "",
+                                            page: "prev",
                                             currentPage: 1,
                                             exportType: "",
                                             sortBy: sortBy,
@@ -824,6 +833,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                             startDate: startDateToServer,
                                             endDate: endDateToServer,
                                             paidFilter: "",
+                                            page: "next",
                                             searchQuery: "",
                                             currentPage: 1,
                                             exportType: "",
@@ -903,8 +913,8 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                 //     context: ctx));
 
                 ctx.read<ReportBloc>().add(GetAllInvoiceReportEvent(
-                    startDate: "",
-                    endDate: "",
+                    startDate: startDateToServer,
+                    endDate: endDateToServer,
                     paidFilter: currentPaidFilter == "This Week"
                         ? "week"
                         : currentPaidFilter == "This Month"
@@ -913,6 +923,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                                 ? "year"
                                 : currentPaidFilter?.toLowerCase() ?? "",
                     searchQuery: "",
+                    page: "",
                     currentPage: 1,
                     exportType: "excel"));
               },
@@ -922,7 +933,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(
@@ -961,6 +972,7 @@ class _AllInvoiceReportScreen extends State<AllInvoiceReportScreen> {
           searchQuery: "",
           currentPage: 1,
           exportType: "",
+          page: "",
           sortBy: sortBy,
           tableName: tableName,
           fieldName: fieldName));

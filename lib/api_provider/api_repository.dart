@@ -723,28 +723,72 @@ class ApiRepository {
     return apiProvider.getReportTechnicanList(token);
   }
 
-  Future<dynamic> getShopPerformanceReport(String token, int page) {
-    return apiProvider.getShopPerformanceSummary(token, page);
+  Future<dynamic> getShopPerformanceReport(String token, String exportType) {
+    return apiProvider.getShopPerformanceSummary(token, exportType);
   }
 
   Future<dynamic> getTransactionReport(
-      String token, int page, String exportType, String createFilter) {
+      String token,
+      int page,
+      String exportType,
+      String createFilter,
+      String? sortBy,
+      String? fieldName,
+      String? table) {
     return apiProvider.getTransactionReport(
-        token, page, exportType, createFilter);
+        token, page, exportType, createFilter, sortBy, fieldName, table);
   }
 
-  Future<dynamic> getAllOrdersReport(
-      String token, int page, String exportType, String createFilter) {
+  Future<dynamic> getAllOrdersReport(String token, int page, String exportType,
+      String createFilter, String? sortBy, String? table, String? fieldName) {
     return apiProvider.getAllOrdersReport(
-        token, page, exportType, createFilter);
+        token, page, exportType, createFilter, sortBy, fieldName, table);
   }
 
-  Future<dynamic> getLineItemDetailReport(String token, int page) {
-    return apiProvider.getLineItemDetailReport(token, page);
+  Future<dynamic> getLineItemDetailReport(
+      String token,
+      int page,
+      String createFilter,
+      String exportType,
+      String? sortBy,
+      String? fieldName,
+      String? table) {
+    return apiProvider.getLineItemDetailReport(
+        token, page, exportType, createFilter, sortBy, fieldName, table);
   }
 
   Future<dynamic> getEndOfDayReport(String token, String exportType) {
     return apiProvider.getEndOfDayReport(token, exportType);
+  }
+
+  Future<dynamic> getProfitablityReport(
+      String token,
+      String fromDate,
+      String toDate,
+      String serviceId,
+      String exportType,
+      int page,
+      String? sortBy,
+      String? fieldName,
+      String? table) {
+    return apiProvider.getProfitablityReport(token, fromDate, toDate, serviceId,
+        exportType, page, sortBy, fieldName, table);
+  }
+
+  Future<dynamic> getCustomerSummaryReport(
+      String token,
+      String createFilter,
+      String exportType,
+      int page,
+      String? sortBy,
+      String? fieldName,
+      String? table) {
+    return apiProvider.getCustomerSummaryReport(
+        token, createFilter, exportType, page, sortBy, fieldName, table);
+  }
+
+  Future<dynamic> getServiceWriter(String token) {
+    return apiProvider.getServiceWriter(token);
   }
 }
 

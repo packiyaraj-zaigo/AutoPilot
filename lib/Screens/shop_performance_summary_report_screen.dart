@@ -20,7 +20,7 @@ class _ShopPerformanceSummaryScreen
   final scaffoldKey = GlobalKey<ScaffoldState>();
   ShopPerformanceReportModel? shopPerformanceReportModel;
   List<DataRow> rows = [];
-  List<Datum> reportList = [];
+  List<Service> reportList = [];
   @override
   Widget build(BuildContext) {
     return BlocProvider(
@@ -28,18 +28,25 @@ class _ShopPerformanceSummaryScreen
       child: BlocListener<ReportBloc, ReportState>(
         listener: (context, state) {
           if (state is InternetConnectionSuccessState) {
-            context.read<ReportBloc>().add(GetShopPerformanceReportEvent());
+            context
+                .read<ReportBloc>()
+                .add(GetShopPerformanceReportEvent(exportType: ""));
           } else if (state is GetShopPerformanceReportState) {
             shopPerformanceReportModel = state.shopPerformanceReportModel;
-            reportList
-                .addAll(state.shopPerformanceReportModel.data.paginator.data);
+            reportList.addAll(state.shopPerformanceReportModel.data.service);
             reportList.forEach((element) {
               rows.add(DataRow(cells: [
                 DataCell(Text(element.type)),
-                DataCell(Text(element.percent)),
-                DataCell(Text(element.revenue)),
+                DataCell(Text(element.percentage)),
+                DataCell(Text(element.service)),
               ]));
             });
+          } else if (state is GetExportLinkState) {
+            context.read<ReportBloc>().add(ExportReportEvent(
+                downloadPath: "",
+                downloadUrl: state.link,
+                fileName: "",
+                context: context));
           }
           // TODO: implement listener
         },
@@ -50,7 +57,9 @@ class _ShopPerformanceSummaryScreen
               drawer: showDrawer(context),
               bottomNavigationBar: state is ReportLoadingState
                   ? const SizedBox()
-                  : exportButtonWidget(context),
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -123,28 +132,23 @@ class _ShopPerformanceSummaryScreen
                               ),
                               summaryTile(
                                   "Invoiced",
-                                  shopPerformanceReportModel?.data.paginator
-                                          .salesSummary.invoiced ??
+                                  shopPerformanceReportModel?.invoiced
+                                          .toString() ??
                                       "0"),
                               summaryTile(
                                   "Payments Collected",
-                                  shopPerformanceReportModel?.data.paginator
-                                          .salesSummary.paymentsCollected ??
-                                      "0"),
-                              summaryTile(
-                                  "Paying Customers",
-                                  shopPerformanceReportModel?.data.paginator
-                                          .salesSummary.payingCustomers ??
+                                  shopPerformanceReportModel?.paymentCollected
+                                          .toString() ??
                                       "0"),
                               summaryTile(
                                   "Profit",
-                                  shopPerformanceReportModel?.data.paginator
-                                          .salesSummary.profit ??
+                                  shopPerformanceReportModel?.profit
+                                          .toString() ??
                                       "0"),
                               summaryTile(
                                   "Profit Percentage",
-                                  shopPerformanceReportModel?.data.paginator
-                                          .salesSummary.profitPercent ??
+                                  shopPerformanceReportModel?.profitPercentage
+                                          .toString() ??
                                       "0"),
                               const SizedBox(
                                 height: 32,
@@ -269,72 +273,10 @@ class _ShopPerformanceSummaryScreen
                     ),
                   ),
                 ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text('Rows per page: 10'),
-                  const SizedBox(
-                    width: 16,
-                  ),
-                  // Text(
-                  //     "${timeLogReportModel?.data.range.from} - ${timeLogReportModel?.data.range.to} to ${timeLogReportModel?.data.range.total}")
-                ],
-              ),
-              Transform.scale(
-                scale: 0.7,
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.prevPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
-                        },
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.prevPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
-                        )),
-                    IconButton(
-                        onPressed: () {
-                          // if (timeLogReportModel
-                          //         ?.data.paginator.nextPageUrl !=
-                          //     null) {
-                          //   ctx.read<ReportBloc>().add(
-                          //       GetTimeLogReportEvent(
-                          //           monthFilter: "",
-                          //           techFilter: technicianId,
-                          //           searchQuery: "",
-                          //           currentPage: 1,
-                          //           exportType: ""));
-                          // }
-                        },
-                        icon: Icon(
-                          Icons.arrow_forward_ios_outlined,
-                          // color: timeLogReportModel
-                          //             ?.data.paginator.nextPageUrl !=
-                          //         null
-                          //     ? Colors.black
-                          //     : Colors.grey.shade300,
-                        ))
-                  ],
-                ),
-              )
-            ],
-          ),
+          const SizedBox(
+            height: 24,
+          )
+
           // Padding(
           //   padding: const EdgeInsets.only(top: 8.0),
           //   child: Row(
@@ -394,6 +336,9 @@ class _ShopPerformanceSummaryScreen
           padding: const EdgeInsets.only(right: 21.0, bottom: 12, left: 21),
           child: ElevatedButton(
               onPressed: () async {
+                ctx
+                    .read<ReportBloc>()
+                    .add(GetShopPerformanceReportEvent(exportType: "excel"));
                 // ctx.read<ReportBloc>().add(GetTimeLogReportEvent(
                 //     monthFilter: currentTimeIn == "Last Week"
                 //         ? "last_week"
@@ -413,7 +358,7 @@ class _ShopPerformanceSummaryScreen
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(

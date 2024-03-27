@@ -100,7 +100,11 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
               key: scaffoldKey,
               bottomNavigationBar: Padding(
                 padding: const EdgeInsets.only(left: 24.0),
-                child: exportButtonWidget(context),
+                child: state is ReportLoadingState
+                    ? const SizedBox()
+                    : reportList.isEmpty
+                        ? const SizedBox()
+                        : exportButtonWidget(context),
               ),
               drawer: showDrawer(context),
               appBar: AppBar(
@@ -264,7 +268,7 @@ class _SalesTaxReportScreenState extends State<SalesTaxReportScreen> {
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(

@@ -29,6 +29,10 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
   String? currentType;
   AllOrdersReportModel? allOrdersReportModel;
   List<Datum> reportList = [];
+  String sortBy = "asc";
+  String? table;
+  String? fieldName;
+
   @override
   Widget build(BuildContext) {
     return BlocProvider(
@@ -54,6 +58,7 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                 DataCell(Text(element.firstName)),
                 DataCell(Text(element.lastName)),
                 DataCell(Text(element.vehicleName)),
+                DataCell(Text(element.paidStatus)),
                 DataCell(Text(element.serviceWriter)),
                 DataCell(Text(element.dateCreated)),
                 DataCell(Text(element.dateInvoiced)),
@@ -76,7 +81,9 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
               drawer: showDrawer(context),
               bottomNavigationBar: state is ReportLoadingState
                   ? const SizedBox()
-                  : exportButtonWidget(context),
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               appBar: AppBar(
                   leading: IconButton(
                     icon: const Icon(
@@ -328,12 +335,84 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                             child: DataTable(
                               columns: [
                                 DataColumn(
-                                  label: Text('Order'),
+                                  label: Row(
+                                    children: [
+                                      Text('Order'),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            table = "order";
+                                            fieldName = "order_number";
+                                          });
+
+                                          sortTable(ctx);
+                                        },
+                                        child: Icon(sortBy == "asc"
+                                            ? Icons.arrow_upward_rounded
+                                            : Icons.arrow_downward_rounded),
+                                      )
+                                    ],
+                                  ),
                                 ),
                                 DataColumn(label: Text('Order Status')),
-                                DataColumn(label: Text('First Name')),
-                                DataColumn(label: Text('Last Name')),
-                                DataColumn(label: Text('Vehicle')),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('First Name'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "customer";
+                                          fieldName = "first_name";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Last Name'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "customer";
+                                          fieldName = "last_name";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
+                                DataColumn(
+                                    label: Row(
+                                  children: [
+                                    Text('Vehicle'),
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          table = "vehicle";
+                                          fieldName = "vehicle_make";
+                                        });
+
+                                        sortTable(ctx);
+                                      },
+                                      child: Icon(sortBy == "asc"
+                                          ? Icons.arrow_upward_rounded
+                                          : Icons.arrow_downward_rounded),
+                                    )
+                                  ],
+                                )),
+                                DataColumn(label: Text('Paid Status')),
                                 DataColumn(label: Text('Service Writer')),
                                 DataColumn(label: Text('Created Date')),
                                 DataColumn(label: Text('Date Invoiced')),
@@ -475,7 +554,9 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
           child: ElevatedButton(
               onPressed: () async {
                 ctx.read<ReportBloc>().add(GetAllOrderReportEvent(
-                    exportType: "excel", page: "", createFilter: ""));
+                    exportType: "excel",
+                    page: "",
+                    createFilter: dropdownValuesMap[currentType] ?? ""));
               },
               style: ElevatedButton.styleFrom(
                   elevation: 0.6,
@@ -483,7 +564,7 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(
@@ -503,5 +584,23 @@ class _AllOrdersReportScreen extends State<AllOrdersReportScreen> {
                 ],
               ))),
     );
+  }
+
+  void toggleSortOrder() {
+    setState(() {
+      sortBy = sortBy == "asc" ? "desc" : "asc";
+    });
+    print("Sort order toggled to: $sortBy");
+  }
+
+  void sortTable(BuildContext ctx) {
+    toggleSortOrder();
+    ctx.read<ReportBloc>().add(GetAllOrderReportEvent(
+        exportType: "",
+        page: "",
+        createFilter: dropdownValuesMap[currentType] ?? "",
+        sortBy: sortBy,
+        fieldName: fieldName,
+        table: table));
   }
 }

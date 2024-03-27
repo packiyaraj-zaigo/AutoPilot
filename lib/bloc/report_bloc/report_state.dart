@@ -186,3 +186,40 @@ class GetEndOfDayReportErrorState extends ReportState {
 
   GetEndOfDayReportErrorState({required this.errorMessage});
 }
+
+class GetProfitablityReportState extends ReportState {
+  final ProfitablityReportModel profitablityReportModel;
+  GetProfitablityReportState({required this.profitablityReportModel});
+}
+
+class GetProfitablityReportErrorState extends ReportState {
+  final String errorMessage;
+  GetProfitablityReportErrorState({required this.errorMessage});
+}
+
+class GetServiceWriterState extends ReportState {
+  final ServiceWriterModel serviceWriterModel;
+
+  GetServiceWriterState({required this.serviceWriterModel});
+
+  @override
+  List<Object> get props => [serviceWriterModel];
+}
+
+class GetServiceWriterErrorState extends ReportState {
+  final String errorMessage;
+  GetServiceWriterErrorState({required this.errorMessage});
+}
+
+class GetCustomerSummaryReportState extends ReportState {
+  final CustomerSummaryReportModel customerSummaryReportModel;
+  GetCustomerSummaryReportState({required this.customerSummaryReportModel});
+
+  @override
+  List<Object> get props => [customerSummaryReportModel];
+}
+
+class GetCustomerSummaryReportErrorState extends ReportState {
+  final String errorMessage;
+  GetCustomerSummaryReportErrorState({required this.errorMessage});
+}

@@ -29,7 +29,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
   String? currentTimeIn;
   int _rowsPerPage = 5;
   TimeLogReportModel? timeLogReportModel;
-  String sortBy = "asc";
+  String sortBy = "desc";
   String? tableName;
   String? fieldName;
 
@@ -99,6 +99,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                 monthFilter: "",
                 techFilter: "",
                 searchQuery: "",
+                page: "",
                 currentPage: 1,
                 exportType: ""));
 
@@ -120,7 +121,11 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -293,6 +298,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                     techFilter: technicianId,
                     searchQuery: "",
                     currentPage: 1,
+                    page: "",
                     exportType: "excel"));
               },
               style: ElevatedButton.styleFrom(
@@ -301,7 +307,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(
@@ -368,6 +374,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                 techFilter: technicianId,
                                 searchQuery: "",
                                 currentPage: 1,
+                                page: "",
                                 exportType: ""));
 
                           setState(() {
@@ -397,6 +404,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                         techFilter: technicianId,
                         searchQuery: "",
                         currentPage: 1,
+                        page: "",
                         exportType: ""));
                 },
                 items: monthOptions
@@ -482,6 +490,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                                         ?.toLowerCase() ??
                                                     "",
                                     techFilter: "",
+                                    page: "",
                                     searchQuery: "",
                                     currentPage: 1,
                                     exportType: ""));
@@ -778,6 +787,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                           monthFilter: "",
                                           techFilter: technicianId,
                                           searchQuery: "",
+                                          page: "prev",
                                           currentPage: 1,
                                           exportType: ""));
                                 }
@@ -800,6 +810,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                           monthFilter: "",
                                           techFilter: technicianId,
                                           searchQuery: "",
+                                          page: "next",
                                           currentPage: 1,
                                           exportType: ""));
                                 }
@@ -883,6 +894,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
           techFilter: technicianId,
           searchQuery: "",
           currentPage: 1,
+          page: "",
           exportType: "",
           sortBy: sortBy,
           fieldName: fieldName,
@@ -962,6 +974,7 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                                             monthFilter: "",
                                             techFilter: technicianId,
                                             searchQuery: "",
+                                            page: "",
                                             currentPage: 1,
                                             exportType: ""));
 

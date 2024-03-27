@@ -100,6 +100,7 @@ class _ServicesByTechnicianReportScreen
           } else if (state is InternetConnectionSuccessState) {
             context.read<ReportBloc>().add(GetServiceByTechnicianReportEvent(
                 startDate: "",
+                page: "",
                 endDate: "",
                 searchQuery: "",
                 techFilter: "",
@@ -125,7 +126,11 @@ class _ServicesByTechnicianReportScreen
           builder: (context, state) {
             return Scaffold(
               key: scaffoldKey,
-              bottomNavigationBar: exportButtonWidget(context),
+              bottomNavigationBar: state is ReportLoadingState
+                  ? const SizedBox()
+                  : reportList.isEmpty
+                      ? const SizedBox()
+                      : exportButtonWidget(context),
               drawer: showDrawer(context),
               appBar: AppBar(
                   leading: IconButton(
@@ -279,6 +284,7 @@ class _ServicesByTechnicianReportScreen
                     endDate: endDateToServer,
                     searchQuery: "",
                     techFilter: technicianId,
+                    page: "",
                     currentPage: 1,
                     pagination: "",
                     exportType: "excel"));
@@ -289,7 +295,7 @@ class _ServicesByTechnicianReportScreen
                   minimumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   maximumSize: Size(MediaQuery.of(ctx).size.width, 56),
                   backgroundColor: Color(0xffF6F6F6),
-                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
                   textStyle:
                       TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               child: Row(
@@ -487,6 +493,7 @@ class _ServicesByTechnicianReportScreen
                                                         endDate:
                                                             endDateToServer,
                                                         searchQuery: "",
+                                                        page: "",
                                                         techFilter:
                                                             technicianId,
                                                         currentPage: 1,
@@ -525,6 +532,7 @@ class _ServicesByTechnicianReportScreen
                                             techFilter: technicianId,
                                             currentPage: 1,
                                             pagination: "",
+                                            page: "",
                                             exportType: "",
                                             sort: sortBy,
                                             fieldName: "order_number",
@@ -555,6 +563,7 @@ class _ServicesByTechnicianReportScreen
                                                   searchQuery: "",
                                                   techFilter: technicianId,
                                                   currentPage: 1,
+                                                  page: "",
                                                   pagination: "",
                                                   exportType: "",
                                                   sort: sortBy,
@@ -624,6 +633,7 @@ class _ServicesByTechnicianReportScreen
                                             startDate: startDateToServer,
                                             endDate: endDateToServer,
                                             searchQuery: "",
+                                            page: "prev",
                                             techFilter: technicianId,
                                             currentPage: 1,
                                             pagination: "prev",
@@ -651,6 +661,7 @@ class _ServicesByTechnicianReportScreen
                                             startDate: startDateToServer,
                                             endDate: endDateToServer,
                                             searchQuery: "",
+                                            page: "next",
                                             techFilter: technicianId,
                                             currentPage: 1,
                                             pagination: "next",
@@ -758,6 +769,7 @@ class _ServicesByTechnicianReportScreen
                                         startDate: "",
                                         endDate: "",
                                         searchQuery: "",
+                                        page: "",
                                         techFilter: technicianId,
                                         currentPage: 1,
                                         pagination: "",
@@ -839,6 +851,7 @@ class _ServicesByTechnicianReportScreen
                                                     endDate: endDateToServer,
                                                     searchQuery: "",
                                                     techFilter: "",
+                                                    page: "",
                                                     currentPage: 1,
                                                     pagination: "",
                                                     exportType: ""));
@@ -951,6 +964,7 @@ class _ServicesByTechnicianReportScreen
                                     endDate: endDateToServer,
                                     searchQuery: "",
                                     techFilter: "",
+                                    page: "",
                                     currentPage: 1,
                                     pagination: "",
                                     exportType: ""));
@@ -1045,6 +1059,7 @@ class _ServicesByTechnicianReportScreen
                                             searchQuery: "",
                                             startDate: "",
                                             endDate: "",
+                                            page: "",
                                             techFilter: technicianId,
                                             currentPage: 1,
                                             pagination: "",

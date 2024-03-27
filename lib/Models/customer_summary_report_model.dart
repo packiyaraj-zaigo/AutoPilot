@@ -1,32 +1,37 @@
 // To parse this JSON data, do
 //
-//     final lineItemDetailReportModel = lineItemDetailReportModelFromJson(jsonString);
+//     final customerSummaryReportModel = customerSummaryReportModelFromJson(jsonString);
 
 import 'dart:convert';
 
-LineItemDetailReportModel lineItemDetailReportModelFromJson(String str) =>
-    LineItemDetailReportModel.fromJson(json.decode(str));
+CustomerSummaryReportModel customerSummaryReportModelFromJson(String str) =>
+    CustomerSummaryReportModel.fromJson(json.decode(str));
 
-String lineItemDetailReportModelToJson(LineItemDetailReportModel data) =>
+String customerSummaryReportModelToJson(CustomerSummaryReportModel data) =>
     json.encode(data.toJson());
 
-class LineItemDetailReportModel {
+class CustomerSummaryReportModel {
   Data data;
+  List<GraphArr> graphArr;
   String message;
 
-  LineItemDetailReportModel({
+  CustomerSummaryReportModel({
     required this.data,
+    required this.graphArr,
     required this.message,
   });
 
-  factory LineItemDetailReportModel.fromJson(Map<String, dynamic> json) =>
-      LineItemDetailReportModel(
+  factory CustomerSummaryReportModel.fromJson(Map<String, dynamic> json) =>
+      CustomerSummaryReportModel(
         data: Data.fromJson(json["data"]),
+        graphArr: List<GraphArr>.from(
+            json["graphArr"].map((x) => GraphArr.fromJson(x))),
         message: json["message"],
       );
 
   Map<String, dynamic> toJson() => {
         "data": data.toJson(),
+        "graphArr": List<dynamic>.from(graphArr.map((x) => x.toJson())),
         "message": message,
       };
 }
@@ -112,58 +117,30 @@ class Paginator {
 }
 
 class Datum {
-  int orderNumber;
-  String invoicedDate;
-  String vehicle;
-  String type;
-  String itemDescription;
-  String technician;
-  String note;
-  String vendor;
-  String cost;
-  String price;
-  String quantity;
+  String firstName;
+  String lastName;
+  String totalPayments;
+  String profitablity;
 
   Datum({
-    required this.orderNumber,
-    required this.invoicedDate,
-    required this.vehicle,
-    required this.type,
-    required this.itemDescription,
-    required this.technician,
-    required this.note,
-    required this.vendor,
-    required this.cost,
-    required this.price,
-    required this.quantity,
+    required this.firstName,
+    required this.lastName,
+    required this.totalPayments,
+    required this.profitablity,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-        orderNumber: json["order_number"],
-        invoicedDate: json["invoiced_date"],
-        vehicle: json["vehicle"],
-        type: json["type"],
-        itemDescription: json["item_description"],
-        technician: json["technician"],
-        note: json["note"],
-        vendor: json["vendor"],
-        cost: json["cost"],
-        price: json["price"],
-        quantity: json["quantity"],
+        firstName: json["first_name"],
+        lastName: json["last_name"],
+        totalPayments: json["total_payments"],
+        profitablity: json["profitablity"],
       );
 
   Map<String, dynamic> toJson() => {
-        "order_number": orderNumber,
-        "invoiced_date": invoicedDate,
-        "vehicle": vehicle,
-        "type": type,
-        "item_description": itemDescription,
-        "technician": technician,
-        "note": note,
-        "vendor": vendor,
-        "cost": cost,
-        "price": price,
-        "quantity": quantity,
+        "first_name": firstName,
+        "last_name": lastName,
+        "total_payments": totalPayments,
+        "profitablity": profitablity,
       };
 }
 
@@ -188,5 +165,25 @@ class Range {
         "from": from,
         "to": to,
         "total": total,
+      };
+}
+
+class GraphArr {
+  String firstName;
+  String totalPayments;
+
+  GraphArr({
+    required this.firstName,
+    required this.totalPayments,
+  });
+
+  factory GraphArr.fromJson(Map<String, dynamic> json) => GraphArr(
+        firstName: json["first_name"],
+        totalPayments: json["total_payments"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "first_name": firstName,
+        "total_payments": totalPayments,
       };
 }
