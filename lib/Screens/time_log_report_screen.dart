@@ -298,6 +298,9 @@ class _TimeLogReportScreen extends State<TimeLogReportScreen> {
                     techFilter: technicianId,
                     searchQuery: "",
                     currentPage: 1,
+                    fieldName: fieldName,
+                    sortBy: sortBy,
+                    tableName: tableName,
                     page: "",
                     exportType: "excel"));
               },

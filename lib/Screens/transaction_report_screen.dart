@@ -518,6 +518,9 @@ class _TransactionReportScreen extends State<TransactionReportScreen> {
                   ..add(GetTransactionReportEvent(
                       page: "",
                       exportType: "excel",
+                      fieldName: fieldName,
+                      sortBy: sortBy,
+                      table: table,
                       createFilter: dropdownValuesMap[currentType] ?? ""));
               },
               style: ElevatedButton.styleFrom(

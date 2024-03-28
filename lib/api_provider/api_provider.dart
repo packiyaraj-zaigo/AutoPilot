@@ -2625,9 +2625,9 @@ class ApiProvider {
       //     "https://run.mocky.io/v3/298211eb-6a30-4993-9116-9e42c60d7142");
       var url = sortBy != null && fieldName != null && table != null
           ? Uri.parse(
-              "${BASE_URL}api/transaction?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
+              "${BASE_URL}api/transaction?page=$page&file_type=$exportType&filter=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
           : Uri.parse(
-              "${BASE_URL}api/transaction?page=$page&file_type=$exportType&type=$createFilter");
+              "${BASE_URL}api/transaction?page=$page&file_type=$exportType&filter=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2650,9 +2650,9 @@ class ApiProvider {
       //     "https://run.mocky.io/v3/09a5e963-57f9-44ef-9c4f-647845583683");
       var url = sortBy != null && table != null && fieldName != null
           ? Uri.parse(
-              "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
+              "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&filter=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
           : Uri.parse(
-              "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&type=$createFilter");
+              "${BASE_URL}api/all_orders?page=$page&file_type=$exportType&filter=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {
@@ -2679,7 +2679,7 @@ class ApiProvider {
       //         "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&type=$createFilter&sort_by=$sortBy&field_name=$fieldName&table=$table")
       //     :
       var url = Uri.parse(
-          "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&type=$createFilter");
+          "${BASE_URL}api/line_item_detail?page=$page&file_type=$exportType&filter=$createFilter");
       final response = http.get(url, headers: getHeader(token));
       return response;
     } catch (e) {

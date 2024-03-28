@@ -731,6 +731,9 @@ class _ProfitabilityReportScreen extends State<ProfitabilityReportScreen> {
                       fromDate: startDateToServer,
                       toDate: endDateToServer,
                       serviceId: serviceId,
+                      fieldName: fieldName,
+                      sortBy: sortBy,
+                      table: table,
                       page: "",
                       exportType: "excel"));
               },
