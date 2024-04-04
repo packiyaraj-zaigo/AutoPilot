@@ -1163,7 +1163,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                       label.contains('Labor Rate') ||
                       label == "Hours" ||
                       label == 'Price ' ||
-                      label == "Quantity"
+                      label == "Quantity " || label=="Quantity"
                   ? 7
                   : label == "Service Name" ||
                           label == "Notes" ||
@@ -4363,7 +4363,7 @@ class _AddOrderServiceScreenState extends State<AddOrderServiceScreen> {
                                               padding:
                                                   const EdgeInsets.all(12.0),
                                               child: Text(
-                                                technicianData[index].firstName,
+                                                "${technicianData[index].firstName} ${technicianData[index].lastName}",
                                                 style: const TextStyle(
                                                     fontSize: 18,
                                                     fontWeight:

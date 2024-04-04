@@ -3945,7 +3945,7 @@ class _EditOrderServiceScreenState extends State<EditOrderServiceScreen> {
                                               padding:
                                                   const EdgeInsets.all(12.0),
                                               child: Text(
-                                                technicianData[index].firstName,
+                                                "${technicianData[index].firstName} ${technicianData[index].lastName}",
                                                 style: const TextStyle(
                                                     fontSize: 18,
                                                     fontWeight:
